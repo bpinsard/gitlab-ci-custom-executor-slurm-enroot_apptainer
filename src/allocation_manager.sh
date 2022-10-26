@@ -2,7 +2,6 @@
 
 
 function start_allocation_manager () {
-
     ALLOCATION_MANAGER_MAX_RUNTIME=$1
     ALLOCATION_MANAGER_WORKSPACE=$2
     for SUBDIR in todo done
@@ -14,8 +13,7 @@ function start_allocation_manager () {
 
     allocation_manager "${ALLOCATION_MANAGER_MAX_RUNTIME}" > /dev/null &
     ALLOCATION_MANAGER_JOBID=$!
-
-
+    declare -p ${!ALLOCATION_MANAGER*} > "${ALLOCATION_MANAGER_WORKSPACE}"/.env
 }
 
 function stop_allocation_manager () {
@@ -23,12 +21,11 @@ function stop_allocation_manager () {
 }
 
 function allocation_manager () {
-
-    ALLOCATION_MANAGER_START_TIME=$(_current_time)
-    ALLOCATION_MANAGER_END_TIME=$((ALLOCATION_MANAGER_START_TIME + ALLOCATION_MANAGER_MAX_RUNTIME))
+    local START_TIME=$(_current_time)
+    local END_TIME=$((START_TIME + ALLOCATION_MANAGER_MAX_RUNTIME))
     local TODO="${ALLOCATION_MANAGER_WORKSPACE}"/todo
     local DONE="${ALLOCATION_MANAGER_WORKSPACE}"/done
-    while [[ $(_current_time) -lt $ALLOCATION_MANAGER_END_TIME ]]
+    while [[ $(_current_time) -lt $END_TIME ]]
     do
         for JOB in $(ls $TODO )
         do
@@ -39,7 +36,6 @@ function allocation_manager () {
         done
         sleep 1 # TODO: lengthen interval
     done
-
 }
 
 function _current_time(){
@@ -51,8 +47,6 @@ function submit_to_allocation_manager() {
     cp $JOBSCRIPT "${ALLOCATION_MANAGER_WORKSPACE}"/todo
 
     _log "Submitted $TODO/$JOB to allocation manager"
-
-
 }
 
 function cleanup_allocation_manager_workspace() {
@@ -61,7 +55,5 @@ function cleanup_allocation_manager_workspace() {
 }
 
 function _log() {
-
     echo $(date) $@ >> ${ALLOCATION_MANAGER_LOGFILE}
-
 }

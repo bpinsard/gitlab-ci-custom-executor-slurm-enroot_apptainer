@@ -14,7 +14,7 @@ teardown(){
 }
 
 @test "allocation manager starts and is alive" {
-    start_allocation_manager 2 "${WORKDIR}"
+    (start_allocation_manager 2 "${WORKDIR}")
     sleep 1
     job_is_alive=$(jobs -r | wc -l)
     assert_equal $job_is_alive 1
@@ -68,5 +68,13 @@ teardown(){
     start_allocation_manager 1 $WORKDIR
 
     assert [ -f "${LOGFILE}" ]
+
+}
+
+@test "start_allocation_manager creates env file" {
+
+    start_allocation_manager 1 $WORKDIR
+    assert [ -f $WORKDIR/.env ]
+    assert_equal $(cat $WORKDIR/.env | wc -l) 4
 
 }
