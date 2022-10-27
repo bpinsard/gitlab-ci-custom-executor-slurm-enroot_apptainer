@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 
-
 function start_allocation_manager () {
     ALLOCATION_MANAGER_MAX_RUNTIME=$1
     ALLOCATION_MANAGER_WORKSPACE=$2
-    for SUBDIR in todo done
-    do
-        mkdir -p "${ALLOCATION_MANAGER_WORKSPACE}"/$SUBDIR
-    done
+    _create_directories
     ALLOCATION_MANAGER_LOGFILE="${ALLOCATION_MANAGER_WORKSPACE}"/log.txt
     touch "${ALLOCATION_MANAGER_LOGFILE}"
 
@@ -16,8 +12,28 @@ function start_allocation_manager () {
     declare -p ${!ALLOCATION_MANAGER*} > "${ALLOCATION_MANAGER_WORKSPACE}"/.env
 }
 
+function _create_directories(){
+    for SUBDIR in todo done
+    do
+        mkdir -p "${ALLOCATION_MANAGER_WORKSPACE}"/$SUBDIR
+    done
+}
+
+function allocation_manager_is_alive () {
+    ps --pid $ALLOCATION_MANAGER_JOBID > /dev/null
+}
+
 function stop_allocation_manager () {
     kill $ALLOCATION_MANAGER_JOBID
+    while allocation_manager_is_alive
+    do
+    sleep 1
+    done
+}
+
+function cleanup_allocation_manager_workspace() {
+    rm -r "${ALLOCATION_MANAGER_WORKSPACE}"
+    stop_allocation_manager
 }
 
 function allocation_manager () {
@@ -47,11 +63,6 @@ function submit_to_allocation_manager() {
     cp $JOBSCRIPT "${ALLOCATION_MANAGER_WORKSPACE}"/todo
 
     _log "Submitted $TODO/$JOB to allocation manager"
-}
-
-function cleanup_allocation_manager_workspace() {
-    rm -r "${ALLOCATION_MANAGER_WORKSPACE}"
-    stop_allocation_manager
 }
 
 function _log() {

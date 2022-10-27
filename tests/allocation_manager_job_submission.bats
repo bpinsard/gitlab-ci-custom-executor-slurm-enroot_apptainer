@@ -12,7 +12,8 @@ teardown(){
 }
 
 @test "submitted jobs to allocation manager get executed" {
-    start_allocation_manager 5 $WORKDIR
+    (start_allocation_manager 5 $WORKDIR)
+    source $WORKDIR/.env
     cat << EOF > job.sh
 touch $TEST_PLAYGROUND/test-job-results.txt
 
@@ -27,7 +28,8 @@ EOF
 
 
 @test "submitted jobs to allocation manager get executed ONCE" {
-    start_allocation_manager 5 $WORKDIR
+    (start_allocation_manager 5 $WORKDIR)
+    source $WORKDIR/.env
     cat << EOF > job.sh
 echo "A new line" >> $TEST_PLAYGROUND/test-job-results.txt
 
@@ -45,13 +47,14 @@ EOF
 
 @test "job starts is recorded in logfile" {
 
-    start_allocation_manager 3 $WORKDIR
+    (start_allocation_manager 3 $WORKDIR)
+    source $WORKDIR/.env
     LOGFILE=$WORKDIR/log.txt
 
     touch job-123.sh
     chmod +x job-123.sh
-
     submit_to_allocation_manager job-123.sh
+    rm job-123.sh
     sleep 2
     run cat $LOGFILE
     assert_output --regexp "Processing.*job-123.sh"
@@ -60,13 +63,16 @@ EOF
 
 @test "job submission is recorded in logfile" {
 
-    start_allocation_manager 3 $WORKDIR
+    (start_allocation_manager 3 $WORKDIR)
+    source $WORKDIR/.env
     LOGFILE=$WORKDIR/log.txt
 
     touch job-123.sh
     chmod +x job-123.sh
 
+
     submit_to_allocation_manager job-123.sh
+    rm job-123.sh
     sleep 2
     run  cat $LOGFILE
     assert_output --regexp "Submitted.*job-123.sh"
@@ -75,13 +81,15 @@ EOF
 
 @test "job termination is recorded in logfile" {
 
-    start_allocation_manager 3 $WORKDIR
+    (start_allocation_manager 3 $WORKDIR)
+    source $WORKDIR/.env
     LOGFILE=$WORKDIR/log.txt
 
     touch job-123.sh
     chmod +x job-123.sh
 
     submit_to_allocation_manager job-123.sh
+    rm job-123.sh
     sleep 2
     run  cat $LOGFILE
     assert_output --partial "job-123.sh has ended"
