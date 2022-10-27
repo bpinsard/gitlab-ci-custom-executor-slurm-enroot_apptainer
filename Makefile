@@ -1,10 +1,13 @@
 
 
 test:
-	./tests/bats/bin/bats tests/
+	./tests/bats/bin/bats tests/*
 
 test-jobsub:
-	./tests/bats/bin/bats tests/allocation_manager_job_submission.bats
+	./tests/bats/bin/bats tests/allocation_manager/job_submission.bats
 
 test-lifetime:
-	./tests/bats/bin/bats tests/allocation_manager_lifetime.bats
+	./tests/bats/bin/bats tests/allocation_manager/lifetime.bats
+
+shellcheck:
+	shellcheck ./src/*

@@ -4,9 +4,9 @@
 # https://bats-core.readthedocs.io/en/stable/tutorial.html
 
 function _common_setup() {
-    load 'test_helper/bats-support/load' # for run
-    load 'test_helper/bats-assert/load' # for assert_output and refute_output
-    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/.." > /dev/null 2>&1 && pwd)"
+    load '../test_helper/bats-support/load' # for run
+    load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
     # and loading
@@ -19,7 +19,6 @@ function _common_setup() {
 
 function _common_teardown() {
     rm -r $TEST_PLAYGROUND
-
 }
 
 function _no_allocation_manager_variables_declared() {

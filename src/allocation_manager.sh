@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 function start_allocation_manager () {
+    declare -i ALLOCATION_MANAGER_MAX_RUNTIME ALLOCATION_MANAGER_CYCLETIME
     ALLOCATION_MANAGER_MAX_RUNTIME=$1
     ALLOCATION_MANAGER_CYCLETIME=$2
     ALLOCATION_MANAGER_WORKSPACE=$3
@@ -15,7 +16,7 @@ function start_allocation_manager () {
 
 function submit_to_allocation_manager() {
     local JOBSCRIPT=$1
-    cp $JOBSCRIPT "${ALLOCATION_MANAGER_WORKSPACE}"/todo
+    cp "$JOBSCRIPT" "${ALLOCATION_MANAGER_WORKSPACE}"/TODO
 
     _log "Submitted $TODO/$JOB to allocation manager"
 }
@@ -38,25 +39,28 @@ function cleanup_allocation_manager_workspace() {
 }
 
 function _allocation_manager () {
-    local START_TIME=$(_current_time)
+    local START_TIME
+    START_TIME=$(_current_time)
     local END_TIME=$((START_TIME + ALLOCATION_MANAGER_MAX_RUNTIME))
-    local TODO="${ALLOCATION_MANAGER_WORKSPACE}"/todo
-    local DONE="${ALLOCATION_MANAGER_WORKSPACE}"/done
+    local TODO="${ALLOCATION_MANAGER_WORKSPACE}"/TODO
+    local DONE="${ALLOCATION_MANAGER_WORKSPACE}"/DONE
+    shopt -s nullglob
     while [[ $(_current_time) -lt $END_TIME ]]
     do
-        for JOB in $(ls $TODO )
+        for JOB in "$TODO"/*
         do
-            _log "Processing $TODO/$JOB ..."
-            $TODO/$JOB
-            mv $TODO/$JOB $DONE
-            _log "$TODO/$JOB has ended"
+            _log "Processing $JOB ..."
+            "$JOB"
+            mv "$JOB" "$DONE"
+            _log "$JOB" "has ended"
         done
-        sleep $ALLOCATION_MANAGER_CYCLETIME
+        sleep "$ALLOCATION_MANAGER_CYCLETIME"
     done
+    shopt -u nullglob
 }
 
 function _create_directories(){
-    for SUBDIR in todo done
+    for SUBDIR in TODO DONE
     do
         mkdir -p "${ALLOCATION_MANAGER_WORKSPACE}"/$SUBDIR
     done
@@ -68,5 +72,5 @@ function _current_time(){
 }
 
 function _log() {
-    echo $(date) $@ >> ${ALLOCATION_MANAGER_LOGFILE}
+    echo "$(date)" "$@" >> "${ALLOCATION_MANAGER_LOGFILE}"
 }

@@ -15,10 +15,10 @@ to clarify some aspects of that.
   - using enroot or --container 
   - managing correctly mount options
 - start the allocation manager in the config phase 
-- allocation manager should die when set
+- DONE allocation manager should die when set 
 - allocation manager should die gracefully 
-- allocation manager should pick up jobs and execute them
-- submitting jobs to the allocation manager 
+- DONE allocation manager should pick up jobs and execute them
+- DONE submitting jobs to the allocation manager 
 
 The allocation already comprises a container if needed.
 
@@ -27,6 +27,13 @@ Preparation of the slurm allocation was done here,
 and the information on how to reach it 
 were saved in a json that contains an environment section,
 so that in subsequent steps it is available through environment variables.
+
+Here we need to create the slurm allocation
+with the right parameters
+start the "allocation manager" here, 
+make the "allocation manager" reachable.
+
+
 
 ### prepare.sh
 Preparation of the image/container is done here 
