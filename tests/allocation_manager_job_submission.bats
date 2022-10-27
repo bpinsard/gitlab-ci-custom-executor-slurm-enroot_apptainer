@@ -12,7 +12,7 @@ teardown(){
 }
 
 @test "submitted jobs to allocation manager get executed" {
-    (start_allocation_manager 5 $WORKDIR)
+    (start_allocation_manager 5 1 $WORKDIR)
     source $WORKDIR/.env
     cat << EOF > job.sh
 touch $TEST_PLAYGROUND/test-job-results.txt
@@ -28,7 +28,7 @@ EOF
 
 
 @test "submitted jobs to allocation manager get executed ONCE" {
-    (start_allocation_manager 5 $WORKDIR)
+    (start_allocation_manager 5 1 $WORKDIR)
     source $WORKDIR/.env
     cat << EOF > job.sh
 echo "A new line" >> $TEST_PLAYGROUND/test-job-results.txt
@@ -47,7 +47,7 @@ EOF
 
 @test "job starts is recorded in logfile" {
 
-    (start_allocation_manager 3 $WORKDIR)
+    (start_allocation_manager 3 1 $WORKDIR)
     source $WORKDIR/.env
     LOGFILE=$WORKDIR/log.txt
 
@@ -63,16 +63,16 @@ EOF
 
 @test "job submission is recorded in logfile" {
 
-    (start_allocation_manager 3 $WORKDIR)
+    (start_allocation_manager 3 1 $WORKDIR)
     source $WORKDIR/.env
     LOGFILE=$WORKDIR/log.txt
 
     touch job-123.sh
     chmod +x job-123.sh
 
-
     submit_to_allocation_manager job-123.sh
     rm job-123.sh
+
     sleep 2
     run  cat $LOGFILE
     assert_output --regexp "Submitted.*job-123.sh"
@@ -81,7 +81,7 @@ EOF
 
 @test "job termination is recorded in logfile" {
 
-    (start_allocation_manager 3 $WORKDIR)
+    (start_allocation_manager 3 1 $WORKDIR)
     source $WORKDIR/.env
     LOGFILE=$WORKDIR/log.txt
 
@@ -93,5 +93,32 @@ EOF
     sleep 2
     run  cat $LOGFILE
     assert_output --partial "job-123.sh has ended"
+
+}
+
+@test "allocation_manager cycles at the given interval" {
+
+    (start_allocation_manager 10 5 $WORKDIR)
+    source $WORKDIR/.env
+
+    LOGFILE=$WORKDIR/log.txt
+
+    touch job-1.sh
+    chmod +x job-1.sh
+    sleep 1
+    # We should miss the first iteration
+    submit_to_allocation_manager job-1.sh
+    rm job-1.sh
+    sleep 2
+
+    run cat $LOGFILE
+    refute_output --regexp "Processing.*job-1.sh"
+
+    sleep 3
+    # but now it should have been processed.
+    cat $LOGFILE
+    run cat $LOGFILE
+    assert_output --regexp "Processing.*job-1.sh"
+
 
 }

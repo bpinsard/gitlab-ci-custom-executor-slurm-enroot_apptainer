@@ -23,7 +23,7 @@ function _common_teardown() {
 }
 
 function _no_allocation_manager_variables_declared() {
-    local ndeclared=$(env | grep -E '^ALLOCATION_MANAGER' | wc -l )
-    #local ndeclared=$( echo "${!ALLOCATION_MANAGER*}" | wc -w )
+    #local ndeclared=$(env | grep -E '^ALLOCATION_MANAGER' | wc -l )
+    local ndeclared=$( echo "${!ALLOCATION_MANAGER*}" | wc -w )
     [ $ndeclared -eq 0 ]
 }
