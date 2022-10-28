@@ -11,17 +11,16 @@ function setup() {
     TEST_PLAYGROUND=$(mktemp -d alloc-manager-testXXXXXXX)
     echo "Created test playground at $TEST_PLAYGROUND"
 
-    assert _on_horeka
 }
 
 function _on_horeka () {
-    run hostname
-    assert_output --regexp "hkn[0-9]{4}.localdomain"
+    hostname | grep -E "hkn[0-9]{4}.localdomain"
 }
 
 
 @test "srun --container-image runs in a container (with the right mount options)" {
     # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/
+    _on_horeka || skip
     GET_DISTRONAME=(grep PRETTY /etc/os-release)
     run "${GET_DISTRONAME[@]}"
     refute_output --partial "Alpine Linux"

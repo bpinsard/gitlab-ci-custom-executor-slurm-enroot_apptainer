@@ -53,7 +53,7 @@ function _allocation_manager () {
         for JOB in "$TODO"/*
         do
             _log "Processing $JOB ..."
-            "$JOB" &> "$OUTPUT"/$(basename "$JOB").out
+            "$JOB" &> "$OUTPUT"/"$(basename "$JOB")".out
             mv "$JOB" "$DONE"
             _log "$JOB" "has ended"
         done
