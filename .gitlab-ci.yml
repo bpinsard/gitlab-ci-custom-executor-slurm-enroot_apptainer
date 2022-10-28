@@ -1,0 +1,23 @@
+
+stages:          # List of stages for jobs, and their order of execution
+  - test
+
+
+unit-test-job:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test
+  script:
+    - make test
+  tags:
+    - shell
+
+lint-test-job:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test
+  script:
+    - source ./tests/install_shellcheck.sh
+    - make shellcheck
+  tags:
+    - shell

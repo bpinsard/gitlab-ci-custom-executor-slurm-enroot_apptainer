@@ -6,18 +6,21 @@ and from Holger Obermeier's Slurm and enroot custom executor.
 
 ## Tests
 
-T o run all the tests, 
-install all submodules 
+To run all the tests, 
+install all submodules with
+```
+git submodule update --init
+```
+(you can find alternatives [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules))
 and then use the command
-
 ``` bash
 make test
 ```
 
 ### Unit tests
 
-Unit tests require the [bats framework](https://github.com/bats-core).
-
+Unit tests require the [bats framework](https://github.com/bats-core)
+installed as a collection of submodules.
 
 ### Integration tests
 
