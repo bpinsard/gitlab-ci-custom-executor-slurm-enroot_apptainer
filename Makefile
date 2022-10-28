@@ -10,4 +10,4 @@ test-lifetime:
 	./tests/bats/bin/bats tests/allocation_manager/lifetime.bats
 
 shellcheck:
-	shellcheck ./src/*
+	shellcheck ./src/* ./tests/*.sh

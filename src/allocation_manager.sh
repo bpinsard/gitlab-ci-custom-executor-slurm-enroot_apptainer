@@ -11,6 +11,8 @@ function start_allocation_manager () {
 
     _allocation_manager "${ALLOCATION_MANAGER_MAX_RUNTIME}" > /dev/null &
     ALLOCATION_MANAGER_JOBID=$!
+
+    # shellcheck disable=SC2086
     declare -p ${!ALLOCATION_MANAGER*} > "${ALLOCATION_MANAGER_WORKSPACE}"/.env
 }
 
