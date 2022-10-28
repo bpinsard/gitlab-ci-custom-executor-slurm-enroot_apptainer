@@ -138,6 +138,7 @@ EOF
 
 
     submit_to_allocation_manager job-1.sh
+    rm job-1.sh
     sleep 2
     assert [ -f $WORKDIR/OUTPUT/job-1.sh.out ]
 
