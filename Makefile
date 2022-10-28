@@ -9,5 +9,11 @@ test-jobsub:
 test-lifetime:
 	./tests/bats/bin/bats tests/allocation_manager/lifetime.bats
 
+
+test-integration:
+	./tests/bats/bin/bats tests/integration
+
+
+
 shellcheck:
-	shellcheck ./src/* ./tests/*.sh
+	shellcheck ./src/*
