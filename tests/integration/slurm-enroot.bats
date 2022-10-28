@@ -8,8 +8,6 @@ function setup() {
     # To make scripts in /src available for sourcing
     # and loading
     PATH="$PROJECT_ROOT/src:$PATH"
-    TEST_PLAYGROUND=$(mktemp -d alloc-manager-testXXXXXXX)
-    echo "Created test playground at $TEST_PLAYGROUND"
 
 }
 

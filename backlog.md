@@ -35,6 +35,11 @@ with the right parameters
 start the "allocation manager" here, 
 make the "allocation manager" reachable.
 
+- variables (which might be used to select slurm resources)
+  are presented to this script by the runner prepended with 
+  `CUSTOM_ENV`.
+  The right ones (starting with SLURM)
+  need to be renamed so that sbatch can pick them up.
 
 
 ### prepare.sh
