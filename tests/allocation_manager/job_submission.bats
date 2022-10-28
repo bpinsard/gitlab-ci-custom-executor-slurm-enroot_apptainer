@@ -122,3 +122,29 @@ EOF
 
 
 }
+
+@test "job output is stored in \$WORKSPACE/OUTPUT/<jobfilename>.out" {
+
+    (start_allocation_manager 2 1 $WORKDIR)
+    source $WORKDIR/.env
+
+    cat << EOF > job-1.sh
+echo "A new line"
+echo "A stderr line" >&2
+EOF
+
+    touch job-1.sh
+    chmod +x job-1.sh
+
+
+    submit_to_allocation_manager job-1.sh
+    sleep 2
+    assert [ -f $WORKDIR/OUTPUT/job-1.sh.out ]
+
+    run cat $WORKDIR/OUTPUT/job-1.sh.out
+    assert_output - <<EOF
+A new line
+A stderr line
+EOF
+
+}

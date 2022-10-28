@@ -46,13 +46,14 @@ function _allocation_manager () {
     local END_TIME=$((START_TIME + ALLOCATION_MANAGER_MAX_RUNTIME))
     local TODO="${ALLOCATION_MANAGER_WORKSPACE}"/TODO
     local DONE="${ALLOCATION_MANAGER_WORKSPACE}"/DONE
+    local OUTPUT="${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT
     shopt -s nullglob
     while [[ $(_current_time) -lt $END_TIME ]]
     do
         for JOB in "$TODO"/*
         do
             _log "Processing $JOB ..."
-            "$JOB"
+            "$JOB" &> "$OUTPUT"/$(basename "$JOB").out
             mv "$JOB" "$DONE"
             _log "$JOB" "has ended"
         done
@@ -62,7 +63,7 @@ function _allocation_manager () {
 }
 
 function _create_directories(){
-    for SUBDIR in TODO DONE
+    for SUBDIR in TODO DONE OUTPUT
     do
         mkdir -p "${ALLOCATION_MANAGER_WORKSPACE}"/$SUBDIR
     done

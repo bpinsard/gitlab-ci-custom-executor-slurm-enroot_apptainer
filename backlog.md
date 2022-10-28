@@ -19,6 +19,8 @@ to clarify some aspects of that.
 - allocation manager should die gracefully 
 - DONE allocation manager should pick up jobs and execute them
 - DONE submitting jobs to the allocation manager 
+- DONE the allocation manager should give back stdin and stdout
+       (in the same file for simplicity)
 
 The allocation already comprises a container if needed.
 
