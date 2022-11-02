@@ -5,7 +5,7 @@ setup(){
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     WORKDIR="${TEST_PLAYGROUND}"/amws
-    PATH="$PROJECT_ROOT/tests/mocks/bin:$PATH"
+    PATH="$PROJECT_ROOT/tests/mocks/bin:$PROJECT_ROOT/src/slurm-utils:$PATH"
     TEST_PLAYGROUND=$(mktemp -d alloc-manager-testXXXXXXX)
     echo "Created test playground at $TEST_PLAYGROUND"
     export MOCKLOGDIR=$TEST_PLAYGROUND

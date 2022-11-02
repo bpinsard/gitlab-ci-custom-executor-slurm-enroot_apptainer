@@ -122,7 +122,8 @@ then
     SLURM_STEP_KILLED_MSG_NODE_ID
   )
 else
-  # shellcheck disable SC2162
+  #shellcheck disable=SC2162
   read -a INPUT_VARIABLES <  <(get_all_env_var_names)
 fi
-echo ${INPUT_VARIABLES[@]}
+
+echo "${INPUT_VARIABLES[@]}"
