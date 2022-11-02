@@ -14,6 +14,8 @@ test-integration:
 	./tests/bats/bin/bats tests/integration
 
 
+test-mocks:
+	./tests/bats/bin/bats tests/mocks
 
 shellcheck:
 	shellcheck ./src/*
