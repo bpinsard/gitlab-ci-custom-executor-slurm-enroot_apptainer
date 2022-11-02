@@ -18,4 +18,4 @@ test-mocks:
 	./tests/bats/bin/bats tests/mocks
 
 shellcheck:
-	shellcheck ./src/*
+	shellcheck $$(find src -name '*.sh')

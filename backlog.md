@@ -40,6 +40,10 @@ make the "allocation manager" reachable.
   `CUSTOM_ENV`.
   The right ones (starting with SLURM)
   need to be renamed so that sbatch can pick them up.
+- unfortunately `sbatch` cannot take all the job parameters
+  as environment variables.
+  For this reason, we need to provide a way to pass parameters
+  to the sbatch invocation.
 
 
 ### prepare.sh
