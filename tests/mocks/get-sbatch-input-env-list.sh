@@ -14,9 +14,11 @@ function get_line_from_content() {
 }
 
 function get_relevant_lines_from_sbatch_manual() {
+    local START
+    local END
 
-    local START=$(get_line_from_content "INPUT ENVIRONMENT VARIABLES")
-    local END=$(get_line_from_content "OUTPUT ENVIRONMENT VARIABLES")
+    START=$(get_line_from_content "INPUT ENVIRONMENT VARIABLES")
+    END=$(get_line_from_content "OUTPUT ENVIRONMENT VARIABLES")
 
     man sbatch | head -n $((END-1)) | tail -n +$((START+1)) | grep -E '^\s+(SBATCH|SLURM)'
 

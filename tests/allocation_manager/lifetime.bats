@@ -5,6 +5,9 @@ setup(){
     _common_setup
     source "$PROJECT_ROOT/src/allocation_manager.sh"
     WORKDIR="${TEST_PLAYGROUND}"/amws
+    STARTDIR="${TEST_PLAYGROUND}"/start
+    mkdir -p "$STARTDIR"
+    cd "$STARTDIR"
 
 }
 

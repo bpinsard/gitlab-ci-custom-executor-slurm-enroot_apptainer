@@ -3,7 +3,10 @@ setup(){
     load 'common_setup'
     _common_setup
     source "$PROJECT_ROOT/src/allocation_manager.sh"
+    STARTDIR="${TEST_PLAYGROUND}"/start
     WORKDIR="${TEST_PLAYGROUND}"/amws
+    mkdir -p "${STARTDIR}"
+    cd "${STARTDIR}"
 
 }
 
