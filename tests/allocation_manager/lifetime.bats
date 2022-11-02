@@ -5,15 +5,10 @@ setup(){
     _common_setup
     source "$PROJECT_ROOT/src/allocation_manager.sh"
     WORKDIR="${TEST_PLAYGROUND}"/amws
-    STARTDIR="${TEST_PLAYGROUND}"/start
-    mkdir -p "$STARTDIR"
-    cd "$STARTDIR"
-
 }
 
 teardown(){
     _common_teardown
-
 }
 
 @test "allocation manager starts and is alive - same shell" {

@@ -11,14 +11,18 @@ function _common_setup() {
     # To make scripts in /src available for sourcing
     # and loading
     PATH="$PROJECT_ROOT/src:$PATH"
-    TEST_PLAYGROUND=$(mktemp -d alloc-manager-testXXXXXXX)
+    TEST_PLAYGROUND=$PWD/$(mktemp -d alloc-manager-testXXXXXXX)
     echo "Created test playground at $TEST_PLAYGROUND"
 
+    STARTDIR="${TEST_PLAYGROUND}"/start
+    mkdir -p "$STARTDIR"
+    cd "$STARTDIR"
 }
 
 
 function _common_teardown() {
     rm -r $TEST_PLAYGROUND
+
 }
 
 function _no_allocation_manager_variables_declared() {
