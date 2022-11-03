@@ -63,7 +63,15 @@ teardown(){
 
 }
 
+function _on_horeka () {
+    hostname | grep -q -E "hkn[0-9]{4}.localdomain"
+}
+
+
+
 @test "sbatch input environment variables read from docs are the expected ones" {
+
+   _on_horeka || skip
 
    source sbatch-input-variable-list.sh
    mapfile INPUT_VARIABLES_FROM_DOCS < <(_get-sbatch-input-env-list.sh)
