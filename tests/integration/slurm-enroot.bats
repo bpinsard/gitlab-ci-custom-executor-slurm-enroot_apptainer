@@ -12,7 +12,7 @@ function setup() {
 }
 
 function _on_horeka () {
-    hostname | grep -E "hkn[0-9]{4}.localdomain"
+    hostname | grep -q -E "hkn[0-9]{4}.localdomain"
 }
 
 
