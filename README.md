@@ -2,7 +2,7 @@
 
 This is a [custom executor for GitLab](https://docs.gitlab.com/runner/executors/custom.html)
 written taking inspiration from https://github.com/ginkgo-project/gitlab-hpc-ci-cb 
-and from Holger Obermeier's Slurm and enroot custom executor.
+and from Holger Obermaier's Slurm and enroot custom executor.
 
 ## Tests
 

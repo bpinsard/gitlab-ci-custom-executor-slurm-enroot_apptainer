@@ -40,7 +40,7 @@ function get_first_word() {
 
 function get_additional_spellings() {
   # To be used in a pipe
-  grep 'or SLURM' | cut -d' ' -f4
+  grep 'or SLURM' | cut -d' ' -f3
 }
 
 
@@ -60,8 +60,6 @@ get_relevant_lines_from_sbatch_manual | sanitize_whitespace | get_additional_spe
 function on_horeka () {
     hostname | grep -E "hkn[0-9]{4}.localdomain"
 }
-
-declare -a INPUT_VARIABLES
 
 if [[ ! $(on_horeka) ]]
 then
@@ -121,9 +119,8 @@ then
     SLURM_EXIT_ERROR
     SLURM_STEP_KILLED_MSG_NODE_ID
   )
+  echo "${INPUT_VARIABLES[@]}" 
 else
-  #shellcheck disable=SC2162
-  read -a INPUT_VARIABLES <  <(get_all_env_var_names)
+  get_all_env_var_names
 fi
 
-echo "${INPUT_VARIABLES[@]}"
