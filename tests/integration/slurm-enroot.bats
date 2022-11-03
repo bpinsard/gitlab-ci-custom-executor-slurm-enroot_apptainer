@@ -31,3 +31,4 @@ function _on_horeka () {
 
     assert_output --partial "Alpine Linux"
 }
+

@@ -62,3 +62,13 @@ teardown(){
     refute_output --partial "SLURM_NTASKS=5"
 
 }
+
+@test "sbatch input environment variables read from docs are the expected ones" {
+
+   source sbatch-input-variable-list.sh
+   mapfile INPUT_VARIABLES_FROM_DOCS < <(_get-sbatch-input-env-list.sh)
+   N=$(echo ${INPUT_VARIABLES[@]} ${INPUT_VARIABLES_FROM_DOCS[@]} | tr ' ' '\n' | sort | uniq -u | wc -l )
+   assert_equal "$N" 0
+
+
+}

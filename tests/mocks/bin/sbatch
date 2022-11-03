@@ -20,7 +20,12 @@ function _on_horeka () {
     hostname | grep -E "hkn[0-9]{4}.localdomain"
 }
 
-INPUT_VARIABLES=$(_get-sbatch-input-env-list.sh)
+if [[ $(_on_horeka) ]]
+then
+  mapfile INPUT_VARIABLES < <(_get-sbatch-input-env-list.sh)
+else
+  source input-variables.sh
+fi
 
 for VARIABLE in ${INPUT_VARIABLES[@]}
 do if [[ ! -z ${!VARIABLE} ]]
