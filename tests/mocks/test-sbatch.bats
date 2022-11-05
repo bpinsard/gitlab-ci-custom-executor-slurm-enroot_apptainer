@@ -6,7 +6,10 @@ setup(){
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     WORKDIR="${TEST_PLAYGROUND}"/amws
     PATH="$PROJECT_ROOT/tests/mocks/bin:$PROJECT_ROOT/src/slurm-utils:$PATH"
-    TEST_PLAYGROUND=$(mktemp -d alloc-manager-testXXXXXXX)
+    TEST_PLAYGROUND=$PWD/$(mktemp -d sbatch-mock-testXXXXXXX)
+    STARTDIR="${TEST_PLAYGROUND}"/start
+    mkdir -p "$STARTDIR"
+    cd "$STARTDIR"
     echo "Created test playground at $TEST_PLAYGROUND"
     export MOCKLOGDIR=$TEST_PLAYGROUND
 
@@ -77,6 +80,21 @@ function _on_horeka () {
    mapfile INPUT_VARIABLES_FROM_DOCS < <(_get-sbatch-input-env-list.sh)
    N=$(echo ${INPUT_VARIABLES[@]} ${INPUT_VARIABLES_FROM_DOCS[@]} | tr ' ' '\n' | sort | uniq -u | wc -l )
    assert_equal "$N" 0
+
+
+}
+
+@test "sbatch mock tries to execute the last argument" {
+    # This is not how real sbatch works,
+    # but we need to keep things simple here.
+
+    cat <<EOF > job.sh
+    touch output.sh
+EOF
+    chmod +x job.sh
+
+    sbatch some options ./job.sh
+    assert [ -f output.sh ]
 
 
 }

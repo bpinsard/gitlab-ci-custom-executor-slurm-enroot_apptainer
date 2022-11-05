@@ -10,19 +10,16 @@ on the systems we are interacting with
 to clarify some aspects of that.
 
 ## Functional
-- when a container image is required
-  - create an image calling enroot (?)
-  - using enroot or --container 
-  - managing correctly mount options
-- start the allocation manager in the config phase 
-- DONE allocation manager should die when set 
-- allocation manager should die gracefully 
-- DONE allocation manager should pick up jobs and execute them
-- DONE submitting jobs to the allocation manager 
-- DONE the allocation manager should give back stdin and stdout
-       (in the same file for simplicity)
 
-The allocation already comprises a container if needed.
+### Allocation manager
+
+- [X] allocation manager should die when set 
+- [ ] allocation manager should die gracefully 
+- [X] allocation manager should pick up jobs and execute them
+- [X] submitting jobs to the allocation manager 
+- [X] the allocation manager should give back stdin and stdout
+  (in the same file for simplicity)
+
 
 ### configure.sh
 Preparation of the slurm allocation was done here,
@@ -35,6 +32,8 @@ with the right parameters
 start the "allocation manager" here, 
 make the "allocation manager" reachable.
 
+Considerations:
+
 - variables (which might be used to select slurm resources)
   are presented to this script by the runner prepended with
   `CUSTOM_ENV`.
@@ -44,6 +43,20 @@ make the "allocation manager" reachable.
   as environment variables.
   For this reason, we need to provide a way to pass parameters
   to the sbatch invocation.
+
+Features:
+
+- [X] use `sbatch` with --container-image when a container image is required
+- [ ] manage correctly mount options when a container image is required
+  NOTE: this might need adjustments as we go along.
+  - [ ] mount the prolog stuff (from the [container docs][horeka-cont-docs])
+  - [ ] mount /scratch (from the [container docs][horeka-cont-docs])
+- [ ] start the allocation manager in the config phase 
+      The allocation already comprises a container if needed.
+- [ ] pass input variables on to sbatch
+- [ ] pass content of variable `COMMAND_OPTIONS_SBATCH` to `sbatch` invocation
+- [ ] use reasonable defaults for `sbatch` invocation 
+      when `COMMAND_OPTIONS_SBATCH`not set 
 
 
 ### prepare.sh
@@ -126,3 +139,6 @@ Preparation of the image/container is done here
 ## Ideas
 - test bootstrapping: testing the custom executor 
   on the custom executor itself?
+
+
+[horeka-cont-docs]: https://www.nhr.kit.edu/userdocs/horeka/containers/#slurm-integration

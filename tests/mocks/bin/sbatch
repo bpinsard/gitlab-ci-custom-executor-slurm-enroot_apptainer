@@ -34,3 +34,9 @@ do if [[ ! -z ${!VARIABLE} ]]
        echo $VARIABLE=${!VARIABLE} >> $SBATCH_LOG
    fi
 done
+
+# Execute last argument
+LAST_ARG_IDX=$#
+"${!LAST_ARG_IDX}" #&> /dev/null &
+
+echo "Submitted" "${!LAST_ARG_IDX}"
