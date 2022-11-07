@@ -51,9 +51,11 @@ Features:
   NOTE: this might need adjustments as we go along.
   - [X] mount the prolog stuff (from the [container docs][horeka-cont-docs])
   - [X] mount /scratch (from the [container docs][horeka-cont-docs])
+  - [ ] mount the workspace for the allocation manager 
+    (otherwise it will not be reachable)
 - [X] start the allocation manager in the config phase 
       The allocation already comprises a container if needed.
-- [ ] pass input variables on to sbatch
+- [X] pass input variables on to sbatch
 - [ ] pass content of variable `COMMAND_OPTIONS_SBATCH` to `sbatch` invocation
 - [ ] when `COMMAND_OPTIONS_SBATCH` is not defined, do lament
 - [ ] use reasonable defaults for `sbatch` invocation 

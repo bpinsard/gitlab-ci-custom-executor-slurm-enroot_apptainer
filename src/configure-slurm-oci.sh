@@ -32,17 +32,15 @@ WORKSPACE="$CUSTOM_ENV_CI_BUILDS_DIR"
 # ENV VARIABLE TRANSLATION #
 ############################
 
-
 for VAR in $("$SRC"/slurm-utils/get-sbatch-input-env-list.sh)
 do
+    export_custom_env_var_into_var_if_defined "$VAR"
 done
-
 
 ###########################
 # FINAL SBATCH INVOCATION #
 ###########################
 
-
 sbatch --container-image="$CUSTOM_ENV_CI_JOB_IMAGE" \
        --container-mounts="$MOUNTS_STRING" \
-       "$SRC"/job.slurm 5 2 "$WORKSPACE"
+       "$SRC"/job.slurm 2 1 "$WORKSPACE"

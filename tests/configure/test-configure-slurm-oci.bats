@@ -78,14 +78,39 @@ function teardown() {
 
     $SRC/configure-slurm-oci.sh
 
-    cat $MOCKLOGDIR/sbatch.log
-
     assert [ -f "$TEST_PLAYGROUND"/.env ]
     source "$TEST_PLAYGROUND"/.env
 
     assert ps -q "$ALLOCATION_MANAGER_JOBID"
 
+}
+
+@test "the right CUSTOM_ENV_* sbatch variables are visible to sbatch" {
+
+    local CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_BUILDS_DIR
+
+    export CUSTOM_ENV_SBATCH_ACCOUNT='averyimportantone'
+
+    $SRC/configure-slurm-oci.sh
 
 
+    run cat $MOCKLOGDIR/sbatch.log
+    assert_output --partial "SBATCH_ACCOUNT=averyimportantone"
+
+}
+
+@test "the WRONG CUSTOM_ENV_* sbatch variables are NOT visible to sbatch" {
+
+    local CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_BUILDS_DIR
+
+    export CUSTOM_ENV_SBATCH_ACCOUNT_WRONG='averyimportantone'
+
+    $SRC/configure-slurm-oci.sh
+
+
+    run cat $MOCKLOGDIR/sbatch.log
+    refute_output --partial "averyimportantone"
 
 }

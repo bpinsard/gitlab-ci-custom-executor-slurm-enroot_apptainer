@@ -37,3 +37,36 @@ function teardown() {
     assert_output "a:a,list:list,of:of,paths:paths"
 
 }
+
+@test "copying custom_env_* variables into variables works for defined custom_env_* variables " {
+
+    export CUSTOM_ENV_TESTVARIABLE="avalue"
+
+    export_custom_env_var_into_var_if_defined TESTVARIABLE
+
+    assert [ "$TESTVARIABLE" == "avalue" ]
+
+}
+
+@test "copying custom_env_* variables into variables does nothing for undefined custom_env_* variables " {
+
+    unset CUSTOM_ENV_TESTVARIABLE
+
+    export_custom_env_var_into_var_if_defined TESTVARIABLE
+
+    assert [ -z "$TESTVARIABLE" ]
+
+}
+
+@test "copying custom_env_* variables into variables and exporting works for defined custom_env_* variables " {
+
+    export CUSTOM_ENV_TESTVARIABLE="avalue"
+
+    export_custom_env_var_into_var_if_defined TESTVARIABLE
+
+    run env
+
+    assert_output --partial "TESTVARIABLE=avalue"
+
+
+}
