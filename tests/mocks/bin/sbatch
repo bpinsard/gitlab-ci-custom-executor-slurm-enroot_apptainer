@@ -24,7 +24,7 @@ MOCKS="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )"/../../../src > /dev/null 2>&1 && pwd)"
 if [[ $(_on_horeka) ]]
 then
-  mapfile INPUT_VARIABLES < <($SRC/get-sbatch-input-env-list.sh)
+  mapfile INPUT_VARIABLES < <($SRC/_get-sbatch-input-env-list.sh)
 else
   mapfile INPUT_VARIABLES < <($MOCKS/get-sbatch-input-env-list.sh)
 fi
