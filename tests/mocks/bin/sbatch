@@ -35,8 +35,11 @@ do if [[ ! -z ${!VARIABLE} ]]
    fi
 done
 
-# Execute last argument
-LAST_ARG_IDX=$#
-"${!LAST_ARG_IDX}" #&> /dev/null &
+# Execute first non-option argument
+while [[ "$1" =~ ^- ]]
+do
+    shift
+done
+$@
 
-echo "Submitted" "${!LAST_ARG_IDX}"
+echo "Submitted" "$@" "$!"

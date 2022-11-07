@@ -2,7 +2,9 @@
 
 function start_allocation_manager () {
     declare -i ALLOCATION_MANAGER_MAX_RUNTIME ALLOCATION_MANAGER_CYCLETIME
+    # In seconds
     ALLOCATION_MANAGER_MAX_RUNTIME=$1
+    # In seconds
     ALLOCATION_MANAGER_CYCLETIME=$2
     ALLOCATION_MANAGER_WORKSPACE=$3
     _create_directories

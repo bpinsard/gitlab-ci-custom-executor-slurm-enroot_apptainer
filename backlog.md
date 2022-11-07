@@ -49,14 +49,16 @@ Features:
 - [X] use `sbatch` with --container-image when a container image is required
 - [ ] manage correctly mount options when a container image is required
   NOTE: this might need adjustments as we go along.
-  - [ ] mount the prolog stuff (from the [container docs][horeka-cont-docs])
-  - [ ] mount /scratch (from the [container docs][horeka-cont-docs])
-- [ ] start the allocation manager in the config phase 
+  - [X] mount the prolog stuff (from the [container docs][horeka-cont-docs])
+  - [X] mount /scratch (from the [container docs][horeka-cont-docs])
+- [X] start the allocation manager in the config phase 
       The allocation already comprises a container if needed.
 - [ ] pass input variables on to sbatch
 - [ ] pass content of variable `COMMAND_OPTIONS_SBATCH` to `sbatch` invocation
 - [ ] use reasonable defaults for `sbatch` invocation 
       when `COMMAND_OPTIONS_SBATCH`not set 
+- [ ] `job_env` should contain the information needed to next steps
+ 
 
 
 ### prepare.sh

@@ -24,23 +24,23 @@ teardown(){
 
     (
     export MOCKLOGDIR=
-    refute sbatch something
+    refute sbatch --something
     )
 
 }
 
 @test "sbatch mock records logs at a given location" {
 
-    sbatch something
+    sbatch --something
     assert [ -f $MOCKLOGDIR/sbatch.log ]
 
 }
 
 @test "sbatch mock records arguments correctly" {
 
-    sbatch something like this
+    sbatch --something --like --this
     run cat $MOCKLOGDIR/sbatch.log
-    assert_output --partial "something like this"
+    assert_output --partial "--something --like --this"
 
 }
 
@@ -48,7 +48,7 @@ teardown(){
 
     (
     export SBATCH_GPUS=volta:3
-    sbatch something like this
+    sbatch --something --like --this
     )
     run cat $MOCKLOGDIR/sbatch.log
     assert_output --partial "SBATCH_GPUS=volta:3"
@@ -59,7 +59,7 @@ teardown(){
     (
     # Unfortunately this is not one of the sbatch input environment variables.
     export SLURM_NTASKS=5
-    sbatch something like this
+    sbatch --something --like --this
     )
     run cat $MOCKLOGDIR/sbatch.log
     refute_output --partial "SLURM_NTASKS=5"
@@ -84,16 +84,19 @@ function _on_horeka () {
 
 }
 
-@test "sbatch mock tries to execute the last argument" {
+@test "sbatch mock tries to execute the first non option argument" {
     # This is not how real sbatch works,
     # but we need to keep things simple here.
 
     cat <<EOF > job.sh
-    touch output.sh
+touch "\$1"
 EOF
     chmod +x job.sh
 
-    sbatch some options ./job.sh
+    sbatch --some --options ./job.sh output.sh
+    # This is not robust
+    # (failure of this does not necessarily mean
+    # failure of the test)
     assert [ -f output.sh ]
 
 

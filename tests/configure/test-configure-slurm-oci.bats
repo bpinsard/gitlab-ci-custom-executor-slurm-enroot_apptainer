@@ -70,3 +70,22 @@ function teardown() {
     assert_output --partial '/etc/slurm/task_prolog.hk:/etc/slurm/task_prolog.hk'
 
 }
+
+@test "allocation manager is started in slurm allocation" {
+
+    local CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_BUILDS_DIR
+
+    $SRC/configure-slurm-oci.sh
+
+    cat $MOCKLOGDIR/sbatch.log
+
+    assert [ -f "$TEST_PLAYGROUND"/.env ]
+    source "$TEST_PLAYGROUND"/.env
+
+    assert ps -q "$ALLOCATION_MANAGER_JOBID"
+
+
+
+
+}
