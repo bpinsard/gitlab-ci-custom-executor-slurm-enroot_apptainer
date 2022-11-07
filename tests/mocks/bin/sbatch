@@ -22,10 +22,9 @@ function _on_horeka () {
 
 if [[ $(_on_horeka) ]]
 then
-  echo "Hey, on horeka!"
   mapfile INPUT_VARIABLES < <(_get-sbatch-input-env-list.sh)
 else
-  source sbatch-input-variable-list.sh
+  mapfile INPUT_VARIABLES < <(sbatch-input-variable-list.sh)
 fi
 
 for VARIABLE in ${INPUT_VARIABLES[@]}

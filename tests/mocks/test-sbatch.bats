@@ -76,9 +76,7 @@ function _on_horeka () {
 
    _on_horeka || skip
 
-   source sbatch-input-variable-list.sh
-   mapfile INPUT_VARIABLES_FROM_DOCS < <(_get-sbatch-input-env-list.sh)
-   N=$(echo ${INPUT_VARIABLES[@]} ${INPUT_VARIABLES_FROM_DOCS[@]} | tr ' ' '\n' | sort | uniq -u | wc -l )
+   N=$(diff <(sbatch-input-variable-list.sh | sort ) <(_get-sbatch-input-env-list.sh | sort ) | wc -l)
    assert_equal "$N" 0
 
 

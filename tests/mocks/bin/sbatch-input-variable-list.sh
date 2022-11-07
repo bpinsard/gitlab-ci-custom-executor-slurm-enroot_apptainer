@@ -1,6 +1,7 @@
 #!/bin/bash
 
-INPUT_VARIABLES=(
+function _print_all_variables(){
+local INPUT_VARIABLES=(
     SBATCH_ACCOUNT
     SBATCH_ACCTG_FREQ
     SBATCH_ARRAY_INX
@@ -59,3 +60,8 @@ INPUT_VARIABLES=(
     SLURM_HINT
   )
 
+local IFS=$'\n' 
+echo "${INPUT_VARIABLES[*]}" | sort
+}
+
+_print_all_variables
