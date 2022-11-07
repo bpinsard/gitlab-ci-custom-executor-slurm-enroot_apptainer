@@ -75,8 +75,12 @@ function _on_horeka () {
 @test "sbatch input environment variables read from docs are the expected ones" {
 
    _on_horeka || skip
+   local MOCK="$PROJECT_ROOT"/tests/mocks
+   local SRC="$PROJECT_ROOT"/src
 
-   N=$(diff <(sbatch-input-variable-list.sh | sort ) <(_get-sbatch-input-env-list.sh | sort ) | wc -l)
+   N=$(diff <("$SRC"/slurm-utils/get-sbatch-input-env-list.sh | sort )  \
+            <( "$MOCK"/bin/get-sbatch-input-env-list.sh | sort )  \
+   | wc -l)
    assert_equal "$N" 0
 
 
