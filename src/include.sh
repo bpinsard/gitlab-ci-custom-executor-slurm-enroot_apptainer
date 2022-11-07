@@ -7,3 +7,4 @@ function assemble_mounts () {
     echo "${MOUNT_DIRECTIVES[*]}"
 
 }
+

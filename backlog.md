@@ -55,6 +55,7 @@ Features:
       The allocation already comprises a container if needed.
 - [ ] pass input variables on to sbatch
 - [ ] pass content of variable `COMMAND_OPTIONS_SBATCH` to `sbatch` invocation
+- [ ] when `COMMAND_OPTIONS_SBATCH` is not defined, do lament
 - [ ] use reasonable defaults for `sbatch` invocation 
       when `COMMAND_OPTIONS_SBATCH`not set 
 - [ ] `job_env` should contain the information needed to next steps
