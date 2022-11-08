@@ -31,14 +31,14 @@ teardown(){
 
 @test "sbatch mock records logs at a given location" {
 
-    sbatch --something
+    sbatch --something echo
     assert [ -f $MOCKLOGDIR/sbatch.log ]
 
 }
 
 @test "sbatch mock records arguments correctly" {
 
-    sbatch --something --like --this
+    sbatch --something --like --this echo
     run cat $MOCKLOGDIR/sbatch.log
     assert_output --partial "--something --like --this"
 
@@ -48,7 +48,7 @@ teardown(){
 
     (
     export SBATCH_GPUS=volta:3
-    sbatch --something --like --this
+    sbatch --something --like --this echo
     )
     run cat $MOCKLOGDIR/sbatch.log
     assert_output --partial "SBATCH_GPUS=volta:3"
@@ -59,7 +59,7 @@ teardown(){
     (
     # Unfortunately this is not one of the sbatch input environment variables.
     export SLURM_NTASKS=5
-    sbatch --something --like --this
+    sbatch --something --like --this echo
     )
     run cat $MOCKLOGDIR/sbatch.log
     refute_output --partial "SLURM_NTASKS=5"

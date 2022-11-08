@@ -5,7 +5,7 @@
 # - all the relevant environment variables
 
 [ ! -z $MOCKLOGDIR ] || {
-    echo "The mock needs a place to store logs"
+    echo "The mock needs a place to store logs" >&2
     exit 1
 }
 
@@ -37,10 +37,18 @@ do if [[ ! -z ${!VARIABLE} ]]
 done
 
 # Execute first non-option argument
-while [[ "$1" =~ ^- ]]
+declare -i count
+count=0
+while [[ "$1" =~ ^-  || -z $1 ]]
 do
     shift
+    if [[ $count -gt 30 ]]
+    then
+        echo "Error in sbatch mock arg list" >&2
+        exit 20
+    fi
+    count=$((count+1))
 done
+
 $@
 
-echo "Submitted" "$@" "$!"

@@ -37,10 +37,28 @@ do
     export_custom_env_var_into_var_if_defined "$VAR"
 done
 
+###########################################################
+# CHECK ON THE VALUE OF CUSTOM_ENV_COMMAND_OPTIONS_SBATCH #
+###########################################################
+
+if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
+then
+    echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
+    CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=cpu_only -n 1 -t 30"
+fi
+
+
 ###########################
 # FINAL SBATCH INVOCATION #
 ###########################
 
-sbatch --container-image="$CUSTOM_ENV_CI_JOB_IMAGE" \
+sbatch "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
+       --container-image="$CUSTOM_ENV_CI_JOB_IMAGE" \
        --container-mounts="$MOUNTS_STRING" \
        "$SRC"/job.slurm 2 1 "$WORKSPACE"
+
+
+
+cat <<EOF
+{"job_env":{}}
+EOF
