@@ -13,7 +13,8 @@ to clarify some aspects of that.
 
 ### Allocation manager
 
-- [ ] allocation manager should die gracefully when killed and print a message
+- [X] allocation manager should die gracefully when killed and print a message
+      (It takes a while to die)
 - [ ] allocation manager should die and print a message even if a job is running
 - [X] allocation manager should pick up jobs and execute them
 - [X] submitting jobs to the allocation manager 

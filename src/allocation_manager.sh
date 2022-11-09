@@ -4,6 +4,7 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
+
 function start_allocation_manager () {
     if [[ $# -gt 1 ]]
     then
@@ -40,6 +41,7 @@ function allocation_manager_is_alive () {
 }
 
 function stop_allocation_manager () {
+    # bs_log "Allocation manager stopped." # DEBUG
     kill $ALLOCATION_MANAGER_JOBID
     while allocation_manager_is_alive
     do
@@ -47,15 +49,24 @@ function stop_allocation_manager () {
     done
 }
 
+function emergency_stop () {
+    date > /tmp/diocane # DEBUG
+    _log "Stopping allocation manager..."
+    exit 0
+}
+
+
 function cleanup_allocation_manager_workspace() {
     stop_allocation_manager
     rm -r "${ALLOCATION_MANAGER_WORKSPACE}"
 }
 
 function _allocation_manager () {
+    _log "Starting allocation manager."
     local TODO="${ALLOCATION_MANAGER_WORKSPACE}"/TODO
     local DONE="${ALLOCATION_MANAGER_WORKSPACE}"/DONE
     local OUTPUT="${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT
+    trap emergency_stop SIGINT
     shopt -s nullglob
     while true
     do
