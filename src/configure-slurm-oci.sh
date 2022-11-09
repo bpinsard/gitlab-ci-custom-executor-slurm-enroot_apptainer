@@ -4,9 +4,11 @@
 # This script configures a slurm job
 # using the slurm OCI support
 
+set -o nounset
+set -o errexit
+set -o pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-
 
 ##########
 # MOUNTS #
@@ -41,11 +43,13 @@ done
 # CHECK ON THE VALUE OF CUSTOM_ENV_COMMAND_OPTIONS_SBATCH #
 ###########################################################
 
+set +o nounset
 if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
 then
     echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
     CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=cpu_only -n 1 -t 30"
 fi
+set -o nounset
 
 
 ###########################
@@ -57,7 +61,7 @@ sbatch "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
        --container-mounts="$MOUNTS_STRING" \
        "$SRC"/job.slurm 2 1 "$WORKSPACE"
 
-
+echo "after sbatch" >&2
 
 cat <<EOF
 {"job_env":{}}

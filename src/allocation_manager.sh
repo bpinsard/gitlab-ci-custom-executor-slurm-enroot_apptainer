@@ -1,17 +1,24 @@
 #!/usr/bin/env bash
 
+set -o nounset
+set -o errexit
+set -o pipefail
+
 function start_allocation_manager () {
-    declare -i ALLOCATION_MANAGER_MAX_RUNTIME ALLOCATION_MANAGER_CYCLETIME
+    if [[ $# -gt 1 ]]
+    then
+        echo "Too many arguments to 'start_allocation_manager', exiting" >&2
+        return 1
+    fi
+    declare -i ALLOCATION_MANAGER_CYCLETIME
     # In seconds
-    ALLOCATION_MANAGER_MAX_RUNTIME=$1
-    # In seconds
-    ALLOCATION_MANAGER_CYCLETIME=$2
-    ALLOCATION_MANAGER_WORKSPACE=$3
+    ALLOCATION_MANAGER_CYCLETIME=3 # DEBUG
+    ALLOCATION_MANAGER_WORKSPACE=$1
     _create_directories
     ALLOCATION_MANAGER_LOGFILE="${ALLOCATION_MANAGER_WORKSPACE}"/log.txt
     touch "${ALLOCATION_MANAGER_LOGFILE}"
 
-    _allocation_manager "${ALLOCATION_MANAGER_MAX_RUNTIME}" > /dev/null &
+    _allocation_manager > /dev/null &
     ALLOCATION_MANAGER_JOBID=$!
 
     # shellcheck disable=SC2086
@@ -21,6 +28,9 @@ function start_allocation_manager () {
 function submit_to_allocation_manager() {
     local JOBSCRIPT=$1
     cp "$JOBSCRIPT" "${ALLOCATION_MANAGER_WORKSPACE}"/TODO
+    local JOB TODO
+    TODO="${ALLOCATION_MANAGER_WORKSPACE}"/TODO
+    JOB="$(basename "$JOBSCRIPT")"
 
     _log "Submitted $TODO/$JOB to allocation manager"
 }
@@ -43,14 +53,11 @@ function cleanup_allocation_manager_workspace() {
 }
 
 function _allocation_manager () {
-    local START_TIME
-    START_TIME=$(_current_time)
-    local END_TIME=$((START_TIME + ALLOCATION_MANAGER_MAX_RUNTIME))
     local TODO="${ALLOCATION_MANAGER_WORKSPACE}"/TODO
     local DONE="${ALLOCATION_MANAGER_WORKSPACE}"/DONE
     local OUTPUT="${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT
     shopt -s nullglob
-    while [[ $(_current_time) -lt $END_TIME ]]
+    while true
     do
         for JOB in "$TODO"/*
         do

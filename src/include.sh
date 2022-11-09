@@ -13,9 +13,11 @@ function export_custom_env_var_into_var_if_defined() {
 
     local VAR="$1"
 
+    set +o nounset
     eval 'if [[ ! -z "$CUSTOM_ENV_'"$VAR"'" ]];
           then
             export '"$VAR"'="$CUSTOM_ENV_'"$VAR"'";
           fi; '
+    set -o nounset
 
 }

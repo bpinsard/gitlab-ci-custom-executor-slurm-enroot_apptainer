@@ -10,21 +10,22 @@ function setup() {
 
     # To make scripts in /src available for sourcing
     # and loading, and also make the sbatch mock available.
-    PATH="$PROJECT_ROOT/src:$PATH"
-    source include.sh
+    SRC="$PROJECT_ROOT/src"
+    # shellcheck disable=SC1091
+    source "$SRC"/include.sh
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d configure-testXXXXXXX)
-    export MOCKLOGDIR=$TEST_PLAYGROUND
+    export MOCKLOGDIR="$TEST_PLAYGROUND"
     echo "Created test playground at $TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
-    cd "$STARTDIR"
+    cd "$STARTDIR" || exit
 }
 
 
 function teardown() {
-    rm -r $TEST_PLAYGROUND
+    rm -r "$TEST_PLAYGROUND"
 
 }
 
@@ -40,6 +41,7 @@ function teardown() {
 
 @test "copying custom_env_* variables into variables works for defined custom_env_* variables " {
 
+    # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_TESTVARIABLE="avalue"
 
     export_custom_env_var_into_var_if_defined TESTVARIABLE
@@ -54,12 +56,15 @@ function teardown() {
 
     export_custom_env_var_into_var_if_defined TESTVARIABLE
 
+    set +o nounset
     assert [ -z "$TESTVARIABLE" ]
+    set -o nounset
 
 }
 
 @test "copying custom_env_* variables into variables and exporting works for defined custom_env_* variables " {
 
+    # shellcheck disable=SC2031
     export CUSTOM_ENV_TESTVARIABLE="avalue"
 
     export_custom_env_var_into_var_if_defined TESTVARIABLE

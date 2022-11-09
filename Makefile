@@ -23,4 +23,4 @@ test-mocks:
 	./tests/bats/bin/bats tests/mocks
 
 shellcheck:
-	shellcheck $$(find src -name '*.sh')
+	shellcheck $$(find src -name '*.sh') $$(find tests -name '*.bats' -not -path 'tests/bats/*' -not -path 'tests/test_helper/*')

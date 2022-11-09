@@ -4,12 +4,11 @@ setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
-    WORKDIR="${TEST_PLAYGROUND}"/amws
     PATH="$PROJECT_ROOT/tests/mocks/bin:$PROJECT_ROOT/src/slurm-utils:$PATH"
     TEST_PLAYGROUND=$PWD/$(mktemp -d sbatch-mock-testXXXXXXX)
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
-    cd "$STARTDIR"
+    cd "$STARTDIR" || exit
     echo "Created test playground at $TEST_PLAYGROUND"
     export MOCKLOGDIR=$TEST_PLAYGROUND
 
@@ -17,12 +16,13 @@ setup(){
 }
 
 teardown(){
-    rm -r $TEST_PLAYGROUND
+    rm -r "$TEST_PLAYGROUND"
 }
 
 @test "sbatch mock complains if no log location is given" {
 
     (
+    # shellcheck disable=SC2030
     export MOCKLOGDIR=
     refute sbatch --something
     )
@@ -32,14 +32,16 @@ teardown(){
 @test "sbatch mock records logs at a given location" {
 
     sbatch --something echo
-    assert [ -f $MOCKLOGDIR/sbatch.log ]
+    # shellcheck disable=SC2031
+    assert [ -f "$MOCKLOGDIR"/sbatch.log ]
 
 }
 
 @test "sbatch mock records arguments correctly" {
 
     sbatch --something --like --this echo
-    run cat $MOCKLOGDIR/sbatch.log
+    # shellcheck disable=SC2031
+    run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "--something --like --this"
 
 }
@@ -50,7 +52,8 @@ teardown(){
     export SBATCH_GPUS=volta:3
     sbatch --something --like --this echo
     )
-    run cat $MOCKLOGDIR/sbatch.log
+    # shellcheck disable=SC2031
+    run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "SBATCH_GPUS=volta:3"
 }
 
@@ -61,7 +64,8 @@ teardown(){
     export SLURM_NTASKS=5
     sbatch --something --like --this echo
     )
-    run cat $MOCKLOGDIR/sbatch.log
+    # shellcheck disable=SC2031
+    run cat "$MOCKLOGDIR"/sbatch.log
     refute_output --partial "SLURM_NTASKS=5"
 
 }
