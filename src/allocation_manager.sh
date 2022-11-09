@@ -48,8 +48,8 @@ function stop_allocation_manager () {
 }
 
 function cleanup_allocation_manager_workspace() {
-    rm -r "${ALLOCATION_MANAGER_WORKSPACE}"
     stop_allocation_manager
+    rm -r "${ALLOCATION_MANAGER_WORKSPACE}"
 }
 
 function _allocation_manager () {

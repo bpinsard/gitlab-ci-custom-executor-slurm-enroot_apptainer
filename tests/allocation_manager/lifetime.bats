@@ -113,11 +113,11 @@ teardown(){
 @test "start_allocation_manager creates logfile" {
 
     LOGFILE="$WORKDIR"/log.txt
-    refute [ -f "${LOGFILE}" ]
+    refute [ -f "$LOGFILE" ]
 
     (start_allocation_manager "$WORKDIR")
 
-    assert [ -f "${LOGFILE}" ]
+    assert [ -f "$LOGFILE" ]
 
 }
 
