@@ -60,7 +60,7 @@ function list_all_child_pids() {
 
 function emergency_stop () {
     _log "Stopping allocation manager..."
-    while read CHILD_PID
+    while read -r CHILD_PID
     do
         if ps --pid "$CHILD_PID" > /dev/null
         then
@@ -94,10 +94,12 @@ function _allocation_manager () {
         for JOB in "$TODO"/*
         do
             _log "Processing $JOB ..."
-            local BNAME="$(basename "$JOB")"
+            local BNAME
+            BNAME="$(basename "$JOB")"
             mv "$JOB" "$WORKING"/"$BNAME"
             (
-             trap "_log $BNAME was terminated; exit 0" SIGTERM
+             # shellcheck disable=SC2064
+             trap "_log $BNAME was terminated. ; exit 0" SIGTERM
              "$WORKING"/"$BNAME" &> "$OUTPUT"/"$BNAME".out
              mv "$WORKING"/"$BNAME" "$DONE"
              _log "$BNAME has ended"
@@ -107,7 +109,7 @@ function _allocation_manager () {
             echo "$SUBMITTEDPID" >> "$ALLOCATION_MANAGER_JOBPIDS"
         done
         shopt -u nullglob
-        for i in  $(seq "$ALLOCATION_MANAGER_CYCLETIME")
+        for _ in  $(seq "$ALLOCATION_MANAGER_CYCLETIME")
         do
             sleep 1
         done

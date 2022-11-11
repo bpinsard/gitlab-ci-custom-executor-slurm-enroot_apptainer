@@ -133,7 +133,7 @@ teardown(){
     run cat "$LOGFILE"
     refute_output  --partial "Stopping allocation manager..."
 
-    kill -s SIGINT "$ALLOCATION_MANAGER_JOBID"
+    kill -s SIGTERM "$ALLOCATION_MANAGER_JOBID"
     # killing might take a while
     while allocation_manager_is_alive
     do

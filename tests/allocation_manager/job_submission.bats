@@ -199,7 +199,7 @@ EOF
 
 @test "listing all the child pids works as expected" {
 
-    for I in {1..20}
+    for _ in {1..20}
     do
         sleep 10 &
     done
@@ -229,18 +229,19 @@ EOF
 @test "allocation manager saves the pids of the jobs in a file" {
 
     (start_allocation_manager "$WORKDIR")
+    # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
-    assert_equal 0 $( wc -l < "$ALLOCATION_MANAGER_JOBPIDS" )
+    assert_equal 0 "$( wc -l < "$ALLOCATION_MANAGER_JOBPIDS" )"
     touch job.sh
     chmod +x job.sh
 
     submit_to_allocation_manager job.sh
     sleep $ALLOCATION_MANAGER_CYCLETIME 1
-    assert_equal 1 $( wc -l < "$ALLOCATION_MANAGER_JOBPIDS" )
+    assert_equal 1 "$( wc -l < "$ALLOCATION_MANAGER_JOBPIDS" )"
     submit_to_allocation_manager job.sh
     sleep $ALLOCATION_MANAGER_CYCLETIME 1
-    assert_equal 2 $( wc -l < "$ALLOCATION_MANAGER_JOBPIDS" )
+    assert_equal 2 "$( wc -l < "$ALLOCATION_MANAGER_JOBPIDS" )"
 
 
 
@@ -277,7 +278,7 @@ EOF
     done
 
     # killing subprocesses might take a while
-    while read CHILD_PID
+    while read -r CHILD_PID
     do
         while ps --pid "$CHILD_PID" > /dev/null
         do
