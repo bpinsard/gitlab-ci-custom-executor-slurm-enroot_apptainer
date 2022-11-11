@@ -30,9 +30,9 @@ teardown(){
 
     (start_allocation_manager "$WORKDIR")
     assert [ -f "$WORKDIR"/.env ]
-    # There are 4 variables that need to be declared
+    # There are 5 variables that need to be declared
     # (this might need to be updated)
-    assert_equal "$(wc -l < "$WORKDIR"/.env)" 4
+    assert_equal "$(wc -l < "$WORKDIR"/.env)" 5
 
 }
 

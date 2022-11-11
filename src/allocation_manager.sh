@@ -16,8 +16,10 @@ function start_allocation_manager () {
     ALLOCATION_MANAGER_CYCLETIME=3 # DEBUG
     ALLOCATION_MANAGER_WORKSPACE=$1
     _create_directories
-    ALLOCATION_MANAGER_LOGFILE="${ALLOCATION_MANAGER_WORKSPACE}"/log.txt
-    touch "${ALLOCATION_MANAGER_LOGFILE}"
+    ALLOCATION_MANAGER_LOGFILE="$ALLOCATION_MANAGER_WORKSPACE"/log.txt
+    ALLOCATION_MANAGER_JOBPIDS="$ALLOCATION_MANAGER_WORKSPACE"/pids.txt
+    touch "$ALLOCATION_MANAGER_LOGFILE"
+    touch "$ALLOCATION_MANAGER_JOBPIDS"
 
     _allocation_manager > /dev/null &
     ALLOCATION_MANAGER_JOBID=$!
@@ -41,7 +43,6 @@ function allocation_manager_is_alive () {
 }
 
 function stop_allocation_manager () {
-    # bs_log "Allocation manager stopped." # DEBUG
     kill $ALLOCATION_MANAGER_JOBID
     while allocation_manager_is_alive
     do
@@ -49,9 +50,27 @@ function stop_allocation_manager () {
     done
 }
 
+
+function list_all_child_pids() {
+    # Note: this function should not be called in a subshell
+    # or in a pipe
+    # or 'jobs -p' would just return no jobs.
+    jobs -p | sed -r 's/[+-]//;s/\s+/ /g' | cut -d' ' -f2
+}
+
 function emergency_stop () {
-    date > /tmp/diocane # DEBUG
     _log "Stopping allocation manager..."
+    while read CHILD_PID
+    do
+        if ps --pid "$CHILD_PID" > /dev/null
+        then
+            _log "Sending SIGTERM to process $CHILD_PID"
+            kill -TERM "$CHILD_PID"
+        else
+            _log "Process $CHILD_PID has already completed."
+        fi
+    done < "$ALLOCATION_MANAGER_JOBPIDS"
+    _log "Sent kill signal to all the jobs"
     exit 0
 }
 
@@ -63,27 +82,42 @@ function cleanup_allocation_manager_workspace() {
 
 function _allocation_manager () {
     _log "Starting allocation manager."
+    local SUBMITTEDPID
     local TODO="${ALLOCATION_MANAGER_WORKSPACE}"/TODO
+    local WORKING="${ALLOCATION_MANAGER_WORKSPACE}"/WORKING
     local DONE="${ALLOCATION_MANAGER_WORKSPACE}"/DONE
     local OUTPUT="${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT
-    trap emergency_stop SIGINT
-    shopt -s nullglob
+    trap emergency_stop SIGTERM
     while true
     do
+        shopt -s nullglob
         for JOB in "$TODO"/*
         do
             _log "Processing $JOB ..."
-            "$JOB" &> "$OUTPUT"/"$(basename "$JOB")".out
-            mv "$JOB" "$DONE"
-            _log "$JOB" "has ended"
+            local BNAME="$(basename "$JOB")"
+            mv "$JOB" "$WORKING"/"$BNAME"
+            (
+             trap "_log $BNAME was terminated; exit 0" SIGTERM
+             "$WORKING"/"$BNAME" &> "$OUTPUT"/"$BNAME".out
+             mv "$WORKING"/"$BNAME" "$DONE"
+             _log "$BNAME has ended"
+            ) &
+            SUBMITTEDPID=$!
+            _log "$BNAME (PID=$SUBMITTEDPID) launched."
+            echo "$SUBMITTEDPID" >> "$ALLOCATION_MANAGER_JOBPIDS"
         done
-        sleep "$ALLOCATION_MANAGER_CYCLETIME"
+        shopt -u nullglob
+        for i in  $(seq "$ALLOCATION_MANAGER_CYCLETIME")
+        do
+            sleep 1
+        done
     done
-    shopt -u nullglob
+
+    wait
 }
 
 function _create_directories(){
-    for SUBDIR in TODO DONE OUTPUT
+    for SUBDIR in TODO WORKING DONE OUTPUT
     do
         mkdir -p "${ALLOCATION_MANAGER_WORKSPACE}"/$SUBDIR
     done
