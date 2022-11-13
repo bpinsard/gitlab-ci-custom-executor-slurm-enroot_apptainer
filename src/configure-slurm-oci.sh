@@ -10,17 +10,6 @@ set -o pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
-##########
-# MOUNTS #
-##########
-# shellcheck source=src/include.sh
-source "$SRC"/include.sh
-
-MIRROR_MOUNTS=(/scratch
-               /etc/slurm/task_prolog.hk)
-MOUNTS_STRING="$(assemble_mounts "${MIRROR_MOUNTS[@]}")"
-
-
 ########################
 # WORKSPACE DEFINITION #
 ########################
@@ -28,6 +17,18 @@ MOUNTS_STRING="$(assemble_mounts "${MIRROR_MOUNTS[@]}")"
 # TODO: Test that this variables is set by the gitlab runner
 # TODO: Change this to a job-id related name
 WORKSPACE="$CUSTOM_ENV_CI_BUILDS_DIR"
+
+##########
+# MOUNTS #
+##########
+# shellcheck source=src/include.sh
+source "$SRC"/include.sh
+
+MIRROR_MOUNTS=(/scratch
+               /etc/slurm/task_prolog.hk
+               "$CUSTOM_ENV_CI_BUILDS_DIR")
+MOUNTS_STRING="$(assemble_mounts "${MIRROR_MOUNTS[@]}")"
+
 
 
 ############################
@@ -48,6 +49,8 @@ if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
 then
     echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
     CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=cpu_only -n 1 -t 30"
+else
+    check_custom_env_command_options_sbatch_for_forbidden_options --container-image --container-mounts
 fi
 set -o nounset
 
@@ -59,9 +62,8 @@ set -o nounset
 sbatch "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
        --container-image="$CUSTOM_ENV_CI_JOB_IMAGE" \
        --container-mounts="$MOUNTS_STRING" \
-       "$SRC"/job.slurm 2 1 "$WORKSPACE"
+       "$SRC"/job.slurm "$WORKSPACE"
 
-echo "after sbatch" >&2
 
 cat <<EOF
 {"job_env":{}}

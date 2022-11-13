@@ -8,7 +8,7 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 source "$SRC"/allocation_manager.sh
 
-ALLOCATION_MANAGER_WORKSPACE=$3
+ALLOCATION_MANAGER_WORKSPACE=$1
 
 
 echo "Starting allocation manager" >&2

@@ -19,10 +19,11 @@ function setup() {
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
-    cd "$STARTDIR"
+    cd "$STARTDIR" || exit
 
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    echo "Test setup phase completed."
 }
 
 function json_validate () {
@@ -77,6 +78,15 @@ function teardown() {
 
 }
 
+@test "\$CUSTOM_ENV_CI_BUILDS_DIR in container mounts" {
+
+    "$SRC"/configure-slurm-oci.sh | json_validate
+
+    run cat "$MOCKLOGDIR"/sbatch.log
+    assert_output --partial "$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
+
+}
+
 @test "allocation manager is started in slurm allocation" {
 
 
@@ -87,6 +97,17 @@ function teardown() {
     source "$TEST_PLAYGROUND"/.env
 
     assert ps -q "$ALLOCATION_MANAGER_JOBID"
+
+}
+
+@test "allocation manager uses \$CUSTOM_ENV_CI_BUILDS_DIR as a workspace" {
+
+    "$SRC"/configure-slurm-oci.sh | json_validate
+    # shellcheck disable=SC1091
+    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+
+    assert_equal "$CUSTOM_ENV_CI_BUILDS_DIR" "$ALLOCATION_MANAGER_WORKSPACE"
+
 
 }
 
@@ -134,8 +155,8 @@ function teardown() {
 
     local STDOUT="$TEST_PLAYGROUND/.stdout.test"
     local STDERR="$TEST_PLAYGROUND/.stderr.test"
-        "$SRC"/configure-slurm-oci.sh 1> "$STDOUT" \
-                                    2> "$STDERR"
+    "$SRC"/configure-slurm-oci.sh 1> "$STDOUT" \
+                                  2> "$STDERR"
 
     run cat "$STDERR"
     assert_output --partial "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options"
@@ -177,7 +198,9 @@ function teardown() {
 
     run _helper
 
-
     assert_success
 
 }
+
+
+

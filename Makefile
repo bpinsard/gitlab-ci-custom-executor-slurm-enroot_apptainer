@@ -18,7 +18,6 @@ test-integration:
 test-configure:
 	./tests/bats/bin/bats tests/configure
 
-
 test-mocks:
 	./tests/bats/bin/bats tests/mocks
 
