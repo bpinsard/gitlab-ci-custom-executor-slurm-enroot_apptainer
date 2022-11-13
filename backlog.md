@@ -54,6 +54,8 @@ Features:
   - [X] mount /scratch (from the [container docs][horeka-cont-docs])
   - [ ] mount the workspace for the allocation manager 
     (otherwise it will not be reachable)
+  - [ ] mount `$CUSTOM_ENV_CI_BUILDS_DIR` 
+    (from Holger's custom executor enroot implementation)
 - [X] start the allocation manager in the config phase 
       The allocation already comprises a container if needed.
 - [X] pass input variables on to sbatch
@@ -115,6 +117,9 @@ in Holger's example.
    THIS NEEDS TO BE TESTED
 
 - [ ] The exported variables need to be passed to the submitted file.
+
+
+# cleanup.sh
 
    
 ## Diagnostics
