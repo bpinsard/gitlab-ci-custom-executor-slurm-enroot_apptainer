@@ -64,6 +64,11 @@ set -o nounset
 sbatch "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
        --container-image="$CUSTOM_ENV_CI_JOB_IMAGE" \
        --container-mounts="$MOUNTS_STRING" \
+       --export=NONE \
+       --propagate=NONE \
+       --input=/dev/null \
+       --output=/dev/null \
+       --error=/dev/null \
        "$SRC"/job.slurm "$WORKSPACE"
 
 

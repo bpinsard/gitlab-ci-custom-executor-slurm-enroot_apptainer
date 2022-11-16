@@ -83,18 +83,28 @@ Features:
       We can have two kinds of tests:
       - The unit test that just verify that the options are passed to the sbatch mock
       - The integration test that verifies the effect on the slurm allocation
-  - [ ] Only SLURM_* variables from the user environment will be defined: `--export=NONE`
-        This might be tested with an integration test that checks 
-        no variable is exported to the to the allocation manager 
-        (we need to check instead that variables are exported and how
-        if we do not use that `--export=NONE` flag)
-  - [ ] None of the modifiable (soft) resource limits are propagated `--propagate=NONE`
-        (how to test that at the integration level?)
-  - [ ] Set / as the working directory of the batch script `--chdir=/`
-        This might be trivially tested with an integration test
-  - [ ] Connect the batch script's standard input, output and error  with `/dev/null`: `--input=/dev/null` `--output=/dev/null` `--error=/dev/null`
+  - Only SLURM_* variables from the user environment will be defined: `--export=NONE`
+    This might be tested with an integration test that checks 
+    no variable is exported to the to the allocation manager 
+    (we need to check instead that variables are exported and how
+    if we do not use that `--export=NONE` flag)
+    [X] Unit
+    [ ] Integration
+  - None of the modifiable (soft) resource limits are propagated `--propagate=NONE`
+    (how to test that at the integration level?)
+    [X] Unit
+    [ ] Integration
+  - Set / as the working directory of the batch script `--chdir=/`
+    Note: is this what we actually want here? The setup is more complicate than in Holger's case.
+    This might be trivially tested with an integration test
+    [ ] Unit
+    [ ] Integration
+  - Connect the batch script's standard input, output and error  with `/dev/null`: `--input=/dev/null` `--output=/dev/null` `--error=/dev/null`
+    [X] Unit
+    [ ] Integration
+
 - [ ] SIGUSR1 should be sent to the job when the allocation is about to run out of time
-      (and the allocation manager should terminate)
+  (and the allocation manager should terminate)
 
 
 

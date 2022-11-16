@@ -39,26 +39,6 @@ function teardown() {
     rm -r "$TEST_PLAYGROUND"
 
 }
-
-@test "sbatch called with --container-image" {
-
-    "$SRC"/configure-slurm-oci.sh | json_validate
-
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial '--container-image=alpine:latest'
-
-}
-
-@test "sbatch called with --container-mounts" {
-
-
-    "$SRC"/configure-slurm-oci.sh | json_validate
-
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial '--container-mounts='
-
-}
-
 @test "/scratch in container mounts" {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
@@ -201,6 +181,4 @@ function teardown() {
     assert_success
 
 }
-
-
 
