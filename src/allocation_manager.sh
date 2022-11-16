@@ -87,7 +87,7 @@ function _allocation_manager () {
     local WORKING="${ALLOCATION_MANAGER_WORKSPACE}"/WORKING
     local DONE="${ALLOCATION_MANAGER_WORKSPACE}"/DONE
     local OUTPUT="${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT
-    trap emergency_stop SIGTERM
+    trap emergency_stop SIGTERM SIGUSR1
     while true
     do
         shopt -s nullglob

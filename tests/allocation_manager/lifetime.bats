@@ -122,7 +122,7 @@ teardown(){
 }
 
 
-@test "allocation manager should die gracefully when killed and print a message" {
+@test "allocation manager should die gracefully when killed with SIGTERM and print a message" {
 
     LOGFILE="$WORKDIR"/log.txt
 
@@ -138,6 +138,34 @@ teardown(){
     while allocation_manager_is_alive
     do
         sleep 1
+    done
+
+    run cat "$LOGFILE"
+    assert_output  --partial "Stopping allocation manager..."
+
+
+}
+
+
+@test "allocation manager should die gracefully when killed with SIGUSR1 and print a message" {
+
+    LOGFILE="$WORKDIR"/log.txt
+
+    (start_allocation_manager "$WORKDIR")
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    run cat "$LOGFILE"
+    refute_output  --partial "Stopping allocation manager..."
+
+    kill -s SIGUSR1 "$ALLOCATION_MANAGER_JOBID"
+    # killing might take a while, but not forever
+    declare -i count
+    count=0
+    while allocation_manager_is_alive && [ "$count" -lt 20 ]
+    do
+        sleep 1
+        count=$((count+1))
     done
 
     run cat "$LOGFILE"

@@ -50,7 +50,9 @@ then
     echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
     CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=cpu_only -n 1 -t 30"
 else
-    check_custom_env_command_options_sbatch_for_forbidden_options --container-image --container-mounts
+    check_custom_env_command_options_sbatch_for_forbidden_options \
+        --container-image \
+        --container-mounts
 fi
 set -o nounset
 
