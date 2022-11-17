@@ -182,3 +182,66 @@ function teardown() {
 
 }
 
+@test "script output has driver.name" {
+
+    function _helper() {
+
+    "$SRC"/configure-slurm-oci.sh | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
+    }
+
+    run _helper
+    assert_success
+
+}
+
+
+@test "script output has driver.version" {
+
+    function _helper() {
+
+    "$SRC"/configure-slurm-oci.sh | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
+    }
+
+    run _helper
+    assert_success
+
+}
+
+@test "script output has job_env.CE_SLURM_JOB_ID which contains the JOB ID of the allocation" {
+
+    function _helper() {
+
+cat <<EOF > scr.py
+import json
+import sys
+dump = json.load(sys.stdin)
+int(dump["job_env"]["CE_SLURM_JOB_ID"])
+EOF
+    "$SRC"/configure-slurm-oci.sh | python3 scr.py
+    }
+
+    run _helper
+    assert_success
+
+}
+
+@test "script output has job_env.CE_ALLOCATION_MANAGER_ENV_PATH (where the .env created by start_allocation_manager lives)" {
+
+    function _helper() {
+
+cat <<EOF > scr.py
+import json
+import sys
+dump = json.load(sys.stdin)
+print(dump["job_env"]["CE_ALLOCATION_MANAGER_ENV_PATH"])
+EOF
+    "$SRC"/configure-slurm-oci.sh 2> /dev/null | python3 scr.py
+    }
+
+    run _helper
+    assert_success
+
+    assert_output "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    assert [ -f  "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
+
+}

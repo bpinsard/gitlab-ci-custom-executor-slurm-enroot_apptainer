@@ -61,17 +61,26 @@ set -o nounset
 # FINAL SBATCH INVOCATION #
 ###########################
 
-sbatch "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
-       --container-image="$CUSTOM_ENV_CI_JOB_IMAGE" \
-       --container-mounts="$MOUNTS_STRING" \
-       --export=NONE \
-       --propagate=NONE \
-       --input=/dev/null \
-       --output=/dev/null \
-       --error=/dev/null \
-       "$SRC"/job.slurm "$WORKSPACE"
+JOB_ID=$(sbatch "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
+         --container-image="$CUSTOM_ENV_CI_JOB_IMAGE" \
+         --container-mounts="$MOUNTS_STRING" \
+         --export=NONE \
+         --propagate=NONE \
+         --input=/dev/null \
+         --output=/dev/null \
+         --error=/dev/null \
+         "$SRC"/job.slurm "$WORKSPACE")
 
 
 cat <<EOF
-{"job_env":{}}
+{
+  "driver": {
+    "name": "ENROOT+Slurm driver",
+    "version": "v0.0.1"
+  },
+"job_env": {
+    "CE_SLURM_JOB_ID": "$JOB_ID",
+    "CE_ALLOCATION_MANAGER_ENV_PATH" : "$WORKSPACE/.env"
+  }
+}
 EOF

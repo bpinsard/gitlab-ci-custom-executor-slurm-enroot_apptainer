@@ -107,3 +107,28 @@ EOF
 
 
 }
+
+@test "sbatch mock returns a number when called with --parsable" {
+
+    touch job.sh
+    chmod +x job.sh
+
+    run sbatch --parsable --some --options ./job.sh
+    assert_output --regexp "[0-9]+"
+
+}
+
+@test "sbatch mock saves the output and error stream somewhere else, not in output" {
+    # This is not how real sbatch works,
+    # but we need to keep things simple here.
+
+    cat <<EOF > job.sh
+echo Hello
+EOF
+    chmod +x job.sh
+
+    run sbatch --some --options ./job.sh output.sh
+    refute_output --partial "Hello"
+
+
+}

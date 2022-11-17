@@ -16,7 +16,7 @@ test-integration:
 	./tests/bats/bin/bats tests/integration
 
 test-configure:
-	./tests/bats/bin/bats tests/configure
+	./tests/bats/bin/bats --jobs 4 -T tests/configure
 
 test-mocks:
 	./tests/bats/bin/bats tests/mocks

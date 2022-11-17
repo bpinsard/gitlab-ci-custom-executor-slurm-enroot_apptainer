@@ -50,5 +50,5 @@ do
     count=$((count+1))
 done
 
-$@
-
+echo 987654321
+$@ 1> slurm-987654321.out 2> slurm-987654321.err
