@@ -21,7 +21,6 @@ function setup() {
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     echo "Test setup phase completed."
-    "$SRC"/configure-slurm-oci.sh | json_validate
 }
 
 function json_validate () {
@@ -41,6 +40,7 @@ function teardown() {
 
 @test "sbatch called with --container-image" {
 
+    "$SRC"/configure-slurm-oci.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial '--container-image=alpine:latest'
 
@@ -48,13 +48,36 @@ function teardown() {
 
 @test "sbatch called with --container-mounts" {
 
+    "$SRC"/configure-slurm-oci.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial '--container-mounts='
 
 }
 
+@test "sbatch NOT called with --container-image when CUSTOM_ENV_CI_JOB_IMAGE not set" {
+
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CI_JOB_IMAGE=''
+    "$SRC"/configure-slurm-oci.sh | json_validate
+    run cat "$MOCKLOGDIR"/sbatch.log
+    refute_output --partial '--container-image'
+
+}
+
+@test "sbatch NOT called with --container-mounts when CUSTOM_ENV_CI_JOB_IMAGE not set" {
+
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=''
+    "$SRC"/configure-slurm-oci.sh | json_validate
+    run cat "$MOCKLOGDIR"/sbatch.log
+    refute_output --partial '--container-mounts'
+
+}
+
+
 @test "sbatch called with '--export=NONE'" {
 
+    "$SRC"/configure-slurm-oci.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "--export=NONE"
 
@@ -62,14 +85,26 @@ function teardown() {
 
 @test "sbatch invoked with '--propagate=NONE'" {
 
+    "$SRC"/configure-slurm-oci.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "--propagate=NONE"
 
 
 }
 
+@test "sbatch invoked with '--parsable'" {
+
+    "$SRC"/configure-slurm-oci.sh | json_validate
+    run cat "$MOCKLOGDIR"/sbatch.log
+    assert_output --partial "--parsable"
+
+
+}
+
+
 @test "sbatch invoked with --{input,output,error}=/dev/null" {
 
+    "$SRC"/configure-slurm-oci.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     for STREAM in input output error
     do

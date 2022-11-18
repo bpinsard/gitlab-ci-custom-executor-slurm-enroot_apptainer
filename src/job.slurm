@@ -1,5 +1,6 @@
 #!/bin/bash
 
+if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
 set -o nounset
 set -o errexit
 set -o pipefail

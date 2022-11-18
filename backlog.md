@@ -102,6 +102,7 @@ Features:
   - Connect the batch script's standard input, output and error  with `/dev/null`: `--input=/dev/null` `--output=/dev/null` `--error=/dev/null`
     - [X] Unit
     - [ ] Integration
+- [ ] Do not use `--container-**`when `CUSTOM_ENV_CI_IMAGE` is not set
 
 - [ ] SIGUSR1 should be sent to the job when the allocation is about to run out of time
   (and the allocation manager should terminate)

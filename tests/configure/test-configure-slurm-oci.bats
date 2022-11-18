@@ -4,6 +4,7 @@
 # https://bats-core.readthedocs.io/en/stable/tutorial.html
 
 function setup() {
+    export TRACE=1
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
@@ -119,7 +120,7 @@ function teardown() {
 
 @test "the content of 'COMMAND_OPTIONS_SBATCH' is passed to sbatch as part of the parameters" {
 
-    local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important long --option"
+    local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
     "$SRC"/configure-slurm-oci.sh | json_validate
@@ -148,12 +149,12 @@ function teardown() {
 
 }
 
-@test "when 'COMMAND_OPTIONS_SBATCH' is not defined, use --partition=cpu_only -n 1 -t 30" {
+@test "when 'COMMAND_OPTIONS_SBATCH' is not defined, use --partition=cpu_only -n=1 -t=30" {
 
 
     "$SRC"/configure-slurm-oci.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
-   assert_output --regexp "--partition=cpu_only\s+-n\s+1\s+-t\s+30"
+   assert_output --regexp "--partition=cpu_only\s+-n=1\s+-t=30"
 
 }
 
@@ -161,7 +162,7 @@ function teardown() {
 
     function _helper() {
     set -o errexit
-    local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important long --option"
+    local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
     "$SRC"/configure-slurm-oci.sh | json_validate

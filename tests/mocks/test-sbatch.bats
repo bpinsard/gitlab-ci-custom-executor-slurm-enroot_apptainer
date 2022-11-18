@@ -108,7 +108,8 @@ EOF
 
 }
 
-@test "sbatch mock returns a number when called with --parsable" {
+@test "sbatch mock echoes a number only" {
+    # This should be true only if called with --parsable
 
     touch job.sh
     chmod +x job.sh
