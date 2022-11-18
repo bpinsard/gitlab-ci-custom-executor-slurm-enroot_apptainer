@@ -96,11 +96,9 @@ set -o nounset
 ###########################
 # FINAL SBATCH INVOCATION #
 ###########################
-COMMAND+=("$SRC"/job.slurm "$WORKSPACE")
-
+COMMAND+=("$SRC"/job.slurm "$WORKSPACE" "$SRC")
 
 JOB_ID=$("${COMMAND[@]}")
-
 
 cat <<EOF
 {
