@@ -4,10 +4,10 @@
 # This script configures a slurm job
 # using the slurm OCI support
 
-if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
-set -o nounset
-set -o errexit
-set -o pipefail
+#if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
+#set -o nounset
+#set -o errexit
+#set -o pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
@@ -87,17 +87,25 @@ set -o nounset
 set +o nounset
 if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
 then
-    COMMAND+=(--input=/dev/null
-              --output=/dev/null
-              --error=/dev/null)
+    COMMAND+=( --input=/dev/null
+               --output=/dev/null
+               --error=/dev/null
+	      )
+else
+    COMMAND+=( --output="$HOME"/cedebug.out
+               --error="$HOME"/cedebug.err
+	      )
+
 fi
 set -o nounset
+
 
 ###########################
 # FINAL SBATCH INVOCATION #
 ###########################
 COMMAND+=("$SRC"/job.slurm "$WORKSPACE" "$SRC")
 
+echo "${COMMAND[@]}" >&2
 JOB_ID=$("${COMMAND[@]}")
 
 cat <<EOF
