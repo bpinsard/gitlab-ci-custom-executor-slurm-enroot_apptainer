@@ -90,6 +90,18 @@ function _on_horeka () {
 
 }
 
+function wait_unti_file_exists() {
+    local FILE="$1"
+    local MAXDELAY="$2"
+    local T0="$SECONDS"
+    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+        sleep 1
+    done
+
+}
+
+
 @test "sbatch mock tries to execute the first non option argument" {
     # This is not how real sbatch works,
     # but we need to keep things simple here.
@@ -100,6 +112,8 @@ EOF
     chmod +x job.sh
 
     sbatch --some --options ./job.sh output.sh
+
+    wait_unti_file_exists output.sh 10
     # This is not robust
     # (failure of this does not necessarily mean
     # failure of the test)

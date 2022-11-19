@@ -3,6 +3,10 @@
 test:
 	./tests/bats/bin/bats --jobs 4 -T tests/*
 
+test-report:
+	./tests/bats/bin/bats --jobs 4 --formatter junit tests/* > report.xml
+
+
 test-include:
 	./tests/bats/bin/bats --jobs 4 -T tests/test-include.bats
 

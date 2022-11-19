@@ -31,7 +31,20 @@ function json_validate () {
     python3 -c 'import json,sys;json.load(sys.stdin)' || ( echo "JSON validation failed" && exit 1 )
 }
 
+function wait_unti_file_exists() {
+    local FILE="$1"
+    local MAXDELAY="$2"
+    local T0="$SECONDS"
+    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+        sleep 1
+    done
+
+}
+
+
 function teardown() {
+    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
     # shellcheck disable=SC1091

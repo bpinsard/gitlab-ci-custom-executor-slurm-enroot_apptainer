@@ -40,6 +40,17 @@ function teardown() {
     rm -r "$TEST_PLAYGROUND"
 }
 
+function wait_unti_file_exists() {
+    local FILE="$1"
+    local MAXDELAY="$2"
+    local T0="$SECONDS"
+    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+        sleep 1
+    done
+
+}
+
 
 @test "configure launches allocation manager in slurm job - no container" {
 
@@ -100,8 +111,8 @@ function teardown() {
     done
 
     scontrol wait_job "$JOB_ID"
-    sleep 1 # Give it some time.
-   
+
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     assert [ -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
 
 }
@@ -134,12 +145,9 @@ function teardown() {
 
     scontrol wait_job "$JOB_ID"
    
-    ENVFILE="$CUSTOM_ENV_CI_BUILDS_DIR"/.env 
-    # Even if the job has started,
-    while [ ! -f "$ENVFILE" ]
-    do 
-	sleep 1
-    done	
+    ENVFILE="$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+
+    wait_until_file_exists "$ENVFILE" 100
 
     # shellcheck disable=SC1090
     source "$ENVFILE"
@@ -156,7 +164,9 @@ EOF
 
     submit_to_allocation_manager job.sh
 
-    sleep $((ALLOCATION_MANAGER_CYCLETIME*2))
+
+    wait_until_file_exists "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out \
+        $((ALLOCATION_MANAGER_CYCLETIME*2))
 
     assert [ -f "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out ]
     run cat "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out
