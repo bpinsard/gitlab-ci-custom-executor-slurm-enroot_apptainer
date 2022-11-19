@@ -44,7 +44,7 @@ function wait_until_file_exists() {
 
 
 function teardown() {
-    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 50
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 50
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
     # shellcheck disable=SC1091
@@ -86,7 +86,7 @@ function teardown() {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
 
-    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
 
@@ -98,7 +98,7 @@ function teardown() {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
 
-    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
 
@@ -187,7 +187,7 @@ function teardown() {
         sleep 1
     done
 
-    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
     # shellcheck disable=SC1091

@@ -90,7 +90,7 @@ function _on_horeka () {
 
 }
 
-function wait_unti_file_exists() {
+function wait_until_file_exists() {
     local FILE="$1"
     local MAXDELAY="$2"
     local T0="$SECONDS"
@@ -113,7 +113,7 @@ EOF
 
     sbatch --some --options ./job.sh output.sh
 
-    wait_unti_file_exists output.sh 10
+    wait_until_file_exists output.sh 10
     # This is not robust
     # (failure of this does not necessarily mean
     # failure of the test)
