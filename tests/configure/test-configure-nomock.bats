@@ -96,7 +96,7 @@ function wait_until_file_exists() {
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 3"
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CE_DEBUG=1
     
@@ -113,7 +113,7 @@ function wait_until_file_exists() {
 
     scontrol wait_job "$JOB_ID"
 
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 60
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 90
 
     assert [ -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
 
