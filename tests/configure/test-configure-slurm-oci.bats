@@ -44,7 +44,7 @@ function wait_until_file_exists() {
 
 
 function teardown() {
-    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
+    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 50
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
     # shellcheck disable=SC1091

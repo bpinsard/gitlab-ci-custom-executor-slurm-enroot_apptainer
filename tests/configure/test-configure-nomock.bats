@@ -78,8 +78,9 @@ function wait_until_file_exists() {
     done
 
     scontrol wait_job "$JOB_ID"
-    sleep 1 # Give it some time.
-   
+
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 30
+
     assert [ -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
 
 }
@@ -112,7 +113,8 @@ function wait_until_file_exists() {
 
     scontrol wait_job "$JOB_ID"
 
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 30
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 60
+
     assert [ -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
 
 }
