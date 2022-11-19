@@ -75,15 +75,6 @@ function teardown() {
 }
 
 
-@test "sbatch called with '--export=NONE'" {
-    skip
-
-    "$SRC"/configure-slurm-oci.sh | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "--export=NONE"
-
-}
-
 @test "sbatch invoked with '--propagate=NONE'" {
 
     "$SRC"/configure-slurm-oci.sh | json_validate

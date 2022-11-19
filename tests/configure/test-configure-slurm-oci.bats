@@ -73,7 +73,10 @@ function teardown() {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
 
-    assert [ -f "$TEST_PLAYGROUND"/.env ]
+    while [ ! -f "$TEST_PLAYGROUND"/.env ]
+    do
+        sleep 1
+    done
     # shellcheck disable=SC1091
     source "$TEST_PLAYGROUND"/.env
 
@@ -84,6 +87,11 @@ function teardown() {
 @test "allocation manager uses \$CUSTOM_ENV_CI_BUILDS_DIR as a workspace" {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
+
+    while [ ! -f "$TEST_PLAYGROUND"/.env ]
+    do
+        sleep 1
+    done
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
 
@@ -167,6 +175,10 @@ function teardown() {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
 
+    while [ ! -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
+    do
+        sleep 1
+    done
 
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env

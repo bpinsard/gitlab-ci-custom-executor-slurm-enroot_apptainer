@@ -42,6 +42,11 @@ count=0
 while [[ "$1" =~ ^-  || -z $1 ]]
 do
     shift
+    # Unfortunately we need to use -n and -t without =
+    if [[ "$1" == '-n' || "$1" == '-t' ]]
+    then
+        shift
+    fi
     if [[ $count -gt 30 ]]
     then
         echo "Error in sbatch mock arg list" >&2
@@ -51,4 +56,4 @@ do
 done
 
 echo 987654321
-$@ 1> slurm-987654321.out 2> slurm-987654321.err
+$@ 1> slurm-987654321.out 2> slurm-987654321.err &
