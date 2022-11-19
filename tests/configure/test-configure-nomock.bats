@@ -10,7 +10,8 @@ function setup(){
     # and loading, and also make the sbatch mock available.
     export SRC="$PROJECT_ROOT"/src
 
-    export TEST_PLAYGROUND=$PWD/$(mktemp -d configure-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
+    export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
     export CUSTOM_ENV_CE_DEBUG=1
     mkdir -p "$STARTDIR"
@@ -44,9 +45,14 @@ function teardown() {
 
     _on_horeka || skip
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
-    mkdir -p $CUSTOM_ENV_CI_BUILDS_DIR # This should not be needed
+    # shellcheck disable=SC2030
+    CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_BUILDS_DIR
+    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
+
+    # shellcheck disable=SC2030
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
+    # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=1
     
 
@@ -71,10 +77,15 @@ function teardown() {
 
     _on_horeka || skip
 
+    # shellcheck disable=SC2030
     export CUSTOM_ENV_CI_JOB_IMAGE="bash:latest"
+    # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
-    mkdir -p $CUSTOM_ENV_CI_BUILDS_DIR # This should not be needed
+    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
+
+    # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
+    # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CE_DEBUG=1
     
 
@@ -100,10 +111,14 @@ function teardown() {
 
     _on_horeka || skip
 
+    # shellcheck disable=SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE="ubuntu:kinetic-20221101"
+    # shellcheck disable=SC2031
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
-    mkdir -p $CUSTOM_ENV_CI_BUILDS_DIR # This should not be needed
+    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
+    # shellcheck disable=SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 3 -n 1"
+    # shellcheck disable=SC2031
     export CUSTOM_ENV_CE_DEBUG=1
     
 
@@ -126,7 +141,9 @@ function teardown() {
 	sleep 1
     done	
 
+    # shellcheck disable=SC1090
     source "$ENVFILE"
+    # shellcheck disable=SC1091
     source "$SRC"/allocation_manager.sh
 
     cat << EOF > job.sh
