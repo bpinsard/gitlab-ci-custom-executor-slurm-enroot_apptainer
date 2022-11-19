@@ -40,7 +40,7 @@ function teardown() {
     rm -r "$TEST_PLAYGROUND"
 }
 
-function wait_unti_file_exists() {
+function wait_until_file_exists() {
     local FILE="$1"
     local MAXDELAY="$2"
     local T0="$SECONDS"

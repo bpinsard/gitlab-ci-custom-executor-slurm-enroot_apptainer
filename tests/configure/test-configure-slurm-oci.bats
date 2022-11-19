@@ -268,6 +268,7 @@ EOF
     assert_success
 
     assert_output "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
-    assert [ -f  "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
+    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 20
+    assert [ -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
 
 }
