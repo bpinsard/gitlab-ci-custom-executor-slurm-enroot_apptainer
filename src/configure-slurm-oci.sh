@@ -66,7 +66,6 @@ set -o nounset
 # Here we do want the variable to be split
 # shellcheck disable=SC2206
 COMMAND=(sbatch $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
-         --export=NONE
          --propagate=NONE
          --parsable)
 ############################
@@ -75,8 +74,8 @@ COMMAND=(sbatch $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 set +o nounset
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
-    COMMAND+=(--container-image="$CUSTOM_ENV_CI_JOB_IMAGE"
-              --container-mounts="$MOUNTS_STRING")
+    COMMAND+=( --container-image="$CUSTOM_ENV_CI_JOB_IMAGE"
+               --container-mounts="$MOUNTS_STRING" )
 fi
 set -o nounset
 

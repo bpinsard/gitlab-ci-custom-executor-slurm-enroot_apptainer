@@ -131,5 +131,5 @@ function _current_time(){
 }
 
 function _log() {
-    echo "$(date)" "$@" >> "${ALLOCATION_MANAGER_LOGFILE}"
+	echo "$(date)" "$(hostname)" "$@" >> "${ALLOCATION_MANAGER_LOGFILE}"
 }
