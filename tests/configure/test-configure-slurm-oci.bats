@@ -86,12 +86,9 @@ function teardown() {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
 
-    while [ ! -f "$TEST_PLAYGROUND"/.env ]
-    do
-        sleep 1
-    done
+    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
-    source "$TEST_PLAYGROUND"/.env
+    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
 
     assert ps -q "$ALLOCATION_MANAGER_JOBID"
 
@@ -101,10 +98,7 @@ function teardown() {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
 
-    while [ ! -f "$TEST_PLAYGROUND"/.env ]
-    do
-        sleep 1
-    done
+    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
 
@@ -193,6 +187,7 @@ function teardown() {
         sleep 1
     done
 
+    wait_unti_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
     # shellcheck disable=SC1091
