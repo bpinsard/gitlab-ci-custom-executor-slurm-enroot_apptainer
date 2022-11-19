@@ -8,9 +8,15 @@ unit-test-job:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test
+    - make test-report
   tags:
     - shell
+  artifacts:
+    when: always
+    paths:
+      - report.xml
+    reports:
+      junit: report.xml
 
 lint-test-job:
   variables:
