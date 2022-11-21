@@ -3,22 +3,22 @@ stages:          # List of stages for jobs, and their order of execution
   - test
 
 
-unit-test-job:
+unit-test:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test-report
+    - make test-report-parallel
   tags:
     - shell
   artifacts:
     when: always
     paths:
-      - report.xml
+      - report-parallel.xml
     reports:
-      junit: report.xml
+      junit: report-parallel.xml
 
-lint-test-job:
+lint:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
