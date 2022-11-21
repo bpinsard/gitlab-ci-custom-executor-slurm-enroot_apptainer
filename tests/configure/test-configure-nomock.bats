@@ -96,9 +96,8 @@ function wait_until_file_exists() {
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 3"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_CE_DEBUG=1
     
 
     JOB_ID=$("$SRC"/configure-slurm-oci.sh | python3 get_jobid.py)
@@ -130,9 +129,8 @@ function wait_until_file_exists() {
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
     # shellcheck disable=SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 3 -n 1"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
     # shellcheck disable=SC2031
-    export CUSTOM_ENV_CE_DEBUG=1
     
 
     JOB_ID=$("$SRC"/configure-slurm-oci.sh | python3 get_jobid.py)

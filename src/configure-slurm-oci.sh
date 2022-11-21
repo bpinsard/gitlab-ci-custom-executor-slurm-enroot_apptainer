@@ -50,7 +50,7 @@ set +o nounset
 if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
 then
     echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
-    CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=cpu_only -n=1 -t=30"
+    CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=cpu_only -n 1 -t 30"
 else
     check_custom_env_command_options_sbatch_for_forbidden_options \
         --container-image \

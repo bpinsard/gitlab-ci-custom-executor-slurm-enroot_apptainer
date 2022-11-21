@@ -164,12 +164,12 @@ function teardown() {
 
 }
 
-@test "when 'COMMAND_OPTIONS_SBATCH' is not defined, use --partition=cpu_only -n=1 -t=30" {
+@test "when 'COMMAND_OPTIONS_SBATCH' is not defined, use --partition=cpu_only -n 1 -t 30" {
 
 
     "$SRC"/configure-slurm-oci.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
-   assert_output --regexp "--partition=cpu_only\s+-n=1\s+-t=30"
+   assert_output --regexp '--partition=cpu_only\s+-n\s+1\s+-t\s+30'
 
 }
 
