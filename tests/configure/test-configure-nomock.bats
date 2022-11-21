@@ -73,7 +73,9 @@ function wait_until_file_exists() {
     # and the test may fail
     while ! scontrol wait_job "$JOB_ID"
     do
-    sleep 1
+	echo "squeue output:"
+        squeue
+        sleep 3
     done
 
     scontrol wait_job "$JOB_ID"
@@ -89,7 +91,7 @@ function wait_until_file_exists() {
     _on_horeka || skip
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_JOB_IMAGE="bash:latest"
+    export CUSTOM_ENV_CI_JOB_IMAGE="ubuntu:kinetic-20221101"
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
@@ -106,7 +108,9 @@ function wait_until_file_exists() {
     # and the test may fail
     while ! scontrol wait_job "$JOB_ID"
     do
-    sleep 1
+	echo "squeue output:"
+        squeue
+        sleep 3
     done
 
     scontrol wait_job "$JOB_ID"
@@ -139,7 +143,9 @@ function wait_until_file_exists() {
     # and the test may fail
     while ! scontrol wait_job "$JOB_ID"
     do
-    sleep 1
+	echo "squeue output:"
+        squeue
+        sleep 3
     done
 
     scontrol wait_job "$JOB_ID"
