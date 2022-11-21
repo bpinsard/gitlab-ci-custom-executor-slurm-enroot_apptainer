@@ -1,4 +1,8 @@
 #!/bin/bash
+#SBATCH --output /home/hk-project-scs/%u/cetest%J.out  
+#SBATCH --error /home/hk-project-scs/%u/cetest%J.err  
+#SBATCH --job-name GitLabCustomExec
+
 
 if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
 set -o nounset

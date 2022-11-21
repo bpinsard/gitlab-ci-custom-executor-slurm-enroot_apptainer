@@ -90,11 +90,6 @@ then
                --output=/dev/null
                --error=/dev/null
 	      )
-else
-    COMMAND+=( --output="$HOME"/cedebug.out
-               --error="$HOME"/cedebug.err
-	      )
-
 fi
 set -o nounset
 

@@ -64,7 +64,6 @@ function wait_until_file_exists() {
     # shellcheck disable=SC2030
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CE_DEBUG=1
     
 
     JOB_ID=$("$SRC"/configure-slurm-oci.sh | python3 get_jobid.py)
