@@ -121,10 +121,79 @@ function wait_until_file_exists() {
 
 }
 
+@test "configure launches allocation manager in slurm job - no container - submission" {
+
+    _on_horeka || skip
+
+    ############################################
+    # STARTING ALLOCATION MANAGER IN SLURM JOB #
+    ############################################
+
+
+    # shellcheck disable=SC2030
+    CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_BUILDS_DIR
+    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
+
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
+    # shellcheck disable=SC2030
+    
+
+    JOB_ID=$("$SRC"/configure-slurm-oci.sh | python3 get_jobid.py)
+
+    # scontrol is slow, so it might query the job information
+    # before it is actually available
+    # and the test may fail
+    while ! scontrol wait_job "$JOB_ID"
+    do
+	echo "squeue output:"
+        squeue
+        sleep 3
+    done
+
+    scontrol wait_job "$JOB_ID"
+
+    ENVFILE="$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    wait_until_file_exists "$ENVFILE" 30
+
+    ####################################
+    # SUBMITTING TO ALLOCATION MANAGER #
+    ####################################
+
+    # shellcheck disable=SC1090
+    source "$ENVFILE"
+    # shellcheck disable=SC1091
+    source "$SRC"/allocation_manager.sh
+
+    cat << EOF > job.sh
+#!/usr/bin/env bash
+grep PRETTY /etc/os-release
+
+EOF
+    chmod +x job.sh
+
+
+    submit_to_allocation_manager job.sh
+
+
+    wait_until_file_exists "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out \
+        $((ALLOCATION_MANAGER_CYCLETIME*2))
+
+    assert [ -f "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out ]
+
+
+}
+
+
 
 @test "configure launches allocation manager in slurm job - with container - submission" {
 
     _on_horeka || skip
+
+    ############################################
+    # STARTING ALLOCATION MANAGER IN SLURM JOB #
+    ############################################
 
     # shellcheck disable=SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE="ubuntu:kinetic-20221101"
@@ -154,13 +223,17 @@ function wait_until_file_exists() {
 
     wait_until_file_exists "$ENVFILE" 100
 
+    ####################################
+    # SUBMITTING TO ALLOCATION MANAGER #
+    ####################################
+    
     # shellcheck disable=SC1090
     source "$ENVFILE"
     # shellcheck disable=SC1091
     source "$SRC"/allocation_manager.sh
 
     cat << EOF > job.sh
-#!/bin/bash
+#!/usr/bin/env bash
 grep PRETTY /etc/os-release
 
 EOF
@@ -175,6 +248,7 @@ EOF
 
     assert [ -f "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out ]
     run cat "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out
+    # Making sure this has run in a container
     assert_output  'PRETTY_NAME="Ubuntu 22.10"'
 
 }
