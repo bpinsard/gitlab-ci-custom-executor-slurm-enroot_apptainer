@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function _print_all_variables(){
 local INPUT_VARIABLES=(

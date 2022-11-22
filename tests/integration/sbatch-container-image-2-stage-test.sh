@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 JOBID=$(sbatch -p dev_cpuonly -n 1 -t 5 --wrap "sleep 300" --parsable)
 
 

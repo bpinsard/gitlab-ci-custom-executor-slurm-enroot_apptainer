@@ -91,7 +91,7 @@ function wait_until_file_exists() {
     _on_horeka || skip
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_JOB_IMAGE="ubuntu:kinetic-20221101"
+    export CUSTOM_ENV_CI_JOB_IMAGE="bash:5.2.9-alpine3.16"
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
@@ -168,7 +168,7 @@ function wait_until_file_exists() {
 
     cat << EOF > job.sh
 #!/usr/bin/env bash
-grep PRETTY /etc/os-release
+echo "Hello"
 
 EOF
     chmod +x job.sh
@@ -181,6 +181,10 @@ EOF
         $((ALLOCATION_MANAGER_CYCLETIME*2))
 
     assert [ -f "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out ]
+    run cat "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out
+    # Making sure this has run in a container
+    assert_output 'Hello'
+
 
 
 }
@@ -196,7 +200,7 @@ EOF
     ############################################
 
     # shellcheck disable=SC2031
-    export CUSTOM_ENV_CI_JOB_IMAGE="ubuntu:kinetic-20221101"
+    export CUSTOM_ENV_CI_JOB_IMAGE="bash:5.2.9-alpine3.16"
     # shellcheck disable=SC2031
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
@@ -249,7 +253,7 @@ EOF
     assert [ -f "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out ]
     run cat "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out
     # Making sure this has run in a container
-    assert_output  'PRETTY_NAME="Ubuntu 22.10"'
+    assert_output 'PRETTY_NAME="Alpine Linux v3.16"'
 
 }
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #SBATCH --output /home/hk-project-scs/%u/cetest%J.out  
 #SBATCH --error /home/hk-project-scs/%u/cetest%J.err  
 #SBATCH --job-name GitLabCustomExec

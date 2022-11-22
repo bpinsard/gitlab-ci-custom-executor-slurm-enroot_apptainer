@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # This is a mock of sbatch
 # Will record:
 # - Arguments it was called with
