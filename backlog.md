@@ -88,7 +88,8 @@ Features:
     no variable is exported to the to the allocation manager 
     (we need to check instead that variables are exported and how
     if we do not use that `--export=NONE` flag)
-    - [X] Unit
+    ISSUE: This does not work with pyxis! DISCUSS
+    - [ ] Unit
     - [ ] Integration
   - None of the modifiable (soft) resource limits are propagated `--propagate=NONE`
     (how to test that at the integration level?)
@@ -97,21 +98,29 @@ Features:
   - Set / as the working directory of the batch script `--chdir=/`
     Note: is this what we actually want here? The setup is more complicate than in Holger's case.
     This might be trivially tested with an integration test
+    DISCUSS
     - [ ] Unit
     - [ ] Integration
   - Connect the batch script's standard input, output and error  with `/dev/null`: `--input=/dev/null` `--output=/dev/null` `--error=/dev/null`
+    This does not happen when the variable `CUSTOM_ENV_CE_DEBUG` is set.
     - [X] Unit
     - [ ] Integration
-- [ ] Do not use `--container-**`when `CUSTOM_ENV_CI_IMAGE` is not set
+
+- [X] Do not use `--container-**`when `CUSTOM_ENV_CI_IMAGE` is not set
 
 - [ ] SIGUSR1 should be sent to the job when the allocation is about to run out of time
   (and the allocation manager should terminate)
+  - [ ] Unit
+  - [ ] Integration
 
 
 
 ### prepare.sh
 Preparation of the image/container is done here 
 in Holger's example.
+
+If the preparation of the container is already done in the configure stage,
+there is no need to do anything here.
 
 
 ### run.sh
@@ -152,9 +161,18 @@ in Holger's example.
    THIS NEEDS TO BE TESTED
 
 - [ ] The exported variables need to be passed to the submitted file.
+- [ ] Every step which is submitted to the allocation manager
+      needs to have its output redirected from the file where it is printed
+      to the stdout of this process (use `tail -f ...`?)
 
 
 # cleanup.sh
+- [ ] The slurm job needs to be terminated
+- [ ] Temporary directories need to be deleted
+- [ ] if `CUSTOM_ENV_CE_DEBUG` is set, 
+      some debugging information should be printed
+      and/or some files should be kept for later inspection.
+    
 
    
 ## Diagnostics
