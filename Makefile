@@ -14,10 +14,10 @@ test-include:
 	./tests/bats/bin/bats --jobs 4 -T tests/test-include.bats
 
 test-jobsub:
-	./tests/bats/bin/bats --jobs 4 -T tests/allocation_manager/job_submission.bats
+	./tests/bats/bin/bats --jobs 4 -T tests/custom_executor_queue/job_submission.bats
 
 test-lifetime:
-	./tests/bats/bin/bats --jobs 4 -T tests/allocation_manager/lifetime.bats
+	./tests/bats/bin/bats --jobs 4 -T tests/custom_executor_queue/lifetime.bats
 
 test-integration:
 	./tests/bats/bin/bats tests/integration

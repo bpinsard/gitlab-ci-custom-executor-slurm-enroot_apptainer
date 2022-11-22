@@ -9,18 +9,18 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-ALLOCATION_MANAGER_WORKSPACE=$1
+CUSTOM_EXECUTOR_QUEUE_WORKSPACE=$1
 SRC=$2
 
-source "$SRC"/allocation_manager.sh
+source "$SRC"/custom_executor_queue.sh
 
-echo -n "Starting allocation manager... " >&2
-start_allocation_manager "$ALLOCATION_MANAGER_WORKSPACE"
+echo -n "Starting custom executor queue... " >&2
+start_custom_executor_queue "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
 echo -n "done. Waiting." >&2
 
-source "$ALLOCATION_MANAGER_WORKSPACE"/.env
+source "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/.env
 
-trap "kill -s SIGUSR1 $ALLOCATION_MANAGER_JOBID; wait; exit" SIGUSR1
+trap "kill -s SIGUSR1 $CUSTOM_EXECUTOR_QUEUE_JOBID; wait; exit" SIGUSR1
 
 while true
 do 

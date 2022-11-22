@@ -25,8 +25,8 @@ function _common_teardown() {
 
 }
 
-function _no_allocation_manager_variables_declared() {
-    #local ndeclared=$(env | grep -E '^ALLOCATION_MANAGER' | wc -l )
-    local ndeclared=$( echo "${!ALLOCATION_MANAGER*}" | wc -w )
+function _no_custom_executor_queue_variables_declared() {
+    #local ndeclared=$(env | grep -E '^CUSTOM_EXECUTOR_QUEUE' | wc -l )
+    local ndeclared=$( echo "${!CUSTOM_EXECUTOR_QUEUE*}" | wc -w )
     [ $ndeclared -eq 0 ]
 }

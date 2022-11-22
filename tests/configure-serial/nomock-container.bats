@@ -62,10 +62,10 @@ function wait_until_file_exists() {
 
 
 
-@test "configure launches allocation manager in slurm job - with container" {
+@test "configure launches custom executor queue in slurm job - with container" {
 
     ############################################
-    # STARTING ALLOCATION MANAGER IN SLURM JOB #
+    # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
     ############################################
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
@@ -94,11 +94,11 @@ function wait_until_file_exists() {
 
 
 
-@test "configure launches allocation manager in slurm job - with container - submission" {
+@test "configure launches custom executor queue in slurm job - with container - submission" {
 
 
     ############################################
-    # STARTING ALLOCATION MANAGER IN SLURM JOB #
+    # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
     ############################################
     # shellcheck disable=SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
@@ -123,13 +123,13 @@ function wait_until_file_exists() {
     wait_until_file_exists "$ENVFILE" 100
 
     ####################################
-    # SUBMITTING TO ALLOCATION MANAGER #
+    # SUBMITTING TO CUSTOM EXECUTOR QUEUE #
     ####################################
     
     # shellcheck disable=SC1090
     source "$ENVFILE"
     # shellcheck disable=SC1091
-    source "$SRC"/allocation_manager.sh
+    source "$SRC"/custom_executor_queue.sh
 
     cat << EOF > job.sh
 #!/usr/bin/env bash
@@ -139,14 +139,14 @@ EOF
     chmod +x job.sh
 
 
-    submit_to_allocation_manager job.sh
+    submit_to_custom_executor_queue job.sh
 
 
-    wait_until_file_exists "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out \
-        $((ALLOCATION_MANAGER_CYCLETIME*2))
+    wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
+        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
 
-    assert [ -f "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out ]
-    run cat "${ALLOCATION_MANAGER_WORKSPACE}"/OUTPUT/job.sh.out
+    assert [ -f "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out ]
+    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out
     # Making sure this has run in a container
     assert_output 'PRETTY_NAME="Alpine Linux v3.16"'
 

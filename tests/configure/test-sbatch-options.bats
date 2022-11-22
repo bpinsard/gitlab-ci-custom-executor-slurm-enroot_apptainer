@@ -43,8 +43,8 @@ function teardown() {
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
     # shellcheck disable=SC1091
-    source "$SRC"/allocation_manager.sh
-    stop_allocation_manager
+    source "$SRC"/custom_executor_queue.sh
+    stop_custom_executor_queue
     rm -r "$TEST_PLAYGROUND"
 
 }

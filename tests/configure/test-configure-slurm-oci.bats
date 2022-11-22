@@ -48,8 +48,8 @@ function teardown() {
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
     # shellcheck disable=SC1091
-    source "$SRC"/allocation_manager.sh
-    stop_allocation_manager
+    source "$SRC"/custom_executor_queue.sh
+    stop_custom_executor_queue
     rm -r "$TEST_PLAYGROUND"
 
 }
@@ -81,7 +81,7 @@ function teardown() {
 
 }
 
-@test "allocation manager is started in slurm allocation" {
+@test "custom executor queue is started in slurm allocation" {
 
 
     "$SRC"/configure-slurm.sh | json_validate
@@ -90,11 +90,11 @@ function teardown() {
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
 
-    assert ps -q "$ALLOCATION_MANAGER_JOBID"
+    assert ps -q "$CUSTOM_EXECUTOR_QUEUE_JOBID"
 
 }
 
-@test "allocation manager uses \$CUSTOM_ENV_CI_BUILDS_DIR as a workspace" {
+@test "custom executor queue uses \$CUSTOM_ENV_CI_BUILDS_DIR as a workspace" {
 
     "$SRC"/configure-slurm.sh | json_validate
 
@@ -102,7 +102,7 @@ function teardown() {
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
 
-    assert_equal "$CUSTOM_ENV_CI_BUILDS_DIR" "$ALLOCATION_MANAGER_WORKSPACE"
+    assert_equal "$CUSTOM_ENV_CI_BUILDS_DIR" "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
 
 
 }
@@ -191,8 +191,8 @@ function teardown() {
     # shellcheck disable=SC1091
     source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
     # shellcheck disable=SC1091
-    source "$SRC"/allocation_manager.sh
-    stop_allocation_manager
+    source "$SRC"/custom_executor_queue.sh
+    stop_custom_executor_queue
 
 
     }
@@ -246,7 +246,7 @@ EOF
 
 }
 
-@test "script output has job_env.CE_ALLOCATION_MANAGER_ENV_PATH (where the .env created by start_allocation_manager lives)" {
+@test "script output has job_env.CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH (where the .env created by start_custom_executor_queue lives)" {
 
     function _helper() {
 
@@ -254,7 +254,7 @@ cat <<EOF > scr.py
 import json
 import sys
 dump = json.load(sys.stdin)
-print(dump["job_env"]["CE_ALLOCATION_MANAGER_ENV_PATH"])
+print(dump["job_env"]["CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH"])
 EOF
     "$SRC"/configure-slurm.sh 2> /dev/null | python3 scr.py
     }
