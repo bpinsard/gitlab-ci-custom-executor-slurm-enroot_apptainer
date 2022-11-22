@@ -68,7 +68,7 @@ set -o nounset
 COMMAND=(sbatch $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
          --propagate=NONE
          --parsable
-	 --signal=10@15 # SIGUSR1 15 seconds before the end of the job.
+	 --signal=B:USR1@15 # SIGUSR1 15 seconds before the end of the job.
 	 )
 ############################
 # CI IMAGE-RELATED OPTIONS #

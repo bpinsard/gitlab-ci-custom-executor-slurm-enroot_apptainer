@@ -105,11 +105,11 @@ function teardown() {
 
 }
 
-@test "sbatch invoked with '--signal=10@15'" {
+@test "sbatch invoked with '--signal=B:USR1@15'" {
 
     "$SRC"/configure-slurm-oci.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "--signal=10@15"
+    assert_output --partial "--signal=B:USR1@15"
 
 
 }

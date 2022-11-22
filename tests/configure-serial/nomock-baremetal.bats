@@ -146,4 +146,38 @@ EOF
 
 }
 
+@test "allocation manager is sent SIGUSR1 before end of job and trap is activated" {
 
+
+    ############################################
+    # STARTING ALLOCATION MANAGER IN SLURM JOB #
+    ############################################
+
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 2 -n 1"
+    JOB_ID=$("$SRC"/configure-slurm-oci.sh | python3 get_jobid.py)
+
+    # scontrol is slow, so it might query the job information
+    # before it is actually available
+    # and the test may fail
+    while ! scontrol wait_job "$JOB_ID"
+    do
+	echo "squeue output:"
+        squeue
+        sleep 3
+    done
+
+    scontrol wait_job "$JOB_ID"
+
+    wait_until_file_exists "$ENVFILE" 30
+    source "$ENVFILE"
+
+    cp $ALLOCATION_MANAGER_LOGFILE ~/allocmanlog.txt
+    run sbatch -p dev_cpuonly -n 1 -t 1 \
+        --dependency=afterany:"$JOB_ID" \
+       	--wait \
+	--wrap "grep -q 'Stopping allocation manager...' $ALLOCATION_MANAGER_LOGFILE"
+
+    assert_success
+
+}
