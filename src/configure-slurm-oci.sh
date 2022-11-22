@@ -67,7 +67,9 @@ set -o nounset
 # shellcheck disable=SC2206
 COMMAND=(sbatch $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
          --propagate=NONE
-         --parsable)
+         --parsable
+	 --signal=10@15 # SIGUSR1 15 seconds before the end of the job.
+	 )
 ############################
 # CI IMAGE-RELATED OPTIONS #
 ############################
