@@ -98,6 +98,7 @@ function wait_until_file_exists() {
     ############################################
     # STARTING ALLOCATION MANAGER IN SLURM JOB #
     ############################################
+    # shellcheck disable=SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
     
 

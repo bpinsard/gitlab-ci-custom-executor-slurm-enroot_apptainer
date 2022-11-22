@@ -170,9 +170,12 @@ EOF
     scontrol wait_job "$JOB_ID"
 
     wait_until_file_exists "$ENVFILE" 30
+
+
+    # shellcheck disable=SC1090
     source "$ENVFILE"
 
-    cp $ALLOCATION_MANAGER_LOGFILE ~/allocmanlog.txt
+    cp "$ALLOCATION_MANAGER_LOGFILE" ~/allocmanlog.txt
     run sbatch -p dev_cpuonly -n 1 -t 1 \
         --dependency=afterany:"$JOB_ID" \
        	--wait \
