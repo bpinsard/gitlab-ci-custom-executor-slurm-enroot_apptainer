@@ -42,10 +42,13 @@ EOF
 }
 
 function teardown() {
-    echo scancel "$JOB_ID"
-    scancel "$JOB_ID"
-    echo rm -r "$TEST_PLAYGROUND"
-    rm -r "$TEST_PLAYGROUND"
+    if _on_horeka
+    then
+      echo scancel "$JOB_ID"
+      scancel "$JOB_ID"
+      echo rm -r "$TEST_PLAYGROUND"
+      rm -r "$TEST_PLAYGROUND"
+    fi
 }
 
 function wait_until_file_exists() {
@@ -68,7 +71,7 @@ function wait_until_file_exists() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
-    JOB_ID=$("$SRC"/configure-slurm-oci.sh | python3 get_jobid.py)
+    JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
 
     # scontrol is slow, so it might query the job information
     # before it is actually available
@@ -98,7 +101,7 @@ function wait_until_file_exists() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
-    JOB_ID=$("$SRC"/configure-slurm-oci.sh | python3 get_jobid.py)
+    JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
 
     # scontrol is slow, so it might query the job information
     # before it is actually available
@@ -155,7 +158,7 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 2 -n 1"
-    JOB_ID=$("$SRC"/configure-slurm-oci.sh | python3 get_jobid.py)
+    JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
 
     # scontrol is slow, so it might query the job information
     # before it is actually available

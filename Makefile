@@ -8,7 +8,7 @@ test-report-parallel:
 	./tests/bats/bin/bats --jobs 4 --formatter junit $$(ls -d tests/* | grep -v '.*serial$$' ) > report-parallel.xml
 
 test-report-serial:
-	./tests/bats/bin/bats --formatter junit tests/*serial >> report-serial.xml
+	./tests/bats/bin/bats --formatter junit tests/*serial > report-serial.xml
 
 test-include:
 	./tests/bats/bin/bats --jobs 4 -T tests/test-include.bats

@@ -52,7 +52,7 @@ function teardown() {
 
 @test "sbatch called with --container-image" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial '--container-image=alpine:latest'
 
@@ -60,7 +60,7 @@ function teardown() {
 
 @test "sbatch called with --container-mounts" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial '--container-mounts='
 
@@ -70,7 +70,7 @@ function teardown() {
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CI_JOB_IMAGE=''
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     refute_output --partial '--container-image'
 
@@ -80,7 +80,7 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE=''
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     refute_output --partial '--container-mounts'
 
@@ -89,7 +89,7 @@ function teardown() {
 
 @test "sbatch invoked with '--propagate=NONE'" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "--propagate=NONE"
 
@@ -98,7 +98,7 @@ function teardown() {
 
 @test "sbatch invoked with '--parsable'" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "--parsable"
 
@@ -107,7 +107,7 @@ function teardown() {
 
 @test "sbatch invoked with '--signal=B:USR1@15'" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "--signal=B:USR1@15"
 
@@ -118,7 +118,7 @@ function teardown() {
 
 @test "sbatch invoked with --{input,output,error}=/dev/null" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     for STREAM in input output error
     do

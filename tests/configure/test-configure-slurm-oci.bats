@@ -55,7 +55,7 @@ function teardown() {
 }
 @test "/scratch in container mounts" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial '/scratch:/scratch'
@@ -65,7 +65,7 @@ function teardown() {
 
 @test "prolog script in container mounts" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial '/etc/slurm/task_prolog.hk:/etc/slurm/task_prolog.hk'
@@ -74,7 +74,7 @@ function teardown() {
 
 @test "\$CUSTOM_ENV_CI_BUILDS_DIR in container mounts" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
@@ -84,7 +84,7 @@ function teardown() {
 @test "allocation manager is started in slurm allocation" {
 
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
     wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
@@ -96,7 +96,7 @@ function teardown() {
 
 @test "allocation manager uses \$CUSTOM_ENV_CI_BUILDS_DIR as a workspace" {
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
     wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
     # shellcheck disable=SC1091
@@ -112,7 +112,7 @@ function teardown() {
 
     export CUSTOM_ENV_SBATCH_ACCOUNT='averyimportantone'
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
 
     run cat "$MOCKLOGDIR"/sbatch.log
@@ -125,7 +125,7 @@ function teardown() {
 
     export CUSTOM_ENV_SBATCH_ACCOUNT_WRONG='averyimportantone'
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
 
     run cat "$MOCKLOGDIR"/sbatch.log
@@ -138,7 +138,7 @@ function teardown() {
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
 
@@ -151,7 +151,7 @@ function teardown() {
 
     local STDOUT="$TEST_PLAYGROUND/.stdout.test"
     local STDERR="$TEST_PLAYGROUND/.stderr.test"
-    "$SRC"/configure-slurm-oci.sh 1> "$STDOUT" \
+    "$SRC"/configure-slurm.sh 1> "$STDOUT" \
                                   2> "$STDERR"
 
     run cat "$STDERR"
@@ -167,7 +167,7 @@ function teardown() {
 @test "when 'COMMAND_OPTIONS_SBATCH' is not defined, use --partition=cpu_only -n 1 -t 30" {
 
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
    assert_output --regexp '--partition=cpu_only\s+-n\s+1\s+-t\s+30'
 
@@ -180,7 +180,7 @@ function teardown() {
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
-    "$SRC"/configure-slurm-oci.sh | json_validate
+    "$SRC"/configure-slurm.sh | json_validate
 
     while [ ! -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
     do
@@ -207,7 +207,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure-slurm-oci.sh | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
+    "$SRC"/configure-slurm.sh | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
     }
 
     run _helper
@@ -220,7 +220,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure-slurm-oci.sh | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
+    "$SRC"/configure-slurm.sh | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
     }
 
     run _helper
@@ -238,7 +238,7 @@ import sys
 dump = json.load(sys.stdin)
 int(dump["job_env"]["CE_SLURM_JOB_ID"])
 EOF
-    "$SRC"/configure-slurm-oci.sh | python3 scr.py
+    "$SRC"/configure-slurm.sh | python3 scr.py
     }
 
     run _helper
@@ -256,7 +256,7 @@ import sys
 dump = json.load(sys.stdin)
 print(dump["job_env"]["CE_ALLOCATION_MANAGER_ENV_PATH"])
 EOF
-    "$SRC"/configure-slurm-oci.sh 2> /dev/null | python3 scr.py
+    "$SRC"/configure-slurm.sh 2> /dev/null | python3 scr.py
     }
 
     run _helper
