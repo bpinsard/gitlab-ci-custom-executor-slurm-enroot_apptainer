@@ -21,7 +21,7 @@ function _common_setup() {
 
 
 function _common_teardown() {
-    rm -r $TEST_PLAYGROUND
+    rm -rf $TEST_PLAYGROUND
 
 }
 

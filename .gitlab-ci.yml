@@ -9,6 +9,8 @@ unit-test-parallel:
   stage: test
   script:
     - make test-report-parallel
+  after_script:
+    - make joker
   tags:
     - shell
   artifacts:
@@ -25,6 +27,8 @@ unit-test-serial:
   stage: test
   script:
     - make test-report-serial
+  after_script:
+    - make joker
   tags:
     - shell
   artifacts:
