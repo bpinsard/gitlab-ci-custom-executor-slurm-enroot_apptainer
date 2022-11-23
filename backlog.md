@@ -157,7 +157,6 @@ there is no need to do anything here.
    since so far artifact operations need to see the `gitlab_runner` executable
 - `cleanup_file_variables`
    At the moment this is done in the container.
-   The file-based environment variables are supposedly 
    THIS NEEDS TO BE TESTED
 
 - [ ] The exported variables need to be passed to the submitted file.
