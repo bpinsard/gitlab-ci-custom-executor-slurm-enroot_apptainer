@@ -108,10 +108,10 @@ Features:
 
 - [X] Do not use `--container-**`when `CUSTOM_ENV_CI_IMAGE` is not set
 
-- [ ] SIGUSR1 should be sent to the job when the allocation is about to run out of time
+- [X] SIGUSR1 should be sent to the job when the allocation is about to run out of time
   (and the custom executor queue should terminate)
-  - [ ] Unit
-  - [ ] Integration
+  - [X] Unit
+  - [X] Integration
 
 
 

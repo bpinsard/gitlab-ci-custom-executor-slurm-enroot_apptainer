@@ -11,7 +11,7 @@ test-report-serial:
 	./tests/bats/bin/bats --formatter junit tests/*serial > report-serial.xml
 
 test-include:
-	./tests/bats/bin/bats --jobs 4 -T tests/test-include.bats
+	./tests/bats/bin/bats --jobs 4 -T tests/test-config-include.bats
 
 test-jobsub:
 	./tests/bats/bin/bats --jobs 4 -T tests/custom_executor_queue/job_submission.bats

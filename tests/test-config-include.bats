@@ -12,7 +12,7 @@ function setup() {
     # and loading, and also make the sbatch mock available.
     SRC="$PROJECT_ROOT/src"
     # shellcheck disable=SC1091
-    source "$SRC"/include.sh
+    source "$SRC"/config-include.sh
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d configure-testXXXXXXX)
     export MOCKLOGDIR="$TEST_PLAYGROUND"

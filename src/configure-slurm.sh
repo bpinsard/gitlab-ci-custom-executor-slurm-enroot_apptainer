@@ -4,10 +4,10 @@
 # This script configures a slurm job
 # using the slurm OCI support
 
-#if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
-#set -o nounset
-#set -o errexit
-#set -o pipefail
+if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
+set -o nounset
+set -o errexit
+set -o pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
@@ -24,6 +24,8 @@ WORKSPACE="$CUSTOM_ENV_CI_BUILDS_DIR"
 ##########
 # shellcheck source=src/include.sh
 source "$SRC"/include.sh
+# shellcheck source=src/config-include.sh
+source "$SRC"/config-include.sh
 
 MIRROR_MOUNTS=(/scratch
                /etc/slurm/task_prolog.hk
