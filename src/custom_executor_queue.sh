@@ -100,8 +100,15 @@ function _custom_executor_queue () {
             (
              # shellcheck disable=SC2064
              trap "_log $BNAME was terminated. ; exit 0" SIGTERM
-             "$WORKING"/"$BNAME" &> "$OUTPUT"/"$BNAME".out
-             mv "$WORKING"/"$BNAME" "$DONE"
+             set +o pipefail
+             set +o errexit
+             set +o nounset
+             "$WORKING/$BNAME" &> "$OUTPUT/$BNAME.out"
+             echo $? > "$OUTPUT/$BNAME.exitcode"
+             set -o nounset
+             set -o errexit
+             set -o pipefail
+             mv "$WORKING/$BNAME" "$DONE"
              _log "$BNAME has ended"
             ) &
             SUBMITTEDPID=$!

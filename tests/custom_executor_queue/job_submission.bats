@@ -160,6 +160,28 @@ EOF
 }
 
 
+
+@test "the exit code of each job should be stored in \$WORKSPACE/OUTPUT/<jobfilename>.exitcode" {
+
+    (start_custom_executor_queue "$WORKDIR")
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat << EOF > job-1.sh
+exit 42
+EOF
+
+    chmod +x job-1.sh
+
+    submit_to_custom_executor_queue job-1.sh
+    rm job-1.sh
+    sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME+1))
+    assert [ -f "$WORKDIR"/OUTPUT/job-1.sh.exitcode ]
+
+    run cat "$WORKDIR"/OUTPUT/job-1.sh.exitcode
+    assert_output "42"
+
+}
 @test "custom executor queue should die gracefully when killed and print a message even if a job is running." {
 
     LOGFILE="$WORKDIR"/log.txt

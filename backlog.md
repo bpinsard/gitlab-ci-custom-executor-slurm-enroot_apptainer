@@ -22,6 +22,7 @@ to clarify some aspects of that.
 - [X] submitting jobs to the custom executor queue 
 - [X] the custom executor queue should give back stdin and stdout
   (in the same file for simplicity)
+- [X] the exit code of the jobs should be stored somewhere accessible
 
 
 ### configure.sh
@@ -160,9 +161,10 @@ there is no need to do anything here.
    THIS NEEDS TO BE TESTED
 
 - [ ] The exported variables need to be passed to the submitted file.
-- [ ] Every step which is submitted to the custom executor queue
+- [X] Every step which is submitted to the custom executor queue
       needs to have its output redirected from the file where it is printed
-      to the stdout of this process (use `tail -f ...`?)
+      to the stdout of this process (use `tail -f ...`? Or just "cat" at the end)
+- [ ] `run` must exit with the same error as the submitted job
 
 
 # cleanup.sh
