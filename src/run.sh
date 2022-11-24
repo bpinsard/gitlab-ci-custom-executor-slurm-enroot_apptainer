@@ -4,7 +4,11 @@ SCRIPT="${1}"
 STEPNAME="${2}"
 
 case "$STEPNAME" in
-    prepare_script|step_*|build_script|after_script|cleanup_file_variables)
+    prepare_script|\
+        step_*|\
+        build_script|\
+        after_script|\
+        cleanup_file_variables)
     SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
     # shellcheck source=./src/custom_executor_queue.sh
@@ -17,6 +21,7 @@ case "$STEPNAME" in
     BNAME="$(basename "$SCRIPT")"
     DONENAME="$CUSTOM_ENV_CI_BUILDS_DIR/DONE/$BNAME"
     OUTPUTNAME="$CUSTOM_ENV_CI_BUILDS_DIR/OUTPUT/$BNAME.out"
+    EXITVALUEFNAME="$CUSTOM_ENV_CI_BUILDS_DIR/OUTPUT/$BNAME.exitcode"
     while [ ! -f "$DONENAME" ]
     do
         sleep 1
@@ -24,15 +29,24 @@ case "$STEPNAME" in
     TIME="$(date +"%s")"
     mv "$DONENAME" "$DONENAME"-"$TIME"
     cat "$OUTPUTNAME"
-
+    read -r EXITVALUE < "$EXITVALUEFNAME"
+    exit "$EXITVALUE"
     ;;
 
-get_sources|restore_cache|download_artifacts|archive_cache|archive_cache_on_failure|upload_artifacts_on_success|upload_artifacts_on_failure)
+    get_sources|\
+        restore_cache|\
+        download_artifacts|\
+        archive_cache|\
+        archive_cache_on_failure|\
+        upload_artifacts_on_success|\
+        upload_artifacts_on_failure)
 
     "$SCRIPT"
-
+    exit $?
     ;;
 
     *)
+        echo "Step name not recognized: $STEPNAME" >&2
+        exit "$SYSTEM_FAILURE_EXIT_CODE"
     ;;
 esac

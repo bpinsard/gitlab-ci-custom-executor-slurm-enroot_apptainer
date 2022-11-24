@@ -222,6 +222,42 @@ EOF
     assert_output "Hello from $STEP"
     done
 
+}
 
+@test "run exits with the same code as the script." {
+    # shellcheck disable=SC1091
+    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    for STEP in "${ALL_STEP_NAMES[@]}"
+    do
+cat << EOF > script-"$STEP".sh
+
+exit 42
+
+EOF
+    chmod +x ./script-"$STEP".sh
+
+    run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+
+    assert_equal "$status" 42
+    done
+
+}
+
+@test "run exits with \$SYSTEM_FAILURE_EXIT_CODE if an erroneus step name is given" {
+
+    # shellcheck disable=SC1091
+    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    export SYSTEM_FAILURE_EXIT_CODE=102
+
+cat << EOF > script.sh
+
+echo "won't run"
+
+EOF
+    chmod +x ./script.sh
+
+    run "$SRC/run.sh" ./script.sh
+
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
 
 }
