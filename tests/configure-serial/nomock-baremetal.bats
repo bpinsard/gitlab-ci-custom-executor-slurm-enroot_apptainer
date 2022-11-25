@@ -95,9 +95,9 @@ function wait_until_file_exists() {
 @test "configure launches custom executor queue in slurm job - no container - submission" {
 
 
-    ############################################
+    ###############################################
     # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
-    ############################################
+    ###############################################
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
@@ -117,9 +117,9 @@ function wait_until_file_exists() {
 
     wait_until_file_exists "$ENVFILE" 30
 
-    ####################################
+    #######################################
     # SUBMITTING TO CUSTOM EXECUTOR QUEUE #
-    ####################################
+    #######################################
 
     # shellcheck disable=SC1090
     source "$ENVFILE"
@@ -140,9 +140,12 @@ EOF
     wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
         $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
 
-    assert [ -f "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out ]
-    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out
-    # Making sure this has run in a container
+    echo "Logfile so far:"
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
+    echo "end of logfile"
+    assert [ -f "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out" ]
+    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out"
+    # Making sure this has run 
     assert_output 'Hello'
 
 
@@ -152,9 +155,9 @@ EOF
 @test "custom executor queue is sent SIGUSR1 before end of job and trap is activated" {
 
 
-    ############################################
+    ###############################################
     # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
-    ############################################
+    ###############################################
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 2 -n 1"
