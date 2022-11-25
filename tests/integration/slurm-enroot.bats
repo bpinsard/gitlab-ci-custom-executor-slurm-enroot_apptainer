@@ -20,9 +20,15 @@ function _on_horeka () {
     # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/
     _on_horeka || skip
     GET_DISTRONAME=(grep PRETTY /etc/os-release)
-    run "${GET_DISTRONAME[@]}"
+    
+    # Running on the host (on a compute node)
+    run srun -p dev_cpuonly \
+        -n 1 -t 1 \
+        "${GET_DISTRONAME[@]}"
+
     refute_output --partial "Alpine Linux"
 
+    # Running inside a container (on a compute node)
     run srun -p dev_cpuonly \
         --container-image=alpine:latest \
         --container-mounts=/scratch:/scratch,/etc/slurm/task_prolog.hk:/etc/slurm/task_prolog.hk \
