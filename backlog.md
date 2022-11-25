@@ -160,11 +160,12 @@ there is no need to do anything here.
    At the moment this is done in the container.
    THIS NEEDS TO BE TESTED
 
-- [ ] The exported variables need to be passed to the submitted file.
+- [ ] The exported variables might need to be passed to the submitted file
+      DISCUSS
 - [X] Every step which is submitted to the custom executor queue
       needs to have its output redirected from the file where it is printed
       to the stdout of this process (use `tail -f ...`? Or just "cat" at the end)
-- [ ] `run` must exit with the same error as the submitted job
+- [X] `run` must exit with the same error as the submitted job
 
 
 # cleanup.sh
