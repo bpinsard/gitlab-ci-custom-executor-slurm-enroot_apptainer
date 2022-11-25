@@ -20,6 +20,7 @@ function setup() {
 
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR"/cews/.env
     echo "Test setup phase completed."
 }
 
@@ -39,9 +40,9 @@ function wait_until_file_exists() {
 }
 
 function teardown() {
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 30
+    wait_until_file_exists "$CEQ_ENV" 30
     # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    source "$CEQ_ENV"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue

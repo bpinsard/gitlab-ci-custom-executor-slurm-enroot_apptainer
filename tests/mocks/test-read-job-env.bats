@@ -9,7 +9,7 @@ function setup() {
     # and loading, and also make the sbatch mock available.
     PATH="$PROJECT_ROOT/tests/mocks/bin:$PATH"
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d configure-testXXXXXXX)
+    TEST_PLAYGROUND=$PWD/$(mktemp -d read-job-env-testXXXXXXX)
     echo "Created test playground at $TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start
@@ -18,6 +18,14 @@ function setup() {
 
 
     }
+
+
+function teardown(){
+
+    rm -r "$TEST_PLAYGROUND"
+
+
+}
 
 @test "read-job-env reads correctly the json output (by configure)" {
 

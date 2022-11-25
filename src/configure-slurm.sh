@@ -17,7 +17,7 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # TODO: Test that this variables is set by the gitlab runner
 # TODO: Change this to a job-id related name
-WORKSPACE="$CUSTOM_ENV_CI_BUILDS_DIR"
+WORKSPACE="$CUSTOM_ENV_CI_BUILDS_DIR"/cews
 
 ##########
 # MOUNTS #

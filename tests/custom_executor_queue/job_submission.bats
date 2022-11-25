@@ -4,7 +4,7 @@ setup(){
     _common_setup
     source "$PROJECT_ROOT/src/custom_executor_queue.sh"
     STARTDIR="${TEST_PLAYGROUND}"/start
-    WORKDIR="${TEST_PLAYGROUND}"/amws
+    WORKDIR="${TEST_PLAYGROUND}"/cews
     mkdir -p "${STARTDIR}"
     cd "${STARTDIR}"
 

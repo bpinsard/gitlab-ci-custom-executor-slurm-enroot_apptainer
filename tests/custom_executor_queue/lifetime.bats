@@ -4,7 +4,7 @@ setup(){
     load 'common_setup'
     _common_setup
     source "$PROJECT_ROOT/src/custom_executor_queue.sh"
-    WORKDIR="${TEST_PLAYGROUND}"/amws
+    WORKDIR="${TEST_PLAYGROUND}"/cews
 }
 
 teardown(){

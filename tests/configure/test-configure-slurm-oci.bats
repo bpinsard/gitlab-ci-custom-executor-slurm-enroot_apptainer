@@ -24,6 +24,7 @@ function setup() {
 
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR"/cews/.env
     echo "Test setup phase completed."
 }
 
@@ -44,9 +45,9 @@ function wait_until_file_exists() {
 
 
 function teardown() {
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 50
+    wait_until_file_exists "$CEQ_ENV" 50
     # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    source "$CEQ_ENV"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
@@ -55,7 +56,7 @@ function teardown() {
 }
 @test "/scratch in container mounts" {
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial '/scratch:/scratch'
@@ -65,7 +66,7 @@ function teardown() {
 
 @test "prolog script in container mounts" {
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial '/etc/slurm/task_prolog.hk:/etc/slurm/task_prolog.hk'
@@ -74,7 +75,7 @@ function teardown() {
 
 @test "\$CUSTOM_ENV_CI_BUILDS_DIR in container mounts" {
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
     assert_output --partial "$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
@@ -84,25 +85,25 @@ function teardown() {
 @test "custom executor queue is started in slurm allocation" {
 
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
+    wait_until_file_exists "$CEQ_ENV" 10
     # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    source "$CEQ_ENV"
 
     assert ps -q "$CUSTOM_EXECUTOR_QUEUE_JOBID"
 
 }
 
-@test "custom executor queue uses \$CUSTOM_ENV_CI_BUILDS_DIR as a workspace" {
+@test "custom executor queue uses \$CUSTOM_ENV_CI_BUILDS_DIR/cews as a workspace" {
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
+    wait_until_file_exists "$CEQ_ENV" 10
     # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    source "$CEQ_ENV"
 
-    assert_equal "$CUSTOM_ENV_CI_BUILDS_DIR" "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
+    assert_equal "$CUSTOM_ENV_CI_BUILDS_DIR"/cews "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
 
 
 }
@@ -112,7 +113,7 @@ function teardown() {
 
     export CUSTOM_ENV_SBATCH_ACCOUNT='averyimportantone'
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
 
     run cat "$MOCKLOGDIR"/sbatch.log
@@ -125,7 +126,7 @@ function teardown() {
 
     export CUSTOM_ENV_SBATCH_ACCOUNT_WRONG='averyimportantone'
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
 
     run cat "$MOCKLOGDIR"/sbatch.log
@@ -138,7 +139,7 @@ function teardown() {
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
 
@@ -152,7 +153,8 @@ function teardown() {
     local STDOUT="$TEST_PLAYGROUND/.stdout.test"
     local STDERR="$TEST_PLAYGROUND/.stderr.test"
     "$SRC"/configure-slurm.sh 1> "$STDOUT" \
-                                  2> "$STDERR"
+        2> "$STDERR" \
+        3> /dev/null
 
     run cat "$STDERR"
     assert_output --partial "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options"
@@ -167,7 +169,7 @@ function teardown() {
 @test "when 'COMMAND_OPTIONS_SBATCH' is not defined, use --partition=cpu_only -n 1 -t 30" {
 
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
    assert_output --regexp '--partition=cpu_only\s+-n\s+1\s+-t\s+30'
 
@@ -180,16 +182,11 @@ function teardown() {
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
-    "$SRC"/configure-slurm.sh | json_validate
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
-    while [ ! -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
-    do
-        sleep 1
-    done
-
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 10
+    wait_until_file_exists "$CEQ_ENV" 10
     # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    source "$CEQ_ENV"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
@@ -207,7 +204,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure-slurm.sh | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
+    "$SRC"/configure-slurm.sh 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
     }
 
     run _helper
@@ -220,7 +217,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure-slurm.sh | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
+    "$SRC"/configure-slurm.sh 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
     }
 
     run _helper
@@ -238,7 +235,7 @@ import sys
 dump = json.load(sys.stdin)
 int(dump["job_env"]["CE_SLURM_JOB_ID"])
 EOF
-    "$SRC"/configure-slurm.sh | python3 scr.py
+    "$SRC"/configure-slurm.sh 3> /dev/null | python3 scr.py
     }
 
     run _helper
@@ -256,14 +253,14 @@ import sys
 dump = json.load(sys.stdin)
 print(dump["job_env"]["CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH"])
 EOF
-    "$SRC"/configure-slurm.sh 2> /dev/null | python3 scr.py
+    "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null | python3 scr.py
     }
 
     run _helper
     assert_success
 
-    assert_output "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 20
-    assert [ -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
+    assert_output "$CEQ_ENV"
+    wait_until_file_exists "$CEQ_ENV" 20
+    assert [ -f "$CEQ_ENV" ]
 
 }

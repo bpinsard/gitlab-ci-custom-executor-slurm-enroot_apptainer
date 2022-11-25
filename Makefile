@@ -1,32 +1,36 @@
 
 
 test:
-	./tests/bats/bin/bats --jobs 4 $$(ls -d tests/* | grep -v '.*serial$$' ) 
+	./tests/bats/bin/bats --jobs 8 $$(ls -d tests/* | grep -v '.*serial$$' ) 
 	./tests/bats/bin/bats tests/*serial
 
 test-report-parallel:
-	./tests/bats/bin/bats --jobs 4 --formatter junit $$(ls -d tests/* | grep -v '.*serial$$' ) > report-parallel.xml
+	./tests/bats/bin/bats --jobs 8 --formatter junit $$(ls -d tests/* | grep -v '.*serial$$' ) > report-parallel.xml
 
 test-report-serial:
 	./tests/bats/bin/bats --formatter junit tests/*serial > report-serial.xml
 
 test-include:
-	./tests/bats/bin/bats --jobs 4 -T tests/test-config-include.bats
+	./tests/bats/bin/bats --jobs 8 -T tests/test-config-include.bats
 
 test-jobsub:
-	./tests/bats/bin/bats --jobs 4 -T tests/custom_executor_queue/job_submission.bats
+	./tests/bats/bin/bats --jobs 8 -T tests/custom_executor_queue/job_submission.bats
 
 test-lifetime:
-	./tests/bats/bin/bats --jobs 4 -T tests/custom_executor_queue/lifetime.bats
+	./tests/bats/bin/bats --jobs 8 -T tests/custom_executor_queue/lifetime.bats
 
 test-integration:
 	./tests/bats/bin/bats tests/integration
 
 test-configure:
-	./tests/bats/bin/bats --jobs 4 -T tests/configure/
+	./tests/bats/bin/bats --jobs 8 -T tests/configure/
 
 test-run:
-	./tests/bats/bin/bats --jobs 4 -T tests/run/
+	./tests/bats/bin/bats --jobs 8 -T tests/run/
+
+test-cleanup:
+	./tests/bats/bin/bats --jobs 8 -T tests/cleanup/
+
 
 test-mocks:
 	./tests/bats/bin/bats tests/mocks
@@ -39,7 +43,7 @@ test-mocks:
 # slurmstepd: error: pyxis:     mkdir: cannot create directory ‘/run/user/244691’: Permission denied
 # slurmstepd: error: pyxis: couldn't start container
 test-configure-nomock:
-	./tests/bats/bin/bats --jobs 4 -T tests/configure/
+	./tests/bats/bin/bats --jobs 8 -T tests/configure/
 
 shellcheck:
 	shellcheck $$(find src -name '*.sh') $$(find tests -name '*.bats' -not -path 'tests/bats/*' -not -path 'tests/test_helper/*')

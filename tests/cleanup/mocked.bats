@@ -27,9 +27,11 @@ function setup() {
     # shellcheck disable=SC1090
     source <( "$SRC/configure-slurm.sh" 3> /dev/null | read-job-env.py )
 
+
 }
 
 function teardown() {
+
     rm -rf "$TEST_PLAYGROUND"
 }
 
@@ -71,7 +73,8 @@ function wait_until_file_exists() {
     run cat "$MOCKLOGDIR/scancel.log"
 
     refute_line "ARGS: $CE_SLURM_JOB_ID"
-    sleep 5
+    # Additional 3 seconds for safety
+    sleep 5 3
     run cat "$MOCKLOGDIR/scancel.log"
     assert_line "ARGS: $CE_SLURM_JOB_ID"
 
@@ -80,9 +83,11 @@ function wait_until_file_exists() {
 
 @test "cleanup removes the custom executor queue workspace" {
 
-    "$SRC/cleanup-slurm.sh"
+    wait_until_file_exists "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH" 10
     # shellcheck disable=SC1090
     source "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH"
+
+    "$SRC/cleanup-slurm.sh"
 
     assert_dir_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
 
