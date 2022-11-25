@@ -6,4 +6,4 @@
 }
 
 SCANCEL_LOG=$MOCKLOGDIR/scancel.log
-echo "ARGS:" "$@" > $SCANCEL_LOG
+echo "ARGS:" "$@" >> "$SCANCEL_LOG"

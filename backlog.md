@@ -162,14 +162,31 @@ there is no need to do anything here.
 
 - [ ] The exported variables might need to be passed to the submitted file
       DISCUSS
-- [X] Every step which is submitted to the custom executor queue
+- [ ] Every step which is submitted to the custom executor queue
       needs to have its output redirected from the file where it is printed
       to the stdout of this process (use `tail -f ...`? Or just "cat" at the end)
-- [X] `run` must exit with the same error as the submitted job
+   - [X] Unit
+   - [ ] Integration
+- [ ] `run` must exit with the same error as the submitted job
+   - [X] Unit
+   - [ ] Integration
 
 
 # cleanup.sh
 - [ ] The slurm job needs to be terminated
+  - [ ] `--signal=SIGUSR1` should be used first
+    - [X] Unit
+    - [ ] Integration
+  - [ ] standard `scancel` should be used after 5 seconds
+    - [X] Unit
+    - [ ] Integration
+  - [ ] Optional: use '-f' as well
+    To send the signal to every child 
+    (this should not be necessary
+    given how configure and `job.slurm` work).
+    - [X] Unit
+    - [ ] Integration
+
 - [ ] Temporary directories need to be deleted
 - [ ] if `CUSTOM_ENV_CE_DEBUG` is set, 
       some debugging information should be printed

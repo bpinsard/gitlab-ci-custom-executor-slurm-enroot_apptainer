@@ -11,7 +11,7 @@
 
 SBATCH_LOG=$MOCKLOGDIR/sbatch.log
 
-echo ARGS: $@ > $SBATCH_LOG
+echo "ARGS:" "$@" >> "$SBATCH_LOG"
 
 
 # This list of variables has been collected

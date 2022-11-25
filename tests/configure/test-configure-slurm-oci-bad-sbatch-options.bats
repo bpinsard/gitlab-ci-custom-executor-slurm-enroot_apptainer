@@ -35,7 +35,7 @@ function teardown() {
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--container-image=fuzz"
     local STDOUT="$TEST_PLAYGROUND/.stdout.test"
     local STDERR="$TEST_PLAYGROUND/.stderr.test"
-    "$SRC"/configure-slurm.sh 1> "$STDOUT" 2> "$STDERR" || true #
+    "$SRC"/configure-slurm.sh 1> "$STDOUT" 2> "$STDERR" 3> /dev/null || true #
 
     run cat "$STDERR"
     assert_output --partial "Error: please do not use --container-image in \$COMMAND_OPTIONS_SBATCH."
@@ -48,7 +48,7 @@ function teardown() {
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--container-mounts=/fuzz:/fuzz"
     local STDOUT="$TEST_PLAYGROUND/.stdout.test"
     local STDERR="$TEST_PLAYGROUND/.stderr.test"
-    "$SRC"/configure-slurm.sh 1> "$STDOUT" 2> "$STDERR" || true #
+    "$SRC"/configure-slurm.sh 1> "$STDOUT" 2> "$STDERR" 3> /dev/null || true #
 
     run cat "$STDERR"
     assert_output --partial "Error: please do not use --container-mounts in \$COMMAND_OPTIONS_SBATCH."
@@ -59,7 +59,11 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--container-image=fuzz"
-    run "$SRC"/configure-slurm.sh
+    function _helper()
+    {
+    "$SRC"/configure-slurm.sh 3> /dev/null
+    }
+    run _helper
     assert_failure "$SYSTEM_FAILURE_EXIT_CODE"
 
 }
