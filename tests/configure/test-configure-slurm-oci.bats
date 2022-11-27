@@ -46,7 +46,7 @@ function wait_until_file_exists() {
 
 function teardown() {
     wait_until_file_exists "$CEQ_ENV" 50
-    # shellcheck disable=SC1091
+    # shellcheck disable=SC1090
     source "$CEQ_ENV"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
@@ -88,7 +88,7 @@ function teardown() {
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
     wait_until_file_exists "$CEQ_ENV" 10
-    # shellcheck disable=SC1091
+    # shellcheck disable=SC1090
     source "$CEQ_ENV"
 
     assert ps -q "$CUSTOM_EXECUTOR_QUEUE_JOBID"
@@ -100,7 +100,7 @@ function teardown() {
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
     wait_until_file_exists "$CEQ_ENV" 10
-    # shellcheck disable=SC1091
+    # shellcheck disable=SC1090
     source "$CEQ_ENV"
 
     assert_equal "$CUSTOM_ENV_CI_BUILDS_DIR"/cews "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
@@ -185,9 +185,9 @@ function teardown() {
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
     wait_until_file_exists "$CEQ_ENV" 10
-    # shellcheck disable=SC1091
+    # shellcheck disable=SC1090
     source "$CEQ_ENV"
-    # shellcheck disable=SC1091
+    # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
 

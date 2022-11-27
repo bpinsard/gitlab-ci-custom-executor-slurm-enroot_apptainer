@@ -41,13 +41,12 @@ function wait_until_file_exists() {
 
 function teardown() {
     wait_until_file_exists "$CEQ_ENV" 30
-    # shellcheck disable=SC1091
+    # shellcheck disable=SC1090
     source "$CEQ_ENV"
-    # shellcheck disable=SC1091
+    # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
     rm -r "$TEST_PLAYGROUND"
-
 }
 
 
