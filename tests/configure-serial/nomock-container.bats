@@ -34,6 +34,7 @@ EOF
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
 
+    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR/cews/.env"
 
     echo "Test setup phase completed."
 
@@ -85,9 +86,9 @@ function wait_until_file_exists() {
 
     scontrol wait_job "$JOB_ID"
 
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 90
+    wait_until_file_exists "$CEQ_ENV" 90
 
-    assert [ -f "$CUSTOM_ENV_CI_BUILDS_DIR"/.env ]
+    assert [ "$CEQ_ENV" ]
 
 }
 
@@ -118,16 +119,15 @@ function wait_until_file_exists() {
 
     scontrol wait_job "$JOB_ID"
    
-    ENVFILE="$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    wait_until_file_exists "$CEQ_ENV" 90
 
-    wait_until_file_exists "$ENVFILE" 100
 
     ####################################
     # SUBMITTING TO CUSTOM EXECUTOR QUEUE #
     ####################################
     
     # shellcheck disable=SC1090
-    source "$ENVFILE"
+    source "$CEQ_ENV"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
 

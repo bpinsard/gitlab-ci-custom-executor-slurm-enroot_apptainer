@@ -37,7 +37,7 @@ EOF
     export CUSTOM_ENV_CI_BUILDS_DIR
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
 
-    ENVFILE="$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR/cews/.env"
 
 }
 
@@ -115,14 +115,14 @@ function wait_until_file_exists() {
 
     scontrol wait_job "$JOB_ID"
 
-    wait_until_file_exists "$ENVFILE" 30
+    wait_until_file_exists "$CEQ_ENV" 30
 
     #######################################
     # SUBMITTING TO CUSTOM EXECUTOR QUEUE #
     #######################################
 
     # shellcheck disable=SC1090
-    source "$ENVFILE"
+    source "$CEQ_ENV"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
 
@@ -175,11 +175,11 @@ EOF
 
     scontrol wait_job "$JOB_ID"
 
-    wait_until_file_exists "$ENVFILE" 30
+    wait_until_file_exists "$CEQ_ENV" 30
 
 
     # shellcheck disable=SC1090
-    source "$ENVFILE"
+    source "$CEQ_ENV"
 
     run sbatch -p dev_cpuonly -n 1 -t 1 \
         --dependency=afterany:"$JOB_ID" \
