@@ -24,6 +24,7 @@ function wait_until_file_exists() {
 
 
 teardown(){
+    # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     stop_custom_executor_queue
     _common_teardown

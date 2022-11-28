@@ -122,9 +122,9 @@ function _custom_executor_queue () {
                  set -o nounset
                  set -o errexit
                  set -o pipefail
-                 trap "kill \"$RUNNINGPID\"; \
-                       echo \"$(date)\" \"$(hostname)\" \"$BNAME was terminated.\" >> \"$LOGS/$BNAME.log\"; \
-                       exit 0" SIGTERM
+                 trap 'kill '"$RUNNINGPID"'; \
+                       echo "$(date)" "$(hostname)" "'"$BNAME"' was terminated." >> "'"$LOGS/$BNAME.log"'"; \
+                       exit 0' SIGTERM
                  while ps --pid $RUNNINGPID > /dev/null
                  do
                      sleep 1
