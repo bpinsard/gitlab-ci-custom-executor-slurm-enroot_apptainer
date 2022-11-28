@@ -50,7 +50,7 @@ function custom_executor_queue_is_alive () {
 }
 
 function stop_custom_executor_queue () {
-    emergency_stop
+    stop_all
     kill $CUSTOM_EXECUTOR_QUEUE_JOBID
     while custom_executor_queue_is_alive
     do
@@ -66,7 +66,7 @@ function list_all_child_pids() {
     jobs -p | sed -r 's/[+-]//;s/\s+/ /g' | cut -d' ' -f2
 }
 
-function emergency_stop () {
+function stop_all () {
     _log "Stopping custom executor queue..."
     while read -r CHILD_PID
     do
@@ -79,9 +79,12 @@ function emergency_stop () {
         fi
     done < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
     _log "Sent kill signal to all the jobs"
-    exit 0
 }
 
+function emergency_stop () {
+    stop_all
+    exit 0
+}
 
 function cleanup_custom_executor_queue_workspace() {
     stop_custom_executor_queue
