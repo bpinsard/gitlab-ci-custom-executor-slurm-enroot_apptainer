@@ -1,7 +1,7 @@
 
 
 test:
-	./tests/bats/bin/bats --jobs 8 $$(ls -d tests/* | grep -v '.*serial$$' ) 
+	./tests/bats/bin/bats --jobs 8 $$(ls -d tests/* | grep -v '.*serial$$' )
 	./tests/bats/bin/bats tests/*serial
 
 test-report-parallel:
@@ -40,7 +40,7 @@ test-mocks:
 # slurmstepd: error: pyxis: child 3977009 failed with error code: 1
 # slurmstepd: error: pyxis: failed to create container filesystem
 # slurmstepd: error: pyxis: printing enroot log file:
-# slurmstepd: error: pyxis:     mkdir: cannot create directory ‘/run/user/244691’: Permission denied
+# slurmstepd: error: pyxis:     mkdir: cannot create directory ‘/run/user/248691’: Permission denied
 # slurmstepd: error: pyxis: couldn't start container
 test-configure-nomock:
 	./tests/bats/bin/bats --jobs 8 -T tests/configure/

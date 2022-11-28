@@ -30,6 +30,13 @@ function start_custom_executor_queue () {
 
 function submit_to_custom_executor_queue() {
     local JOBSCRIPT=$1
+
+    local BNAME
+    BNAME="$(basename "$JOBSCRIPT")"
+    if [ -f  "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/TODO/$BNAME" ]
+    then
+        return 45
+    fi
     cp "$JOBSCRIPT" "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
     local JOB TODO
     TODO="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
@@ -43,6 +50,7 @@ function custom_executor_queue_is_alive () {
 }
 
 function stop_custom_executor_queue () {
+    emergency_stop
     kill $CUSTOM_EXECUTOR_QUEUE_JOBID
     while custom_executor_queue_is_alive
     do
@@ -94,27 +102,42 @@ function _custom_executor_queue () {
         shopt -s nullglob
         for JOB in "$TODO"/*
         do
-            _log "Processing $JOB ..."
             local BNAME
             BNAME="$(basename "$JOB")"
-            mv "$JOB" "$WORKING"/"$BNAME"
-            (
-             # shellcheck disable=SC2064
-             trap "echo \"$(date)\" \"$(hostname)\" \"$BNAME was terminated.\" >> \"$LOGS/$BNAME.log\"; exit 0" SIGTERM
-             set +o pipefail
-             set +o errexit
-             set +o nounset
-             "$WORKING/$BNAME" &> "$OUTPUT/$BNAME.out"
-             echo $? > "$OUTPUT/$BNAME.exitcode"
-             set -o nounset
-             set -o errexit
-             set -o pipefail
-             mv "$WORKING/$BNAME" "$DONE"
-             echo "$(date)" "$(hostname)" "$BNAME has ended" >> "$LOGS/$BNAME.log"
-            ) &
-            SUBMITTEDPID=$!
-            _log "$BNAME (PID=$SUBMITTEDPID) launched."
-            echo "$SUBMITTEDPID" >> "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
+            local WNAME
+            WNAME="$WORKING/$BNAME"
+            if [ ! -f "$WNAME" ]
+            then
+                _log "Processing $JOB ..."
+                mv "$JOB" "$WNAME"
+                (
+                 echo "$(date)" "$(hostname)" "$BNAME is starting." >> "$LOGS/$BNAME.log"
+                 # shellcheck disable=SC2064
+                 set +o pipefail
+                 set +o errexit
+                 set +o nounset
+                 ("$WORKING/$BNAME" &> "$OUTPUT/$BNAME.out"
+                  echo $? > "$OUTPUT/$BNAME.exitcode") &
+                 RUNNINGPID=$!
+                 set -o nounset
+                 set -o errexit
+                 set -o pipefail
+                 trap "kill \"$RUNNINGPID\"; \
+                       echo \"$(date)\" \"$(hostname)\" \"$BNAME was terminated.\" >> \"$LOGS/$BNAME.log\"; \
+                       exit 0" SIGTERM
+                 while ps --pid $RUNNINGPID > /dev/null
+                 do
+                     sleep 1
+                 done
+                 mv "$WORKING/$BNAME" "$DONE"
+                 echo "$(date)" "$(hostname)" "$BNAME has ended." >> "$LOGS/$BNAME.log"
+                ) &
+                SUBMITTEDPID=$!
+                _log "$BNAME (PID=$SUBMITTEDPID) launched."
+                echo "$SUBMITTEDPID" >> "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
+            else
+                _log "Waiting on $JOB, $BNAME still in progess..."
+            fi
         done
         shopt -u nullglob
         for _ in  $(seq "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME")

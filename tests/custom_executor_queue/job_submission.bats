@@ -7,15 +7,29 @@ setup(){
     WORKDIR="${TEST_PLAYGROUND}"/cews
     mkdir -p "${STARTDIR}"
     cd "${STARTDIR}"
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
 }
 
+function wait_until_file_exists() {
+    local FILE="$1"
+    local MAXDELAY="$2"
+    local T0="$SECONDS"
+    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+        sleep 1
+    done
+
+}
+
+
 teardown(){
+    source "$WORKDIR"/.env
+    stop_custom_executor_queue
     _common_teardown
 }
 
 @test "submitted jobs to custom executor queue get executed" {
-    (start_custom_executor_queue  "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     cat << EOF > job.sh
@@ -32,7 +46,6 @@ EOF
 
 
 @test "submitted jobs to custom executor queue get executed ONCE" {
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     cat << EOF > job.sh
@@ -52,7 +65,6 @@ EOF
 
 @test "job starts are recorded in logfile" {
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     LOGFILE="$WORKDIR"/log.txt
@@ -69,7 +81,6 @@ EOF
 
 @test "job submission is recorded in logfile" {
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     LOGFILE="$WORKDIR"/log.txt
@@ -86,9 +97,8 @@ EOF
 
 }
 
-@test "job termination is recorded in job-specific log " {
+@test "job end is recorded in job-specific log " {
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     LOGFILE="$WORKDIR"/log.txt
@@ -98,16 +108,19 @@ EOF
 
     submit_to_custom_executor_queue job-123.sh
     rm job-123.sh
-    sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
 
-    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/LOGS/job-123.sh.log"
+    local LOGFILE
+    LOGFILE="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/LOGS/job-123.sh.log"
+    wait_until_file_exists "$LOGFILE" $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
+    run cat "$LOGFILE"
     assert_output --partial "job-123.sh has ended"
 
 }
 
+# This test is inherently flakier than the others
+# when run in a oversubscribed manner.
 @test "custom_executor_queue cycles at the given interval" {
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
@@ -136,7 +149,6 @@ EOF
 
 @test "job stdout and stderr are both stored in \$WORKSPACE/OUTPUT/<jobfilename>.out" {
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
@@ -149,10 +161,11 @@ EOF
 
     submit_to_custom_executor_queue job-1.sh
     rm job-1.sh
-    sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME+1))
-    assert [ -f "$WORKDIR"/OUTPUT/job-1.sh.out ]
+    local OUT="$WORKDIR"/OUTPUT/job-1.sh.out
+    wait_until_file_exists "$OUT" 10
+    assert [ -f "$OUT" ]
 
-    run cat "$WORKDIR"/OUTPUT/job-1.sh.out
+    run cat "$OUT"
     assert_output - <<EOF
 A new line
 A stderr line
@@ -161,10 +174,8 @@ EOF
 }
 
 
-
 @test "the exit code of each job should be stored in \$WORKSPACE/OUTPUT/<jobfilename>.exitcode" {
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
@@ -183,11 +194,12 @@ EOF
     assert_output "42"
 
 }
+
+
 @test "custom executor queue should die gracefully when killed and print a message even if a job is running." {
 
     LOGFILE="$WORKDIR"/log.txt
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
@@ -249,25 +261,59 @@ EOF
 
 }
 
-@test "custom executor queue saves the pids of the jobs in a file" {
+# bats test_tags=samename,serialization
+@test "execution of jobs with the same name is serialized." {
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
     assert_equal 0 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
-    touch job.sh
-    chmod +x job.sh
 
+    cat <<EOF > job.sh
+# So that it will take long enough
+for i in {1..5}
+do
+    sleep $CUSTOM_EXECUTOR_QUEUE_CYCLETIME
+done
+EOF
+    chmod +x job.sh
     submit_to_custom_executor_queue job.sh
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
+
+    cat <<EOF > job.sh
+# I am an unfortunate job.
+touch "$WORKDIR/result.out"
+EOF
+    submit_to_custom_executor_queue job.sh || exit
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
+    # job.sh MUST NOT have executed
+    assert_file_not_exists "$WORKDIR/result.out"
+
+    # But after the first job has completed, the second one should be executed.
+    sleep "$((8*CUSTOM_EXECUTOR_QUEUE_CYCLETIME))"
+
+    assert_file_exists "$WORKDIR/result.out"
+
+
+}
+
+
+@test "custom executor queue saves the pids of the jobs in a file" {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    assert_equal 0 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
+
+    touch job1.sh
+    chmod +x job1.sh
+    submit_to_custom_executor_queue job1.sh
     sleep $CUSTOM_EXECUTOR_QUEUE_CYCLETIME 1
     assert_equal 1 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
-    submit_to_custom_executor_queue job.sh
+
+    submit_to_custom_executor_queue job1.sh
     sleep $CUSTOM_EXECUTOR_QUEUE_CYCLETIME 1
     assert_equal 2 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
-
-
-
 
 }
 
@@ -276,7 +322,6 @@ EOF
 
     LOGFILE="$WORKDIR"/log.txt
 
-    (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
@@ -310,7 +355,28 @@ EOF
         done
     done < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
 
-    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/LOGS/job-1.sh.log
+    local JOBLOG="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/LOGS/job-1.sh.log
+    wait_until_file_exists "$JOBLOG" 40
+
+    run cat "$JOBLOG"
     assert_output --partial "job-1.sh was terminated."
+
+}
+
+# bats test_tags=samename
+@test "attempting to submit 2 jobs with the same name too fast causes error" {
+
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > job1.sh
+echo "A line of output"
+EOF
+    chmod +x job1.sh
+    submit_to_custom_executor_queue job1.sh
+    run submit_to_custom_executor_queue job1.sh
+    assert_equal "$status" 45
+
 
 }

@@ -11,7 +11,7 @@ function setup() {
     SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d configure-testXXXXXXX)
-    echo "Created test playground at $TEST_PLAYGROUND"
+    echo "Created test playground at $TEST_PLAYGROUND" >&3
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"

@@ -19,7 +19,7 @@ teardown(){
 
 @test "custom executor queue starts and is alive - same shell" {
     # We test in the current shell,
-    start_custom_executor_queue "${WORKDIR}"
+    start_custom_executor_queue "${WORKDIR}" 3> /dev/null
     sleep 5
     job_is_alive=$(jobs -r | wc -l)
     assert_equal "$job_is_alive" 1
@@ -28,7 +28,7 @@ teardown(){
 
 @test "start_custom_executor_queue creates env file" {
 
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     assert [ -f "$WORKDIR"/.env ]
     # There are 5 variables that need to be declared
     # (this might need to be updated)
@@ -39,7 +39,7 @@ teardown(){
 @test "sourcing env files gives you CUSTOM_EXECUTOR_QUEUE... variables" {
 
     assert _no_custom_executor_queue_variables_declared
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     echo "sourcing environment..."
@@ -49,7 +49,7 @@ teardown(){
 }
 
 @test "custom executor queue dies when killed" {
-    (start_custom_executor_queue "${WORKDIR}")
+    (start_custom_executor_queue "${WORKDIR}" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     stop_custom_executor_queue
@@ -60,7 +60,7 @@ teardown(){
 
 @test "stop_custom_executor_queue stops the custom executor queue" {
 
-    (start_custom_executor_queue "${WORKDIR}")
+    (start_custom_executor_queue "${WORKDIR}" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     stop_custom_executor_queue
@@ -70,7 +70,7 @@ teardown(){
 
 @test "custom_executor_queue_is_alive gives right result" {
 
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     assert custom_executor_queue_is_alive
@@ -84,7 +84,7 @@ teardown(){
 }
 
 @test "custom executor queue ensures workdir exists" {
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR/".env
     assert [ -d "${WORKDIR}" ]
@@ -92,7 +92,7 @@ teardown(){
 
 @test "cleanup_custom_executor_queue_workspace deletes workspace" {
 
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR/".env
     cleanup_custom_executor_queue_workspace
@@ -102,7 +102,7 @@ teardown(){
 
 @test "cleanup custom executor queue workspace stops the custom executor queue" {
 
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     cleanup_custom_executor_queue_workspace
@@ -115,7 +115,7 @@ teardown(){
     LOGFILE="$WORKDIR"/log.txt
     refute [ -f "$LOGFILE" ]
 
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
     assert [ -f "$LOGFILE" ]
 
@@ -126,7 +126,7 @@ teardown(){
 
     LOGFILE="$WORKDIR"/log.txt
 
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
@@ -134,10 +134,13 @@ teardown(){
     refute_output  --partial "Stopping custom executor queue..."
 
     kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_JOBID"
-    # killing might take a while
-    while custom_executor_queue_is_alive
+    # killing might take a while, but not forever
+    declare -i count
+    count=0
+    while custom_executor_queue_is_alive && [ "$count" -lt 20 ]
     do
         sleep 1
+        count=$((count+1))
     done
 
     run cat "$LOGFILE"
@@ -151,7 +154,7 @@ teardown(){
 
     LOGFILE="$WORKDIR"/log.txt
 
-    (start_custom_executor_queue "$WORKDIR")
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 

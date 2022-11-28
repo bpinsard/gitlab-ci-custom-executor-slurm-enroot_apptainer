@@ -6,13 +6,15 @@
 function _common_setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load' # for filesystem-related asserts
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
     # and loading
-    PATH="$PROJECT_ROOT/src:$PATH"
+    SRC="$PROJECT_ROOT/src"
+    PATH="$SRC:$PATH"
     TEST_PLAYGROUND=$PWD/$(mktemp -d alloc-manager-testXXXXXXX)
-    echo "Created test playground at $TEST_PLAYGROUND"
+    echo "Created test playground at $TEST_PLAYGROUND" >&3
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
@@ -22,7 +24,6 @@ function _common_setup() {
 
 function _common_teardown() {
     rm -rf $TEST_PLAYGROUND
-
 }
 
 function _no_custom_executor_queue_variables_declared() {
