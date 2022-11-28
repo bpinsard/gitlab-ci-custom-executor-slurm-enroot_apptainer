@@ -86,7 +86,7 @@ EOF
 
 }
 
-@test "job termination is recorded in logfile" {
+@test "job termination is recorded in job-specific log " {
 
     (start_custom_executor_queue "$WORKDIR")
     # shellcheck disable=SC1091
@@ -99,7 +99,8 @@ EOF
     submit_to_custom_executor_queue job-123.sh
     rm job-123.sh
     sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
-    run  cat "$LOGFILE"
+
+    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/LOGS/job-123.sh.log"
     assert_output --partial "job-123.sh has ended"
 
 }
@@ -271,7 +272,7 @@ EOF
 }
 
 
-@test "when custom executor queue is killed, the running job should say it was terminated." {
+@test "when custom executor queue killed, job termination recorded in job-specific log." {
 
     LOGFILE="$WORKDIR"/log.txt
 
@@ -309,8 +310,7 @@ EOF
         done
     done < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
 
-
-    run cat "$LOGFILE"
+    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/LOGS/job-1.sh.log
     assert_output --partial "job-1.sh was terminated."
 
 }

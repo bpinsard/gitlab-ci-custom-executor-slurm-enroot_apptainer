@@ -87,6 +87,7 @@ function _custom_executor_queue () {
     local WORKING="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/WORKING
     local DONE="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/DONE
     local OUTPUT="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT
+    local LOGS="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/LOGS
     trap emergency_stop SIGTERM SIGUSR1
     while true
     do
@@ -99,7 +100,7 @@ function _custom_executor_queue () {
             mv "$JOB" "$WORKING"/"$BNAME"
             (
              # shellcheck disable=SC2064
-             trap "_log $BNAME was terminated. ; exit 0" SIGTERM
+             trap "echo \"$(date)\" \"$(hostname)\" \"$BNAME was terminated.\" >> \"$LOGS/$BNAME.log\"; exit 0" SIGTERM
              set +o pipefail
              set +o errexit
              set +o nounset
@@ -109,7 +110,7 @@ function _custom_executor_queue () {
              set -o errexit
              set -o pipefail
              mv "$WORKING/$BNAME" "$DONE"
-             _log "$BNAME has ended"
+             echo "$(date)" "$(hostname)" "$BNAME has ended" >> "$LOGS/$BNAME.log"
             ) &
             SUBMITTEDPID=$!
             _log "$BNAME (PID=$SUBMITTEDPID) launched."
@@ -126,7 +127,7 @@ function _custom_executor_queue () {
 }
 
 function _create_directories(){
-    for SUBDIR in TODO WORKING DONE OUTPUT
+    for SUBDIR in TODO WORKING DONE OUTPUT LOGS
     do
         mkdir -p "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/$SUBDIR
     done
