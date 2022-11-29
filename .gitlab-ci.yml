@@ -8,7 +8,7 @@ unit-test-parallel:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test-report-parallel JOBS=8
+    - make test-report-parallel JOBS=4
   after_script:
     - make joker
   tags:
