@@ -70,13 +70,10 @@ function wait_until_file_exists() {
 
     "$SRC/cleanup-slurm.sh"  &
     wait_until_file_exists "$MOCKLOGDIR/scancel.log"
-    run cat "$MOCKLOGDIR/scancel.log"
-
-    refute_line "ARGS: $CE_SLURM_JOB_ID"
+    refute  grep -q "ARGS: $CE_SLURM_JOB_ID" "$MOCKLOGDIR/scancel.log"
     # Additional 3 seconds for safety
     sleep 5 3
-    run cat "$MOCKLOGDIR/scancel.log"
-    assert_line "ARGS: $CE_SLURM_JOB_ID"
+    assert  grep -q "ARGS: $CE_SLURM_JOB_ID" "$MOCKLOGDIR/scancel.log"
 
 
 }

@@ -3,25 +3,20 @@ setup(){
     load 'common_setup'
     _common_setup
     source "$PROJECT_ROOT/src/custom_executor_queue.sh"
-    STARTDIR="${TEST_PLAYGROUND}"/start
+
+    TEST_PLAYGROUND=$PWD/$(mktemp -d ce-queue-job-sub-testXXXXXXX)
+    echo "Created test playground at $TEST_PLAYGROUND" >&3
+
+
     WORKDIR="${TEST_PLAYGROUND}"/cews
+    STARTDIR="${TEST_PLAYGROUND}"/start
+
     mkdir -p "${STARTDIR}"
     cd "${STARTDIR}"
+
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
 }
-
-function wait_until_file_exists() {
-    local FILE="$1"
-    local MAXDELAY="$2"
-    local T0="$SECONDS"
-    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
-    do
-        sleep 1
-    done
-
-}
-
 
 teardown(){
     # shellcheck disable=SC1091
@@ -42,7 +37,11 @@ EOF
     submit_to_custom_executor_queue job.sh
     rm job.sh
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1 1
-    assert [ -f  "$TEST_PLAYGROUND"/test-job-results.txt ]
+    local RESULT
+    RESULT="$TEST_PLAYGROUND"/test-job-results.txt
+    wait_until_file_exists "$RESULT" 20
+    assert_file_exists "$RESULT"
+
 }
 
 
@@ -59,8 +58,10 @@ EOF
     rm job.sh
     # We wait 2 cycle times
     sleep $((2*CUSTOM_EXECUTOR_QUEUE_CYCLETIME))
-    nlines=$(wc -l < "$TEST_PLAYGROUND"/test-job-results.txt)
-
+    local RESULT
+    RESULT="$TEST_PLAYGROUND"/test-job-results.txt
+    wait_until_file_exists "$RESULT" 20
+    nlines=$(wc -l < "$RESULT")
     assert_equal "$nlines" 1
 }
 
@@ -75,6 +76,9 @@ EOF
     submit_to_custom_executor_queue job-123.sh
     rm job-123.sh
     sleep $CUSTOM_EXECUTOR_QUEUE_CYCLETIME 1
+
+    wait_until_file_contains "$LOGFILE" "Processing.*job-123.sh" 30
+
     run cat "$LOGFILE"
     assert_output --regexp "Processing.*job-123.sh"
 
@@ -92,7 +96,7 @@ EOF
     submit_to_custom_executor_queue job-123.sh
     rm job-123.sh
 
-    sleep 2
+    wait_until_file_contains "$LOGFILE" "Submitted.*job-123.sh" 30
     run cat "$LOGFILE"
     assert_output --regexp "Submitted.*job-123.sh"
 
@@ -113,6 +117,8 @@ EOF
     local LOGFILE
     LOGFILE="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/LOGS/job-123.sh.log"
     wait_until_file_exists "$LOGFILE" $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
+
+    wait_until_file_contains "$LOGFILE" "job-123.sh has ended" 30
     run cat "$LOGFILE"
     assert_output --partial "job-123.sh has ended"
 
@@ -142,6 +148,8 @@ EOF
     sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME-1-1+1))
     # but now it should have been processed.
     cat "$LOGFILE"
+    wait_until_file_contains "$LOGFILE" "Processing.*job-1.sh" 30
+
     run cat "$LOGFILE"
     assert_output --regexp "Processing.*job-1.sh"
 
@@ -188,7 +196,7 @@ EOF
 
     submit_to_custom_executor_queue job-1.sh
     rm job-1.sh
-    sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME+1))
+    wait_until_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode 30
     assert [ -f "$WORKDIR"/OUTPUT/job-1.sh.exitcode ]
 
     run cat "$WORKDIR"/OUTPUT/job-1.sh.exitcode
@@ -201,9 +209,11 @@ EOF
 
     LOGFILE="$WORKDIR"/log.txt
 
+    wait_until_file_exists "$WORKDIR/.env" 30
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
+    wait_until_file_exists "$LOGFILE" 30
     run cat "$LOGFILE"
     refute_output  --partial "Stopping custom executor queue..."
 
@@ -228,6 +238,7 @@ EOF
         sleep 1
     done
 
+    wait_until_file_contains "$LOGFILE" "Stopping custom executor queue..." 30
     run cat "$LOGFILE"
     assert_output  --partial "Stopping custom executor queue..."
 
@@ -375,7 +386,15 @@ EOF
 echo "A line of output"
 EOF
     chmod +x job1.sh
-    submit_to_custom_executor_queue job1.sh
+    while [ ! -f "$WORKDIR"/TODO/job1.sh ]
+    do
+        submit_to_custom_executor_queue job1.sh
+    done
+
+    if [ ! -f "$WORKDIR"/TODO/job1.sh ]
+    then
+        skip # We are very unlucky
+    fi
     run submit_to_custom_executor_queue job1.sh
     assert_equal "$status" 45
 

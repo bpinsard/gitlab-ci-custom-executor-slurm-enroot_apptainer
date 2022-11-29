@@ -92,6 +92,7 @@ function cleanup_custom_executor_queue_workspace() {
 }
 
 function _custom_executor_queue () {
+    trap emergency_stop SIGTERM SIGUSR1
     _log "Starting custom executor queue."
     local SUBMITTEDPID
     local TODO="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
@@ -99,7 +100,6 @@ function _custom_executor_queue () {
     local DONE="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/DONE
     local OUTPUT="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT
     local LOGS="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/LOGS
-    trap emergency_stop SIGTERM SIGUSR1
     while true
     do
         shopt -s nullglob

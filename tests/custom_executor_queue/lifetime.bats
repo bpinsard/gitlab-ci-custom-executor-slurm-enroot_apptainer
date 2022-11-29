@@ -4,7 +4,16 @@ setup(){
     load 'common_setup'
     _common_setup
     source "$PROJECT_ROOT/src/custom_executor_queue.sh"
+
+    TEST_PLAYGROUND=$PWD/$(mktemp -d ce-lifetime-testXXXXXXX)
+    echo "Created test playground at $TEST_PLAYGROUND" >&3
+
     WORKDIR="${TEST_PLAYGROUND}"/cews
+    STARTDIR="${TEST_PLAYGROUND}"/start
+
+    mkdir -p "$STARTDIR"
+    cd "$STARTDIR"
+
 }
 
 teardown(){
@@ -13,7 +22,7 @@ teardown(){
 
 @test "custom executor queue complains when invoked with the wrong number of arguments" {
 
-    refute start_custom_executor_queue many more args than needed
+    refute start_custom_executor_queue many more args than needed 3> /dev/null
 
 }
 
@@ -117,39 +126,11 @@ teardown(){
 
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
-    assert [ -f "$LOGFILE" ]
+    assert_file_exists "$LOGFILE"
 
 }
 
-
-@test "custom executor queue should die gracefully when killed with SIGTERM and print a message" {
-
-    LOGFILE="$WORKDIR"/log.txt
-
-    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
-    # shellcheck disable=SC1091
-    source "$WORKDIR"/.env
-
-    run cat "$LOGFILE"
-    refute_output  --partial "Stopping custom executor queue..."
-
-    kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_JOBID"
-    # killing might take a while, but not forever
-    declare -i count
-    count=0
-    while custom_executor_queue_is_alive && [ "$count" -lt 20 ]
-    do
-        sleep 1
-        count=$((count+1))
-    done
-
-    run cat "$LOGFILE"
-    assert_output  --partial "Stopping custom executor queue..."
-
-
-}
-
-
+# bats test_tags=ce_termination
 @test "custom executor queue should die gracefully when killed with SIGUSR1 and print a message" {
 
     LOGFILE="$WORKDIR"/log.txt
@@ -161,16 +142,54 @@ teardown(){
     run cat "$LOGFILE"
     refute_output  --partial "Stopping custom executor queue..."
 
+    wait_until_file_contains "$LOGFILE" "Starting custom executor queue." 20
     kill -s SIGUSR1 "$CUSTOM_EXECUTOR_QUEUE_JOBID"
     # killing might take a while, but not forever
     declare -i count
     count=0
-    while custom_executor_queue_is_alive && [ "$count" -lt 20 ]
+    while custom_executor_queue_is_alive && [ "$count" -lt 40 ]
+    do
+        sleep 1
+        count=$((count+1))
+    done
+    if custom_executor_queue_is_alive
+    then
+        echo "custom executor queue refuses to die"
+    fi
+
+    wait_until_file_contains "$LOGFILE" "Stopping custom executor queue..." 20
+
+    run cat "$LOGFILE"
+    assert_output  --partial "Stopping custom executor queue..."
+
+
+}
+
+
+# bats test_tags=ce_termination
+@test "custom executor queue should die gracefully when killed with SIGTERM and print a message" {
+
+    LOGFILE="$WORKDIR"/log.txt
+
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    run cat "$LOGFILE"
+    refute_output  --partial "Stopping custom executor queue..."
+
+    wait_until_file_contains "$LOGFILE" "Starting custom executor queue." 20
+    kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_JOBID"
+    # killing might take a while, but not forever
+    declare -i count
+    count=0
+    while custom_executor_queue_is_alive && [ "$count" -lt 40 ]
     do
         sleep 1
         count=$((count+1))
     done
 
+    wait_until_file_contains "$LOGFILE" "Stopping custom executor queue..." 40
     run cat "$LOGFILE"
     assert_output  --partial "Stopping custom executor queue..."
 

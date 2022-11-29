@@ -50,6 +50,13 @@ Considerations:
 
 Features:
 
+
+- [ ] if a container image is used, 
+      needs to check that the container image
+      contains everything is needed
+      by the custom executor queue.
+      List of commands to test:
+      - [ ] `ps --pid`
 - [X] use `sbatch` with --container-image when a container image is required
 - [X] manage correctly mount options when a container image is required
   NOTE: this might need adjustments as we go along.

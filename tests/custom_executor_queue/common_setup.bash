@@ -13,12 +13,7 @@ function _common_setup() {
     # and loading
     SRC="$PROJECT_ROOT/src"
     PATH="$SRC:$PATH"
-    TEST_PLAYGROUND=$PWD/$(mktemp -d alloc-manager-testXXXXXXX)
-    echo "Created test playground at $TEST_PLAYGROUND" >&3
 
-    STARTDIR="${TEST_PLAYGROUND}"/start
-    mkdir -p "$STARTDIR"
-    cd "$STARTDIR"
 }
 
 
@@ -30,4 +25,28 @@ function _no_custom_executor_queue_variables_declared() {
     #local ndeclared=$(env | grep -E '^CUSTOM_EXECUTOR_QUEUE' | wc -l )
     local ndeclared=$( echo "${!CUSTOM_EXECUTOR_QUEUE*}" | wc -w )
     [ $ndeclared -eq 0 ]
+}
+
+
+function wait_until_file_exists() {
+    local FILE="$1"
+    local MAXDELAY="$2"
+    local T0="$SECONDS"
+    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+        sleep 1
+    done
+
+}
+
+function wait_until_file_contains() {
+    local FILE="$1"
+    local WHAT="$2"
+    local MAXDELAY="$3"
+    local T0="$SECONDS"
+    while ! grep -qE "$WHAT" "$FILE" &&  [[ "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+        sleep 1
+    done
+
 }
