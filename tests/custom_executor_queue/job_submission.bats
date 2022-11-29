@@ -102,7 +102,7 @@ EOF
 
 }
 
-@test "job end is recorded in job-specific log " {
+@test "job end is recorded in log " {
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -114,8 +114,6 @@ EOF
     submit_to_custom_executor_queue job-123.sh
     rm job-123.sh
 
-    local LOGFILE
-    LOGFILE="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/LOGS/job-123.sh.log"
     wait_until_file_exists "$LOGFILE" $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
 
     wait_until_file_contains "$LOGFILE" "job-123.sh has ended" 30
@@ -330,7 +328,7 @@ EOF
 }
 
 
-@test "when custom executor queue killed, job termination recorded in job-specific log." {
+@test "when custom executor queue killed, job termination recorded in log." {
 
     LOGFILE="$WORKDIR"/log.txt
 
@@ -367,10 +365,7 @@ EOF
         done
     done < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
 
-    local JOBLOG="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/LOGS/job-1.sh.log
-    wait_until_file_exists "$JOBLOG" 40
-
-    run cat "$JOBLOG"
+    run cat "$LOGFILE"
     assert_output --partial "job-1.sh was terminated."
 
 }
