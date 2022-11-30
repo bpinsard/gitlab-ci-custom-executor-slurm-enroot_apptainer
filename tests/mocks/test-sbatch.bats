@@ -152,6 +152,7 @@ EOF
 
     sbatch --some --options ./job.sh output.sh
 
+    # shellcheck disable=SC2031
     assert_file_exists "$MOCKLOGDIR/pids.txt"
 
 }
