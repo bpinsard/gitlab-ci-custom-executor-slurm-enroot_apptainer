@@ -10,6 +10,7 @@
 }
 
 SBATCH_LOG=$MOCKLOGDIR/sbatch.log
+SBATCH_PIDS=$MOCKLOGDIR/pids.txt
 
 echo "ARGS:" "$@" >> "$SBATCH_LOG"
 
@@ -59,4 +60,5 @@ do
 done
 
 echo 987654321
-$@ 1> slurm-987654321.out 2> slurm-987654321.err &
+("$@" 1> slurm-987654321.out 2> slurm-987654321.err) &
+echo $! "$@" >> "$SBATCH_PIDS"

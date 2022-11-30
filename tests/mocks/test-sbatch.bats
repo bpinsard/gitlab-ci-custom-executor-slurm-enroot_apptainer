@@ -3,6 +3,7 @@
 setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load' # for assert_output and refute_output
     load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     PATH="$PROJECT_ROOT/tests/mocks/bin:$PROJECT_ROOT/src/slurm-utils:$PATH"
@@ -14,10 +15,14 @@ setup(){
     echo "Created test playground at $TEST_PLAYGROUND"
     export MOCKLOGDIR=$TEST_PLAYGROUND
 
-
 }
 
 teardown(){
+    if [ -f "$MOCKLOGDIR"/pids.txt  ]
+    then
+        awk '{print $1}' "$MOCKLOGDIR"/pids.txt | xargs kill
+    fi
+
     rm -r "$TEST_PLAYGROUND"
 }
 
@@ -35,7 +40,7 @@ teardown(){
 
     sbatch --something echo
     # shellcheck disable=SC2031
-    assert [ -f "$MOCKLOGDIR"/sbatch.log ]
+    assert_file_exists "$MOCKLOGDIR"/sbatch.log
 
 }
 
@@ -107,7 +112,7 @@ EOF
     # This is not robust
     # (failure of this does not necessarily mean
     # failure of the test)
-    assert [ -f output.sh ]
+    assert_file_exists output.sh
 
 
 }
@@ -135,5 +140,18 @@ EOF
     run sbatch --some --options ./job.sh output.sh
     refute_output --partial "Hello"
 
+
+}
+
+@test "sbatch mock saves the PID of the executable launched in the background in a file" {
+
+    cat <<EOF > job.sh
+echo Hello
+EOF
+    chmod +x job.sh
+
+    sbatch --some --options ./job.sh output.sh
+
+    assert_file_exists "$MOCKLOGDIR/pids.txt"
 
 }

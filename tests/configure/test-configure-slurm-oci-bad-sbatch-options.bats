@@ -25,6 +25,7 @@ function setup() {
 }
 
 function teardown() {
+    awk '{print $1}' "$MOCKLOGDIR"/pids.txt | xargs kill
     rm -r "$TEST_PLAYGROUND"
 }
 
