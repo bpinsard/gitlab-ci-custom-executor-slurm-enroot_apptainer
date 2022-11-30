@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 
-function _on_horeka() {
-   hostname | grep -q -E "hkn[0-9]{4}.localdomain"
-}
+# bats file_tags=serial
 
 function setup(){
 
-    _on_horeka || skip
-
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test-utils'
+    _on_horeka || skip
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
@@ -29,15 +27,15 @@ dump = json.load(sys.stdin)
 print(dump["job_env"]["CE_SLURM_JOB_ID"])
 EOF
 
-
-    echo "Test setup phase completed."
-
     # shellcheck disable=SC2030
-    CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
-    export CUSTOM_ENV_CI_BUILDS_DIR
+    export CUSTOM_ENV_CI_JOB_IMAGE="bash:5.2.9-alpine3.16"
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
 
     CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR/cews/.env"
+
+    echo "Test setup phase completed."
 
 }
 
@@ -51,26 +49,15 @@ function teardown() {
     fi
 }
 
-function wait_until_file_exists() {
-    local FILE="$1"
-    local MAXDELAY="$2"
-    local T0="$SECONDS"
-    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
-    do
-        sleep 1
-    done
-
-}
-
-
-@test "configure launches custom executor queue in slurm job - no container" {
+@test "configure launches custom executor queue in slurm job - with container" {
 
     ############################################
     # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
     ############################################
-
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
+
+
     JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
 
     # scontrol is slow, so it might query the job information
@@ -85,22 +72,25 @@ function wait_until_file_exists() {
 
     scontrol wait_job "$JOB_ID"
 
-    wait_until_file_exists "$CEQ_ENV" 30
+    wait_until_file_exists "$CEQ_ENV" 90
 
-    assert [ -f "$CEQ_ENV" ]
+    assert [ "$CEQ_ENV" ]
 
 }
 
 
-@test "configure launches custom executor queue in slurm job - no container - submission" {
 
 
-    ###############################################
+@test "configure launches custom executor queue in slurm job - with container - submission" {
+
+
+    ############################################
     # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
-    ###############################################
+    ############################################
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
+    
 
-    # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
     JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
 
     # scontrol is slow, so it might query the job information
@@ -114,13 +104,14 @@ function wait_until_file_exists() {
     done
 
     scontrol wait_job "$JOB_ID"
+   
+    wait_until_file_exists "$CEQ_ENV" 90
 
-    wait_until_file_exists "$CEQ_ENV" 30
 
-    #######################################
+    ####################################
     # SUBMITTING TO CUSTOM EXECUTOR QUEUE #
-    #######################################
-
+    ####################################
+    
     # shellcheck disable=SC1090
     source "$CEQ_ENV"
     # shellcheck disable=SC1091
@@ -128,7 +119,7 @@ function wait_until_file_exists() {
 
     cat << EOF > job.sh
 #!/usr/bin/env bash
-echo "Hello"
+grep PRETTY /etc/os-release
 
 EOF
     chmod +x job.sh
@@ -140,52 +131,9 @@ EOF
     wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
         $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
 
-    echo "Logfile so far:"
-    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
-    echo "end of logfile"
-    assert [ -f "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out" ]
-    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out"
-    # Making sure this has run 
-    assert_output 'Hello'
-
-
-
-}
-
-@test "custom executor queue is sent SIGUSR1 before end of job and trap is activated" {
-
-
-    ###############################################
-    # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
-    ###############################################
-
-    # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 2 -n 1"
-    JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
-
-    # scontrol is slow, so it might query the job information
-    # before it is actually available
-    # and the test may fail
-    while ! scontrol wait_job "$JOB_ID"
-    do
-	echo "squeue output:"
-        squeue
-        sleep 3
-    done
-
-    scontrol wait_job "$JOB_ID"
-
-    wait_until_file_exists "$CEQ_ENV" 30
-
-
-    # shellcheck disable=SC1090
-    source "$CEQ_ENV"
-
-    run sbatch -p dev_cpuonly -n 1 -t 1 \
-        --dependency=afterany:"$JOB_ID" \
-       	--wait \
-	--wrap "grep -q 'Stopping custom executor queue...' $CUSTOM_EXECUTOR_QUEUE_LOGFILE"
-
-    assert_success
+    assert [ -f "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out ]
+    run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out
+    # Making sure this has run in a container
+    assert_output 'PRETTY_NAME="Alpine Linux v3.16"'
 
 }

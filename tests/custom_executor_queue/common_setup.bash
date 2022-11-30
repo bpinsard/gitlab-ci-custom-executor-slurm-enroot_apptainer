@@ -7,6 +7,7 @@ function _common_setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
     load '../test_helper/bats-file/load' # for filesystem-related asserts
+    load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
@@ -28,25 +29,3 @@ function _no_custom_executor_queue_variables_declared() {
 }
 
 
-function wait_until_file_exists() {
-    local FILE="$1"
-    local MAXDELAY="$2"
-    local T0="$SECONDS"
-    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
-    do
-        sleep 1
-    done
-
-}
-
-function wait_until_file_contains() {
-    local FILE="$1"
-    local WHAT="$2"
-    local MAXDELAY="$3"
-    local T0="$SECONDS"
-    while ! grep -qE "$WHAT" "$FILE" &&  [[ "$SECONDS" -lt $((T0+MAXDELAY)) ]]
-    do
-        sleep 1
-    done
-
-}

@@ -1,14 +1,18 @@
 
 
 test:
-	./tests/bats/bin/bats --jobs $(JOBS) -T $$(ls -d tests/* | grep -v '.*serial$$' )
-	./tests/bats/bin/bats -T tests/*serial
+	./tests/bats/bin/bats --jobs $(JOBS) -T --filter-tags !serial tests/*
+	./tests/bats/bin/bats -T --filter-tags serial tests/*
 
 test-report-parallel:
-	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit $$(ls -d tests/* | grep -v '.*serial$$' ) > report-parallel.xml
+	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/* > report-parallel.xml
 
 test-report-serial:
-	./tests/bats/bin/bats --formatter junit tests/*serial > report-serial.xml
+	./tests/bats/bin/bats --formatter junit --filter-tags serial tests/* > report-serial.xml
+
+
+# These targets are provided for convenience
+# to run just a directory-based subset of tests.
 
 test-include:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/test-config-include.bats

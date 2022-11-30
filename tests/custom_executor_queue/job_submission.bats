@@ -271,8 +271,9 @@ EOF
 
 }
 
-# bats test_tags=samename,serialization
+# bats test_tags=samename,serialization,serial
 @test "execution of jobs with the same name is serialized." {
+    # This is a stronger test when run in serial
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -370,9 +371,12 @@ EOF
 
 }
 
-# bats test_tags=samename
+# bats test_tags=samename,serial
 @test "attempting to submit 2 jobs with the same name too fast causes error" {
-
+# Using serial here because this test might fail
+# if there is too much congestion:
+# the first script might be snatched
+# before we manage to try to submit the second.
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env

@@ -3,6 +3,7 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
@@ -22,21 +23,6 @@ function setup() {
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR"/cews/.env
     echo "Test setup phase completed."
-}
-
-function json_validate () {
-    python3 -c 'import json,sys;json.load(sys.stdin)' || ( echo "JSON validation failed" && exit 1 )
-}
-
-function wait_until_file_exists() {
-    local FILE="$1"
-    local MAXDELAY="$2"
-    local T0="$SECONDS"
-    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
-    do
-        sleep 1
-    done
-
 }
 
 function teardown() {

@@ -3,6 +3,7 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
@@ -26,17 +27,6 @@ function setup() {
     source "$SRC"/custom_executor_queue.sh
     start_custom_executor_queue "$CUSTOM_ENV_CI_BUILDS_DIR" 
     )
-}
-
-function wait_until_file_exists() {
-    local FILE="$1"
-    local MAXDELAY="$2"
-    local T0="$SECONDS"
-    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
-    do
-        sleep 1
-    done
-
 }
 
 function teardown() {

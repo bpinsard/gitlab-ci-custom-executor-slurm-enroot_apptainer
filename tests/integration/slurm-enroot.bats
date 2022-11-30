@@ -3,16 +3,13 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
     # and loading
     PATH="$PROJECT_ROOT/src:$PATH"
 
-}
-
-function _on_horeka () {
-    hostname | grep -q -E "hkn[0-9]{4}.localdomain"
 }
 
 

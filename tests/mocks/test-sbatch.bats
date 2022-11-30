@@ -3,6 +3,7 @@
 setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     PATH="$PROJECT_ROOT/tests/mocks/bin:$PROJECT_ROOT/src/slurm-utils:$PATH"
     TEST_PLAYGROUND=$PWD/$(mktemp -d sbatch-mock-testXXXXXXX)
@@ -90,18 +91,6 @@ function _on_horeka () {
 
 
 }
-
-function wait_until_file_exists() {
-    local FILE="$1"
-    local MAXDELAY="$2"
-    local T0="$SECONDS"
-    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
-    do
-        sleep 1
-    done
-
-}
-
 
 @test "sbatch mock tries to execute the first non option argument" {
     # This is not how real sbatch works,
