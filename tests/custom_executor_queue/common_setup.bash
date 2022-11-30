@@ -19,13 +19,14 @@ function _common_setup() {
 
 
 function _common_teardown() {
-    rm -rf $TEST_PLAYGROUND
+    rm -rf "$TEST_PLAYGROUND"
 }
 
 function _no_custom_executor_queue_variables_declared() {
     #local ndeclared=$(env | grep -E '^CUSTOM_EXECUTOR_QUEUE' | wc -l )
-    local ndeclared=$( echo "${!CUSTOM_EXECUTOR_QUEUE*}" | wc -w )
-    [ $ndeclared -eq 0 ]
+    local ndeclared
+    ndeclared=$( echo "${!CUSTOM_EXECUTOR_QUEUE*}" | wc -w )
+    [ "$ndeclared" -eq 0 ]
 }
 
 

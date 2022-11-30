@@ -50,7 +50,18 @@ test-configure-nomock:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure/
 
 shellcheck:
-	shellcheck $$(find src -name '*.sh') $$(find tests -name '*.bats' -not -path 'tests/bats/*' -not -path 'tests/test_helper/*')
+	shellcheck $$(find src -name '*.sh') \
+               $$(find tests -name '*.bats' \
+                  -not -path 'tests/bats/*' \
+                  -not -path 'tests/test_helper/*')\
+               $$(find tests -name '*.bash' \
+                  -not -path 'tests/bats/*' \
+                  -not -path 'tests/test_helper/*')\
+               $$(find tests -name '*.sh' \
+                  -not -path 'tests/bats/*' \
+                  -not -path 'tests/test_helper/*')
+
+
 
 # This might be useful because for some reason bats process 
 # tend to linger around even if the tests are over. 

@@ -3,21 +3,21 @@ echo Create the allocation and get the job ID
 echo This job runs on the host, no container
 JOBID=$(sbatch -p dev_cpuonly -n 1 -t 5 --wrap "sleep 300" --parsable)
 
-echo $JOBID created
+echo "$JOBID" created
 
 echo "Using the slurm facilities to wait for the job to start..."
-srun --partition dev_cpuonly --dependency=after:$JOBID \
+srun --partition dev_cpuonly --dependency=after:"$JOBID" \
 	-n 1 -t 1 \
 	bash -c "echo waiting"
 
 
 echo "Running a job step in a container inside the allocation at $JOBID"
-srun --jobid=$JOBID --overlap \
+srun --jobid="$JOBID" --overlap \
      --container-image=alpine:latest \
      --container-mounts=/scratch:/scratch,/etc/slurm/task_prolog.hk:/etc/slurm/task_prolog.hk \
      -n 1 -t 1 grep PRETTY /etc/os-release
 
-scancel $JOBID
+scancel "$JOBID"
 
 # OUTPUT:
 # Create the allocation and get the job ID
