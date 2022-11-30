@@ -7,15 +7,17 @@ and from Holger Obermaier's Slurm and enroot custom executor.
 ## Tests
 
 To run all the tests, 
-install all submodules with
+install all the necessary BATS submodules with
 ```
 git submodule update --init
 ```
 (you can find alternatives [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules))
 and then use the command
 ``` bash
-make test
+make test JOBS=64
 ```
+Notice that this will NOT run all the tests.
+Some non-unit tests need to be run on the HoreKa cluster.
 
 ### Unit tests
 
@@ -24,10 +26,9 @@ installed as a collection of submodules.
 
 ### Integration tests
 
-These integration tests expose the different interactions 
+These integration tests probe the different interactions 
 that we assume our software will have with the external system
-(e.g., HoReKa).
-
+(e.g., HoreKa).
 
 
 
