@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # "soft" cleanup
-scancel --signal=SIGUSR1 -f "$CE_SLURM_JOB_ID"
+scancel --batch --signal=SIGUSR1 -f "$CE_SLURM_JOB_ID"
 sleep 5
 # "hard" cleanup - in case SIGUSR1 did not work
 scancel "$CE_SLURM_JOB_ID"
