@@ -124,9 +124,16 @@ grep PRETTY /etc/os-release
 EOF
     chmod +x job.sh
 
-
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "+ Work directory content before job submission: +"
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++"
+    find "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"
     submit_to_custom_executor_queue job.sh
 
+    echo "++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "+ Work directory content after job submission: +"
+    echo "++++++++++++++++++++++++++++++++++++++++++++++++"
+    find "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"
 
     wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
         $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
@@ -139,9 +146,9 @@ EOF
     echo "+ Custom Executor queue log output: +"
     echo "+++++++++++++++++++++++++++++++++++++"
     cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
-    echo "+++++++++++++++++++++++++++"
-    echo "+ Work directory content: +"
-    echo "+++++++++++++++++++++++++++"
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "+ Work directory content after job execution: +"
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++"
     find "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"
 
     # Making sure this has run in a container
