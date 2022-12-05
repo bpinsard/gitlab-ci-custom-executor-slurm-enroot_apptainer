@@ -8,6 +8,6 @@ scancel "$CE_SLURM_JOB_ID"
 
 
 # shellcheck disable=SC1090
-source "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH"
+source "$CE_QUEUE_ENV_PATH"
 
 rm -r "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"

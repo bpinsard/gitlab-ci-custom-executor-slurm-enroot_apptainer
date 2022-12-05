@@ -53,8 +53,7 @@ function teardown() {
     do
         sleep 1
     done
-    # The job also needs to start
-    wait_until_file_exists "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH" 30
+    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 30
 
     assert_file_exists "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH"
 
