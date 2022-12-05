@@ -3,6 +3,13 @@
 SCRIPT="${1}"
 STEPNAME="${2}"
 
+if [[ -z "$CE_QUEUE_ENV_PATH" ]]
+then
+    echo "CE_QUEUE_ENV_PATH not defined." >&2
+    exit "$SYSTEM_FAILURE_EXIT_CODE"
+fi
+
+
 case "$STEPNAME" in
     prepare_script|\
         step_*|\
@@ -13,15 +20,15 @@ case "$STEPNAME" in
 
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC"/custom_executor_queue.sh
-    # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
 
     submit_to_custom_executor_queue "$SCRIPT"
 
     BNAME="$(basename "$SCRIPT")"
-    DONENAME="$CUSTOM_ENV_CI_BUILDS_DIR/DONE/$BNAME"
-    OUTPUTNAME="$CUSTOM_ENV_CI_BUILDS_DIR/OUTPUT/$BNAME.out"
-    EXITVALUEFNAME="$CUSTOM_ENV_CI_BUILDS_DIR/OUTPUT/$BNAME.exitcode"
+    DONENAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/DONE/$BNAME"
+    OUTPUTNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.out"
+    EXITVALUEFNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.exitcode"
     while [ ! -f "$DONENAME" ]
     do
         sleep 1
