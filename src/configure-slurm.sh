@@ -114,7 +114,7 @@ cat <<EOF
   },
 "job_env": {
     "CE_SLURM_JOB_ID": "$JOB_ID",
-    "CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH" : "$WORKSPACE/.env"
+    "CE_QUEUE_ENV_PATH" : "$WORKSPACE/.env"
   }
 }
 EOF

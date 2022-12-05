@@ -71,9 +71,9 @@ function teardown() {
 
 @test "cleanup removes the custom executor queue workspace" {
 
-    wait_until_file_exists "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH" 10
+    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 10
     # shellcheck disable=SC1090
-    source "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_ENV_PATH"
 
     "$SRC/cleanup-slurm.sh"
 

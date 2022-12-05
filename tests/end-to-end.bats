@@ -55,7 +55,7 @@ function teardown() {
     do
         sleep 1
     done
-    wait_until_file_exists "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH" 30
+    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 30
 
 
     "$SRC"/cleanup-slurm.sh
