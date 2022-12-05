@@ -37,7 +37,7 @@ function teardown(){
   },
 "job_env": {
     "CE_SLURM_JOB_ID": "1234723",
-    "CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH" : "/some/path/.env"
+    "CE_QUEUE_ENV_PATH" : "/some/path/.env"
   }
 }
 
@@ -46,6 +46,6 @@ EOF
     run read-job-env.py < json-output
 
     assert_line 'export CE_SLURM_JOB_ID=1234723'
-    assert_line 'export CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH=/some/path/.env'
+    assert_line 'export CE_QUEUE_ENV_PATH=/some/path/.env'
 
 }

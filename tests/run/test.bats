@@ -25,14 +25,16 @@ function setup() {
     (
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC"/custom_executor_queue.sh
-    start_custom_executor_queue "$CUSTOM_ENV_CI_BUILDS_DIR" 
+    start_custom_executor_queue "$CUSTOM_ENV_CI_BUILDS_DIR"/cews 3> /dev/null
     )
+    export CE_QUEUE_ENV_PATH="$CUSTOM_ENV_CI_BUILDS_DIR"/cews/.env
 }
 
 function teardown() {
-    wait_until_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/.env 30
-    # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 30
+
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
@@ -127,8 +129,8 @@ EOF
 
 @test "step that needs to happen in the container run in the custom executor queue" {
 
-    # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
 
     for STEP in "${STEPS_IN_CONTAINER[@]}"
     do
@@ -152,8 +154,8 @@ EOF
 
 @test "run blocks until the script is executed" {
 
-    # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
 
     for STEP in "${STEPS_IN_CONTAINER[@]}"
     do
@@ -174,8 +176,8 @@ EOF
 
 
 @test "if two submitted scripts have the same name, run will wait till the end of the second" {
-    # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
 
        cat << EOF > script.sh
 sleep 3
@@ -196,8 +198,8 @@ EOF
 }
 
 @test "run outputs what the script outputs." {
-    # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
     for STEP in "${ALL_STEP_NAMES[@]}"
     do
 cat << EOF > script-"$STEP".sh
@@ -215,8 +217,8 @@ EOF
 }
 
 @test "run exits with the same code as the script." {
-    # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
     for STEP in "${ALL_STEP_NAMES[@]}"
     do
 cat << EOF > script-"$STEP".sh
@@ -235,8 +237,9 @@ EOF
 
 @test "run exits with \$SYSTEM_FAILURE_EXIT_CODE if an erroneus step name is given" {
 
-    # shellcheck disable=SC1091
-    source "$CUSTOM_ENV_CI_BUILDS_DIR"/.env
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
+    # shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
 
 cat << EOF > script.sh
@@ -251,3 +254,27 @@ EOF
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
 
 }
+
+@test "run exits with \$SYSTEM_FAILURE_EXIT_CODE if CE_QUEUE_ENV_PATH is not defined" {
+
+    # shellcheck disable=SC2031
+    export SYSTEM_FAILURE_EXIT_CODE=102
+
+    (
+
+    export CE_QUEUE_ENV_PATH=""
+
+cat << EOF > script.sh
+
+echo "won't run"
+
+EOF
+    chmod +x ./script.sh
+
+    run "$SRC/run.sh" ./script.sh get_sources
+
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    )
+
+
+    }
