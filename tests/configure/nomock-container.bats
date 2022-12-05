@@ -133,6 +133,17 @@ EOF
 
     assert [ -f "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out ]
     run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out
+
+    # For debugging purposes
+    echo "+++++++++++++++++++++++++++++++++++++"
+    echo "+ Custom Executor queue log output: +"
+    echo "+++++++++++++++++++++++++++++++++++++"
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+    echo "+++++++++++++++++++++++++++"
+    echo "+ Work directory content: +"
+    echo "+++++++++++++++++++++++++++"
+    find "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"
+
     # Making sure this has run in a container
     assert_output 'PRETTY_NAME="Alpine Linux v3.16"'
 
