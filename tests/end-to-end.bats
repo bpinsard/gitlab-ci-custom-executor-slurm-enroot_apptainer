@@ -48,6 +48,7 @@ function teardown() {
     #run _helper_pre
     #assert_success
 
+    # shellcheck  disable=SC1091
     source ./job-env
 
     while ! scontrol wait_job "$CE_SLURM_JOB_ID"
