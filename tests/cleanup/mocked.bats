@@ -45,13 +45,14 @@ function teardown() {
 
 }
 
-@test "cleanup calls scancel --signal=SIGUSR1 and -f" {
+@test "cleanup calls scancel --batch --signal=SIGUSR1 and -f" {
 
     "$SRC/cleanup-slurm.sh"
 
     run cat "$MOCKLOGDIR/scancel.log"
 
     assert_line --partial "--signal=SIGUSR1"
+    assert_line --partial "--batch"
     assert_line --partial "-f"
 
 }
