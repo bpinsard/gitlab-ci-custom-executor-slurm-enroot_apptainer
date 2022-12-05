@@ -37,17 +37,15 @@ function teardown() {
 }
 
 @test "configure and cleanup" {
-    skip # DEBUG , still flaky
-
-
 
     "$SRC"/configure-slurm.sh  | "$JOB_ENV_READER" > ./job-env
 
-    #function _helper_pre(){ squeue | grep -q "$CE_SLURM_JOB_ID" }
+    function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
 
-    #run _helper_pre
-    #assert_success
+    run _helper
+    assert_success
 
+    echo "Sourcing job-env"
     # shellcheck  disable=SC1091
     source ./job-env
 
@@ -55,14 +53,17 @@ function teardown() {
     do
         sleep 1
     done
+    # The job also needs to start
     wait_until_file_exists "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH" 30
+
+    assert_file_exists "$CE_CUSTOM_EXECUTOR_QUEUE_ENV_PATH"
 
 
     "$SRC"/cleanup-slurm.sh
 
-    #function _helper_post(){ squeue | grep -q "$CE_SLURM_JOB_ID" }
-    #run _helper_post
-    #assert_failure
+    function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
+    run _helper
+    assert_failure
 
 
 
