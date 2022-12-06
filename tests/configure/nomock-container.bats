@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# bats file_tags=serial
-
 function setup(){
 
     load '../test_helper/bats-support/load' # for run
@@ -30,6 +28,8 @@ EOF
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CI_JOB_IMAGE="bash:5.2.9-alpine3.16"
+
+    export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/enroot"
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
@@ -65,9 +65,9 @@ function teardown() {
     # scontrol is slow, so it might query the job information
     # before it is actually available
     # and the test may fail
-    scontrol_pre_wait_job_with_deadline "$JOB_ID" 180
+    scontrol_pre_wait_job_with_deadline "$JOB_ID" 600
 
-    wait_until_file_exists "$CEQ_ENV" 90
+    wait_until_file_exists "$CEQ_ENV" 180
 
     assert [ "$CEQ_ENV" ]
 
@@ -91,16 +91,9 @@ function teardown() {
     # scontrol is slow, so it might query the job information
     # before it is actually available
     # and the test may fail
-    while ! scontrol wait_job "$JOB_ID"
-    do
-	echo "squeue output:"
-        squeue
-        sleep 3
-    done
+    scontrol_pre_wait_job_with_deadline "$JOB_ID" 600
 
-    scontrol wait_job "$JOB_ID"
-   
-    wait_until_file_exists "$CEQ_ENV" 90
+    wait_until_file_exists "$CEQ_ENV" 180
 
 
     ####################################

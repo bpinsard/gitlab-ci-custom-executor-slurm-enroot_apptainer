@@ -10,8 +10,20 @@ function setup() {
     # and loading
     PATH="$PROJECT_ROOT/src:$PATH"
 
+    TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
+    echo "Created test playground at $TEST_PLAYGROUND" >&3
+    export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/run/enroot"
+    export ENROOT_CONFIG_PATH="$TEST_PLAYGROUND/conf/enroot"
+    export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/cache/enroot"
+    export ENROOT_DATA_PATH="$TEST_PLAYGROUND/data/enroot"
+    export ENROOT_TEMP_PATH="$TEST_PLAYGROUND/tmp/enroot"
 }
 
+function teardown() {
+    rm -rf "$TEST_PLAYGROUND"
+
+
+}
 
 @test "srun --container-image runs in a container (with the right mount options)" {
     # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/

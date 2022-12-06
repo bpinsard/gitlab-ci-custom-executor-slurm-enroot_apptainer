@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# bats file_tags=serial
-
 function setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
@@ -63,14 +61,7 @@ function teardown() {
     # scontrol is slow, so it might query the job information
     # before it is actually available
     # and the test may fail
-    while ! scontrol wait_job "$JOB_ID"
-    do
-	echo "squeue output:"
-        squeue
-        sleep 3
-    done
-
-    scontrol wait_job "$JOB_ID"
+    scontrol_pre_wait_job_with_deadline "$JOB_ID" 600
 
     wait_until_file_exists "$CEQ_ENV" 30
 
@@ -93,14 +84,7 @@ function teardown() {
     # scontrol is slow, so it might query the job information
     # before it is actually available
     # and the test may fail
-    while ! scontrol wait_job "$JOB_ID"
-    do
-	echo "squeue output:"
-        squeue
-        sleep 3
-    done
-
-    scontrol wait_job "$JOB_ID"
+    scontrol_pre_wait_job_with_deadline "$JOB_ID" 600
 
     wait_until_file_exists "$CEQ_ENV" 30
 
@@ -153,14 +137,7 @@ EOF
     # scontrol is slow, so it might query the job information
     # before it is actually available
     # and the test may fail
-    while ! scontrol wait_job "$JOB_ID"
-    do
-	echo "squeue output:"
-        squeue
-        sleep 3
-    done
-
-    scontrol wait_job "$JOB_ID"
+    scontrol_pre_wait_job_with_deadline "$JOB_ID" 600
 
     wait_until_file_exists "$CEQ_ENV" 30
 

@@ -37,7 +37,7 @@ function teardown() {
 }
 
 @test "cleanup calls scancel with the right job id" {
-
+    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
     "$SRC/cleanup-slurm.sh"
     run cat "$MOCKLOGDIR/scancel.log"
 
@@ -46,6 +46,7 @@ function teardown() {
 }
 
 @test "cleanup calls scancel --batch --signal=SIGUSR1 and -f" {
+    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
 
     "$SRC/cleanup-slurm.sh"
 
