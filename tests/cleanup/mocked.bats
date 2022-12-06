@@ -60,7 +60,7 @@ function teardown() {
 @test "cleanup calls plain scancel after 5 seconds" {
 
     "$SRC/cleanup-slurm.sh"  &
-    wait_until_file_exists "$MOCKLOGDIR/scancel.log"
+    wait_until_file_exists "$MOCKLOGDIR/scancel.log" 10
     refute  grep -q "ARGS: $CE_SLURM_JOB_ID" "$MOCKLOGDIR/scancel.log"
     # Additional 3 seconds for safety
     sleep 5 3

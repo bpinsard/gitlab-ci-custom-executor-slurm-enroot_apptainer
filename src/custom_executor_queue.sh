@@ -117,7 +117,7 @@ function _custom_executor_queue () {
                  set +o pipefail
                  set +o errexit
                  set +o nounset
-                 ("$WORKING/$BNAME" &> "$OUTPUT/$BNAME.out"
+                 ("$WNAME" &> "$OUTPUT/$BNAME.out"
                   echo $? > "$OUTPUT/$BNAME.exitcode") &
                  RUNNINGPID=$!
                  set -o nounset
@@ -130,7 +130,7 @@ function _custom_executor_queue () {
                  do
                      sleep 1
                  done
-                 mv "$WORKING/$BNAME" "$DONE"
+                 mv "$WNAME" "$DONE"
                  _log "$BNAME has ended."
                 ) &
                 SUBMITTEDPID=$!

@@ -8,10 +8,16 @@ function wait_until_file_exists() {
     local FILE="$1"
     local MAXDELAY="$2"
     local T0="$SECONDS"
+    if [ "$#" -ne 2 ]; then echo "wrong number of arguments to ${FUNCNAME[0]}"; fi
     while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
     do
         sleep 1
     done
+    if [[ !  -f "$FILE" ]]
+    then
+        echo "Error: Waited too long ($MAXDELAY) for $FILE to be created".
+        return 124
+    fi
 
 }
 
@@ -19,14 +25,43 @@ function wait_until_file_contains() {
     local FILE="$1"
     local WHAT="$2"
     local MAXDELAY="$3"
+    if [ "$#" -ne 3 ]; then echo "wrong number of arguments to ${FUNCNAME[0]}"; fi
     local T0="$SECONDS"
     while ! grep -qE "$WHAT" "$FILE" &&  [[ "$SECONDS" -lt $((T0+MAXDELAY)) ]]
     do
         sleep 1
     done
+    if ! grep -qE "$WHAT" "$FILE"
+    then
+        echo "Error: Waited too long ($MAXDELAY) for $FILE to contain \"$WHAT\"."
+        return 124
+    fi
+
 
 }
 
 function _on_horeka () {
     hostname | grep -q -E "hkn[0-9]{4}.localdomain"
+}
+
+
+function scontrol_pre_wait_job_with_deadline() {
+    # scontrol tends to fail
+    local JOB_ID
+    JOB_ID=$1
+    local MAXDELAY=$2
+    if [ "$#" -ne 2 ]; then echo "wrong number of arguments to ${FUNCNAME[0]}"; fi
+    local T0="$SECONDS"
+    while ! scontrol wait_job "$JOB_ID" &&  [[ "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+	echo "squeue output:"
+        squeue
+        sleep 3
+    done
+    if ! scontrol wait_job "$JOB_ID"
+    then
+        echo "ERROR: Waited too long ($MAXDELAY) for $JOB_ID to become available."
+        return 124
+    fi
+
 }

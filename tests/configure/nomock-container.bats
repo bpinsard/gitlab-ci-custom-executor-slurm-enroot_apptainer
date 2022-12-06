@@ -15,6 +15,7 @@ function setup(){
     export SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
+    echo "Created test playground at $TEST_PLAYGROUND" >&3
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
     export CUSTOM_ENV_CE_DEBUG=1
@@ -51,26 +52,20 @@ function teardown() {
 
 @test "configure launches custom executor queue in slurm job - with container" {
 
-    ############################################
+    ###############################################
     # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
-    ############################################
+    ###############################################
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
 
 
     JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
+    echo "Starting slurm job $JOB_ID" >&3
 
     # scontrol is slow, so it might query the job information
     # before it is actually available
     # and the test may fail
-    while ! scontrol wait_job "$JOB_ID"
-    do
-	echo "squeue output:"
-        squeue
-        sleep 3
-    done
-
-    scontrol wait_job "$JOB_ID"
+    scontrol_pre_wait_job_with_deadline "$JOB_ID" 180
 
     wait_until_file_exists "$CEQ_ENV" 90
 
