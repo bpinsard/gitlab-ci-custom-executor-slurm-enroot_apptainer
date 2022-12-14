@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+[ ! -z $MOCKLOGDIR ] || {
+    echo "The mock needs a place to store logs" >&2
+    exit 45
+}
+
+
+ENROOT_LOG=$MOCKLOGDIR/enroot.log
+
+echo "ARGS:" "$@" >> "$ENROOT_LOG"

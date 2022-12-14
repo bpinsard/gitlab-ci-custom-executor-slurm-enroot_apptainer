@@ -40,33 +40,15 @@ function teardown() {
     rm -r "$TEST_PLAYGROUND"
 
 }
-@test "/scratch in container mounts" {
+@test "sbatch NOT called with --container-* (NOT using pyxis)" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial '/scratch:/scratch'
+    refute_line --partial '--container'
 
 }
 
-
-@test "prolog script in container mounts" {
-
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial '/etc/slurm/task_prolog.hk:/etc/slurm/task_prolog.hk'
-
-}
-
-@test "\$CUSTOM_ENV_CI_BUILDS_DIR in container mounts" {
-
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
-
-}
 
 @test "custom executor queue is started in slurm allocation" {
 

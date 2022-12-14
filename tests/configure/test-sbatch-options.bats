@@ -38,43 +38,6 @@ function teardown() {
 }
 
 
-@test "sbatch called with --container-image" {
-
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial '--container-image=alpine:latest'
-
-}
-
-@test "sbatch called with --container-mounts" {
-
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial '--container-mounts='
-
-}
-
-@test "sbatch NOT called with --container-image when CUSTOM_ENV_CI_JOB_IMAGE not set" {
-
-    # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_JOB_IMAGE=''
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-    refute_output --partial '--container-image'
-
-}
-
-@test "sbatch NOT called with --container-mounts when CUSTOM_ENV_CI_JOB_IMAGE not set" {
-
-    # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_CI_JOB_IMAGE=''
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-    refute_output --partial '--container-mounts'
-
-}
-
-
 @test "sbatch invoked with '--propagate=NONE'" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
@@ -101,7 +64,6 @@ function teardown() {
 
 
 }
-
 
 
 @test "sbatch invoked with --{input,output,error}=/dev/null" {

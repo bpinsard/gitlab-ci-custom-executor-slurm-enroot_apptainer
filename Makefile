@@ -35,6 +35,8 @@ test-run:
 test-cleanup:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/cleanup/
 
+test-prepare:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/prepare/
 
 test-mocks:
 	./tests/bats/bin/bats tests/mocks

@@ -9,6 +9,14 @@ on the systems we are interacting with
 (both the gitlab stack and the hpc cluster)
 to clarify some aspects of that.
 
+THIS FILE MIGHT NOT BE UP TO DATE.
+IT IS JUST A SPACE TO STORE IDEAS 
+AND KEEP TRACK OF THE STATUS OF THEIR IMPLEMENTATION.
+THE REAL STATUS OF WHAT IS IMPLEMENTED AND WHAT NOT
+IS IN THE TESTS.
+THIS FILE IS MAINTAINED ON A BEST-EFFORT BASIS.
+
+
 ## Functional
 
 ### Custom executor queue
@@ -51,29 +59,11 @@ Considerations:
 Features:
 
 
-- [ ] if a container image is used, 
-      needs to check that the container image
-      contains everything is needed
-      by the custom executor queue.
-      List of commands to test:
-      - [ ] `ps --pid`
-- [X] use `sbatch` with --container-image when a container image is required
-- [X] manage correctly mount options when a container image is required
   NOTE: this might need adjustments as we go along.
-  - [X] mount the prolog stuff (from the [container docs][horeka-cont-docs])
-  - [X] mount /scratch (from the [container docs][horeka-cont-docs])
-  - [X] mount `$CUSTOM_ENV_CI_BUILDS_DIR` 
-    (from Holger's custom executor enroot implementation)
-- [X] allocation maanger is started in slurm allocation 
-      The allocation already comprises a container if needed.
+- [X] allocation manager is started in slurm allocation 
 - [X] pass input variables on to sbatch
 - [X] pass content of variable `COMMAND_OPTIONS_SBATCH` to `sbatch` invocation
 - [X] when `COMMAND_OPTIONS_SBATCH` is not defined, do lament on stderr (but continue)
-- [X] when `COMMAND_OPTIONS_SBATCH` contains any option 
-      that conflicts with the ones we explicitly use, do lament on stderr 
-      and terminate with `SYSTEM_FAILURE_EXIT_CODE`.
-  - [X] when `--container-image` is used explicitly
-  - [X] when `--container-mounts` is used explicitly
 - [X] use reasonable defaults for `sbatch` invocation 
       when `COMMAND_OPTIONS_SBATCH`not set 
 - [ ] `configure` should output valid json *in all cases* 
@@ -114,22 +104,31 @@ Features:
     - [X] Unit
     - [ ] Integration
 
-- [X] Do not use `--container-**`when `CUSTOM_ENV_CI_IMAGE` is not set
-
 - [X] SIGUSR1 should be sent to the job when the allocation is about to run out of time
   (and the custom executor queue should terminate)
   - [X] Unit
   - [X] Integration
 
+- [ ] `job_env` should have a variable for the enroot container name
+- [ ] if an image is requested, the enroot environment variables 
+  should all point to paths that can be deleted by cleanup
+  (inside `CUSTOM_ENV_CI_BUILDS_DIR`),
+  unless - for debug purposes - they are already defined.
 
 
 ### prepare.sh
 Preparation of the image/container is done here 
 in Holger's example.
 
-If the preparation of the container is already done in the configure stage,
-there is no need to do anything here.
-
+- [ ] download image
+  - [X] Unit
+  - [ ] Integration
+- [ ] destroy existing container with the same name 
+  - [X] Unit
+  - [ ] Integration
+- [ ] create container with the container name 
+  defined in the configure stage
+- [ ] Uses paths inside `CUSTOM_ENV_CI_BUILDS_DIR`
 
 ### run.sh
 - `prepare_script`
@@ -177,9 +176,17 @@ there is no need to do anything here.
 - [ ] `run` must exit with the same error as the submitted job
    - [X] Unit
    - [ ] Integration
+- [ ] When a container image is specified, wrap the script in an `enroot` command.
+  The wrap can then be submitted to the custom executor queue.
+
+#### command wrapper
+- [ ] invoke enroot with the right mount points
+- [ ] use `--rw`
+- [ ] use the container name defined in the prepare stage
+  (define an environment variable for that in configure-produce job-env?)
 
 
-# cleanup.sh
+### cleanup.sh
 - [ ] The slurm job needs to be terminated
   - [ ] `--signal=SIGUSR1` should be used first
     - [X] Unit
@@ -198,7 +205,6 @@ there is no need to do anything here.
 - [ ] if `CUSTOM_ENV_CE_DEBUG` is set, 
       some debugging information should be printed
       and/or some files should be kept for later inspection.
-    
 
    
 ## Diagnostics
@@ -243,4 +249,3 @@ there is no need to do anything here.
   on the custom executor itself?
 
 
-[horeka-cont-docs]: https://www.nhr.kit.edu/userdocs/horeka/containers/#slurm-integration

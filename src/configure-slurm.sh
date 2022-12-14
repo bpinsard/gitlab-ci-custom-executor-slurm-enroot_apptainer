@@ -27,14 +27,6 @@ source "$SRC"/include.sh
 # shellcheck source=src/config-include.sh
 source "$SRC"/config-include.sh
 
-MIRROR_MOUNTS=(/scratch
-               /etc/slurm/task_prolog.hk
-               "$CUSTOM_ENV_CI_BUILDS_DIR"
-               "$SRC")
-MOUNTS_STRING="$(assemble_mounts "${MIRROR_MOUNTS[@]}")"
-
-
-
 ############################
 # ENV VARIABLE TRANSLATION #
 ############################
@@ -53,10 +45,6 @@ if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
 then
     echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
     CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -n 1 -t 30"
-else
-    check_custom_env_command_options_sbatch_for_forbidden_options \
-        --container-image \
-        --container-mounts
 fi
 set -o nounset
 
@@ -75,13 +63,6 @@ COMMAND=(sbatch $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 ############################
 # CI IMAGE-RELATED OPTIONS #
 ############################
-set +o nounset
-if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
-then
-    COMMAND+=( --container-image="$CUSTOM_ENV_CI_JOB_IMAGE"
-               --container-mounts="$MOUNTS_STRING" )
-fi
-set -o nounset
 
 #################
 # DEBUG OPTIONS #
