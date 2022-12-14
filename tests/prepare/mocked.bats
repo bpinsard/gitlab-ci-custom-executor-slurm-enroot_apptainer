@@ -3,8 +3,9 @@
 
 function setup() {
     export TRACE=1
-    load '../test_helper/bats-support/load' # for run
-    load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-support/load'
+    load '../test_helper/bats-assert/load'
+    load '../test_helper/bats-file/load'
     load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
@@ -13,7 +14,7 @@ function setup() {
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d prepare-testXXXXXXX)
     export MOCKLOGDIR=$TEST_PLAYGROUND
-    echo "Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Created test playground at $TEST_PLAYGROUND" >&3
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
@@ -99,5 +100,63 @@ teardown() {
     run enroot list
 
     assert_output "$CE_CONTAINER_NAME"
+
+}
+
+@test "enroot should not be called at all if \$CUSTOM_ENV_CI_JOB_IMAGE is not defined" {
+
+    (
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    prepare-enroot.sh
+    )
+    assert_not_exists "$MOCKLOGDIR"/enroot.log
+
+}
+
+@test "if ENROOT_RUNTIME_PATH is already defined, do not redefine it" {
+
+    export ENROOT_RUNTIME_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
+
+    prepare-enroot.sh
+
+    function _helper() {
+        grep ENROOT_RUNTIME_PATH "$MOCKLOGDIR"/enroot.log
+    }
+    run _helper
+
+    assert_line --partial "/already/defined"
+    refute_line --partial "/.enroot/run"
+
+}
+
+@test "if ENROOT_CACHE_PATH is already defined, do not redefine it" {
+
+    export ENROOT_CACHE_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
+
+    prepare-enroot.sh
+
+    function _helper() {
+        grep ENROOT_CACHE_PATH "$MOCKLOGDIR"/enroot.log
+    }
+    run _helper
+
+    assert_line --partial "/already/defined"
+    refute_line --partial "/.enroot/cache"
+
+}
+
+@test "if ENROOT_DATA_PATH is already defined, do not redefine it" {
+
+    export ENROOT_DATA_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
+
+    prepare-enroot.sh
+
+    function _helper() {
+        grep ENROOT_DATA_PATH "$MOCKLOGDIR"/enroot.log
+    }
+    run _helper
+
+    assert_line --partial "/already/defined"
+    refute_line --partial "/.enroot/data"
 
 }

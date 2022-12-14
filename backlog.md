@@ -125,10 +125,11 @@ in Holger's example.
   defined in the configure stage
 - [X] Uses paths inside `CUSTOM_ENV_CI_BUILDS_DIR`
       (except for `ENROOT_TEMP_PATH`)
-- [ ] if an image is requested, the enroot environment variables 
+- [X] if an image is requested, the enroot environment variables 
   should all point to paths that can be deleted by cleanup
   (inside `CUSTOM_ENV_CI_BUILDS_DIR`),
   UNLESS - for debug purposes - they are already defined.
+- [X] do not do anything if image is not defined
 
 
 ### run.sh
