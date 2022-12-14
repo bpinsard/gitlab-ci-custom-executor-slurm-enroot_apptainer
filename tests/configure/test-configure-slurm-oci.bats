@@ -25,6 +25,7 @@ function setup() {
 
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    export CUSTOM_ENV_CI_JOB_ID=54321
     CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR"/cews/.env
     echo "Test setup phase completed."
 }
@@ -230,5 +231,27 @@ EOF
     assert_output "$CEQ_ENV"
     wait_until_file_exists "$CEQ_ENV" 20
     assert [ -f "$CEQ_ENV" ]
+
+}
+
+@test "script output has job_env.CE_CONTAINER_NAME which contains CUSTOM_ENV_CI_JOB_ID" {
+
+
+
+    function _helper() {
+
+cat <<EOF > scr.py
+import json
+import sys
+dump = json.load(sys.stdin)
+print(dump["job_env"]["CE_CONTAINER_NAME"])
+EOF
+    "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null | python3 scr.py
+    }
+
+    run _helper
+    assert_success
+
+    assert_output --partial "GLCE_$CUSTOM_ENV_CI_JOB_ID"
 
 }

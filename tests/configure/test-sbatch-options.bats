@@ -22,6 +22,7 @@ function setup() {
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR"/cews/.env
+    export CUSTOM_ENV_CI_JOB_ID=54321
     echo "Test setup phase completed."
 }
 

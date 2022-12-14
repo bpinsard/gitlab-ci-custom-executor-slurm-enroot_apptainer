@@ -55,3 +55,37 @@ teardown() {
     assert_line --partial "ENROOT_SOME_PATH"
 
 }
+
+@test "enroot mock records its stdin when using remove" {
+
+
+    enroot remove thisthing < <(echo "some kind of input")
+
+    # shellcheck disable=SC2031
+    run cat "$MOCKLOGDIR"/enroot.log
+    assert_line --partial "some kind of input"
+
+
+}
+
+@test "enroot mock creates file named as container and lists it" {
+
+    enroot create --name thiscontainer
+    enroot create --name thatcontainer
+
+    run enroot list
+
+    assert_output --partial thiscontainer
+    assert_output --partial thatcontainer
+
+}
+
+@test "enroot remove removes containers " {
+
+    enroot create --name thiscontainer
+    enroot create --name thatcontainer
+    enroot remove thiscontainer < <(echo yes)
+    run enroot list
+    refute_output --partial thiscontainer
+
+}

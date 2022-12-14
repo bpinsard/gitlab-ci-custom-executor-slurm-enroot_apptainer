@@ -109,12 +109,7 @@ Features:
   - [X] Unit
   - [X] Integration
 
-- [ ] `job_env` should have a variable for the enroot container name
-- [ ] if an image is requested, the enroot environment variables 
-  should all point to paths that can be deleted by cleanup
-  (inside `CUSTOM_ENV_CI_BUILDS_DIR`),
-  unless - for debug purposes - they are already defined.
-
+- [X] `job_env` should have a variable for the enroot container name
 
 ### prepare.sh
 Preparation of the image/container is done here 
@@ -123,12 +118,18 @@ in Holger's example.
 - [ ] download image
   - [X] Unit
   - [ ] Integration
-- [ ] destroy existing container with the same name 
+- [ ] remove existing container with the same name 
   - [X] Unit
   - [ ] Integration
-- [ ] create container with the container name 
+- [X] create container with the container name 
   defined in the configure stage
-- [ ] Uses paths inside `CUSTOM_ENV_CI_BUILDS_DIR`
+- [X] Uses paths inside `CUSTOM_ENV_CI_BUILDS_DIR`
+      (except for `ENROOT_TEMP_PATH`)
+- [ ] if an image is requested, the enroot environment variables 
+  should all point to paths that can be deleted by cleanup
+  (inside `CUSTOM_ENV_CI_BUILDS_DIR`),
+  UNLESS - for debug purposes - they are already defined.
+
 
 ### run.sh
 - `prepare_script`
@@ -205,6 +206,7 @@ in Holger's example.
 - [ ] if `CUSTOM_ENV_CE_DEBUG` is set, 
       some debugging information should be printed
       and/or some files should be kept for later inspection.
+- [ ] containers created in the prepare.sh step need to be removed
 
    
 ## Diagnostics
