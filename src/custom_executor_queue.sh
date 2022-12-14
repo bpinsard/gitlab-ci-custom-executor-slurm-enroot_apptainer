@@ -46,12 +46,12 @@ function submit_to_custom_executor_queue() {
 }
 
 function custom_executor_queue_is_alive () {
-    ps --pid $CUSTOM_EXECUTOR_QUEUE_JOBID > /dev/null
+    ps --pid "$CUSTOM_EXECUTOR_QUEUE_JOBID" > /dev/null
 }
 
 function stop_custom_executor_queue () {
     stop_all
-    kill $CUSTOM_EXECUTOR_QUEUE_JOBID
+    kill "$CUSTOM_EXECUTOR_QUEUE_JOBID"
     while custom_executor_queue_is_alive
     do
     sleep 1

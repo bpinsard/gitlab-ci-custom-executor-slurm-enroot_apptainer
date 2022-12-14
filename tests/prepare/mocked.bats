@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 function setup() {
     export TRACE=1
     load '../test_helper/bats-support/load'
@@ -85,7 +84,7 @@ teardown() {
     set +o pipefail
 
     function _helper(){
-
+        # shellcheck disable=SC2317
         head -n $((END+START)) "$LOG" | tail -n $((START+1))
     }
 
@@ -120,6 +119,7 @@ teardown() {
     prepare-enroot.sh
 
     function _helper() {
+        # shellcheck disable=SC2317
         grep ENROOT_RUNTIME_PATH "$MOCKLOGDIR"/enroot.log
     }
     run _helper
@@ -136,6 +136,7 @@ teardown() {
     prepare-enroot.sh
 
     function _helper() {
+        # shellcheck disable=SC2317
         grep ENROOT_CACHE_PATH "$MOCKLOGDIR"/enroot.log
     }
     run _helper
@@ -152,6 +153,7 @@ teardown() {
     prepare-enroot.sh
 
     function _helper() {
+        # shellcheck disable=SC2317
         grep ENROOT_DATA_PATH "$MOCKLOGDIR"/enroot.log
     }
     run _helper

@@ -62,7 +62,7 @@ teardown(){
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     stop_custom_executor_queue
-    refute ps --pid $CUSTOM_EXECUTOR_QUEUE_JOBID > /dev/null
+    refute ps --pid "$CUSTOM_EXECUTOR_QUEUE_JOBID" > /dev/null
 
 }
 
@@ -73,7 +73,7 @@ teardown(){
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     stop_custom_executor_queue
-    refute ps --pid $CUSTOM_EXECUTOR_QUEUE_JOBID > /dev/null
+    refute ps --pid "$CUSTOM_EXECUTOR_QUEUE_JOBID" > /dev/null
 
 }
 

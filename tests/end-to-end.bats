@@ -46,6 +46,7 @@ function teardown() {
 
     "$SRC"/configure-slurm.sh  | "$JOB_ENV_READER" > ./job-env
 
+    # shellcheck disable=SC2317
     function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
 
     run _helper

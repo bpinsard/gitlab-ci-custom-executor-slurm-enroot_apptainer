@@ -75,7 +75,7 @@ EOF
     chmod +x job-123.sh
     submit_to_custom_executor_queue job-123.sh
     rm job-123.sh
-    sleep $CUSTOM_EXECUTOR_QUEUE_CYCLETIME 1
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
 
     wait_until_file_contains "$LOGFILE" "Processing.*job-123.sh" 30
 
@@ -319,11 +319,11 @@ EOF
     touch job1.sh
     chmod +x job1.sh
     submit_to_custom_executor_queue job1.sh
-    sleep $CUSTOM_EXECUTOR_QUEUE_CYCLETIME 1
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
     assert_equal 1 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
 
     submit_to_custom_executor_queue job1.sh
-    sleep $CUSTOM_EXECUTOR_QUEUE_CYCLETIME 1
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
     assert_equal 2 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
 
 }

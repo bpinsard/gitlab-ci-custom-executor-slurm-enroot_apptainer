@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2317
 
 # This is based on the tutorial for bats
 # https://bats-core.readthedocs.io/en/stable/tutorial.html
@@ -147,6 +148,7 @@ function teardown() {
 @test "script outputs valid json" {
 
     function _helper() {
+
     set -o errexit
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
