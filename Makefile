@@ -61,7 +61,10 @@ shellcheck:
                   -not -path 'tests/test_helper/*')\
                $$(find tests -name '*.sh' \
                   -not -path 'tests/bats/*' \
-                  -not -path 'tests/test_helper/*')
+                  -not -path 'tests/test_helper/*')\
+               $$(find tests/mocks/bin/ -type f -not -name '*.py')
+
+
 
 
 

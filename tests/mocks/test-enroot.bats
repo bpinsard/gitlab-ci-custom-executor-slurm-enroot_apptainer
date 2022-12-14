@@ -15,6 +15,7 @@ setup(){
     echo "Created test playground at $TEST_PLAYGROUND"
     export MOCKLOGDIR=$TEST_PLAYGROUND
 
+    export ENROOT_MOCK_PATH=/some/path
 }
 
 teardown() {
@@ -37,16 +38,20 @@ teardown() {
 @test "enroot mock record logs at given location" {
 
     enroot --something
+    # shellcheck disable=SC2031
     assert_file_exists "$MOCKLOGDIR"/enroot.log
 
 }
 
-@test "enroot mock record ENROOT* environmen variables" {
+@test "enroot mock records ENROOT* environment variables" {
 
 
-    export ENROOT_
+    export ENROOT_SOME_PATH=/test/path
 
     enroot --something
 
+    # shellcheck disable=SC2031
+    run cat "$MOCKLOGDIR"/enroot.log
+    assert_line --partial "ENROOT_SOME_PATH"
 
 }

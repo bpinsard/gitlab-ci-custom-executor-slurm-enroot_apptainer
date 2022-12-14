@@ -4,7 +4,7 @@
 # - Arguments it was called with
 # - all the relevant environment variables
 
-[ ! -z $MOCKLOGDIR ] || {
+[ -n "$MOCKLOGDIR" ] || {
     echo "The mock needs a place to store logs" >&2
     exit 1
 }
@@ -23,17 +23,17 @@ function _on_horeka () {
 
 MOCKS="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )"/../../../src > /dev/null 2>&1 && pwd)"
-if [[ $(_on_horeka) ]]
+if _on_horeka
 then
-  mapfile INPUT_VARIABLES < <($SRC/_get-sbatch-input-env-list.sh)
+  mapfile -t INPUT_VARIABLES < <("$SRC"/slurm-utils/_get-sbatch-input-env-list.sh)
 else
-  mapfile INPUT_VARIABLES < <($MOCKS/get-sbatch-input-env-list.sh)
+  mapfile -t INPUT_VARIABLES < <("$MOCKS"/get-sbatch-input-env-list.sh)
 fi
 
-for VARIABLE in ${INPUT_VARIABLES[@]}
-do if [[ ! -z ${!VARIABLE} ]]
+for VARIABLE in "${INPUT_VARIABLES[@]}"
+do if [[ -n "${!VARIABLE}" ]]
    then
-       echo $VARIABLE=${!VARIABLE} >> $SBATCH_LOG
+       echo "$VARIABLE"="${!VARIABLE}" >> "$SBATCH_LOG"
    fi
 done
 
