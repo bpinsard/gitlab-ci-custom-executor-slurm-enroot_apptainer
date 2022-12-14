@@ -14,14 +14,11 @@ function setup() {
 
     TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
-    TEST_TMP="$(mktemp -d /tmp/enroot-testXXXX)"
-    echo "# Created test tmp at $TEST_TMP" >&3
 
 }
 
 function teardown() {
     rm -rf "$TEST_PLAYGROUND"
-    rm -rf "$TEST_TMP"
     rm -f alpine+latest.sqsh
 
 }
@@ -32,8 +29,6 @@ function teardown() {
     # we do not change ENROOT_CONFIG_PATH
     export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/enroot/cache"
     export ENROOT_DATA_PATH="$TEST_PLAYGROUND/enroot/data"
-    # for some unknown reason ENROOT_TEMP_PATH needs to be in /tmp
-    export ENROOT_TEMP_PATH="$TEST_TMP"
 
     RUNDIR_DONTUSE=/run/user/$(id -u)/enroot
     CONTAINERDIR_DONTUSE=$HOME/.local/share/enroot/alpine-enroot-test
@@ -42,7 +37,6 @@ function teardown() {
     # Cleanup before image download
     rm -f alpine+latest.sqsh
 
-    mkdir -p "$ENROOT_TEMP_PATH" # necessary for import
     enroot import docker://alpine:latest
 
     # Will be in $ENROOT_DATA_PATH 
