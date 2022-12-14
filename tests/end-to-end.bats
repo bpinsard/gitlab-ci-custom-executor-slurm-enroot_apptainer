@@ -28,6 +28,7 @@ function setup(){
     export CUSTOM_ENV_CI_JOB_IMAGE="ubuntu:kinetic-20221101"
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export SYSTEM_FALURE_EXIT_CODE=102
+    export CUSTOM_ENV_CI_JOB_ID=54321
 
     }
 

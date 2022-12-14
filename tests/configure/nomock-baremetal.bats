@@ -28,7 +28,8 @@ EOF
     echo "Test setup phase completed."
 
     # shellcheck disable=SC2030
-    CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_CI_BUILDS_DIR
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
 
