@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+function load_mocks(){
+
+    PATH="$PROJECT_ROOT/tests/mocks/bin:$PATH"
+    echo "# Loaded MOCKS in PATH" >&3
+}
+
+
 function json_validate () {
     python3 -c 'import json,sys;json.load(sys.stdin)' || ( echo "JSON validation failed" && exit 1 )
 }

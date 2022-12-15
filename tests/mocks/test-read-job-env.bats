@@ -3,11 +3,12 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
-    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
+    load '../test-utils'
 
-    # To make scripts in /src available for sourcing
-    # and loading, and also make the sbatch mock available.
-    PATH="$PROJECT_ROOT/tests/mocks/bin:$PATH"
+    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
+    export PROJECT_ROOT
+
+    load_mocks
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d read-job-env-testXXXXXXX)
     echo "Created test playground at $TEST_PLAYGROUND"

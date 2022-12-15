@@ -9,7 +9,7 @@ function setup() {
 
     # To make scripts in /src available for sourcing
     # and loading, and also make the sbatch mock available.
-    PATH="$PROJECT_ROOT/tests/mocks/bin:$PATH"
+    load_mocks
     SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d cleanup-testXXXXXXX)

@@ -5,8 +5,11 @@ setup(){
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
     load '../test_helper/bats-file/load' # for assert_output and refute_output
     load '../test-utils'
+
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
-    PATH="$PROJECT_ROOT/tests/mocks/bin:$PATH"
+    export PROJECT_ROOT
+
+    load_mocks
     TEST_PLAYGROUND=$PWD/$(mktemp -d enroot-mock-testXXXXXXX)
     echo "Created test playground at $TEST_PLAYGROUND" >&3
     STARTDIR="${TEST_PLAYGROUND}"/start

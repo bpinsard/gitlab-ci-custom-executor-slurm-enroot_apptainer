@@ -6,7 +6,8 @@ setup(){
     load '../test_helper/bats-file/load' # for assert_output and refute_output
     load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
-    PATH="$PROJECT_ROOT/tests/mocks/bin:$PROJECT_ROOT/src/slurm-utils:$PATH"
+    PATH="$PROJECT_ROOT/src/slurm-utils:$PATH"
+    load_mocks
     TEST_PLAYGROUND=$PWD/$(mktemp -d sbatch-mock-testXXXXXXX)
     echo "Created test playground at $TEST_PLAYGROUND" >&3
     STARTDIR="${TEST_PLAYGROUND}"/start

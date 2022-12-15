@@ -9,7 +9,8 @@ function setup() {
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     SRC="$PROJECT_ROOT"/src
-    export PATH="$PROJECT_ROOT/tests/mocks/bin:$SRC:$PATH"
+    export PATH="$SRC:$PATH"
+    load_mocks
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d prepare-testXXXXXXX)
     export MOCKLOGDIR=$TEST_PLAYGROUND
