@@ -21,7 +21,8 @@ function setup() {
 
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
-    export CE_CONTAINER_NAME=TestContainer
+    export CUSTOM_ENV_CI_JOB_ID=54321
+    export CE_CONTAINER_NAME="GLCE_54321"
     echo "Test setup phase completed."
 
 }
@@ -109,56 +110,5 @@ teardown() {
     prepare-enroot.sh
     )
     assert_not_exists "$MOCKLOGDIR"/enroot.log
-
-}
-
-@test "if ENROOT_RUNTIME_PATH is already defined, do not redefine it" {
-
-    export ENROOT_RUNTIME_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
-
-    prepare-enroot.sh
-
-    function _helper() {
-        # shellcheck disable=SC2317
-        grep ENROOT_RUNTIME_PATH "$MOCKLOGDIR"/enroot.log
-    }
-    run _helper
-
-    assert_line --partial "/already/defined"
-    refute_line --partial "/.enroot/run"
-
-}
-
-@test "if ENROOT_CACHE_PATH is already defined, do not redefine it" {
-
-    export ENROOT_CACHE_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
-
-    prepare-enroot.sh
-
-    function _helper() {
-        # shellcheck disable=SC2317
-        grep ENROOT_CACHE_PATH "$MOCKLOGDIR"/enroot.log
-    }
-    run _helper
-
-    assert_line --partial "/already/defined"
-    refute_line --partial "/.enroot/cache"
-
-}
-
-@test "if ENROOT_DATA_PATH is already defined, do not redefine it" {
-
-    export ENROOT_DATA_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
-
-    prepare-enroot.sh
-
-    function _helper() {
-        # shellcheck disable=SC2317
-        grep ENROOT_DATA_PATH "$MOCKLOGDIR"/enroot.log
-    }
-    run _helper
-
-    assert_line --partial "/already/defined"
-    refute_line --partial "/.enroot/data"
 
 }

@@ -60,9 +60,6 @@ COMMAND=(sbatch $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
          --parsable
 	 --signal=B:USR1@15 # SIGUSR1 15 seconds before the end of the job.
 	 )
-############################
-# CI IMAGE-RELATED OPTIONS #
-############################
 
 #################
 # DEBUG OPTIONS #
@@ -95,8 +92,7 @@ cat <<EOF
   },
 "job_env": {
     "CE_SLURM_JOB_ID": "$JOB_ID",
-    "CE_QUEUE_ENV_PATH" : "$WORKSPACE/.env",
-    "CE_CONTAINER_NAME" : "GLCE_$CUSTOM_ENV_CI_JOB_ID"
+    "CE_QUEUE_ENV_PATH" : "$WORKSPACE/.env"
   }
 }
 EOF

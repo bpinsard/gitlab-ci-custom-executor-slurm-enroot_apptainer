@@ -38,6 +38,10 @@ test-cleanup:
 test-prepare:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/prepare/
 
+test-containerlib:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/containerlib.bats
+
+
 test-mocks:
 	./tests/bats/bin/bats tests/mocks
 

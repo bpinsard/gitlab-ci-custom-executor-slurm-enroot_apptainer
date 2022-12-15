@@ -235,25 +235,3 @@ EOF
     assert [ -f "$CEQ_ENV" ]
 
 }
-
-@test "script output has job_env.CE_CONTAINER_NAME which contains CUSTOM_ENV_CI_JOB_ID" {
-
-
-
-    function _helper() {
-
-cat <<EOF > scr.py
-import json
-import sys
-dump = json.load(sys.stdin)
-print(dump["job_env"]["CE_CONTAINER_NAME"])
-EOF
-    "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null | python3 scr.py
-    }
-
-    run _helper
-    assert_success
-
-    assert_output --partial "GLCE_$CUSTOM_ENV_CI_JOB_ID"
-
-}

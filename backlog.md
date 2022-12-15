@@ -109,11 +109,21 @@ Features:
   - [X] Unit
   - [X] Integration
 
-- [X] `job_env` should have a variable for the enroot container name
+### containerlib.sh
+ 
+ - [X] should define the necessary `ENROOT_*_PATH` variables
+  so that they can be used in `prepare.sh` but also in `run.sh` and `cleanup.sh`,
+  starting from standard gitlab environment variables
+  - [X] ONLY IF `CUSTOM_ENV_CI_JOB_IMAGE` is set
+ - [X] should define the variable `CE_CONTAINER_NAME` 
+  starting from standard gitlab environment variables
+  - [X] ONLY IF `CUSTOM_ENV_CI_JOB_IMAGE` is set
+ 
 
 ### prepare.sh
 Preparation of the image/container is done here 
 in Holger's example.
+It will source `containerlib.sh`.
 
 - [ ] download image
   - [X] Unit
@@ -125,14 +135,14 @@ in Holger's example.
   defined in the configure stage
 - [X] Uses paths inside `CUSTOM_ENV_CI_BUILDS_DIR`
       (except for `ENROOT_TEMP_PATH`)
-- [X] if an image is requested, the enroot environment variables 
-  should all point to paths that can be deleted by cleanup
-  (inside `CUSTOM_ENV_CI_BUILDS_DIR`),
-  UNLESS - for debug purposes - they are already defined.
 - [X] do not do anything if image is not defined
 
 
 ### run.sh
+
+Every step runs in the allocation, the point is whether or not it needs to be 
+wrapped into a `enroot` command.
+
 - `prepare_script`
    This might need to run in the allocation.
 - `get_sources`
@@ -168,6 +178,7 @@ in Holger's example.
    At the moment this is done in the container.
    THIS NEEDS TO BE TESTED
 
+- [ ] It will source `containerlib.sh`.
 - [ ] The exported variables might need to be passed to the submitted file
       DISCUSS
 - [ ] Every step which is submitted to the custom executor queue
@@ -182,6 +193,7 @@ in Holger's example.
   The wrap can then be submitted to the custom executor queue.
 
 #### command wrapper
+- [ ] set up the enroot environment variables 
 - [ ] invoke enroot with the right mount points
 - [ ] use `--rw`
 - [ ] use the container name defined in the prepare stage
@@ -208,6 +220,7 @@ in Holger's example.
       some debugging information should be printed
       and/or some files should be kept for later inspection.
 - [ ] containers created in the prepare.sh step need to be removed
+  - [ ] unless `CUSTOM_ENV_CE_DEBUG` is set
 
    
 ## Diagnostics

@@ -127,12 +127,12 @@ EOF
 
 }
 
-@test "step that needs to happen in the container run in the custom executor queue" {
+@test "all steps run in the custom executor queue" {
 
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
 
-    for STEP in "${STEPS_IN_CONTAINER[@]}"
+    for STEP in "${ALL_STEP_NAMES[@]}"
     do
        cat << EOF > script-"$STEP".sh
 

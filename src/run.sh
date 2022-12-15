@@ -10,34 +10,26 @@ then
 fi
 
 
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
+
+# shellcheck source=./src/custom_executor_queue.sh
+source "$SRC"/custom_executor_queue.sh
+# shellcheck disable=SC1090
+source "$CE_QUEUE_ENV_PATH"
+
+
+
+
 case "$STEPNAME" in
     prepare_script|\
         step_*|\
         build_script|\
         after_script|\
         cleanup_file_variables)
-    SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-
-    # shellcheck source=./src/custom_executor_queue.sh
-    source "$SRC"/custom_executor_queue.sh
-    # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
-
+    # TODO: this needs to be wrapped into an enroot command
+    #       if a container image was requested
     submit_to_custom_executor_queue "$SCRIPT"
 
-    BNAME="$(basename "$SCRIPT")"
-    DONENAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/DONE/$BNAME"
-    OUTPUTNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.out"
-    EXITVALUEFNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.exitcode"
-    while [ ! -f "$DONENAME" ]
-    do
-        sleep 1
-    done
-    TIME="$(date +"%s")"
-    mv "$DONENAME" "$DONENAME"-"$TIME"
-    cat "$OUTPUTNAME"
-    read -r EXITVALUE < "$EXITVALUEFNAME"
-    exit "$EXITVALUE"
     ;;
 
     get_sources|\
@@ -48,8 +40,7 @@ case "$STEPNAME" in
         upload_artifacts_on_success|\
         upload_artifacts_on_failure)
 
-    "$SCRIPT"
-    exit $?
+    submit_to_custom_executor_queue "$SCRIPT"
     ;;
 
     *)
@@ -57,3 +48,17 @@ case "$STEPNAME" in
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     ;;
 esac
+
+BNAME="$(basename "$SCRIPT")"
+DONENAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/DONE/$BNAME"
+OUTPUTNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.out"
+EXITVALUEFNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.exitcode"
+while [ ! -f "$DONENAME" ]
+do
+    sleep 1
+done
+TIME="$(date +"%s")"
+mv "$DONENAME" "$DONENAME"-"$TIME"
+cat "$OUTPUTNAME"
+read -r EXITVALUE < "$EXITVALUEFNAME"
+exit "$EXITVALUE"
