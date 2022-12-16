@@ -61,6 +61,19 @@ EOF
 
 }
 
+@test "no env var crap in the wrap" {
+
+    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+
+    assert [ "$(wc -l < ./wrapped.sh)" -lt 50 ]
+}
+
 @test "enroot start is called in the wrap" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
@@ -81,19 +94,6 @@ EOF
 }
 
 
-@test "no env var crap in the wrap" {
-
-    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
-    cat <<EOF > "$SCRIPT_TO_WRAP"
-echo "something"
-EOF
-    chmod +x "$SCRIPT_TO_WRAP"
-
-    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
-
-    assert [ "$(wc -l < ./wrapped.sh)" -lt 50 ]
-}
-
 @test "ENROOT_*_PATH variables are set in the wrap" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
@@ -106,8 +106,8 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    cat "$MOCKLOGDIR/enroot.log"
     run cat "$MOCKLOGDIR/enroot.log"
+
     for VARNAME in ENROOT_RUNTIME_PATH ENROOT_CACHE_PATH ENROOT_DATA_PATH
     do
         assert_output --regexp "${VARNAME}.*${CUSTOM_ENV_CI_BUILDS_DIR}"
@@ -115,3 +115,90 @@ EOF
 
 
 }
+
+@test "enroot start uses the right container name" {
+
+
+    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    run cat "$MOCKLOGDIR/enroot.log"
+
+    # shellcheck source=./src/containerlib.sh
+    CONTAINER_NAME=$( . "$SRC"/containerlib.sh; echo "$CE_CONTAINER_NAME")
+    assert_output --regexp "ARGS:\s+start.*$CONTAINER_NAME"
+
+}
+
+@test "enroot uses --rw" {
+
+    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    run cat "$MOCKLOGDIR/enroot.log"
+    assert_output --regexp "ARGS:\s+start\s+--rw"
+
+
+}
+
+@test "enroot mounts the script file inside the container" {
+
+    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    run cat "$MOCKLOGDIR/enroot.log"
+    assert_output --regexp "--mount.*$SCRIPT_TO_WRAP:$SCRIPT_TO_WRAP"
+
+}
+
+@test "enroot mounts CUSTOM_ENV_CI_BUILDS_DIR inside the container" {
+
+    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    run cat "$MOCKLOGDIR/enroot.log"
+    assert_output --regexp "--mount.*$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
+
+}
+
+
+@test "wrapper exits with error EINVAL if script to wrap does not use absolute path" {
+
+    SCRIPT_TO_WRAP="./scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    run "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP"
+    assert_equal "$status" 22
+    assert_output "Needs absolute path to script to wrap."
+    }

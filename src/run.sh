@@ -18,8 +18,6 @@ source "$SRC"/custom_executor_queue.sh
 source "$CE_QUEUE_ENV_PATH"
 
 
-
-
 case "$STEPNAME" in
     prepare_script|\
         step_*|\
@@ -28,7 +26,16 @@ case "$STEPNAME" in
         cleanup_file_variables)
     # TODO: this needs to be wrapped into an enroot command
     #       if a container image was requested
-    submit_to_custom_executor_queue "$SCRIPT"
+
+
+    # shellcheck source=./src/run-include.sh
+    source "$SRC"/run-include.sh
+
+    "$SRC"/script-enroot-wrapper.sh "$(get_abs_path "$SCRIPT")" > "$SCRIPT"-wrapped.sh
+    chmod +x "$SCRIPT"-wrapped.sh
+
+    submit_to_custom_executor_queue "$SCRIPT"-wrapped.sh
+    BNAME="$(basename "$SCRIPT"-wrapped.sh)"
 
     ;;
 
@@ -41,6 +48,7 @@ case "$STEPNAME" in
         upload_artifacts_on_failure)
 
     submit_to_custom_executor_queue "$SCRIPT"
+    BNAME="$(basename "$SCRIPT")"
     ;;
 
     *)
@@ -49,7 +57,6 @@ case "$STEPNAME" in
     ;;
 esac
 
-BNAME="$(basename "$SCRIPT")"
 DONENAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/DONE/$BNAME"
 OUTPUTNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.out"
 EXITVALUEFNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.exitcode"

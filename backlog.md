@@ -178,7 +178,6 @@ wrapped into a `enroot` command.
    At the moment this is done in the container.
    THIS NEEDS TO BE TESTED
 
-- [ ] It will source `containerlib.sh`.
 - [ ] The exported variables might need to be passed to the submitted file
       DISCUSS
 - [ ] Every step which is submitted to the custom executor queue
@@ -189,14 +188,15 @@ wrapped into a `enroot` command.
 - [ ] `run` must exit with the same error as the submitted job
    - [X] Unit
    - [ ] Integration
-- [ ] When a container image is specified, wrap the script in an `enroot` command.
-  The wrap can then be submitted to the custom executor queue.
+- [X] When a container image is specified, wrap the script in an `enroot` command.
+  The wrap can then be submitted to the custom executor queue 
+  (see the "command wrapper" section)
 
 #### command wrapper
-- [ ] set up the enroot environment variables 
-- [ ] invoke enroot with the right mount points
-- [ ] use `--rw`
-- [ ] use the container name defined in the prepare stage
+- [X] set up the enroot environment variables 
+- [X] invoke enroot with the right mount points
+- [X] use `--rw`
+- [X] use the container name defined in the prepare stage
   (define an environment variable for that in configure-produce job-env?)
 
 

@@ -3,16 +3,19 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load'
     load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
     # and loading, and also make the sbatch mock available.
     load_mocks
+
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d configure-testXXXXXXX)
-    echo "Created test playground at $TEST_PLAYGROUND" >&3
+    TEST_PLAYGROUND=$PWD/$(mktemp -d run-testXXXXXXX)
+    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    export MOCKLOGDIR="$TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
@@ -113,6 +116,7 @@ STEPS_OUT_CONTAINER=(get_sources
 
     for STEP in "${ALL_STEP_NAMES[@]}"
     do
+    echo "# testing $STEP..." >&3
 cat << EOF > script-"$STEP".sh
 
 touch script-output-"$STEP".txt
@@ -122,7 +126,7 @@ EOF
 
     "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
 
-    assert [ -f script-output-"$STEP".txt ]
+    assert_exists script-output-"$STEP".txt
     done
 
 }
@@ -168,7 +172,7 @@ EOF
        chmod +x ./script-"$STEP".sh
 
        "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
-       assert [ -f script-output-"$STEP".txt ]
+       assert_exists script-output-"$STEP".txt
 
     done
 
@@ -193,7 +197,7 @@ EOF
        chmod +x ./script.sh
        "$SRC"/run.sh ./script.sh prepare_script
 
-       assert [ -f script-output-second-time.txt ]
+       assert_exists script-output-second-time.txt
 
 }
 
@@ -277,4 +281,27 @@ EOF
     )
 
 
-    }
+}
+
+@test "run uses enroot for the steps \"in container\" " {
+
+for STEPNAME in "${STEPS_IN_CONTAINER[@]}"
+do
+   ENROOTLOG="$MOCKLOGDIR"/enroot.log
+   # cleanup
+   rm -f "$ENROOTLOG"
+   cat << EOF > script-"$STEPNAME".sh
+
+touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
+
+EOF
+   chmod +x ./script-"$STEPNAME".sh
+
+   "$SRC/run.sh" ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+
+   assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
+   assert_exists "$ENROOTLOG"
+
+done
+
+}

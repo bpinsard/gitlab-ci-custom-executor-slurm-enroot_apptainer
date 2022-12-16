@@ -14,7 +14,7 @@ function setup() {
     # shellcheck disable=SC1091
     source "$SRC"/config-include.sh
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d configure-testXXXXXXX)
+    TEST_PLAYGROUND=$PWD/$(mktemp -d config-include-testXXXXXXX)
     export MOCKLOGDIR="$TEST_PLAYGROUND"
     echo "Created test playground at $TEST_PLAYGROUND" >&3
 
@@ -26,7 +26,6 @@ function setup() {
 
 function teardown() {
     rm -r "$TEST_PLAYGROUND"
-
 }
 
 @test "assemble mounts directive works as expected" {

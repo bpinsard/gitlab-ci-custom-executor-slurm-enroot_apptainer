@@ -5,10 +5,7 @@ function setup() {
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
 
     type -p enroot || { echo "# enroot executable not found, skipping" >&3 ; skip ;}
-    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
-    # To make scripts in /src available for sourcing
-    # and loading
 
     TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
