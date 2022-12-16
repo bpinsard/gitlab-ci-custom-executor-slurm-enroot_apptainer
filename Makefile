@@ -41,6 +41,9 @@ test-prepare:
 test-containerlib:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/containerlib.bats
 
+test-script-wrapper:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/script-enroot-wrapper.bats
+
 
 test-mocks:
 	./tests/bats/bin/bats tests/mocks
@@ -55,8 +58,12 @@ test-mocks:
 test-configure-nomock:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure/
 
-shellcheck:
-	shellcheck $$(find src -name '*.sh') \
+
+shellcheck-stable/shellcheck:
+	bash ./tests/install_shellcheck.sh
+
+shellcheck: shellcheck-stable/shellcheck
+	./shellcheck-stable/shellcheck $$(find src -name '*.sh') \
                $$(find tests -name '*.bats' \
                   -not -path 'tests/bats/*' \
                   -not -path 'tests/test_helper/*')\
@@ -67,9 +74,6 @@ shellcheck:
                   -not -path 'tests/bats/*' \
                   -not -path 'tests/test_helper/*')\
                $$(find tests/mocks/bin/ -type f -not -name '*.py')
-
-
-
 
 
 # This might be useful because for some reason bats process 

@@ -44,7 +44,6 @@ lint:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - source ./tests/install_shellcheck.sh
     - make shellcheck
   tags:
     - shell

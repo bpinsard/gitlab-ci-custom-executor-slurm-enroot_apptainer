@@ -74,9 +74,12 @@ teardown(){
 
         # shellcheck source=./src/containerlib.sh
         source "$SRC"/containerlib.sh
+
          _helper() {
+             # shellcheck disable=SC2317
              env | grep -cE '^ENROOT_.*_PATH'
          }
+
          run _helper
          assert_output 0
          assert [ -z "$CE_CONTAINER_NAME" ]

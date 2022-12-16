@@ -29,3 +29,16 @@ if [[ "$1" =~ list ]]
 then
     ( cd "$MOCKLOGDIR"/.enroot-fakecontainers || exit; ls)
 fi
+
+if [[ "$1" =~ start ]]
+then
+    count=0
+while [[ ! "$1" =~ --  && count -lt 10 ]]
+do
+    shift
+    count=$((count+1))
+done
+# last shift, for --
+shift
+"$@"
+fi

@@ -92,3 +92,15 @@ teardown() {
     refute_output --partial thiscontainer
 
 }
+
+@test "enroot start runs the script after --" {
+
+    cat <<EOF > ./script.sh
+echo "something"
+EOF
+    chmod +x ./script.sh
+
+    run enroot start container-name -- ./script.sh
+    assert_output "something"
+
+}
