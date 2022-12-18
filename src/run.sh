@@ -12,30 +12,20 @@ fi
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
-# shellcheck source=./src/custom_executor_queue.sh
-source "$SRC"/custom_executor_queue.sh
-# shellcheck disable=SC1090
-source "$CE_QUEUE_ENV_PATH"
+# shellcheck source=./src/run-include.sh
+source "$SRC"/run-include.sh
 
 
+if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
+then
 case "$STEPNAME" in
     prepare_script|\
         step_*|\
         build_script|\
         after_script|\
         cleanup_file_variables)
-    # TODO: this needs to be wrapped into an enroot command
-    #       if a container image was requested
 
-
-    # shellcheck source=./src/run-include.sh
-    source "$SRC"/run-include.sh
-
-    "$SRC"/script-enroot-wrapper.sh "$(get_abs_path "$SCRIPT")" > "$SCRIPT"-wrapped.sh
-    chmod +x "$SCRIPT"-wrapped.sh
-
-    submit_to_custom_executor_queue "$SCRIPT"-wrapped.sh
-    BNAME="$(basename "$SCRIPT"-wrapped.sh)"
+    F="wrap_enroot"
 
     ;;
 
@@ -47,8 +37,8 @@ case "$STEPNAME" in
         upload_artifacts_on_success|\
         upload_artifacts_on_failure)
 
-    submit_to_custom_executor_queue "$SCRIPT"
-    BNAME="$(basename "$SCRIPT")"
+    F="nowrap"
+
     ;;
 
     *)
@@ -56,6 +46,21 @@ case "$STEPNAME" in
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     ;;
 esac
+else
+    F="nowrap"
+fi
+
+# shellcheck source=./src/custom_executor_queue.sh
+source "$SRC/custom_executor_queue.sh"
+# shellcheck disable=SC1090
+source "$CE_QUEUE_ENV_PATH"
+
+
+WRAPPED="$("$F" "$SCRIPT")"
+submit_to_custom_executor_queue "$WRAPPED"
+BNAME="$(basename "$WRAPPED")"
+# shellcheck disable=SC1090
+source "$CE_QUEUE_ENV_PATH"
 
 DONENAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/DONE/$BNAME"
 OUTPUTNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.out"

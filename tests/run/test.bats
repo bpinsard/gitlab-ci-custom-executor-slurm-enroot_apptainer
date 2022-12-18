@@ -305,3 +305,30 @@ EOF
 done
 
 }
+
+
+@test "run does not run anything in a container if CUSTOM_ENV_CI_JOB_IMAGE not defined" {
+
+    (
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    for STEPNAME in "${STEPS_IN_CONTAINER[@]}"
+    do
+
+        ENROOTLOG="$MOCKLOGDIR"/enroot.log
+        # cleanup
+        rm -f "$ENROOTLOG"
+        cat << EOF > script-"$STEPNAME".sh
+
+touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
+
+EOF
+        chmod +x ./script-"$STEPNAME".sh
+
+        "$SRC/run.sh" ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+
+        assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
+        assert_not_exists "$ENROOTLOG"
+    done
+    )
+
+}

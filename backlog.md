@@ -188,7 +188,14 @@ wrapped into a `enroot` command.
 - [ ] `run` must exit with the same error as the submitted job
    - [X] Unit
    - [ ] Integration
-- [X] When a container image is specified, wrap the script in an `enroot` command.
+- wrap the script in an `enroot` command, if
+  - [ ] An image is specified
+    - [X] Unit
+    - [ ] Integration
+  - [ ] the step name is among those that need to be run in a container.
+    - [X] Unit
+    - [ ] Integration
+  
   The wrap can then be submitted to the custom executor queue 
   (see the "command wrapper" section)
 
@@ -215,11 +222,14 @@ wrapped into a `enroot` command.
     - [X] Unit
     - [ ] Integration
 
-- [ ] Temporary directories need to be deleted
+- [X] Temporary directories need to be deleted
 - [ ] if `CUSTOM_ENV_CE_DEBUG` is set, 
       some debugging information should be printed
       and/or some files should be kept for later inspection.
 - [ ] containers created in the prepare.sh step need to be removed
+  Note: this is already done by deletion 
+  of the temporary directories IF THE NECESSARY SUBSET
+  of `ENROOT_*_PATH` variables are set accordingly.
   - [ ] unless `CUSTOM_ENV_CE_DEBUG` is set
 
    
