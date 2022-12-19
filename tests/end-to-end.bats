@@ -75,7 +75,7 @@ function teardown() {
 
 }
 
-# bats test_tags=configure,prepare, cleanup,run,serial
+# bats test_tags=configure,prepare,cleanup,run,serial
 @test "configure, prepare, run and cleanup run a simple script" {
 
     "$SRC"/configure-slurm.sh | "$JOB_ENV_READER" > ./job-env
@@ -99,7 +99,7 @@ function teardown() {
 
     run "$SRC"/prepare-enroot.sh
     assert_success
-    assert_dir_exists "$CUSTOM_ENV_CI_BUILDS_DIR/.enroot/cache/GLCE_$CUSTOM_ENV_CI_JOB_ID"
+    assert_dir_exists "$CUSTOM_ENV_CI_BUILDS_DIR/.enroot"
 
     cat <<EOF > "$STARTDIR"/get_sources_script.sh
 echo "Cloning dummy repository..."
