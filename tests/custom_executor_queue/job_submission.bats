@@ -5,7 +5,7 @@ setup(){
     source "$PROJECT_ROOT/src/custom_executor_queue.sh"
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d ce-queue-job-sub-testXXXXXXX)
-    echo "Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Created test playground at $TEST_PLAYGROUND" >&3
 
 
     WORKDIR="${TEST_PLAYGROUND}"/cews

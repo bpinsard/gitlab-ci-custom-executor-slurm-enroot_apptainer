@@ -15,7 +15,7 @@ setup(){
 
     TEST_PLAYGROUND=$PWD/$(mktemp -d scriptwrapper-testXXXXXXX)
     export MOCKLOGDIR="$TEST_PLAYGROUND"
-    echo "Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Created test playground at $TEST_PLAYGROUND" >&3
     cd "$TEST_PLAYGROUND" || exit
 
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"

@@ -15,7 +15,7 @@ function setup(){
     JOB_ENV_READER="$PROJECT_ROOT"/tests/mocks/bin/read-job-env.py
 
     TEST_PLAYGROUND="$PWD/$(mktemp -d end-to-end-testXXXXXXX)"
-    echo "Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Created test playground at $TEST_PLAYGROUND" >&3
 
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
@@ -97,7 +97,9 @@ function teardown() {
 
     assert_file_exists "$CE_QUEUE_ENV_PATH"
 
+    echo -n "# Preparing job... " >&3
     run "$SRC"/prepare-enroot.sh
+    echo "done." >&3
     assert_success
     assert_dir_exists "$CUSTOM_ENV_CI_BUILDS_DIR/.enroot"
 
@@ -107,7 +109,7 @@ git clone https://github.com/mmesiti/test-repo-clone-me.git
 EOF
     chmod +x "$STARTDIR"/get_sources_script.sh
 
-    echo -n "Running get_sources... " >&3
+    echo -n "# Running get_sources... " >&3
     run "$SRC"/run.sh "$STARTDIR"/get_sources_script.sh get_sources
     echo "done." >&3
 
@@ -122,9 +124,9 @@ EOF
 EOF
     chmod +x "$STARTDIR"/build_script.sh
 
-    echo -n "Running build_script... " >&3
+    echo -n "# Running build_script... " >&3
     run "$SRC"/run.sh "$STARTDIR"/build_script.sh build_script
-    echo "done. " >&3
+    echo "done." >&3
 
     assert_line "Doing a lot of work..."
     assert_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/job-output.txt

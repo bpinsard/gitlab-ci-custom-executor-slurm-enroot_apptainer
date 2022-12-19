@@ -11,7 +11,7 @@ function setup() {
     PATH="$PROJECT_ROOT/src:$PATH"
 
     TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
-    echo "Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Created test playground at $TEST_PLAYGROUND" >&3
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/run/enroot"
     export ENROOT_CONFIG_PATH="$TEST_PLAYGROUND/conf/enroot"
     export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/cache/enroot"
