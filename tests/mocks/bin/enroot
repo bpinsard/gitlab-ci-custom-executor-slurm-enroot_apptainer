@@ -22,6 +22,11 @@ fi
 
 if [[ "$1" =~ create ]]
 then
+    if [[ "$#" -ne 4 ]]
+    then
+        echo "Image name missing!" >&2
+        exit 22
+    fi
     touch "$MOCKLOGDIR"/.enroot-fakecontainers/"$3"
 fi
 

@@ -73,8 +73,8 @@ teardown() {
 
 @test "enroot mock creates file named as container and lists it" {
 
-    enroot create --name thiscontainer
-    enroot create --name thatcontainer
+    enroot create --name thiscontainer imagename-ignored.sqsh
+    enroot create --name thatcontainer imagename-ignored.sqsh
 
     run enroot list
 
@@ -85,8 +85,8 @@ teardown() {
 
 @test "enroot remove removes containers " {
 
-    enroot create --name thiscontainer
-    enroot create --name thatcontainer
+    enroot create --name thiscontainer imagename-ignored.sqsh
+    enroot create --name thatcontainer imagename-ignored.sqsh
     enroot remove thiscontainer < <(echo yes)
     run enroot list
     refute_output --partial thiscontainer
@@ -102,5 +102,17 @@ EOF
 
     run enroot start -- container-name ./script.sh
     assert_output "something"
+
+}
+
+@test "enroot create needs name and image filename" {
+
+    run enroot create --name thiscontainer
+
+    assert_failure
+    assert_output --partial "Image name missing!"
+
+
+
 
 }

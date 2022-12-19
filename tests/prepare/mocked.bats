@@ -33,12 +33,28 @@ teardown() {
     rm -r "$TEST_PLAYGROUND"
 }
 
-@test "enroot called with import " {
+@test "enroot called with import" {
 
     prepare-enroot.sh
 
     run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --regexp "ARGS:.*import docker://$CUSTOM_ENV_CI_JOB_IMAGE"
+    assert_line --regexp "ARGS:.*import.*docker://$CUSTOM_ENV_CI_JOB_IMAGE"
+
+}
+
+@test "prepare-enroot removes previous image" {
+
+    touch "image_$CE_CONTAINER_NAME.sqsh"
+    prepare-enroot.sh
+
+    assert_not_exists "image_$CE_CONTAINER_NAME.sqsh"
+}
+
+@test "enroot called with import and --output to specify an output file for the image based on CE_CONTAINER_NAME" {
+
+    prepare-enroot.sh
+    run cat "$MOCKLOGDIR"/enroot.log
+    assert_line --regexp "ARGS:.*import.*--output.*image_$CE_CONTAINER_NAME.sqsh"
 
 }
 
@@ -52,6 +68,7 @@ teardown() {
 
 }
 
+
 @test "enroot removed called only if container already exists" {
 
     prepare-enroot.sh
@@ -63,17 +80,17 @@ teardown() {
 
 @test "enroot called to remove container with same name as the one to be created" {
 
-    enroot create --name "$CE_CONTAINER_NAME"
+    enroot create --name "$CE_CONTAINER_NAME" imagename-ignored.sqsh
     prepare-enroot.sh
     run cat "$MOCKLOGDIR"/enroot.log
 
-    assert_line --partial remove "$CE_CONTAINER_NAME"
+    assert_line --partial "remove $CE_CONTAINER_NAME"
 
 }
 
 @test "enroot remove called with yes"  {
 
-    enroot create --name "$CE_CONTAINER_NAME"
+    enroot create --name "$CE_CONTAINER_NAME" imagename-ignored.sqsh
     prepare-enroot.sh
 
     LOG="$MOCKLOGDIR"/enroot.log

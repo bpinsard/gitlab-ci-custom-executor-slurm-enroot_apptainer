@@ -7,10 +7,12 @@ source "$SRC"/containerlib.sh
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
-    enroot import docker://"$CUSTOM_ENV_CI_JOB_IMAGE"
+    IMAGEFILE="image_${CE_CONTAINER_NAME}.sqsh"
+    rm "$IMAGEFILE"
+    enroot import --output "$IMAGEFILE" docker://"$CUSTOM_ENV_CI_JOB_IMAGE"
 
     if { enroot list | grep "$CE_CONTAINER_NAME"; }
     then enroot remove "$CE_CONTAINER_NAME" < <(echo yes)
     fi
-    enroot create --name "$CE_CONTAINER_NAME"
+    enroot create --name "$CE_CONTAINER_NAME" "$IMAGEFILE"
 fi
