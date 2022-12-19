@@ -14,12 +14,29 @@ echo "ARGS:" "$@" >> "$ENROOT_LOG"
 
 { env | grep -E '^ENROOT_\w+_PATH' >> "$ENROOT_LOG"; } || true
 
+if [[ "$1" =~ import ]]
+then
+    shift
+    count=0
+    while [[  "$1" != --output  && "$count" -lt 10 ]]
+    do
+        shift
+        count=$((count+1))
+    done
+    if [[ "$count" -eq 10 ]]
+    then
+        echo "no --output " >&2
+        exit 0
+    else
+        touch "$2"
+    fi
+fi
+
 if [[ "$1" =~ remove ]]
 then
     cat - >> "$ENROOT_LOG"
     rm "$MOCKLOGDIR"/.enroot-fakecontainers/"$2"
 fi
-
 if [[ "$1" =~ create ]]
 then
     if [[ "$#" -ne 4 ]]
@@ -38,7 +55,7 @@ fi
 if [[ "$1" =~ start ]]
 then
     count=0
-while [[ ! "$1" == "--"  && count -lt 10 ]]
+while [[ ! "$1" == "--"  && "$count" -lt 10 ]]
 do
     shift
     count=$((count+1))

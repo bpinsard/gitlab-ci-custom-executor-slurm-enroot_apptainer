@@ -24,6 +24,7 @@ function setup() {
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CE_CONTAINER_NAME="GLCE_54321"
+    export CE_IMAGEFILE="$CUSTOM_ENV_CI_BUILDS_DIR/image_${CE_CONTAINER_NAME}.sqsh"
     echo "Test setup phase completed."
 
 }
@@ -42,12 +43,19 @@ teardown() {
 
 }
 
-@test "prepare-enroot removes previous image" {
+@test "prepare-enroot removes previous image, and replaces it with another one" {
 
-    touch "image_$CE_CONTAINER_NAME.sqsh"
+    (
+    touch "$CE_IMAGEFILE"
+    TIME0="$(stat --format=%W "$CE_IMAGEFILE")"
+    sleep 2
     prepare-enroot.sh
+    TIME1="$(stat --format=%W "$CE_IMAGEFILE")"
 
-    assert_not_exists "image_$CE_CONTAINER_NAME.sqsh"
+    assert_not_equal "$TIME0" "$TIME1"
+    )
+
+
 }
 
 @test "enroot called with import and --output to specify an output file for the image based on CE_CONTAINER_NAME" {

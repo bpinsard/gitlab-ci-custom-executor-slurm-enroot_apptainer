@@ -112,7 +112,13 @@ EOF
     assert_failure
     assert_output --partial "Image name missing!"
 
+}
 
+@test "enroot import creates sqsh file when called with output" {
+
+    enroot import --output thisfile.sqsh docker://thisimage:latest
+
+    assert_exists thisfile.sqsh
 
 
 }

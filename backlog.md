@@ -223,14 +223,13 @@ wrapped into a `enroot` command.
     - [ ] Integration
 
 - [X] Temporary directories need to be deleted
-- [ ] if `CUSTOM_ENV_CE_DEBUG` is set, 
-      some debugging information should be printed
-      and/or some files should be kept for later inspection.
-- [ ] containers created in the prepare.sh step need to be removed
+- [X] if `CUSTOM_ENV_CE_DEBUG` is set, 
+      some files should be kept for later inspection.
+- [X] containers created in the prepare.sh step need to be removed
   Note: this is already done by deletion 
   of the temporary directories IF THE NECESSARY SUBSET
   of `ENROOT_*_PATH` variables are set accordingly.
-  - [ ] unless `CUSTOM_ENV_CE_DEBUG` is set
+  - [X] unless `CUSTOM_ENV_CE_DEBUG` is set
 
    
 ## Diagnostics

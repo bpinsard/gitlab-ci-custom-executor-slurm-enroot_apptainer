@@ -7,7 +7,31 @@ sleep 5
 scancel "$CE_SLURM_JOB_ID"
 
 
+if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
+then
+
+    SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
+    # shellcheck source=./src/containerlib.sh
+    source "$SRC"/containerlib.sh
+
+    if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
+    then
+        enroot remove "$CE_CONTAINER_NAME"
+    fi
+
+    rm "$CE_IMAGEFILE"
+fi
+
 # shellcheck disable=SC1090
 source "$CE_QUEUE_ENV_PATH"
 
-rm -r "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
+
+# End lifetime of the CE queue workspace
+if [[ -n "$CUSTOM_ENV_CE_DEBUG" ]]
+then
+   mkdir -p "$HOME/ce-debug/"
+   mv  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE" "$HOME/ce-debug/""cews_$CUSTOM_ENV_CI_JOB_ID"
+else
+   rm -r "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
+fi
+

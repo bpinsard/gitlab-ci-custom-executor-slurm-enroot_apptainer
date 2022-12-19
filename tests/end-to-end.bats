@@ -41,7 +41,7 @@ function teardown() {
 }
 
 
-# bats test_tags=configure,cleanup,serial
+# bats test_tags=configure,cleanup
 @test "configure and cleanup" {
 
     "$SRC"/configure-slurm.sh  | "$JOB_ENV_READER" > ./job-env
@@ -75,7 +75,7 @@ function teardown() {
 
 }
 
-# bats test_tags=configure,prepare,cleanup,run,serial
+# bats test_tags=configure,prepare,cleanup,run
 @test "configure, prepare, run and cleanup run a simple script" {
 
     "$SRC"/configure-slurm.sh | "$JOB_ENV_READER" > ./job-env
