@@ -22,9 +22,12 @@ function teardown() {
 
 @test "enroot mounts single file in container and executes it without problems." {
 
+    # shellcheck disable=SC2030
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/enroot/run"
     # we do not change ENROOT_CONFIG_PATH
+    # shellcheck disable=SC2030
     export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/enroot/cache"
+    # shellcheck disable=SC2030
     export ENROOT_DATA_PATH="$TEST_PLAYGROUND/enroot/data"
 
     rm -f alpine+latest.sqsh
@@ -48,9 +51,12 @@ EOF
 
 @test "enroot CANNOT mount single file in container AND directory that contains it at the same time" {
 
+    # shellcheck disable=SC2031
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/enroot/run"
     # we do not change ENROOT_CONFIG_PATH
+    # shellcheck disable=SC2031
     export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/enroot/cache"
+    # shellcheck disable=SC2031
     export ENROOT_DATA_PATH="$TEST_PLAYGROUND/enroot/data"
 
     rm -f alpine+latest.sqsh
