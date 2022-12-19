@@ -46,8 +46,30 @@ EOF
 
 }
 
-# TODO: check if one can mount a directory and a file inside it independently
-#       (if this is not possible, work is needed to make sure that the case
-#       where the script is outside CUSTOM_ENV_CI_BUILDS_DIR is covered
-#       as well as the case in which the script is inside that directory)
+@test "enroot CANNOT mount single file in container AND directory that contains it at the same time" {
+
+    export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/enroot/run"
+    # we do not change ENROOT_CONFIG_PATH
+    export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/enroot/cache"
+    export ENROOT_DATA_PATH="$TEST_PLAYGROUND/enroot/data"
+
+    rm -f alpine+latest.sqsh
+    enroot import docker://alpine:latest
+    # Will be in $ENROOT_DATA_PATH 
+    enroot create --name alpine-enroot-test alpine+latest.sqsh
+    
+    SCR="$TEST_PLAYGROUND/script.sh"
+    cat<<EOF > "$SCR"
+#!/bin/sh
+echo "This is a test message"
+EOF
+    chmod +x "$SCR"
+
+    run enroot start --rw --mount "$TEST_PLAYGROUND:$TEST_PLAYGROUND,$SCR:$SCR" alpine-enroot-test "$SCR"
+
+    assert_failure
+
+
+}
+
 
