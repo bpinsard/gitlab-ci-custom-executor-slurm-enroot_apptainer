@@ -46,4 +46,8 @@ EOF
 
 }
 
+# TODO: check if one can mount a directory and a file inside it independently
+#       (if this is not possible, work is needed to make sure that the case
+#       where the script is outside CUSTOM_ENV_CI_BUILDS_DIR is covered
+#       as well as the case in which the script is inside that directory)
 
