@@ -18,16 +18,18 @@ setup(){
     echo "Created test playground at $TEST_PLAYGROUND" >&3
     cd "$TEST_PLAYGROUND" || exit
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="/a/dir/ectory"
+    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=an-image:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
+    TMPSCR=$(mktemp /tmp/scriptwrapper-test-script-XXXX.sh)
 }
 
 
 teardown() {
 
     rm -r "$TEST_PLAYGROUND"
+    rm -f "$TMPSCR"
 }
 
 
@@ -155,9 +157,26 @@ EOF
 
 }
 
-@test "enroot mounts the script file inside the container" {
+@test "enroot DOES NOT mount the script file inside the container if it is in CUSTOM_ENV_CI_BUILDS_DIR" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    run cat "$MOCKLOGDIR/enroot.log"
+    refute_output --regexp "--mount.*$SCRIPT_TO_WRAP:$SCRIPT_TO_WRAP"
+
+}
+
+@test "enroot DOES mount the script file inside the container if it is OUTSIDE CUSTOM_ENV_CI_BUILDS_DIR" {
+
+    SCRIPT_TO_WRAP="$TMPSCR"
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something"
 EOF
@@ -171,6 +190,7 @@ EOF
     assert_output --regexp "--mount.*$SCRIPT_TO_WRAP:$SCRIPT_TO_WRAP"
 
 }
+
 
 @test "enroot mounts CUSTOM_ENV_CI_BUILDS_DIR inside the container" {
 
