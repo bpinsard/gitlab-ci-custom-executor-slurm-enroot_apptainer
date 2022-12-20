@@ -23,8 +23,8 @@ test-jobsub:
 test-lifetime:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/custom_executor_queue/lifetime.bats
 
-test-integration:
-	./tests/bats/bin/bats tests/integration
+test-contract:
+	./tests/bats/bin/bats tests/contract
 
 test-configure:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure/

@@ -107,7 +107,7 @@ Features:
 - [X] SIGUSR1 should be sent to the job when the allocation is about to run out of time
   (and the custom executor queue should terminate)
   - [X] Unit
-  - [X] Integration
+  - [X] Contract 
 
 ### containerlib.sh
  
