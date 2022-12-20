@@ -15,6 +15,4 @@ then
         export ENROOT_DATA_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/.enroot/data"
     fi
     export CE_CONTAINER_NAME="GLCE_$CUSTOM_ENV_CI_JOB_ID"
-    export CE_IMAGEFILE="$CUSTOM_ENV_CI_BUILDS_DIR/image_${CE_CONTAINER_NAME}.sqsh"
-
 fi

@@ -43,32 +43,23 @@ teardown() {
 
 }
 
-@test "prepare-enroot removes previous image, and replaces it with another one" {
+@test "images removed at the end" {
 
-    touch atest
-    if [[ "$(stat --format %W atest)" -eq 0 ]]
-    then
-        # this means that the filesystem is not able to record birth times.
-        skip
-    fi
-    (
-    touch "$CE_IMAGEFILE"
-    TIME0="$(stat --format=%W "$CE_IMAGEFILE")"
-    sleep 2
     prepare-enroot.sh
-    TIME1="$(stat --format=%W "$CE_IMAGEFILE")"
 
-    assert_not_equal "$TIME0" "$TIME1"
-    )
+    IMAGEFILE=$(grep 'import --output' "$MOCKLOGDIR"/enroot.log | awk '{print $4}')
+
+    assert_not_exists "$IMAGEFILE"
 
 
 }
+
 
 @test "enroot called with import and --output to specify an output file for the image based on CE_CONTAINER_NAME" {
 
     prepare-enroot.sh
     run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --regexp "ARGS:.*import.*--output.*image_$CE_CONTAINER_NAME.sqsh"
+    assert_line --regexp "ARGS:.*import.*--output.*image.sqsh"
 
 }
 

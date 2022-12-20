@@ -12,6 +12,8 @@ function setup() {
 
     TEST_PLAYGROUND="$PWD/$(mktemp -d contract-testXXXXXXX)"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    # Apparently, these variables are anyway ignored by enroot
+    # when running inside pyxis
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/run/enroot"
     export ENROOT_CONFIG_PATH="$TEST_PLAYGROUND/conf/enroot"
     export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/cache/enroot"
@@ -44,6 +46,13 @@ function teardown() {
         -n 1 -t 1 \
         "${GET_DISTRONAME[@]}"
 
-    assert_output --partial "Alpine Linux"
+    if [[  "$status" -ne 0 ]]
+    then
+        echo "# This test has failed. " >&3
+        echo "# This test might fail with a 'permission denied' error," >&3
+        echo "# this is why we to not use pyxis." >&3
+        assert_output --partial "permission denied"
+    else
+        assert_output --partial "Alpine Linux"
+    fi
 }
-
