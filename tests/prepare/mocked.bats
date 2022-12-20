@@ -45,6 +45,12 @@ teardown() {
 
 @test "prepare-enroot removes previous image, and replaces it with another one" {
 
+    touch atest
+    if [[ "$(stat --format %W atest)" -eq 0 ]]
+    then
+        # this means that the filesystem is not able to record birth times.
+        skip
+    fi
     (
     touch "$CE_IMAGEFILE"
     TIME0="$(stat --format=%W "$CE_IMAGEFILE")"
