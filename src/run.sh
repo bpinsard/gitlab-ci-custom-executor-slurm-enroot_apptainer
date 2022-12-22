@@ -15,7 +15,6 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # shellcheck source=./src/run-include.sh
 source "$SRC"/run-include.sh
 
-
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
 case "$STEPNAME" in

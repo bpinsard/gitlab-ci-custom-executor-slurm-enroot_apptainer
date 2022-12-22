@@ -220,9 +220,12 @@ EOF
 
 }
 
+# bats test_tags=failing
 @test "run exits with the same code as the script." {
+    export SYSTEM_FAILURE_EXIT_CODE=102
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
+    #for STEP in "${STEPS_OUT_CONTAINER[@]}"
     for STEP in "${ALL_STEP_NAMES[@]}"
     do
 cat << EOF > script-"$STEP".sh
@@ -232,8 +235,8 @@ exit 42
 EOF
     chmod +x ./script-"$STEP".sh
 
+    echo "Testing $STEP" >&3
     run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
-
     assert_equal "$status" 42
     done
 

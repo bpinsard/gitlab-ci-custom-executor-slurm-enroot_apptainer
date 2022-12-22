@@ -16,7 +16,7 @@ then
 
     if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
     then
-        yes | enroot remove "$CE_CONTAINER_NAME"
+        enroot remove "$CE_CONTAINER_NAME" < <(echo yes)
     fi
 
     rm "$CE_IMAGEFILE"

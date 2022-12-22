@@ -12,7 +12,7 @@ function setup() {
     load_mocks
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d cleanup-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/cleanup-test-$BATS_TEST_NAME"
 
     export MOCKLOGDIR=$TEST_PLAYGROUND
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
@@ -43,7 +43,10 @@ function teardown_file(){
 }
 @test "cleanup calls scancel with the right job id" {
     wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
+    echo "env file produced, calling cleanup"
     "$SRC/cleanup-slurm.sh"
+    echo "cleanup called."
+
     run cat "$MOCKLOGDIR/scancel.log"
 
     assert_line --partial "$CE_SLURM_JOB_ID"
@@ -173,6 +176,6 @@ function teardown_file(){
     "$SRC/cleanup-slurm.sh"
 
     run cat "$MOCKLOGDIR/enroot.log"
-    refute_output --partial "remove"
+    refute_line --regexp "\sremove\s"
 
 }

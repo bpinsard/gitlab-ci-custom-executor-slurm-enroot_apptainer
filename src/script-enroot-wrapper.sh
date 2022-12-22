@@ -32,6 +32,6 @@ if [[ "\$status" -ne 0 ]]
 then 
     echo "Command failed with code \$status:"
     echo "\${COMMAND[@]}"
-    exit "\$SYSTEM_FAILURE_EXIT_CODE" 
+    exit "\$status"
 fi
 EOF

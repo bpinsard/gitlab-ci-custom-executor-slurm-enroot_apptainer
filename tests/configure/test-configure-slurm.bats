@@ -237,3 +237,16 @@ EOF
     assert [ -f "$CEQ_ENV" ]
 
 }
+
+@test "configure calls scontrol wait_job" {
+
+
+    "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null
+
+    run cat "$MOCKLOGDIR"/scontrol.log
+    assert_output --partial "wait_job"
+
+
+
+
+}
