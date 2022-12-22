@@ -14,7 +14,7 @@ function setup(){
 
     JOB_ENV_READER="$PROJECT_ROOT"/tests/mocks/bin/read-job-env.py
 
-    TEST_PLAYGROUND="$PWD/$(mktemp -d end-to-end-testXXXXXXX)"
+    TEST_PLAYGROUND="$PWD/end-to-end-test-$BATS_TEST_NAME"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
 
     export TEST_PLAYGROUND
@@ -90,6 +90,7 @@ function teardown() {
     assert_dir_exists "$CUSTOM_ENV_CI_BUILDS_DIR/.enroot"
 
     cat <<EOF > "$STARTDIR"/get_sources_script.sh
+#!/bin/bash
 echo "Cloning dummy repository..."
 git clone https://github.com/mmesiti/test-repo-clone-me.git
 EOF
@@ -102,11 +103,12 @@ EOF
     assert_line "Cloning dummy repository..."
 
     cat <<EOF > "$STARTDIR"/build_script.sh
-
-    echo "Doing a lot of work..."
-    cd $CUSTOM_ENV_CI_BUILDS_DIR
-    touch job-output.txt
-    echo "Done."
+#!/bin/bash
+echo "Doing a lot of work..."
+pwd
+cd $CUSTOM_ENV_CI_BUILDS_DIR
+touch $CUSTOM_ENV_CI_BUILDS_DIR/job-output.txt
+echo "Done."
 EOF
     chmod +x "$STARTDIR"/build_script.sh
 
@@ -119,9 +121,8 @@ EOF
 
     "$SRC"/cleanup-slurm.sh
 
-
+    # Check that the slurm job is over
     run _helper
     assert_failure
-
 
 }

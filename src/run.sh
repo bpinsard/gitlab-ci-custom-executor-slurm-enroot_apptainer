@@ -55,7 +55,6 @@ source "$SRC/custom_executor_queue.sh"
 # shellcheck disable=SC1090
 source "$CE_QUEUE_ENV_PATH"
 
-
 WRAPPED="$("$F" "$SCRIPT")"
 submit_to_custom_executor_queue "$WRAPPED"
 BNAME="$(basename "$WRAPPED")"

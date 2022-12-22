@@ -14,19 +14,24 @@ source "$SRC"/containerlib.sh
 # shellcheck disable=SC2086
 { env | grep -qE '^ENROOT'; } && declare -p ${!ENROOT*}
 
-CECID_REALPATH="$(realpath "$CUSTOM_ENV_CI_BUILDS_DIR")"
-TOWRAP_REALPATH="$(realpath "$TOWRAP")"
-
 MOUNT="$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
 
-if [[ ! "$TOWRAP_REALPATH" =~ ^"${CECID_REALPATH}"  ]]
+if [[ ! "$TOWRAP" =~ ^"${CUSTOM_ENV_CI_BUILDS_DIR}"  ]]
 then
     MOUNT="$TOWRAP":"$TOWRAP","$MOUNT"
 fi
 
 cat <<EOF
-enroot start \
-    --rw \
-    --mount "$MOUNT" \
-    -- "$CE_CONTAINER_NAME" "$TOWRAP"
+COMMAND=(enroot start 
+         --rw 
+         --mount "$MOUNT" 
+	 -- "$CE_CONTAINER_NAME" "$TOWRAP")
+"\${COMMAND[@]}"
+status=\$?
+if [[ "\$status" -ne 0 ]]
+then 
+    echo "Command failed with code \$status:"
+    echo "\${COMMAND[@]}"
+    exit "\$SYSTEM_FAILURE_EXIT_CODE" 
+fi
 EOF
