@@ -52,7 +52,7 @@ lint:
 update-fake-deploy:
   stage: fake-deploy
   variables:
-    - CE_FAKE_DEPLOY_PATH="$HOME"/custom-executor-slurm-fakedeploy
+    - CE_FAKE_DEPLOY_PATH: "$HOME"/custom-executor-slurm-fakedeploy
   tags:
     - shell
   before_script:
