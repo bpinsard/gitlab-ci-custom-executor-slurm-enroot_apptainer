@@ -35,3 +35,25 @@ function check_custom_env_command_options_sbatch_for_forbidden_options(){
     done
 
 }
+
+
+function wait_until_file_exists() {
+    local FILE="$1"
+    local MAXDELAY="$2"
+    local T0="$SECONDS"
+    if [ "$#" -ne 2 ]
+    then 
+	    echo "wrong number of arguments to ${FUNCNAME[0]}" >&2
+	    exit 22
+    fi
+    while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+        sleep 1
+    done
+    if [[ !  -f "$FILE" ]]
+    then
+        echo "Error: Waited too long ($MAXDELAY) for $FILE to be created".
+        return 124
+    fi
+
+}

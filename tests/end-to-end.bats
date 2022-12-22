@@ -55,13 +55,6 @@ function teardown() {
     # shellcheck  disable=SC1091
     source ./job-env
 
-    while ! scontrol wait_job "$CE_SLURM_JOB_ID"
-    do
-        sleep 1
-    done
-    # The image needs to be downloaded and the container set up
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
-
     assert_file_exists "$CE_QUEUE_ENV_PATH"
 
 
@@ -87,13 +80,6 @@ function teardown() {
 
     # shellcheck  disable=SC1091
     source ./job-env
-
-    while ! scontrol wait_job "$CE_SLURM_JOB_ID"
-    do
-        sleep 1
-    done
-    # The image needs to be downloaded and the container set up
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
 
     assert_file_exists "$CE_QUEUE_ENV_PATH"
 
