@@ -222,6 +222,7 @@ EOF
 
 # bats test_tags=failing
 @test "run exits with the same code as the script." {
+    # shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
@@ -246,7 +247,7 @@ EOF
 
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
-    # shellcheck disable=SC2030
+    # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
 
 cat << EOF > script.sh
