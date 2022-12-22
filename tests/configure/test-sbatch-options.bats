@@ -77,3 +77,17 @@ function teardown() {
     done
 
 }
+
+@test "sbatch NOT invoked with --{input,output,error}=/dev/null when CUSTOM_ENV_CE_DEBUG is set." {
+
+    (
+    export CUSTOM_ENV_CE_DEBUG=1
+    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    run cat "$MOCKLOGDIR"/sbatch.log
+    for STREAM in input output error
+    do
+    refute_output --partial "--${STREAM}=/dev/null"
+    done
+    )
+
+}
