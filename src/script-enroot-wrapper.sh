@@ -14,10 +14,12 @@ source "$SRC"/containerlib.sh
 # shellcheck disable=SC2086
 { env | grep -qE '^ENROOT'; } && declare -p ${!ENROOT*}
 
+CECID_REALPATH="$(realpath "$CUSTOM_ENV_CI_BUILDS_DIR")"
+TOWRAP_REALPATH="$(realpath "$TOWRAP")"
 
 MOUNT="$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
 
-if [[ ! "$TOWRAP" =~ ^"${CUSTOM_ENV_CI_BUILDS_DIR}"  ]]
+if [[ ! "$TOWRAP_REALPATH" =~ ^"${CECID_REALPATH}"  ]]
 then
     MOUNT="$TOWRAP":"$TOWRAP","$MOUNT"
 fi

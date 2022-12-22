@@ -222,3 +222,23 @@ EOF
     assert_equal "$status" 22
     assert_output "Needs absolute path to script to wrap."
     }
+
+@test "wrapper calls realpath to determine real directories" {
+
+    SCRIPT_TO_WRAP="$TMPSCR"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+
+    assert_exists "$MOCKLOGDIR"/realpath.log
+    run cat "$MOCKLOGDIR"/realpath.log
+
+    assert_output --partial "$SCRIPT_TO_WRAP"
+    assert_output --partial "$CUSTOM_ENV_CI_BUILDS_DIR"
+
+
+
+}
