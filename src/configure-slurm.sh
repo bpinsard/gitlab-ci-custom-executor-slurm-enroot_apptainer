@@ -84,6 +84,15 @@ COMMAND+=("$SRC"/job.slurm "$WORKSPACE" "$SRC")
 echo "${COMMAND[@]}" >&2
 JOB_ID=$("${COMMAND[@]}")
 
+while ! scontrol wait_job "$JOB_ID"
+do
+    sleep 3
+done
+wait_until_file_exists "$WORKSPACE/.env" 90
+
+ 
+
+
 cat <<EOF
 {
   "driver": {
@@ -96,3 +105,5 @@ cat <<EOF
   }
 }
 EOF
+
+
