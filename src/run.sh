@@ -70,10 +70,17 @@ source "$CE_QUEUE_ENV_PATH"
 DONENAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/DONE/$BNAME"
 OUTPUTNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.out"
 EXITVALUEFNAME="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$BNAME.exitcode"
-while [ ! -f "$DONENAME" ]
+while [ ! -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
 do
     sleep 1
 done
+if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
+then
+echo "Abnormal termination of script, exiting."
+exit "$SYSTEM_FAILURE_EXIT_CODE"
+fi
+
+
 TIME="$(date +"%s")"
 mv "$DONENAME" "$DONENAME"-"$TIME"
 cat "$OUTPUTNAME"

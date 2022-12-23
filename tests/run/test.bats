@@ -118,7 +118,7 @@ STEPS_OUT_CONTAINER=(get_sources
 @test "run script should run its first argument" {
 
 
-    for STEP in "${ALL_STEP_NAMES[@]}"
+    for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
     do
     echo "# testing $STEP..." >&3
 cat << EOF > script-"$STEP".sh
@@ -140,7 +140,7 @@ EOF
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
 
-    for STEP in "${ALL_STEP_NAMES[@]}"
+    for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
     do
        cat << EOF > script-"$STEP".sh
 
@@ -165,20 +165,15 @@ EOF
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
 
-    for STEP in "${STEPS_IN_CONTAINER[@]}"
-    do
-       cat << EOF > script-"$STEP".sh
-
+    STEP="${STEPS_IN_CONTAINER[0]}"
+    cat << EOF > script-"$STEP".sh
 sleep 3
 touch script-output-"$STEP".txt
-
 EOF
-       chmod +x ./script-"$STEP".sh
+    chmod +x ./script-"$STEP".sh
 
-       "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
-       assert_exists script-output-"$STEP".txt
-
-    done
+    "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+    assert_exists script-output-"$STEP".txt
 
 }
 
@@ -208,7 +203,7 @@ EOF
 @test "run outputs what the script outputs." {
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
-    for STEP in "${ALL_STEP_NAMES[@]}"
+    for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
     do
 cat << EOF > script-"$STEP".sh
 
@@ -230,8 +225,7 @@ EOF
     export SYSTEM_FAILURE_EXIT_CODE=102
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
-    #for STEP in "${STEPS_OUT_CONTAINER[@]}"
-    for STEP in "${ALL_STEP_NAMES[@]}"
+    for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
     do
 cat << EOF > script-"$STEP".sh
 
@@ -269,11 +263,12 @@ EOF
 
 @test "run exits with \$SYSTEM_FAILURE_EXIT_CODE if CE_QUEUE_ENV_PATH is not defined" {
 
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
 
     (
 
+    # shellcheck disable=SC2030
     export CE_QUEUE_ENV_PATH=""
 
 cat << EOF > script.sh
@@ -293,8 +288,7 @@ EOF
 
 @test "run uses enroot for the steps \"in container\" " {
 
-for STEPNAME in "${STEPS_IN_CONTAINER[@]}"
-do
+   STEPNAME="${STEPS_IN_CONTAINER[0]}"
    ENROOTLOG="$MOCKLOGDIR"/enroot.log
    # cleanup
    rm -f "$ENROOTLOG"
@@ -310,35 +304,28 @@ EOF
    assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
    assert_exists "$ENROOTLOG"
 
-done
-
 }
 
 
 @test "run does not run anything in a container if CUSTOM_ENV_CI_JOB_IMAGE not defined" {
 
-    (
-    # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_JOB_IMAGE=""
-    for STEPNAME in "${STEPS_IN_CONTAINER[@]}"
-    do
+   (
+   # shellcheck disable=SC2030
+   export CUSTOM_ENV_CI_JOB_IMAGE=""
 
-        ENROOTLOG="$MOCKLOGDIR"/enroot.log
-        # cleanup
-        rm -f "$ENROOTLOG"
-        cat << EOF > script-"$STEPNAME".sh
+   STEPNAME="${STEPS_IN_CONTAINER[0]}"
 
+   ENROOTLOG="$MOCKLOGDIR"/enroot.log
+   # cleanup
+   rm -f "$ENROOTLOG"
+   cat << EOF > script-"$STEPNAME".sh
 touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
-
 EOF
-        chmod +x ./script-"$STEPNAME".sh
-
-        "$SRC/run.sh" ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
-
-        assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
-        assert_not_exists "$ENROOTLOG"
-    done
-    )
+   chmod +x ./script-"$STEPNAME".sh
+   "$SRC/run.sh" ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
+   assert_not_exists "$ENROOTLOG"
+   )
 
 }
 
@@ -351,8 +338,7 @@ EOF
     # to the custom executor queue,
     # because in that case the script is copied for sure in CUSTOM_ENV_CI_BUILDS_DIR.
 
-for STEPNAME in "${STEPS_IN_CONTAINER[@]}"
-do
+   STEPNAME="${STEPS_IN_CONTAINER[0]}"
    ENROOTLOG="$MOCKLOGDIR"/enroot.log
    # cleanup
    rm -f "$ENROOTLOG"
@@ -372,12 +358,42 @@ EOF
    assert_line --regexp "start.*$CE_CONTAINER_NAME.*$CUSTOM_ENV_CI_BUILDS_DIR/"
    )
 
-done
 
+}
 
+# bats test_tags=termination
+@test "run exit with error when slurm job has terminated, but script has not." {
+    # shellcheck disable=SC2031
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    # shellcheck disable=SC1090,SC2031
+    source "$CE_QUEUE_ENV_PATH"
+    # shellcheck source=./src/custom_executor_queue.sh
+    source "$SRC/custom_executor_queue.sh"
 
+    for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
+    do
+cat << EOF > script-"$STEP".sh
 
+sleep 100
 
+EOF
+    chmod +x ./script-"$STEP".sh
 
+    echo "Testing $STEP" >&3
+
+    (
+    sleep 10
+    # Terminating the
+    stop_custom_executor_queue
+    touch "$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
+    ) &
+
+    run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_line "Abnormal termination of script, exiting."
+
+    done
 
 }
