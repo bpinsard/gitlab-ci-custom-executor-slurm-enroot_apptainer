@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SCRIPT="${1}"
+ORIGINAL_SCRIPT="${1}"
 STEPNAME="${2}"
 
 if [[ -z "$CE_QUEUE_ENV_PATH" ]]
@@ -26,6 +26,11 @@ case "$STEPNAME" in
 
     F="wrap_enroot"
 
+    _BNAME="$(basename "$ORIGINAL_SCRIPT")"
+    SCRIPT=$(mktemp "$CUSTOM_ENV_CI_BUILDS_DIR/cp-XXXXXX${_BNAME}")
+    cat "$ORIGINAL_SCRIPT" > "$SCRIPT"
+    chmod +x "$SCRIPT"
+
     ;;
 
     get_sources|\
@@ -37,6 +42,7 @@ case "$STEPNAME" in
         upload_artifacts_on_failure)
 
     F="nowrap"
+    SCRIPT="$ORIGINAL_SCRIPT"
 
     ;;
 
@@ -47,6 +53,7 @@ case "$STEPNAME" in
 esac
 else
     F="nowrap"
+    SCRIPT="$ORIGINAL_SCRIPT"
 fi
 
 # shellcheck source=./src/custom_executor_queue.sh

@@ -13,7 +13,9 @@ function setup() {
 
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d run-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/run-test-$BATS_TEST_NAME"
+    # outside CUSTOM_ENV_CI_BUILDS_DIR
+    TMP_PLAYGROUND=$(mktemp -d /tmp/run-testXXXXXXX)
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
     export MOCKLOGDIR="$TEST_PLAYGROUND"
 
@@ -42,6 +44,7 @@ function teardown() {
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
     rm -r "$TEST_PLAYGROUND"
+    rm -r "$TMP_PLAYGROUND"
 
 }
 
@@ -314,6 +317,7 @@ done
 @test "run does not run anything in a container if CUSTOM_ENV_CI_JOB_IMAGE not defined" {
 
     (
+    # shellcheck disable=SC2030
     export CUSTOM_ENV_CI_JOB_IMAGE=""
     for STEPNAME in "${STEPS_IN_CONTAINER[@]}"
     do
@@ -334,5 +338,45 @@ EOF
         assert_not_exists "$ENROOTLOG"
     done
     )
+
+}
+
+@test "run copies the script to run in CUSTOM_ENV_CI_BUILDS_DIR first of all when enroot is involved" {
+    # this is necessary because enroot will try to mount the file into the container
+    # but the container runs on a compute node
+    # and this means that the file needs to be on the global filesystem,
+    # not in a random directory.
+    # This is not necessary if the file is submitted directly
+    # to the custom executor queue,
+    # because in that case the script is copied for sure in CUSTOM_ENV_CI_BUILDS_DIR.
+
+for STEPNAME in "${STEPS_IN_CONTAINER[@]}"
+do
+   ENROOTLOG="$MOCKLOGDIR"/enroot.log
+   # cleanup
+   rm -f "$ENROOTLOG"
+   cat << EOF > "$TMP_PLAYGROUND/script-$STEPNAME".sh
+
+touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
+
+EOF
+   chmod +x "$TMP_PLAYGROUND/script-$STEPNAME".sh
+
+   "$SRC/run.sh" "$TMP_PLAYGROUND/script-$STEPNAME".sh "$STEPNAME" 3>/dev/null
+
+   (
+   run cat "$ENROOTLOG"
+   # shellcheck source=./src/containerlib.sh
+   source "$SRC/containerlib.sh"
+   assert_line --regexp "start.*$CE_CONTAINER_NAME.*$CUSTOM_ENV_CI_BUILDS_DIR/"
+   )
+
+done
+
+
+
+
+
+
 
 }
