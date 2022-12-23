@@ -49,16 +49,3 @@ lint:
   tags:
     - shell
 
-update-fake-deploy:
-  stage: fake-deploy
-  variables:
-    CE_FAKE_DEPLOY_PATH: "$HOME/custom-executor-slurm-fakedeploy"
-  tags:
-    - shell
-  before_script:
-    - if [[ ! -d "$CE_FAKE_DEPLOY_PATH" ]]; then git clone $CI_REPOSITORY_URL $CE_FAKE_DEPLOY_PATH; fi
-  script:
-    - cd $CE_FAKE_DEPLOY_PATH
-    - git pull
-
-
