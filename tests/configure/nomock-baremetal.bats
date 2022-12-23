@@ -33,7 +33,7 @@ EOF
     export CUSTOM_ENV_CI_BUILDS_DIR
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
 
-    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR/cews/.env"
+    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
 
 }
 
