@@ -7,6 +7,7 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load'
     load '../test-utils'
 
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
@@ -17,7 +18,7 @@ function setup() {
     load_mocks
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d configure-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
     export MOCKLOGDIR=$TEST_PLAYGROUND
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
 
@@ -43,6 +44,7 @@ function teardown() {
     rm -r "$TEST_PLAYGROUND"
 
 }
+
 @test "sbatch NOT called with --container-* (NOT using pyxis)" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
@@ -237,6 +239,7 @@ EOF
 
 }
 
+# bats test_tags=scontrol
 @test "configure calls scontrol wait_job" {
 
 
@@ -245,7 +248,24 @@ EOF
     run cat "$MOCKLOGDIR"/scontrol.log
     assert_output --partial "wait_job"
 
+}
 
+# bats test_tags=termination
+@test "when job script exits, a file named 'terminated' is produced" {
 
+    "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null
+
+    local SBATCHPID
+    SBATCHPID=$(awk '{print $1}' "$MOCKLOGDIR"/pids.txt| head -n 1)
+
+    wait_until_file_exists "$CEQ_ENV" 50
+
+    kill -s TERM "$SBATCHPID"
+    while ps --pid "$SBATCHPID"
+    do
+        sleep 1
+    done
+
+    assert_exists "$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
 
 }

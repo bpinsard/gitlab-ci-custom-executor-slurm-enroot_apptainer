@@ -22,6 +22,7 @@ source "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/.env
 
 trap "kill -s SIGUSR1 $CUSTOM_EXECUTOR_QUEUE_JOBID; wait; exit" SIGUSR1
 trap "kill -s SIGTERM $CUSTOM_EXECUTOR_QUEUE_JOBID; wait; exit" SIGTERM
+trap "touch $CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated;" EXIT
 
 while true
 do 
