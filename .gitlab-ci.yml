@@ -1,8 +1,8 @@
 
 stages:          # List of stages for jobs, and their order of execution
   - test
-  - fake-deploy
-  - test-fake-deploy
+  - test-deploy
+  - test-test-deploy
 
 unit-test-parallel:
   variables:
@@ -55,7 +55,35 @@ update-ce-code:
   tags: 
     - shell
   variables:
-    CI_TEST_CODE: "/home/hk-project-scs/hs2454/custom-executor-slurm-enroot-fakedeploy"
+    # This needs to match the one used in the configured test custom executor
+    # TODO: remove from this file and put in CI/CD settings
+    CI_TEST_CODE: "/home/hk-project-scs/hs2454/custom-executor-slurm-enroot-test-deploy"
   script:
     - cd "$CI_TEST_CODE"
     - git pull $CI_REPOSITORY_URL
+
+minimal-job:
+  stage: test-test-deploy
+  variables:
+    # TODO: remove from this file and put in CI/CD settings
+    CI_BUILDS_DIR: "/home/hk-project-scs/hs2454/gitlab-runner"
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-enroot-test
+  script:
+    - echo "Test Test"
+    - env | sort
+
+image-job:
+  stage: test-test-deploy
+  image: ubuntu:latest
+  variables:
+    # TODO: remove from this file and put in CI/CD settings
+    CI_BUILDS_DIR: "/home/hk-project-scs/hs2454/gitlab-runner"
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-enroot-test
+  script:
+    - echo "Test Test using an image"
+    - grep PRETTY /etc/os-release
+    - env | sort
