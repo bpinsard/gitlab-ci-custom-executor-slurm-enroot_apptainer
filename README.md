@@ -62,5 +62,18 @@ Every time we run the pipeline:
   (via an api call?)
 - optionally retrieve the status of the pipeline 
 
+### Gitlab CI configuration (WORK IN PROGRESS)
+
+The Gitlab CI configuration included in this repository
+is made up of a number of stages:
+1. A test stage, where all the unit, the contract tests, some integration tests and the linter are run.
+2. A test-deploy stage, where the code is deployed to a test directory. 
+3. A end-to-end test stage, where the deployed code is used to run some basic tests.
+
+In order for stage 3 to work, 
+a custom gitlab runner needs to be registered 
+and properly configured 
+so that it uses the scripts in the test directory
+used in the test-deploy stage.
 
 
