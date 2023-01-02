@@ -51,7 +51,7 @@ lint:
 
 
 update-ce-code:
-  stage: fake-deploy
+  stage: test # Not really, but it can be done at the same time
   tags: 
     - shell
   variables:
