@@ -49,3 +49,13 @@ lint:
   tags:
     - shell
 
+
+update-ce-code:
+  stage: fake-deploy
+  tags: 
+    - shell
+  variables:
+    CI_TEST_CODE: "/home/hk-project-scs/hs2454/custom-executor-slurm-enroot-fakedeploy"
+  script:
+    - cd "$CI_TEST_CODE"
+    - git pull $CI_REPOSITORY_URL
