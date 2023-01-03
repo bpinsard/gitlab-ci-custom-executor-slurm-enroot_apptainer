@@ -13,8 +13,9 @@ function setup() {
     load_mocks
 
     TEST_PLAYGROUND="$PWD/prepare-test-$BATS_TEST_NAME"
-    export MOCKLOGDIR=$TEST_PLAYGROUND
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
+    export MOCKLOGDIR="$TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
@@ -93,16 +94,22 @@ teardown() {
 
 }
 
+
+# bats test_tags=notworking
 @test "enroot remove called with yes"  {
 
     enroot create --name "$CE_CONTAINER_NAME" imagename-ignored.sqsh
     prepare-enroot.sh
 
+
     LOG="$MOCKLOGDIR"/enroot.log
-    START=$(grep -nE 'ARGS:.*remove' "$LOG" | cut -d: -f1)
+    CUTLOG="$MOCKLOGDIR"/.enroot-cut-log
+    # Notice the spaces surrounding 'remove'
+    # to make sure it does not pick lines where the directory name
+    # is used.
+    START=$(grep -nE 'ARGS:.* remove ' "$LOG" | cut -d: -f1)
 
     set -o pipefail
-    CUTLOG=$MOCKLOGDIR/.enroot-cut-log
     tail -n +$((START+1)) "$LOG" > "$CUTLOG"
     END=$({ grep -n "ARGS:" "$CUTLOG" | cut -d: -f1; } || { E=$(wc -l < "$CUTLOG"); echo $((E+1)); })
     set +o pipefail

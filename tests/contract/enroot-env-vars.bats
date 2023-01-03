@@ -13,7 +13,8 @@ function setup() {
     PATH="$PROJECT_ROOT/src:$PATH"
 
     TEST_PLAYGROUND="$PWD/enroot-env-var-test-$BATS_TEST_NAME"
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
 
 }
 

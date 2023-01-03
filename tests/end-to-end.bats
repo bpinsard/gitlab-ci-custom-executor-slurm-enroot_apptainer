@@ -15,7 +15,8 @@ function setup(){
     JOB_ENV_READER="$PROJECT_ROOT"/tests/mocks/bin/read-job-env.py
 
     TEST_PLAYGROUND="$PWD/end-to-end-test-$BATS_TEST_NAME"
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
 
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start

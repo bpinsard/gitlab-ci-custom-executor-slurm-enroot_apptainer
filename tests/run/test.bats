@@ -14,9 +14,10 @@ function setup() {
     SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/run-test-$BATS_TEST_NAME"
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
     # outside CUSTOM_ENV_CI_BUILDS_DIR
     TMP_PLAYGROUND=$(mktemp -d /tmp/run-testXXXXXXX)
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
     export MOCKLOGDIR="$TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start

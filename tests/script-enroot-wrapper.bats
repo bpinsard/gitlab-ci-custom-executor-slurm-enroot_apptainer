@@ -14,8 +14,9 @@ setup(){
     SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/scriptwrapper-test-$BATS_TEST_NAME"
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
     cd "$TEST_PLAYGROUND" || exit
 
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"

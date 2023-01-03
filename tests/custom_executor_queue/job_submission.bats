@@ -5,7 +5,8 @@ setup(){
     source "$PROJECT_ROOT/src/custom_executor_queue.sh"
 
     TEST_PLAYGROUND="$PWD/ce-queue-job-sub-test-$BATS_TEST_NAME"
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
 
 
     WORKDIR="${TEST_PLAYGROUND}"/cews

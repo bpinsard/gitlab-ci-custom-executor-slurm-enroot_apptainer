@@ -12,6 +12,8 @@ function setup(){
     export SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
+    echo "# Creating test playground in $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
     # export CUSTOM_ENV_CE_DEBUG=1

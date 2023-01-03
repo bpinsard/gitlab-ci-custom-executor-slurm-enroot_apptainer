@@ -13,8 +13,9 @@ function setup() {
     source "$SRC"/run-include.sh
 
     TEST_PLAYGROUND="$PWD/run-include-test-$BATS_TEST_NAME"
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"

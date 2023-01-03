@@ -11,7 +11,8 @@ setup(){
 
     load_mocks
     TEST_PLAYGROUND="$PWD/enroot-mock-test-$BATS_TEST_NAME"
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit

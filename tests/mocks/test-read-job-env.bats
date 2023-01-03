@@ -11,7 +11,8 @@ function setup() {
     load_mocks
 
     TEST_PLAYGROUND="$PWD/read-job-env-test-$BATS_TEST_NAME"
-    echo "Created test playground at $TEST_PLAYGROUND"
+    echo "Creating test playground at $TEST_PLAYGROUND"
+    mkdir "$TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
