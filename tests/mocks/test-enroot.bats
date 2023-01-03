@@ -10,7 +10,7 @@ setup(){
     export PROJECT_ROOT
 
     load_mocks
-    TEST_PLAYGROUND=$PWD/$(mktemp -d enroot-mock-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/enroot-mock-test-$BATS_TEST_NAME"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"

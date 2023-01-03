@@ -13,7 +13,7 @@ setup(){
 
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d scriptwrapper-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/scriptwrapper-test-$BATS_TEST_NAME"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
     cd "$TEST_PLAYGROUND" || exit

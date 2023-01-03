@@ -11,7 +11,7 @@ function setup(){
     # and loading, and also make the sbatch mock available.
     export SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
+    TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
     # export CUSTOM_ENV_CE_DEBUG=1

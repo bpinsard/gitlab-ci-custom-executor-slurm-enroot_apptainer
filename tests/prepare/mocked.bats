@@ -12,7 +12,7 @@ function setup() {
     export PATH="$SRC:$PATH"
     load_mocks
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d prepare-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/prepare-test-$BATS_TEST_NAME"
     export MOCKLOGDIR=$TEST_PLAYGROUND
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
 

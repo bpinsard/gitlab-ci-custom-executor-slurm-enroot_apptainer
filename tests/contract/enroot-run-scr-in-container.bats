@@ -7,7 +7,7 @@ function setup() {
     type -p enroot || { echo "# enroot executable not found, skipping" >&3 ; skip ;}
 
 
-    TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
+    TEST_PLAYGROUND="$PWD/enroot-contract-test-$BATS_TEST_NAME"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
     cd "$TEST_PLAYGROUND" || exit
 

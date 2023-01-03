@@ -12,7 +12,7 @@ function setup() {
     # shellcheck disable=SC1091
     source "$SRC"/run-include.sh
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d run-include-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/run-include-test-$BATS_TEST_NAME"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
 

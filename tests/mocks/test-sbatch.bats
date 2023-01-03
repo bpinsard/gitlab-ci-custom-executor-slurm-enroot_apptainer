@@ -8,7 +8,7 @@ setup(){
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     PATH="$PROJECT_ROOT/src/slurm-utils:$PATH"
     load_mocks
-    TEST_PLAYGROUND=$PWD/$(mktemp -d sbatch-mock-testXXXXXXX)
+    TEST_PLAYGROUND="$PWD/sbatch-mock-test-$BATS_TEST_NAME"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
