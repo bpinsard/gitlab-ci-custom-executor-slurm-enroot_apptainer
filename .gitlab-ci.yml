@@ -110,7 +110,7 @@ artifact-image-job:
   tags:
     # This needs to match the tag of the test custom executor
     - slurm-enroot-test
-  script: touch test-artifact-image.txt
+  script: cp /etc/os-release test-artifact-image.txt
   artifacts:
     paths:
       - test-artifact.txt
