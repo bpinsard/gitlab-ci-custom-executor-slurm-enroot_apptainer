@@ -44,6 +44,11 @@ function teardown() {
     then
       echo scancel "$JOB_ID"
       scancel "$JOB_ID"
+      while { squeue --format %i | grep -q "$JOB_ID"; }
+      do
+          echo "Waiting for job $JOB_ID to terminate..."
+          sleep 5
+      done
       echo rm -r "$TEST_PLAYGROUND"
       rm -r "$TEST_PLAYGROUND"
     fi
