@@ -116,8 +116,15 @@ EOF
     submit_to_custom_executor_queue job.sh
 
 
+    # DEBUG: This check is flaky.
+    #        Adding 10 seconds just in case there is a delay
+    #        of unknown reason.
+    #        I honestly do not understand the reason why this
+    #        additional delay is sometimes necessary.
     wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
-        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
+        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2+10))
+
+
 
     echo "Logfile so far:"
     cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
