@@ -39,7 +39,7 @@ teardown(){
 @test "start_custom_executor_queue creates env file" {
 
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
-    assert [ -f "$WORKDIR"/.env ]
+    assert_file_exists "$WORKDIR"/.env
     # There are 5 variables that need to be declared
     # (this might need to be updated)
     assert_equal "$(wc -l < "$WORKDIR"/.env)" 5

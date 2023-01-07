@@ -171,7 +171,7 @@ EOF
     rm job-1.sh
     local OUT="$WORKDIR"/OUTPUT/job-1.sh.out
     wait_until_file_exists "$OUT" 10
-    assert [ -f "$OUT" ]
+    assert_file_exists "$OUT"
 
     run cat "$OUT"
     assert_output - <<EOF
@@ -196,7 +196,7 @@ EOF
     submit_to_custom_executor_queue job-1.sh
     rm job-1.sh
     wait_until_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode 30
-    assert [ -f "$WORKDIR"/OUTPUT/job-1.sh.exitcode ]
+    assert_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode
 
     run cat "$WORKDIR"/OUTPUT/job-1.sh.exitcode
     assert_output "42"

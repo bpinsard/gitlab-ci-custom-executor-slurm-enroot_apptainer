@@ -236,7 +236,7 @@ EOF
 
     assert_output "$CEQ_ENV"
     wait_until_file_exists "$CEQ_ENV" 20
-    assert [ -f "$CEQ_ENV" ]
+    assert_file_exists "$CEQ_ENV"
 
 }
 

@@ -3,6 +3,7 @@
 function setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load'
     load '../test-utils'
     _on_horeka || skip
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
@@ -73,7 +74,7 @@ function teardown() {
 
     wait_until_file_exists "$CEQ_ENV" 30
 
-    assert [ -f "$CEQ_ENV" ]
+    assert_file_exists "$CEQ_ENV"
 
 }
 
@@ -129,7 +130,7 @@ EOF
     echo "Logfile so far:"
     cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
     echo "end of logfile"
-    assert [ -f "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out" ]
+    assert_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out"
     run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out"
     # Making sure this has run 
     assert_output 'Hello'
