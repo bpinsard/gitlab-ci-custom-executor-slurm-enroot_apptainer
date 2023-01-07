@@ -27,7 +27,7 @@ case "$STEPNAME" in
     F="wrap_enroot"
 
     _BNAME="$(basename "$ORIGINAL_SCRIPT")"
-    SCRIPT=$(mktemp "$CUSTOM_ENV_CI_BUILDS_DIR/cp-XXXXXX${_BNAME}")
+    SCRIPT=$(mktemp "$CUSTOM_ENV_CI_WS/cp-XXXXXX${_BNAME}")
     cat "$ORIGINAL_SCRIPT" > "$SCRIPT"
     chmod +x "$SCRIPT"
 

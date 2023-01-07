@@ -19,7 +19,7 @@ setup(){
     export MOCKLOGDIR="$TEST_PLAYGROUND"
     cd "$TEST_PLAYGROUND" || exit
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=an-image:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
@@ -113,7 +113,7 @@ EOF
 
     for VARNAME in ENROOT_RUNTIME_PATH ENROOT_CACHE_PATH ENROOT_DATA_PATH
     do
-        assert_output --regexp "${VARNAME}.*${CUSTOM_ENV_CI_BUILDS_DIR}"
+        assert_output --regexp "${VARNAME}.*${CUSTOM_ENV_CI_WS}"
     done
 
 
@@ -158,7 +158,7 @@ EOF
 
 }
 
-@test "enroot DOES NOT mount the script file inside the container if it is in CUSTOM_ENV_CI_BUILDS_DIR" {
+@test "enroot DOES NOT mount the script file inside the container if it is in CUSTOM_ENV_CI_WS" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
     cat <<EOF > "$SCRIPT_TO_WRAP"
@@ -175,7 +175,7 @@ EOF
 
 }
 
-@test "enroot DOES mount the script file inside the container if it is OUTSIDE CUSTOM_ENV_CI_BUILDS_DIR" {
+@test "enroot DOES mount the script file inside the container if it is OUTSIDE CUSTOM_ENV_CI_WS" {
 
     SCRIPT_TO_WRAP="$TMPSCR"
     cat <<EOF > "$SCRIPT_TO_WRAP"
@@ -193,7 +193,7 @@ EOF
 }
 
 
-@test "enroot mounts CUSTOM_ENV_CI_BUILDS_DIR inside the container" {
+@test "enroot mounts CUSTOM_ENV_CI_WS inside the container" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
     cat <<EOF > "$SCRIPT_TO_WRAP"
@@ -206,7 +206,7 @@ EOF
 
     ./wrapped.sh
     run cat "$MOCKLOGDIR/enroot.log"
-    assert_output --regexp "--mount.*$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
+    assert_output --regexp "--mount.*$CUSTOM_ENV_CI_WS:$CUSTOM_ENV_CI_WS"
 
 }
 

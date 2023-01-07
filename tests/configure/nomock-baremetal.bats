@@ -31,12 +31,12 @@ EOF
     echo "Test setup phase completed."
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_ID=54321
-    export CUSTOM_ENV_CI_BUILDS_DIR
-    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
+    export CUSTOM_ENV_CI_WS
+    mkdir -p "$CUSTOM_ENV_CI_WS" # This should not be needed
 
-    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
+    CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
 
 }
 

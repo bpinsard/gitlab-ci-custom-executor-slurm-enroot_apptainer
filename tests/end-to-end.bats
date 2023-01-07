@@ -27,7 +27,7 @@ function setup(){
 
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
     export CUSTOM_ENV_CI_JOB_IMAGE="ubuntu:kinetic-20221101"
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
 
@@ -88,7 +88,7 @@ function teardown() {
     run "$SRC"/prepare-enroot.sh
     echo "done." >&3
     assert_success
-    assert_dir_exists "$CUSTOM_ENV_CI_BUILDS_DIR/.enroot"
+    assert_dir_exists "$CUSTOM_ENV_CI_WS/.enroot"
 
     cat <<EOF > "$STARTDIR"/get_sources_script.sh
 #!/bin/bash
@@ -107,8 +107,8 @@ EOF
 #!/bin/bash
 echo "Doing a lot of work..."
 pwd
-cd $CUSTOM_ENV_CI_BUILDS_DIR
-touch $CUSTOM_ENV_CI_BUILDS_DIR/job-output.txt
+cd $CUSTOM_ENV_CI_WS
+touch $CUSTOM_ENV_CI_WS/job-output.txt
 echo "Done."
 EOF
     chmod +x "$STARTDIR"/build_script.sh
@@ -118,7 +118,7 @@ EOF
     echo "done." >&3
 
     assert_line "Doing a lot of work..."
-    assert_file_exists "$CUSTOM_ENV_CI_BUILDS_DIR"/job-output.txt
+    assert_file_exists "$CUSTOM_ENV_CI_WS"/job-output.txt
 
     "$SRC"/cleanup-slurm.sh
 

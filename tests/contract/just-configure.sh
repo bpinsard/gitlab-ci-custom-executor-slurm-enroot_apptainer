@@ -12,7 +12,7 @@ mkdir -p playground
 
 # export CUSTOM_ENV_CE_DEBUG=1
 export CUSTOM_ENV_CI_JOB_IMAGE="ubuntu:kinetic-20221101"
-export CUSTOM_ENV_CI_BUILDS_DIR=$PWD/playground
+export CUSTOM_ENV_CI_WS=$PWD/playground
 export MOCKLOGDIR=$PWD/playground
 
 

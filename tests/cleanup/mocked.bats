@@ -22,7 +22,7 @@ function setup() {
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     echo "Test setup phase completed."

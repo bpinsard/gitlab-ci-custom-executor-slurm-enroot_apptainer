@@ -21,11 +21,11 @@ function setup() {
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CE_CONTAINER_NAME="GLCE_54321"
-    export CE_IMAGEFILE="$CUSTOM_ENV_CI_BUILDS_DIR/image_${CE_CONTAINER_NAME}.sqsh"
+    export CE_IMAGEFILE="$CUSTOM_ENV_CI_WS/image_${CE_CONTAINER_NAME}.sqsh"
     echo "Test setup phase completed."
 
 }
@@ -68,9 +68,9 @@ teardown() {
 
     prepare-enroot.sh
     run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --partial "ENROOT_RUNTIME_PATH=$CUSTOM_ENV_CI_BUILDS_DIR/.enroot/run"
-    assert_line --partial "ENROOT_CACHE_PATH=$CUSTOM_ENV_CI_BUILDS_DIR/.enroot/cache"
-    assert_line --partial "ENROOT_DATA_PATH=$CUSTOM_ENV_CI_BUILDS_DIR/.enroot/data"
+    assert_line --partial "ENROOT_RUNTIME_PATH=$CUSTOM_ENV_CI_WS/.enroot/run"
+    assert_line --partial "ENROOT_CACHE_PATH=$CUSTOM_ENV_CI_WS/.enroot/cache"
+    assert_line --partial "ENROOT_DATA_PATH=$CUSTOM_ENV_CI_WS/.enroot/data"
 
 }
 

@@ -8,7 +8,7 @@ setup(){
 
     SRC="$PROJECT_ROOT"/src
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="/a/dir/ectory"
+    export CUSTOM_ENV_CI_WS="/a/dir/ectory"
     export CUSTOM_ENV_CI_JOB_IMAGE=an-image:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
@@ -23,7 +23,7 @@ teardown(){
 
 
     # shellcheck disable=SC2030
-    export ENROOT_RUNTIME_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
+    export ENROOT_RUNTIME_PATH="$CUSTOM_ENV_CI_WS/already/defined"
 
     # shellcheck source=./src/containerlib.sh
     source "$SRC"/containerlib.sh
@@ -38,7 +38,7 @@ teardown(){
 @test "if ENROOT_CACHE_PATH is already defined, do not redefine it" {
 
     # shellcheck disable=SC2030,SC2031
-    export ENROOT_CACHE_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
+    export ENROOT_CACHE_PATH="$CUSTOM_ENV_CI_WS/already/defined"
 
     # shellcheck source=./src/containerlib.sh
     source "$SRC"/containerlib.sh
@@ -53,7 +53,7 @@ teardown(){
 @test "if ENROOT_DATA_PATH is already defined, do not redefine it" {
 
     # shellcheck disable=SC2030,SC2031
-    export ENROOT_DATA_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/already/defined"
+    export ENROOT_DATA_PATH="$CUSTOM_ENV_CI_WS/already/defined"
 
     # shellcheck source=./src/containerlib.sh
     source "$SRC"/containerlib.sh
@@ -86,14 +86,14 @@ teardown(){
     )
 }
 
-@test "ENROOT_*_PATHS variables should be all inside CUSTOM_ENV_CI_BUILDS_DIR" {
+@test "ENROOT_*_PATHS variables should be all inside CUSTOM_ENV_CI_WS" {
 
  # shellcheck source=./src/containerlib.sh
  source "$SRC"/containerlib.sh
  for VARNAME in ${!ENROOT*}
  do
      run echo "${!VARNAME}"
-     assert_output --regexp "^$CUSTOM_ENV_CI_BUILDS_DIR"
+     assert_output --regexp "^$CUSTOM_ENV_CI_WS"
  done
 
 }

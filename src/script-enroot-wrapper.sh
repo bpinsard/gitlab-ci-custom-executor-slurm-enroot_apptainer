@@ -14,9 +14,9 @@ source "$SRC"/containerlib.sh
 # shellcheck disable=SC2086
 { env | grep -qE '^ENROOT'; } && declare -p ${!ENROOT*}
 
-MOUNT="$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
+MOUNT="$CUSTOM_ENV_CI_WS:$CUSTOM_ENV_CI_WS"
 
-if [[ ! "$TOWRAP" =~ ^"${CUSTOM_ENV_CI_BUILDS_DIR}"  ]]
+if [[ ! "$TOWRAP" =~ ^"${CUSTOM_ENV_CI_WS}"  ]]
 then
     MOUNT="$TOWRAP":"$TOWRAP","$MOUNT"
 fi

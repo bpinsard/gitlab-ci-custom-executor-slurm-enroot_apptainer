@@ -16,7 +16,7 @@ function setup() {
     TEST_PLAYGROUND="$PWD/run-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
-    # outside CUSTOM_ENV_CI_BUILDS_DIR
+    # outside CUSTOM_ENV_CI_WS
     TMP_PLAYGROUND=$(mktemp -d /tmp/run-testXXXXXXX)
     export MOCKLOGDIR="$TEST_PLAYGROUND"
 
@@ -24,7 +24,7 @@ function setup() {
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     echo "Test setup phase completed."
@@ -32,9 +32,9 @@ function setup() {
     (
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC"/custom_executor_queue.sh
-    start_custom_executor_queue "$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID" 3> /dev/null
+    start_custom_executor_queue "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID" 3> /dev/null
     )
-    export CE_QUEUE_ENV_PATH="$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
+    export CE_QUEUE_ENV_PATH="$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
 }
 
 function teardown() {
@@ -330,14 +330,14 @@ EOF
 
 }
 
-@test "run copies the script to run in CUSTOM_ENV_CI_BUILDS_DIR first of all when enroot is involved" {
+@test "run copies the script to run in CUSTOM_ENV_CI_WS first of all when enroot is involved" {
     # this is necessary because enroot will try to mount the file into the container
     # but the container runs on a compute node
     # and this means that the file needs to be on the global filesystem,
     # not in a random directory.
     # This is not necessary if the file is submitted directly
     # to the custom executor queue,
-    # because in that case the script is copied for sure in CUSTOM_ENV_CI_BUILDS_DIR.
+    # because in that case the script is copied for sure in CUSTOM_ENV_CI_WS.
 
    STEPNAME="${STEPS_IN_CONTAINER[0]}"
    ENROOTLOG="$MOCKLOGDIR"/enroot.log
@@ -356,7 +356,7 @@ EOF
    run cat "$ENROOTLOG"
    # shellcheck source=./src/containerlib.sh
    source "$SRC/containerlib.sh"
-   assert_line --regexp "start.*$CE_CONTAINER_NAME.*$CUSTOM_ENV_CI_BUILDS_DIR/"
+   assert_line --regexp "start.*$CE_CONTAINER_NAME.*$CUSTOM_ENV_CI_WS/"
    )
 
 
@@ -386,7 +386,7 @@ EOF
     sleep 10
     # Terminating the
     stop_custom_executor_queue
-    touch "$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
+    touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
     ) &
 
     run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
