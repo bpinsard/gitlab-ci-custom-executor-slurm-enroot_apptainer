@@ -117,6 +117,27 @@ horeka-mpi-multinode-job:
       [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
       
 
+ce-queue-debug-test:
+  stage: test-test-deploy
+  variables:
+    CE_DEBUG: 1
+  tags:
+    - slurm-enroot-test
+  script:
+    - rm -rf "$HOME/ce-debug/"
+  
+ce-queue-debug-post-test:
+  stage: test-test-deploy
+  needs: 
+    - "ce-queue-debug-test"
+  tags:
+    - shell
+  script:
+    - |
+       [ -d "$HOME/ce-debug/" ]
+  after_script:
+    - rm -rf "$HOME/ce-debug/"
+
 
 unit-test-parallel-bootstrap:
   variables:
@@ -162,3 +183,6 @@ lint-bootstrap:
     - make shellcheck
   tags:
     - slurm-enroot-test
+
+       
+
