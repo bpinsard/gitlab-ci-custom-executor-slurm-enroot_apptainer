@@ -105,6 +105,18 @@ artifact-image-job:
       - test-artifact.txt
 
 
+horeka-mpi-multinode-job:
+  stage: test-test-deploy
+  tags:
+    - slurm-enroot-test
+  variables:
+    COMMAND_OPTION_SBATCH: "--partition cpuonly -t 1 --nodes 2 --ntasks-per-node=1"
+  script:
+    - |
+      [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
+      
+
+
 unit-test-parallel-bootstrap:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
