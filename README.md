@@ -4,7 +4,16 @@ This is a [custom executor for GitLab](https://docs.gitlab.com/runner/executors/
 written taking inspiration from https://github.com/ginkgo-project/gitlab-hpc-ci-cb 
 and from Holger Obermaier's Slurm and enroot custom executor.
 
-## Debug
+## Usage
+
+### Necessary environment variables
+
+Remember to set the variable `CI_WS` 
+to a path you have access to on HoreKa.
+This can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/).
+
+## Development and maintenance
+### Debug
 
 In some cases, the code looks at a variable called `CUSTOM_ENV_CE_DEBUG` 
 (which should be possible to set as `CE_DEBUG` 
@@ -18,7 +27,7 @@ the results can be inspected.
 
 This debuggability feature might need to be expanded.
 
-## Tests
+### Tests
 
 To run all the tests, 
 install all the necessary BATS submodules with
@@ -31,49 +40,68 @@ and then use the command
 make test JOBS=64
 ```
 Notice that this will NOT run all the tests.
-Some non-unit tests need to be run on the HoreKa cluster.
+Some tests which are more complex 
+need to be run on the HoreKa cluster.
 
-### Unit tests
+### Linting
+
+`shellcheck` is used for linting.
+
+#### Unit tests
 
 Unit tests require the [bats framework](https://github.com/bats-core)
 installed as a collection of submodules.
 
-### Contract tests
+#### Contract tests
 
 These contract tests probe the different interactions 
 that we assume our software will have with the external system
 (e.g., HoreKa).
 
 
-### End to end tests on HoreKa
+#### End to end tests on HoreKa
 
 In order to fully test the custom executor, 
 we need to do the following steps.
 
 Once:
-- set up a custom executor with `gitlab-runner register` (once)
+- set up a custom executor with `gitlab-runner register` 
 - set up the custom executor as a systemd service
 
 Every time we run the pipeline:
 
-- deploy the code to horeka, in the locations where the gitlab runner needs them
-- make sure the custom executor is running (log into the horeka-ci loging node)
-- trigger a CI pipeline with jobs that use the deployed custom executor on gitlab
-  (via an api call?)
-- optionally retrieve the status of the pipeline 
+- make sure the gitlab runner is running 
+  (log into the horeka-ci login node)
+- deploy the code to horeka, 
+  in the locations where the gitlab runner needs them
+  (this is part of the pipeline)
+- start jobs that make use 
+  of the custom executor
+  (through the tag mechanism)
 
 ### Gitlab CI configuration (WORK IN PROGRESS)
 
 The Gitlab CI configuration included in this repository
-is made up of a number of stages:
-1. A test stage, where all the unit, the contract tests, some integration tests and the linter are run.
-2. A test-deploy stage, where the code is deployed to a test directory. 
-3. A end-to-end test stage, where the deployed code is used to run some basic tests.
+is made up of a number of stages
+which include unit test, a test deployment,
+a number of tests of the deployed executor
+(this includes a job with artifacts, 
+one in a container,
+a multi-node job (<- TODO))
 
-In order for stage 3 to work, 
-a custom gitlab runner needs to be registered 
-and properly configured 
-so that it uses the scripts in the test directory
-used in the test-deploy stage.
+At the beginning of the pipeline,
+the jobs are run using a shell executor,
+but at some point the code is deployed 
+(in the "test-deploy" stage)
+and the later stages are run using the deployed
+custom executor code.
+
+In order for this to work:
+- a "normal" executor needs to be registered
+  (a shell executor would work just fine)
+- a custom gitlab runner needs to be registered 
+  and properly configured 
+  so that it uses the scripts in the test directory
+  used in the test-deploy stage.
 
 
