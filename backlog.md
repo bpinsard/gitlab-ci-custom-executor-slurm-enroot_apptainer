@@ -60,6 +60,10 @@ Features:
 
 
   NOTE: this might need adjustments as we go along.
+
+- [ ] if CUSTOM_ENV_CI_WS is not defined, clear error message and hint should be printed
+  - [X] Unit
+  - [ ] Integration
 - [X] allocation manager is started in slurm allocation 
 - [X] pass input variables on to sbatch
 - [X] pass content of variable `COMMAND_OPTIONS_SBATCH` to `sbatch` invocation

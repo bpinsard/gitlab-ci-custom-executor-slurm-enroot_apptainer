@@ -17,6 +17,15 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # TODO: Test that this variables is set by the gitlab runner
 # TODO: Change this to a job-id related name
+set +o nounset
+if [[ -z "$CUSTOM_ENV_CI_WS" ]]
+then
+    echo "ERROR: CUSTOM_ENV_CI_WS variable not defined." 1>&2
+    echo "       Please define the CI_WS variable in your gitlab CI/CD setup (See README)." 1>&2
+
+    exit "$SYSTEM_FAILURE_EXIT_CODE"
+fi
+set -o nounset
 WORKSPACE="$CUSTOM_ENV_CI_WS"/cews_"$CUSTOM_ENV_CI_JOB_ID"
 
 ##########
