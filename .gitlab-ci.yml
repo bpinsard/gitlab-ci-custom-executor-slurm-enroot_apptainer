@@ -126,7 +126,7 @@ unit-test-parallel-bootstrap:
   after_script:
     - make joker
   tags:
-    - shell
+    - slurm-enroot-test
   artifacts:
     when: always
     paths:
@@ -144,7 +144,7 @@ unit-test-serial-bootstrap:
   after_script:
     - make joker
   tags:
-    - shell
+    - slurm-enroot-test
   artifacts:
     when: always
     paths:
@@ -160,5 +160,4 @@ lint-bootstrap:
   script:
     - make shellcheck
   tags:
-    - shell
-
+    - slurm-enroot-test
