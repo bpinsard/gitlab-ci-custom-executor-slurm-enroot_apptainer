@@ -12,8 +12,9 @@ function setup() {
     # and loading
     PATH="$PROJECT_ROOT/src:$PATH"
 
-    TEST_PLAYGROUND="$PWD/$(mktemp -d enroot-env-var-testXXXXXXX)"
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    TEST_PLAYGROUND="$PWD/enroot-env-var-test-$BATS_TEST_NAME"
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
 
 }
 
@@ -23,6 +24,8 @@ function teardown() {
 
 }
 
+# This test might conflict with other tests, so we need to run it in isolation.
+# bats test_tags=serial
 @test "enroot does not use /run/user/ or $HOME/.local/share/enroot" {
 
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/enroot/run"

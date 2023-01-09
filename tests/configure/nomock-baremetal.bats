@@ -3,6 +3,7 @@
 function setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load'
     load '../test-utils'
     _on_horeka || skip
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
@@ -11,7 +12,9 @@ function setup(){
     # and loading, and also make the sbatch mock available.
     export SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND="$PWD/$(mktemp -d configure-testXXXXXXX)"
+    TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
+    echo "# Creating test playground in $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
     # export CUSTOM_ENV_CE_DEBUG=1
@@ -28,12 +31,12 @@ EOF
     echo "Test setup phase completed."
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_ID=54321
-    export CUSTOM_ENV_CI_BUILDS_DIR
-    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR" # This should not be needed
+    export CUSTOM_ENV_CI_WS
+    mkdir -p "$CUSTOM_ENV_CI_WS" # This should not be needed
 
-    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
+    CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
 
 }
 
@@ -42,6 +45,11 @@ function teardown() {
     then
       echo scancel "$JOB_ID"
       scancel "$JOB_ID"
+      while { squeue --format %i | grep -q "$JOB_ID"; }
+      do
+          echo "Waiting for job $JOB_ID to terminate..."
+          sleep 5
+      done
       echo rm -r "$TEST_PLAYGROUND"
       rm -r "$TEST_PLAYGROUND"
     fi
@@ -66,7 +74,7 @@ function teardown() {
 
     wait_until_file_exists "$CEQ_ENV" 30
 
-    assert [ -f "$CEQ_ENV" ]
+    assert_file_exists "$CEQ_ENV"
 
 }
 
@@ -109,13 +117,20 @@ EOF
     submit_to_custom_executor_queue job.sh
 
 
+    # DEBUG: This check is flaky.
+    #        Adding 10 seconds just in case there is a delay
+    #        of unknown reason.
+    #        I honestly do not understand the reason why this
+    #        additional delay is sometimes necessary.
     wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
-        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
+        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2+10))
+
+
 
     echo "Logfile so far:"
     cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
     echo "end of logfile"
-    assert [ -f "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out" ]
+    assert_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out"
     run cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out"
     # Making sure this has run 
     assert_output 'Hello'

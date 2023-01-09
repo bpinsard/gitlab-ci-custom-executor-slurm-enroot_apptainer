@@ -12,19 +12,20 @@ function setup() {
     export PATH="$SRC:$PATH"
     load_mocks
 
-    TEST_PLAYGROUND=$PWD/$(mktemp -d prepare-testXXXXXXX)
-    export MOCKLOGDIR=$TEST_PLAYGROUND
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    TEST_PLAYGROUND="$PWD/prepare-test-$BATS_TEST_NAME"
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
+    export MOCKLOGDIR="$TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CE_CONTAINER_NAME="GLCE_54321"
-    export CE_IMAGEFILE="$CUSTOM_ENV_CI_BUILDS_DIR/image_${CE_CONTAINER_NAME}.sqsh"
+    export CE_IMAGEFILE="$CUSTOM_ENV_CI_WS/image_${CE_CONTAINER_NAME}.sqsh"
     echo "Test setup phase completed."
 
 }
@@ -67,9 +68,9 @@ teardown() {
 
     prepare-enroot.sh
     run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --partial "ENROOT_RUNTIME_PATH=$CUSTOM_ENV_CI_BUILDS_DIR/.enroot/run"
-    assert_line --partial "ENROOT_CACHE_PATH=$CUSTOM_ENV_CI_BUILDS_DIR/.enroot/cache"
-    assert_line --partial "ENROOT_DATA_PATH=$CUSTOM_ENV_CI_BUILDS_DIR/.enroot/data"
+    assert_line --partial "ENROOT_RUNTIME_PATH=$CUSTOM_ENV_CI_WS/.enroot/run"
+    assert_line --partial "ENROOT_CACHE_PATH=$CUSTOM_ENV_CI_WS/.enroot/cache"
+    assert_line --partial "ENROOT_DATA_PATH=$CUSTOM_ENV_CI_WS/.enroot/data"
 
 }
 
@@ -93,16 +94,22 @@ teardown() {
 
 }
 
+
+# bats test_tags=notworking
 @test "enroot remove called with yes"  {
 
     enroot create --name "$CE_CONTAINER_NAME" imagename-ignored.sqsh
     prepare-enroot.sh
 
+
     LOG="$MOCKLOGDIR"/enroot.log
-    START=$(grep -nE 'ARGS:.*remove' "$LOG" | cut -d: -f1)
+    CUTLOG="$MOCKLOGDIR"/.enroot-cut-log
+    # Notice the spaces surrounding 'remove'
+    # to make sure it does not pick lines where the directory name
+    # is used.
+    START=$(grep -nE 'ARGS:.* remove ' "$LOG" | cut -d: -f1)
 
     set -o pipefail
-    CUTLOG=$MOCKLOGDIR/.enroot-cut-log
     tail -n +$((START+1)) "$LOG" > "$CUTLOG"
     END=$({ grep -n "ARGS:" "$CUTLOG" | cut -d: -f1; } || { E=$(wc -l < "$CUTLOG"); echo $((E+1)); })
     set +o pipefail

@@ -19,17 +19,18 @@ function setup() {
     SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
-    export MOCKLOGDIR=$TEST_PLAYGROUND
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
+    export MOCKLOGDIR=$TEST_PLAYGROUND
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
-    CEQ_ENV="$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
+    CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
     echo "Test setup phase completed."
 }
 
@@ -68,7 +69,7 @@ function teardown() {
 
 }
 
-@test "custom executor queue uses \$CUSTOM_ENV_CI_BUILDS_DIR/cews_\$CUSTOM_ENV_CI_JOB_ID as a workspace" {
+@test "custom executor queue uses \$CUSTOM_ENV_CI_WS/cews_\$CUSTOM_ENV_CI_JOB_ID as a workspace" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
@@ -76,7 +77,7 @@ function teardown() {
     # shellcheck disable=SC1090
     source "$CEQ_ENV"
 
-    assert_equal "$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID" "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
+    assert_equal "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID" "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
 
 
 }
@@ -235,7 +236,7 @@ EOF
 
     assert_output "$CEQ_ENV"
     wait_until_file_exists "$CEQ_ENV" 20
-    assert [ -f "$CEQ_ENV" ]
+    assert_file_exists "$CEQ_ENV"
 
 }
 
@@ -266,6 +267,6 @@ EOF
         sleep 1
     done
 
-    assert_exists "$CUSTOM_ENV_CI_BUILDS_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
+    assert_exists "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
 
 }

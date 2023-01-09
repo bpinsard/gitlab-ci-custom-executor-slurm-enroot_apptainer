@@ -10,8 +10,9 @@ function setup() {
     # and loading
     PATH="$PROJECT_ROOT/src:$PATH"
 
-    TEST_PLAYGROUND="$PWD/$(mktemp -d contract-testXXXXXXX)"
-    echo "# Created test playground at $TEST_PLAYGROUND" >&3
+    TEST_PLAYGROUND="$PWD/contract-test-$BATS_TEST_NAME"
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
     # Apparently, these variables are anyway ignored by enroot
     # when running inside pyxis
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/run/enroot"
