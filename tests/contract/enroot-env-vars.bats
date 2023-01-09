@@ -24,6 +24,8 @@ function teardown() {
 
 }
 
+# This test might conflict with other tests, so we need to run it in isolation.
+# bats test_tags=serial
 @test "enroot does not use /run/user/ or $HOME/.local/share/enroot" {
 
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/enroot/run"
