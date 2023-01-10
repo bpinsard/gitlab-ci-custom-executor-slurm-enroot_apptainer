@@ -31,7 +31,7 @@ teardown(){
     # shellcheck disable=SC2030
     export MOCKLOGDIR=
     run scancel 123840
-    assert_equal "$status" 1
+    assert_equal "$status" 45
     )
 
 }

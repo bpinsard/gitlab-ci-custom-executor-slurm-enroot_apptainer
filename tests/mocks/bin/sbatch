@@ -4,15 +4,13 @@
 # - Arguments it was called with
 # - all the relevant environment variables
 
-[ -n "$MOCKLOGDIR" ] || {
-    echo "The mock needs a place to store logs" >&2
-    exit 1
-}
-
 SBATCH_LOG=$MOCKLOGDIR/sbatch.log
-SBATCH_PIDS=$MOCKLOGDIR/pids.txt
 
-echo "ARGS:" "$@" >> "$SBATCH_LOG"
+BASEMOCK="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"/basemock
+# shellcheck source=./tests/mocks/bin/basemock
+source "$BASEMOCK" "$SBATCH_LOG" "$@"
+
+SBATCH_PIDS=$MOCKLOGDIR/pids.txt
 
 
 # This list of variables has been collected

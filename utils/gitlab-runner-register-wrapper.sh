@@ -1,51 +1,73 @@
 #!/bin/bash
 
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}" )/.." > /dev/null 2>&1 && pwd)"
+
 set -e
+getopt -Q --name gitlab-runner-register-wrapper \
+    --longoptions url:,registration-token:,name:,description:,tags:,tag-list:,ce-repo: \
+    -- "$0" "$@"
+
 while [ $# -gt 0 ] 
 do
 case "$1" in
+    --url)
+        URL="$2"
+        ;;
 	--registration-token)
 		REGISTRATION_TOKEN="$2"
-		shift
-		shift
 		;;
 	--name|--description)
 		NAME="$2"
-		shift
-		shift
 		;;
-	--tags)
+	--tags|--tag-list)
 		TAGS="$2"
-		shift
-		shift
 		;;
 	--ce-repo)
 		CE_REPO="$2"
-		shift
-		shift
 		;;
+    *)
+        echo "Unexpected arguments or options:" "$@"
+        ;;
 esac
+shift
+shift
 done
 
+if [ -z "$URL" ]
+then
+    URL_DEFAULT="https://scs-gitlab.scc.kit.edu/"
+	echo "Gitlab instance url ($URL_DEFAULT):"
+	read -r URL
+    if [ -z "$URL" ]
+    then
+        URL="$URL_DEFAULT"
+    fi
+fi
 if [ -z "$REGISTRATION_TOKEN" ] 
 then
 	echo "Registration Token:"
-	read REGISTRATION_TOKEN
+	read -r REGISTRATION_TOKEN
 fi
 if [ -z "$NAME" ] 
 then
 	echo "Name or description:"
-	read NAME
+	read -r NAME
 fi
 if [ -z "$TAGS" ] 
 then
 	echo "Tags for the runner:"
-	read TAGS 
+	read -r TAGS
 fi
 if [ -z "$CE_REPO" ] 
 then
-	echo "Location of the custom executor repository:"
-	read -e CE_REPO 
+    CE_REPO_DEFAULT="$REPO"
+	echo "Location of the custom executor repository ($CE_REPO_DEFAULT):"
+	read -er CE_REPO
+    if [ -z "$CE_REPO" ]
+    then
+        CE_REPO="$CE_REPO_DEFAULT"
+    fi
 fi
 
 
@@ -54,8 +76,8 @@ SRC="$CE_REPO"/src
 
 gitlab-runner register \
     --non-interactive \
-    --name="$NAME" \
-    --url=https://scs-gitlab.scc.kit.edu/ \
+    --name=\""$NAME"\" \
+    --url="$URL" \
     --registration-token="$REGISTRATION_TOKEN" \
     --executor="custom" \
     --tag-list="$TAGS" \
@@ -73,6 +95,3 @@ gitlab-runner register \
     --custom-force-kill-timeout=200
 
 systemctl --user restart gitlab-runner.service
-
-	               
-

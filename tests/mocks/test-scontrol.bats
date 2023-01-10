@@ -30,7 +30,7 @@ teardown(){
     # shellcheck disable=SC2030
     export MOCKLOGDIR=
     run scontrol some thing
-    assert_equal "$status" 1
+    assert_equal "$status" 45
     )
 
 }

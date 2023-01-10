@@ -6,11 +6,32 @@ and from Holger Obermaier's Slurm and enroot custom executor.
 
 ## Usage
 
-### Necessary environment variables
+### Setup of the custom executor on HoreKa
+
+### Gitlab CI setup
+
+A gitlab runner needs to be registered on HoreKa
+using the `gitlab-runner register` command,
+answering the questions asked interactively.
+
+
+#### Environment variables
 
 Remember to set the variable `CI_WS` 
 to a path you have access to on HoreKa.
 This can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/).
+This variable needs to be an absolute path
+pointing to an existing directory in your home directory.
+
+#### Job tags
+
+In order for a particular job to use the custom executor,
+one possible way is to use the `tags:` section.
+The tags of the job need to be a subset of the tags 
+with which the runner was set up.
+The tags for a specific runner
+only exist on the Gitlab web interface,
+and can be changed there.
 
 ## Development and maintenance
 ### Debug
