@@ -38,23 +38,34 @@ and a description.
 
 After that, one needs to manually modify the configuration file
 (by default, `$HOME/.gitlab-runner/config.toml`)
-and 
+and add the location of the scripts
+that make up the custom driver.
 
-In this repository wrapper in `/utils/gitlab-runner-register-wrapper.sh`,
+In this repository 
+is included a wrapper for the command `gitlab-runner register`
+`utils/gitlab-runner-register-wrapper.sh`,
 which streamlines the most tedious part 
 of the registration of a runner that uses a custom executor,
 removing the need to manually modify 
-the gitlab runner configuration file.
+the gitlab runner configuration file
+and using some reasonable defaults.
 
-Whether or not 
+The command
+``` bash
+$ utils/gitlab-runner-register-wrapper.sh --help
+```
+explains the usage of the wrapper.
+
 
 #### Environment variables
 
-Remember to set the variable `CI_WS` 
+The variable `CI_WS` must be set 
 to a path you have access to on HoreKa.
 This can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/).
 This variable needs to be an absolute path
-pointing to an existing directory in your home directory.
+pointing to an existing directory 
+you have write privileges on.
+
 
 #### Job tags
 
