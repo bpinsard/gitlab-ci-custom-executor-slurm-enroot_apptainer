@@ -249,3 +249,13 @@ EOF
     assert_line "Location of the custom executor repository ($PROJECT_ROOT):"
 
 }
+
+@test "--help prints help" {
+
+
+    run "$UTILS"/gitlab-runner-register-wrapper.sh --help
+
+    assert_output --partial "This script"
+    assert_output --partial "--help"
+
+}

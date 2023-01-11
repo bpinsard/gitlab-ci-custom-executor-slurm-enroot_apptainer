@@ -3,9 +3,38 @@
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}" )/.." > /dev/null 2>&1 && pwd)"
 
+function show_help() {
+
+cat <<EOF
+This script eases the setup of the custom executor.
+It accepts the following options:
+
+    --url                 The url of the gitlab ci coordinator
+                          (default: https://scs-gitlab.scc.kit.edu/)
+    --registration-token  The registration token, to be obtained
+                          from the project page
+                          (Settings -> CI/CD -> Runners)
+                          on the gitlab web interface
+    --name|--description  A description for the runner
+    --tags|--tag-list     A comma-separated list of tags
+                          associated to the runner being registered
+    --ce-repo             The location of the custom executor code
+                          (default: $REPO)
+    --help                Show this help and exit.
+
+In case some needed information is not provided using command line options,
+it will be asked for in an interactive way.
+EOF
+
+
+
+}
+
+
+
 set -e
 getopt -Q --name gitlab-runner-register-wrapper \
-    --longoptions url:,registration-token:,name:,description:,tags:,tag-list:,ce-repo: \
+    --longoptions url:,registration-token:,name:,description:,tags:,tag-list:,ce-repo:,help \
     -- "$0" "$@"
 
 while [ $# -gt 0 ] 
@@ -14,18 +43,21 @@ case "$1" in
     --url)
         URL="$2"
         ;;
-	--registration-token)
-		REGISTRATION_TOKEN="$2"
-		;;
-	--name|--description)
-		NAME="$2"
-		;;
-	--tags|--tag-list)
-		TAGS="$2"
-		;;
-	--ce-repo)
-		CE_REPO="$2"
-		;;
+    --registration-token)
+        REGISTRATION_TOKEN="$2"
+        ;;
+    --name|--description)
+        NAME="$2"
+        ;;
+    --tags|--tag-list)
+        TAGS="$2"
+        ;;
+    --ce-repo)
+        CE_REPO="$2"
+        ;;
+    --help)
+        show_help
+        ;;
     *)
         echo "Unexpected arguments or options:" "$@"
         ;;

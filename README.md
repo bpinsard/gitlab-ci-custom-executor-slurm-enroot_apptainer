@@ -12,8 +12,41 @@ and from Holger Obermaier's Slurm and enroot custom executor.
 
 A gitlab runner needs to be registered on HoreKa
 using the `gitlab-runner register` command,
-answering the questions asked interactively.
+(see the [official documentation](https://docs.gitlab.com/runner/register/)
+for a general idea,
+the invocation and launch of the gitlab runner 
+depends on the configuration
+of the system the runner is supposed to run on).
 
+The `gitlab-runner register` command
+invoked without options
+will ask clearly for what is needed
+in an interactive way,
+i.e., the `gitlab-=ci coordinator` url,
+the registration token 
+(which can both be obtained 
+in the "Runners" section 
+of the CI/CD panel 
+in the Settings page
+of the project on the gitlab web interface),
+the tags we want to give to the runner
+(any job defined in the pipeline setup, 
+e.g. the `.gitlab-ci.yml` file in the repository,
+will be launched on the runner
+if its tags are a subset of the runner tags),
+and a description.
+
+After that, one needs to manually modify the configuration file
+(by default, `$HOME/.gitlab-runner/config.toml`)
+and 
+
+In this repository wrapper in `/utils/gitlab-runner-register-wrapper.sh`,
+which streamlines the most tedious part 
+of the registration of a runner that uses a custom executor,
+removing the need to manually modify 
+the gitlab runner configuration file.
+
+Whether or not 
 
 #### Environment variables
 
@@ -87,6 +120,7 @@ we need to do the following steps.
 
 Once:
 - set up a custom executor with `gitlab-runner register` 
+
 - set up the custom executor as a systemd service
 
 Every time we run the pipeline:

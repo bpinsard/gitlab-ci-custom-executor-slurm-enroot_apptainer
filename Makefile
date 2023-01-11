@@ -48,16 +48,11 @@ test-script-wrapper:
 test-mocks:
 	./tests/bats/bin/bats tests/mocks
 
-# These tests fail when run in parallel
-# (pyxis fails with permission denied errors:
-# slurmstepd: error: pyxis: child 3977009 failed with error code: 1
-# slurmstepd: error: pyxis: failed to create container filesystem
-# slurmstepd: error: pyxis: printing enroot log file:
-# slurmstepd: error: pyxis:     mkdir: cannot create directory ‘/run/user/248691’: Permission denied
-# slurmstepd: error: pyxis: couldn't start container
 test-configure-nomock:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure/
 
+test-gitlab-runner-register-wrapper:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/test-gitlab-runner-register-wrapper.bats
 
 shellcheck-stable/shellcheck:
 	bash ./tests/install_shellcheck.sh
