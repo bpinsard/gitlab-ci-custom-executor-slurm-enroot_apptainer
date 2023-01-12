@@ -122,10 +122,19 @@ EOF
     #        of unknown reason.
     #        I honestly do not understand the reason why this
     #        additional delay is sometimes necessary.
-    wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
-        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2+10))
+    run wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
+        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
 
 
+    if [ "$status" -ne 0 ]
+    then
+      echo "The output of the job was not created in time."
+      echo "Saving the content of $TEST_PLAYGROUND into $HOME/$BATS_TEST_NAME."
+      cp -r "$TEST_PLAYGROUND" "$HOME/$BATS_TEST_NAME"
+    fi
+
+
+    assert_success
 
     echo "Logfile so far:"
     cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
