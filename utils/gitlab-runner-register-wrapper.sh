@@ -2,6 +2,9 @@
 
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}" )/.." > /dev/null 2>&1 && pwd)"
+URL_DEFAULT="https://scs-gitlab.scc.kit.edu/"
+BUILDS_DIR_DEFAULT="$HOME/gitlab-runner/builds"
+CACHE_DIR_DEFAULT="$HOME/gitlab-runner/cache"
 
 function show_help() {
 
@@ -10,7 +13,7 @@ This script eases the setup of the custom executor.
 It accepts the following options:
 
     --url                 The url of the gitlab ci coordinator
-                          (default: https://scs-gitlab.scc.kit.edu/)
+                          (default: $URL_DEFAULT)
     --registration-token  The registration token, to be obtained
                           from the project page
                           (Settings -> CI/CD -> Runners)
@@ -20,6 +23,10 @@ It accepts the following options:
                           associated to the runner being registered
     --ce-repo             The location of the custom executor code
                           (default: $REPO)
+    --builds-dir          Directory where builds are stored
+                          (default: $BUILDS_DIR_DEFAULT)
+    --cache-dir           Directory where build cache is stored
+                          (default: $CACHE_DIR_DEFAULT)
     --help                Show this help and exit.
 
 In case some needed information is not provided using command line options,
@@ -33,8 +40,21 @@ EOF
 
 
 set -e
+
+OPTSTRING=""
+OPTSTRING+="url:"
+OPTSTRING+=",registration-token:"
+OPTSTRING+=",name:"
+OPTSTRING+=",description:"
+OPTSTRING+=",tags:"
+OPTSTRING+=",tag-list:"
+OPTSTRING+=",ce-repo:"
+OPTSTRING+=",builds-dir:"
+OPTSTRING+=",cache-dir:"
+OPTSTRING+=",help"
+
 getopt -Q --name gitlab-runner-register-wrapper \
-    --longoptions url:,registration-token:,name:,description:,tags:,tag-list:,ce-repo:,help \
+    --longoptions "$OPTSTRING"  \
     -- "$0" "$@"
 
 while [ $# -gt 0 ] 
@@ -55,6 +75,12 @@ case "$1" in
     --ce-repo)
         CE_REPO="$2"
         ;;
+    --builds-dir)
+        BUILDS_DIR="$2"
+        ;;
+    --cache-dir)
+        CACHE_DIR="$2"
+        ;;
     --help)
         show_help
         ;;
@@ -68,7 +94,6 @@ done
 
 if [ -z "$URL" ]
 then
-    URL_DEFAULT="https://scs-gitlab.scc.kit.edu/"
 	echo "Gitlab instance url ($URL_DEFAULT):"
 	read -r URL
     if [ -z "$URL" ]
@@ -101,6 +126,26 @@ then
         CE_REPO="$CE_REPO_DEFAULT"
     fi
 fi
+if [ -z "$BUILDS_DIR" ]
+then
+	echo "Location of the custom executor repository ($BUILDS_DIR_DEFAULT):"
+	read -er BUILDS_DIR
+    if [ -z "$BUILDS_DIR" ]
+    then
+        BUILDS_DIR="$BUILDS_DIR_DEFAULT"
+    fi
+fi
+if [ -z "$CACHE_DIR" ]
+then
+	echo "Location of the custom executor repository ($CACHE_DIR_DEFAULT):"
+	read -er CACHE_DIR
+    if [ -z "$CACHE_DIR" ]
+    then
+        CACHE_DIR="$CACHE_DIR_DEFAULT"
+    fi
+fi
+
+
 
 
 
@@ -113,8 +158,8 @@ gitlab-runner register \
     --registration-token="$REGISTRATION_TOKEN" \
     --executor="custom" \
     --tag-list="$TAGS" \
-    --builds-dir="$HOME/gitlab-runner/builds" \
-    --cache-dir="$HOME/gitlab-runner/cache" \
+    --builds-dir="$BUILDS_DIR" \
+    --cache-dir="$CACHE_DIR" \
     --custom_build_dir-enabled \
     --custom-config-exec="$SRC/configure-slurm.sh" \
     --custom-config-exec-timeout=200 \

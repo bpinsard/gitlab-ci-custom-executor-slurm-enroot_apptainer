@@ -57,11 +57,15 @@ $ utils/gitlab-runner-register-wrapper.sh --help
 explains the usage of the wrapper.
 
 
-#### Environment variables
+#### Workspace for the custom executor
 
 The variable `CI_WS` must be set 
 to a path you have access to on HoreKa.
-This can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/).
+
+This can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/),
+e.g. [in the `.gitlab-ci.yml` file](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-gitlab-ciyml-file)
+or in [web interface](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-ui).
+
 This variable needs to be an absolute path
 pointing to an existing directory 
 you have write privileges on.

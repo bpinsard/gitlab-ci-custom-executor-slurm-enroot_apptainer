@@ -23,6 +23,15 @@ function setup() {
     cd "$STARTDIR" || exit
 
     URL_DEFAULT="https://scs-gitlab.scc.kit.edu/"
+
+    MOCK_INPUTS=(url
+                 token
+                 name
+                 tags
+                 cerepo # custom executor repository
+                 builds_dir
+                 cache_dir
+                )
     }
 
 function teardown() {
@@ -31,15 +40,11 @@ function teardown() {
 
 @test "mock called" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-token
-name
-tags
-cerepo
-EOF
 
-    "$UTILS"/gitlab-runner-register-wrapper.sh < gitlab-runner-mock-input.txt
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
     assert_exists "$MOCKLOGDIR"/gitlab-runner.log
 
@@ -47,16 +52,15 @@ EOF
 
 @test "accepts --url" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-token
-name
-tags
-cerepo
-EOF
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "url" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --url 'this.url.com'
 
-    "$UTILS"/gitlab-runner-register-wrapper.sh \
-         --url 'this.url.com' \
-         < gitlab-runner-mock-input.txt
     run cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_output --partial '--url=this.url.com'
 
@@ -64,16 +68,15 @@ EOF
 
 @test "accepts --registration-token and passes it to gitlab-runner register" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-name
-tags
-cerepo
-EOF
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "token" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --registration-token 'ASDASDASDASD'
 
-    "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --registration-token 'ASDASDASDASD' \
-        < gitlab-runner-mock-input.txt
     run cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_output --partial '--registration-token=ASDASDASDASD'
 
@@ -81,16 +84,15 @@ EOF
 
 @test "accepts --name and passes it to gitlab-runner register" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-token
-tags
-cerepo
-EOF
-
-    "$UTILS"/gitlab-runner-register-wrapper.sh \
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "name" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --name 'a fake name' \
-        < gitlab-runner-mock-input.txt
+
     run cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_output --partial '--name="a fake name"'
 
@@ -98,16 +100,14 @@ EOF
 
 @test "accepts --tags and passes it to gitlab-runner register" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-token
-name
-cerepo
-EOF
-
-    "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --tags 'tags-like-this' \
-        < gitlab-runner-mock-input.txt
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "tags" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --tags 'tags-like-this'
 
     run cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_output --partial '--tag-list=tags-like-this'
@@ -117,16 +117,15 @@ EOF
 
 @test "accepts --ce-repo and passes it to gitlab-runner register" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-token
-name
-tags
-EOF
-
-    "$UTILS"/gitlab-runner-register-wrapper.sh \
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "cerepo" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --ce-repo '/this/path' \
-        < gitlab-runner-mock-input.txt
+
     run cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_output --regexp 'config-exec.*/this/path'
     assert_output --regexp 'prepare-exec.*/this/path'
@@ -134,6 +133,39 @@ EOF
     assert_output --regexp 'cleanup-exec.*/this/path'
 
 }
+
+@test "accepts --builds-dir and passes it to gitlab-runner register" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "builds_dir" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --builds-dir '/this/other/builds/dir' \
+
+    run cat "$MOCKLOGDIR"/gitlab-runner.log
+    assert_output --regexp 'builds-dir=/this/other/builds/dir'
+
+}
+
+@test "accepts --cache-dir and passes it to gitlab-runner register" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "cache_dir" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --cache-dir '/this/other/cache/dir' \
+
+    run cat "$MOCKLOGDIR"/gitlab-runner.log
+    assert_output --regexp 'cache-dir=/this/other/cache/dir'
+
+}
+
 
 @test "complains if bad option is passed" {
 
@@ -162,17 +194,15 @@ EOF
 
 @test "default value for the url is used if left blank" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-
-token
-name
-tags
-cerepo
-EOF
-
-
-    "$UTILS"/gitlab-runner-register-wrapper.sh < gitlab-runner-mock-input.txt
-
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "url" ]]
+        then
+            echo "$mock_datum"
+        else
+            echo
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
     run cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_output --partial "--url=$URL_DEFAULT"
@@ -181,34 +211,62 @@ EOF
 
 @test "default value for the custom executor repo is used if left blank" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-token
-name
-tags
-
-EOF
-
-
-    "$UTILS"/gitlab-runner-register-wrapper.sh < gitlab-runner-mock-input.txt
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "cerepo" ]]
+        then
+            echo "$mock_datum"
+        else
+            echo
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
     run cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_output --partial "--custom-config-exec=$PROJECT_ROOT/src/configure-slurm.sh"
 
 }
 
+@test "default value for builds_dir is used if left blank" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "builds_dir" ]]
+        then
+            echo "$mock_datum"
+        else
+            echo
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
+
+    run cat "$MOCKLOGDIR"/gitlab-runner.log
+    assert_output --partial "--builds-dir=$HOME/gitlab-runner/builds"
+
+}
+
+@test "default value for cache_dir is used if left blank" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "cache_dir" ]]
+        then
+            echo "$mock_datum"
+        else
+            echo
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
+
+    run cat "$MOCKLOGDIR"/gitlab-runner.log
+    assert_output --partial "--cache-dir=$HOME/gitlab-runner/cache"
+
+}
+
 @test "systemctl --user restart gitlab-runner.service is called" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-token
-name
-tags
-cerepo
-EOF
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
-
-    "$UTILS"/gitlab-runner-register-wrapper.sh < gitlab-runner-mock-input.txt
 
     run cat "$MOCKLOGDIR"/systemctl.log
     assert_output --partial "--user restart gitlab-runner.service"
@@ -218,15 +276,15 @@ EOF
 
 @test "default value is displayed correctly for url:" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-token
-name
-tags
-cerepo
-EOF
-
-    run "$UTILS"/gitlab-runner-register-wrapper.sh < gitlab-runner-mock-input.txt
+    _helper(){
+        # shellcheck disable=SC2317
+        for mock_datum in "${MOCK_INPUTS[@]}"
+        do
+            # shellcheck disable=SC2317
+            echo "$mock_datum"
+        done | "$UTILS"/gitlab-runner-register-wrapper.sh
+    }
+    run _helper
 
     assert_line "Gitlab instance url ($URL_DEFAULT):"
 
@@ -234,15 +292,14 @@ EOF
 
 @test "default value is displayed correctly for the custom executor repo:" {
 
-    cat <<EOF > gitlab-runner-mock-input.txt
-url
-token
-name
-tags
-cerepo
-EOF
-
-    _helper(){ "$UTILS"/gitlab-runner-register-wrapper.sh < gitlab-runner-mock-input.txt; }
+    _helper(){
+        # shellcheck disable=SC2317
+        for mock_datum in "${MOCK_INPUTS[@]}"
+        do
+            # shellcheck disable=SC2317
+            echo "$mock_datum"
+        done | "$UTILS"/gitlab-runner-register-wrapper.sh
+    }
 
     run _helper
 
@@ -252,10 +309,20 @@ EOF
 
 @test "--help prints help" {
 
-
     run "$UTILS"/gitlab-runner-register-wrapper.sh --help
 
     assert_output --partial "This script"
     assert_output --partial "--help"
+
+}
+
+@test "help contains default values" {
+
+    run "$UTILS"/gitlab-runner-register-wrapper.sh --help
+
+    assert_output --partial "(default: $URL_DEFAULT)"
+    assert_output --partial "(default: $PROJECT_ROOT)"
+    assert_output --partial "(default: $HOME/gitlab-runner/builds)"
+    assert_output --partial "(default: $HOME/gitlab-runner/cache)"
 
 }
