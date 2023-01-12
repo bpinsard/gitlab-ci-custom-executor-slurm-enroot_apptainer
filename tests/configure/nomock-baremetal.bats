@@ -87,7 +87,7 @@ function teardown() {
     ###############################################
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 3 -n 1"
     JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
 
     # scontrol is slow, so it might query the job information
