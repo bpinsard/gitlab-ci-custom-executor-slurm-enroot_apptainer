@@ -400,3 +400,50 @@ EOF
 
 
 }
+
+# bats test_tags=blocking
+@test "submit_to_custom_executor_queue_and_wait blocks until job has executed" {
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > job1.sh
+sleep 5
+touch $WORKDIR/output
+EOF
+    chmod +x job1.sh
+    run submit_to_custom_executor_queue_and_wait job1.sh
+    assert_success
+
+    assert_exists "$WORKDIR/output"
+
+}
+
+
+# bats test_tags=output
+@test "submit_to_custom_executor_queue_and_wait has the same output as the command" {
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > job1.sh
+echo this is the output
+EOF
+    chmod +x job1.sh
+    run submit_to_custom_executor_queue_and_wait job1.sh
+    assert_output "this is the output"
+
+}
+
+# bats test_tags=exitvalue
+@test "submit_to_custom_executor_queue_and_wait has the same exit value as the command" {
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > job1.sh
+exit 104
+EOF
+    chmod +x job1.sh
+    run submit_to_custom_executor_queue_and_wait job1.sh
+    assert_equal "$status" 104
+
+
+}

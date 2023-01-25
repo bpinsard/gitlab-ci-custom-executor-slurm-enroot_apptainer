@@ -58,7 +58,7 @@ shellcheck-stable/shellcheck:
 	bash ./tests/install_shellcheck.sh
 
 shellcheck: shellcheck-stable/shellcheck
-	./shellcheck-stable/shellcheck $$(find src -name '*.sh') \
+	./shellcheck-stable/shellcheck $$(find src -name '*.sh' -or -name '*.slurm') \
                $$(find tests -name '*.bats' \
                   -not -path 'tests/bats/*' \
                   -not -path 'tests/test_helper/*')\

@@ -11,8 +11,8 @@ if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
 
     SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-    # shellcheck source=./src/containerlib.sh
-    source "$SRC"/containerlib.sh
+    # shellcheck source=./src/enroot-containerlib.sh
+    source "$SRC"/enroot-containerlib.sh
 
     if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
     then

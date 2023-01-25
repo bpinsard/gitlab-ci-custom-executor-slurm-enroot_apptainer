@@ -12,16 +12,21 @@ set -o pipefail
 CUSTOM_EXECUTOR_QUEUE_WORKSPACE=$1
 SRC=$2
 
+# shellcheck source=./src/custom_executor_queue.sh
 source "$SRC"/custom_executor_queue.sh
 
 echo -n "Starting custom executor queue... " >&2
 start_custom_executor_queue "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
 echo -n "done. Waiting." >&2
 
+# shellcheck disable=SC1091
 source "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/.env
 
+# shellcheck disable=SC2064
 trap "kill -s SIGUSR1 $CUSTOM_EXECUTOR_QUEUE_JOBID; wait; exit" SIGUSR1
+# shellcheck disable=SC2064
 trap "kill -s SIGTERM $CUSTOM_EXECUTOR_QUEUE_JOBID; wait; exit" SIGTERM
+# shellcheck disable=SC2064
 trap "touch $CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated;" EXIT
 
 while true

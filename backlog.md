@@ -125,22 +125,30 @@ Features:
  
 
 ### prepare.sh
+prepare should actually run in the allocation, I believe.
+
+#### enroot
 Preparation of the image/container is done here 
 in Holger's example.
 It will source `containerlib.sh`.
 
-- [ ] download image
+- [ ] download image (using import)
   - [X] Unit
   - [ ] Integration
 - [ ] remove existing container with the same name 
   - [X] Unit
   - [ ] Integration
 - [X] create container with the container name 
-  defined in the configure stage
+  defined in the configure stage (with create)
 - [X] Uses paths inside `CUSTOM_ENV_CI_WS`
       (except for `ENROOT_TEMP_PATH`)
 - [X] do not do anything if image is not defined
 
+#### Singularity
+- [ ] download image (using pull)
+  - [ ] Unit
+  - [ ] Integration
+- 
 
 ### run.sh
 

@@ -28,6 +28,48 @@ function start_custom_executor_queue () {
     declare -p ${!CUSTOM_EXECUTOR_QUEUE*} > "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
 }
 
+function _todoname() {
+
+    JOB=$1
+    local TODO="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
+    local BNAME
+    BNAME="$(basename "$JOB")"
+    echo "$TODO/$BNAME"
+
+}
+
+function _wname(){
+    JOB=$1
+    local WORKING="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/WORKING
+    local BNAME
+    BNAME="$(basename "$JOB")"
+    echo "$WORKING/$BNAME"
+}
+
+function _outputname(){
+    JOB=$1
+    local OUTPUT="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT
+    local BNAME
+    BNAME="$(basename "$JOB")"
+    echo "$OUTPUT/$BNAME.out"
+}
+
+function _exitvaluefname(){
+    JOB=$1
+    local OUTPUT="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT
+    local BNAME
+    BNAME="$(basename "$JOB")"
+    echo "$OUTPUT/$BNAME.exitcode"
+}
+
+function _donename(){
+    JOB=$1
+    local DONE="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/DONE
+    local BNAME
+    BNAME="$(basename "$JOB")"
+    echo "$DONE/$BNAME"
+}
+
 function submit_to_custom_executor_queue() {
     local JOBSCRIPT=$1
 
@@ -37,13 +79,37 @@ function submit_to_custom_executor_queue() {
     then
         return 45
     fi
-    cp "$JOBSCRIPT" "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
-    local JOB TODO
-    TODO="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
-    JOB="$(basename "$JOBSCRIPT")"
-
-    _log "Submitted $TODO/$JOB to custom executor queue"
+    local TODONAME
+    TODONAME="$(_todoname "$JOBSCRIPT")"
+    cp "$JOBSCRIPT" "$TODONAME"
+    _log "Submitted $TODONAME to custom executor queue"
 }
+
+
+function submit_to_custom_executor_queue_and_wait() {
+    local JOB=$1
+    submit_to_custom_executor_queue "$JOB"
+    DONENAME="$(_donename "$JOB")"
+    OUTPUTNAME="$(_outputname "$JOB")"
+    EXITVALUEFNAME="$(_exitvaluefname "$JOB")"
+    while [ ! -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
+    do
+        sleep 1
+    done
+    if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
+    then
+    echo "Abnormal termination of script, exiting."
+    exit "$SYSTEM_FAILURE_EXIT_CODE"
+    fi
+
+    TIME="$(date +"%s")"
+    mv "$DONENAME" "$DONENAME"-"$TIME"
+    cat "$OUTPUTNAME"
+    read -r EXITVALUE < "$EXITVALUEFNAME"
+    exit "$EXITVALUE"
+
+}
+
 
 function custom_executor_queue_is_alive () {
     ps --pid "$CUSTOM_EXECUTOR_QUEUE_JOBID" > /dev/null
@@ -91,14 +157,15 @@ function cleanup_custom_executor_queue_workspace() {
     rm -r "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"
 }
 
+
 function _custom_executor_queue () {
     trap emergency_stop SIGTERM SIGUSR1
+    # shellcheck disable=SC2064
+    trap "touch $CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated;" EXIT
+
     _log "Starting custom executor queue."
     local SUBMITTEDPID
     local TODO="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
-    local WORKING="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/WORKING
-    local DONE="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/DONE
-    local OUTPUT="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT
     while true
     do
         shopt -s nullglob
@@ -107,18 +174,20 @@ function _custom_executor_queue () {
             local BNAME
             BNAME="$(basename "$JOB")"
             local WNAME
-            WNAME="$WORKING/$BNAME"
+            WNAME="$(_wname "$JOB")"
             if [ ! -f "$WNAME" ]
             then
                 _log "Processing $JOB ..."
                 mv "$JOB" "$WNAME"
+                OUTPUTNAME="$(_outputname "$JOB")"
+                EXITVALUEFNAME="$(_exitvaluefname "$JOB")"
                 (
                  # shellcheck disable=SC2064
                  set +o pipefail
                  set +o errexit
                  set +o nounset
-                 ("$WNAME" &> "$OUTPUT/$BNAME.out"
-                  echo $? > "$OUTPUT/$BNAME.exitcode") &
+                 ("$WNAME" &> "$OUTPUTNAME"
+                  echo $? > "$EXITVALUEFNAME" ) &
                  RUNNINGPID=$!
                  set -o nounset
                  set -o errexit
@@ -130,7 +199,8 @@ function _custom_executor_queue () {
                  do
                      sleep 1
                  done
-                 mv "$WNAME" "$DONE"
+                 DONENAME="$(_donename "$JOB")"
+                 mv "$WNAME" "$DONENAME"
                  _log "$BNAME has ended."
                 ) &
                 SUBMITTEDPID=$!
