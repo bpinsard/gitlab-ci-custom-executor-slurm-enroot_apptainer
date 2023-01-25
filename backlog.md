@@ -113,7 +113,7 @@ Features:
   - [X] Unit
   - [X] Contract 
 
-### containerlib.sh
+### enroot-containerlib.sh
  
  - [X] should define the necessary `ENROOT_*_PATH` variables
   so that they can be used in `prepare.sh` but also in `run.sh` and `cleanup.sh`,

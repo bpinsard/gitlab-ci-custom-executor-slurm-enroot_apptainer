@@ -134,8 +134,8 @@ EOF
     ./wrapped.sh
     run cat "$MOCKLOGDIR/enroot.log"
 
-    # shellcheck source=./src/containerlib.sh
-    CONTAINER_NAME=$( . "$SRC"/containerlib.sh; echo "$CE_CONTAINER_NAME")
+    # shellcheck source=./src/enroot-containerlib.sh
+    CONTAINER_NAME=$( . "$SRC"/enroot-containerlib.sh; echo "$CE_CONTAINER_NAME")
     assert_output --regexp "ARGS:\s+start.*$CONTAINER_NAME"
 
 }

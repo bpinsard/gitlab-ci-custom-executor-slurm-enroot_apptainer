@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+SINGULARITY_LOG=$MOCKLOGDIR/enroot.log
+
+BASEMOCK="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"/basemock
+# shellcheck source=./tests/mocks/bin/basemock
+source "$BASEMOCK" "$SINGULARITY_LOG" "$@"

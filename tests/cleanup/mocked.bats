@@ -125,8 +125,8 @@ function teardown_file(){
 
 
     run cat "$MOCKLOGDIR/enroot.log"
-    # shellcheck source=./src/containerlib.sh
-    source "$SRC"/containerlib.sh
+    # shellcheck source=./src/enroot-containerlib.sh
+    source "$SRC"/enroot-containerlib.sh
     assert_output --regexp "remove.*$CE_CONTAINER_NAME"
 
 }
@@ -141,8 +141,8 @@ function teardown_file(){
 
     "$SRC/cleanup-slurm.sh"
 
-    # shellcheck source=./src/containerlib.sh
-    source "$SRC"/containerlib.sh
+    # shellcheck source=./src/enroot-containerlib.sh
+    source "$SRC"/enroot-containerlib.sh
 
     assert_not_exists "$CE_IMAGEFILE"
 

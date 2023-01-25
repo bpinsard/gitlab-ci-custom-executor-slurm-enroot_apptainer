@@ -354,8 +354,8 @@ EOF
 
    (
    run cat "$ENROOTLOG"
-   # shellcheck source=./src/containerlib.sh
-   source "$SRC/containerlib.sh"
+   # shellcheck source=./src/enroot-containerlib.sh
+   source "$SRC/enroot-containerlib.sh"
    assert_line --regexp "start.*$CE_CONTAINER_NAME.*$CUSTOM_ENV_CI_WS/"
    )
 
