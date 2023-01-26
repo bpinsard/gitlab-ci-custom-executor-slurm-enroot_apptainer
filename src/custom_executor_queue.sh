@@ -195,10 +195,7 @@ function _custom_executor_queue () {
                  trap 'kill '"$RUNNINGPID"'; \
                        _log "'"$BNAME"' was terminated."; \
                        exit 0' SIGTERM
-                 while ps --pid $RUNNINGPID > /dev/null
-                 do
-                     sleep 1
-                 done
+                 wait $RUNNINGPID
                  DONENAME="$(_donename "$JOB")"
                  mv "$WNAME" "$DONENAME"
                  _log "$BNAME has ended."
@@ -211,7 +208,9 @@ function _custom_executor_queue () {
             fi
         done
         shopt -u nullglob
-        for _ in  $(seq "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME")
+        local CYCLESTART="$SECONDS"
+        local CYCLEEND="$((CYCLESTART + CUSTOM_EXECUTOR_QUEUE_CYCLETIME))"
+        while [[ "$SECONDS" -lt "$CYCLEEND" ]]
         do
             sleep 1
         done
