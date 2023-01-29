@@ -145,15 +145,20 @@ It will source `containerlib.sh`.
 - [X] do not do anything if image is not defined
 
 #### Singularity
+Enroot and singularity work in quite a different way.
+In the way that it is configured on HoreKa, 
+singularity will by default mount PWD and HOME.
+This means that 
 - [ ] download image (using pull)
-  - [ ] Unit
+  - [X] Unit
   - [ ] Integration
-- 
+- [ ] Uses paths inside `CUSTOM_ENV_CI_WS`
 
 ### run.sh
 
-Every step runs in the allocation, the point is whether or not it needs to be 
-wrapped into a `enroot` command.
+Every step runs in the allocation, 
+the point is whether or not it needs to be 
+wrapped into a `enroot`/`singularity` command.
 
 - `prepare_script`
    This might need to run in the allocation.
@@ -211,13 +216,20 @@ wrapped into a `enroot` command.
   The wrap can then be submitted to the custom executor queue 
   (see the "command wrapper" section)
 
-#### command wrapper
+#### enroot command wrapper
 - [X] set up the enroot environment variables 
 - [X] invoke enroot with the right mount points
 - [X] use `--rw`
 - [X] use the container name defined in the prepare stage
   (define an environment variable for that in configure-produce job-env?)
 
+#### singularity command wrapper
+on HoreKa by default PWD is bound on the container 
+with RW permissions,
+so there should be no need 
+for `--writable` (or similar) flag.
+
+- [ ] uses `singularity exec`
 
 ### cleanup.sh
 - [ ] The slurm job needs to be terminated
@@ -237,10 +249,14 @@ wrapped into a `enroot` command.
 - [X] Temporary directories need to be deleted
 - [X] if `CUSTOM_ENV_CE_DEBUG` is set, 
       some files should be kept for later inspection.
-- [X] containers created in the prepare.sh step need to be removed
-  Note: this is already done by deletion 
-  of the temporary directories IF THE NECESSARY SUBSET
-  of `ENROOT_*_PATH` variables are set accordingly.
+- [ ] containers created in the prepare.sh step need to be removed
+  - [X] enroot
+        Note: this is already done by deletion 
+        of the temporary directories IF THE NECESSARY SUBSET
+        of `ENROOT_*_PATH` variables are set 
+        to point inside the right directories.
+  - [ ] singularity
+        TODO: discuss what needs to be done
   - [X] unless `CUSTOM_ENV_CE_DEBUG` is set
 
    

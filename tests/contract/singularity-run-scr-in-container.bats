@@ -4,8 +4,11 @@ function setup() {
     load '../test_helper/bats-support/load' 
     load '../test_helper/bats-assert/load' 
     load '../test_helper/bats-file/load'
+    load '../test-utils'
 
+    _on_horeka || skip
     type -p singularity || { echo "# singularity executable not found, skipping" >&3 ; skip ;}
+
 
 
     TEST_PLAYGROUND="$PWD/singularity-contract-test-$BATS_TEST_NAME"
@@ -29,7 +32,8 @@ function teardown() {
     # Make sure this runs on the login node
     [[ "$HOSTNAME" =~ hkn199[0-3]\.localdomain ]] || skip 
 
-    export SINGULARITY_CACHEDIR="$TEST_PLAYGROUND/singularity/cache"
+    # shellcheck disable=SC2030
+    export SINGULARITY_CACHEDIR="$TEST_PLAYGROUND/singularity"
     run singularity pull docker://alpine:latest
     assert_failure
 
@@ -39,6 +43,7 @@ function teardown() {
 # bats test_tags=pull
 @test "singularity pull runs on the compute node, accept name for output image file and uses cache" {
 
+    # shellcheck disable=SC2031
     export SINGULARITY_CACHEDIR="$TEST_PLAYGROUND/singularity"
 
     run srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
@@ -67,11 +72,9 @@ EOF
     chmod +x "$SCR"
 
 
-    #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR" 
     # may run without a need for an allocation on horeka...
     run singularity exec my-image.sif "$SCR" 
 
-    #run cat output
     assert_line "This is a test message"
     assert_line "$TEST_PLAYGROUND/afile"
 

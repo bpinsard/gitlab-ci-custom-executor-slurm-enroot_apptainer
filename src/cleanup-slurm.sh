@@ -9,17 +9,10 @@ scancel "$CE_SLURM_JOB_ID"
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
-
     SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-    # shellcheck source=./src/enroot-containerlib.sh
-    source "$SRC"/enroot-containerlib.sh
 
-    if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
-    then
-        enroot remove "$CE_CONTAINER_NAME" < <(echo yes)
-    fi
-
-    rm "$CE_IMAGEFILE"
+    # shellcheck source=./src/enroot-cleanup.sh
+    source "$SRC/enroot-cleanup.sh"
 fi
 
 # shellcheck disable=SC1090
