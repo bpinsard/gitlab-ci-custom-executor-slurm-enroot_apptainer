@@ -12,7 +12,7 @@ function setup() {
     export PATH="$SRC:$PATH"
     load_mocks
 
-    TEST_PLAYGROUND="$PWD/prepare-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/enroot-prepare-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
@@ -52,7 +52,6 @@ teardown() {
 
     assert_not_exists "$IMAGEFILE"
 
-
 }
 
 
@@ -75,7 +74,7 @@ teardown() {
 }
 
 
-@test "enroot removed called only if container already exists" {
+@test "enroot remove called only if container already exists" {
 
     prepare-enroot.sh
     run cat "$MOCKLOGDIR"/enroot.log
