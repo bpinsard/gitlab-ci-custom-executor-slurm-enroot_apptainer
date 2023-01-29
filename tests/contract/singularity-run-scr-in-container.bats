@@ -74,9 +74,35 @@ EOF
 
     # may run without a need for an allocation on horeka...
     run singularity exec my-image.sif "$SCR" 
+    assert_success
 
     assert_line "This is a test message"
     assert_line "$TEST_PLAYGROUND/afile"
+
+
+}
+
+# bats test_tags=run
+@test "singularity scripts able to write on the host" {
+    # This may depend on the default binds in /etc/singularity/singularity.conf
+    cd "$TEST_PLAYGROUND"
+    # we need an allocation for this, unfortunately.
+    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    SCR="$TEST_PLAYGROUND/script.sh"
+
+    cat<<EOF > "$SCR"
+#!/bin/sh
+touch "$TEST_PLAYGROUND/afile"
+EOF
+    chmod +x "$SCR"
+
+    #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR" 
+    # may run without a need for an allocation on horeka...
+    run singularity exec my-image.sif "$SCR" 
+
+    assert_success
+
+    assert_exists "$TEST_PLAYGROUND/afile"
 
 
 }
