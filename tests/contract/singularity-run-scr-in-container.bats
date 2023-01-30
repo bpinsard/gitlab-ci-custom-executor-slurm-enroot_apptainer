@@ -86,6 +86,32 @@ EOF
 }
 
 # bats test_tags=run,serial
+@test "singularity sees PWD" {
+    # This may depend on the default binds in /etc/singularity/singularity.conf
+    cd "$TEST_PLAYGROUND"
+    # we need an allocation for this, unfortunately.
+    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+
+    # may run without a need for an allocation on horeka...
+    run singularity exec my-image.sif ls $PWD
+    assert_success
+
+}
+
+# bats test_tags=run,serial
+@test "singularity sees HOME" {
+    # This may depend on the default binds in /etc/singularity/singularity.conf
+    cd "$TEST_PLAYGROUND"
+    # we need an allocation for this, unfortunately.
+    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+
+    # may run without a need for an allocation on horeka...
+    run singularity exec my-image.sif ls $HOME
+    assert_success
+
+}
+
+# bats test_tags=run,serial
 @test "singularity scripts able to write on the host" {
     # This may depend on the default binds in /etc/singularity/singularity.conf
     cd "$TEST_PLAYGROUND"
