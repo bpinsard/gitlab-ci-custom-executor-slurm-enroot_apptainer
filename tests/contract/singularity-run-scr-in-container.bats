@@ -58,8 +58,6 @@ function teardown() {
 
 # bats test_tags=run,serial
 @test "singularity executes file in PWD without bind (exec no salloc)" {
-    # This may depend on the default binds in /etc/singularity/singularity.conf
-    cd "$TEST_PLAYGROUND"
     # we need an allocation for this, unfortunately.
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
@@ -86,8 +84,6 @@ EOF
 
 # bats test_tags=run,serial
 @test "singularity sees PWD" {
-    # This may depend on the default binds in /etc/singularity/singularity.conf
-    cd "$TEST_PLAYGROUND"
     # we need an allocation for this, unfortunately.
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
 
@@ -100,8 +96,6 @@ EOF
 
 # bats test_tags=run,serial
 @test "singularity scripts able to write on the host" {
-    # This may depend on the default binds in /etc/singularity/singularity.conf
-    cd "$TEST_PLAYGROUND"
     # we need an allocation for this, unfortunately.
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
@@ -120,6 +114,48 @@ EOF
 
     assert_exists "$TEST_PLAYGROUND/afile"
 
+}
+
+@test "singularity mounts single file in container and executes it without problems"{
+
+    # we need an allocation for this, unfortunately.
+    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    SCR="$TEST_PLAYGROUND/script.sh"
+
+    cat<<EOF > "$SCR"
+#!/bin/sh
+touch "$TEST_PLAYGROUND/afile"
+EOF
+    chmod +x "$SCR"
+
+    #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR"
+    # may run without a need for an allocation on horeka...
+    run singularity exec --bind "$SCR" my-image.sif "$SCR"
+
+    assert_success
+
+    assert_exists "$TEST_PLAYGROUND/afile"
 
 }
 
+@test "singularity mounts directory and single file in directory in container and executes it without problems"{
+
+    # we need an allocation for this, unfortunately.
+    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    SCR="$TEST_PLAYGROUND/script.sh"
+
+    cat<<EOF > "$SCR"
+#!/bin/sh
+touch "$TEST_PLAYGROUND/afile"
+EOF
+    chmod +x "$SCR"
+
+    #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR"
+    # may run without a need for an allocation on horeka...
+    run singularity exec --bind "$TEST_PLAYGROUND,$SCR" my-image.sif "$SCR"
+
+    assert_success
+
+    assert_exists "$TEST_PLAYGROUND/afile"
+
+}
