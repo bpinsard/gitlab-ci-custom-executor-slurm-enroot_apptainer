@@ -13,7 +13,7 @@ setup(){
 
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND="$PWD/scriptwrapper-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/script-enroot-wrapper-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
@@ -23,7 +23,7 @@ setup(){
     export CUSTOM_ENV_CI_JOB_IMAGE=an-image:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
-    TMPSCR=$(mktemp /tmp/scriptwrapper-test-script-XXXX.sh)
+    TMPSCR=$(mktemp /tmp/script-enroot-wrapper-test-script-XXXX.sh)
 }
 
 
