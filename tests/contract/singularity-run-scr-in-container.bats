@@ -93,7 +93,7 @@ EOF
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
 
     # may run without a need for an allocation on horeka...
-    run singularity exec my-image.sif ls $PWD
+    run singularity exec my-image.sif ls "$PWD"
     assert_success
 
 }
@@ -106,12 +106,12 @@ EOF
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
 
     # may run without a need for an allocation on horeka...
-    run singularity exec my-image.sif ls $HOME
+    run singularity exec my-image.sif ls "$HOME"
     assert_success
 
 }
 
-
+# bats test_tags=serial
 @test "singularity sees directory hierarchy in Home" {
 
     cd "$TEST_PLAYGROUND"
@@ -120,18 +120,19 @@ EOF
 
     # Not to overwrite HOME
     HOME2="/hkfs/home/project/hk-project-scs/hs2454/"
-    singularity exec my-image.sif ls $HOME2
 
+    singularity exec my-image.sif id
     singularity exec my-image.sif pwd
-
-    singularity exec my-image.sif ls $HOME2
+    singularity exec my-image.sif echo "$HOME"
+    singularity exec my-image.sif ls "$HOME"
+    singularity exec my-image.sif ls "$HOME2"
     DIR1="$HOME2/builds/"
-    singularity exec my-image.sif ls $DIR1
+    singularity exec my-image.sif ls "$DIR1"
     DIR2="$DIR1/98EKwN2_/"
-    singularity exec my-image.sif ls $DIR2
+    singularity exec my-image.sif ls "$DIR2"
     REPO="$DIR2/0/sspe/custom-executor-slurm-enroot/"
 
-    run singularity exec my-image.sif ls $REPO
+    run singularity exec my-image.sif ls "$REPO"
     assert_success
 
 

@@ -1,5 +1,6 @@
 
 stages:          # List of stages for jobs, and their order of execution
+  - preliminary
   - test
   - test-deploy
   - test-test-deploy
@@ -26,7 +27,7 @@ unit-test-parallel:
 unit-test-serial:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: test
+  stage: preliminary
   script:
     - make test-report-serial
   after_script:
