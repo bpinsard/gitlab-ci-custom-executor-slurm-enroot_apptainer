@@ -9,8 +9,6 @@ function setup() {
     _on_horeka || skip
     type -p singularity || { echo "# singularity executable not found, skipping" >&3 ; skip ;}
 
-
-
     TEST_PLAYGROUND="$PWD/singularity-contract-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
@@ -119,8 +117,10 @@ EOF
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
 
     # Not to overwrite HOME
-    HOME2="/hkfs/home/project/hk-project-scs/hs2454/"
 
+    echo "PWD: $PWD"
+    echo "pwd:"
+    pwd
     echo "id in container:"
     singularity exec my-image.sif id
     echo "pwd in container:"
@@ -129,9 +129,6 @@ EOF
     echo "home: $HOME"
     echo "home content in container:"
     singularity exec my-image.sif ls "$HOME"
-    echo "home: $HOME2"
-    REPO="$DIR2/0/sspe/custom-executor-slurm-enroot/"
-    assert_success
 
 
 }
