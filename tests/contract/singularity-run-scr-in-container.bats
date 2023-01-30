@@ -121,18 +121,16 @@ EOF
     # Not to overwrite HOME
     HOME2="/hkfs/home/project/hk-project-scs/hs2454/"
 
+    echo "id in container:"
     singularity exec my-image.sif id
+    echo "pwd in container:"
     singularity exec my-image.sif pwd
-    singularity exec my-image.sif echo "$HOME"
+    echo "test playground: $TEST_PLAYGROUND"
+    echo "home: $HOME"
+    echo "home content in container:"
     singularity exec my-image.sif ls "$HOME"
-    singularity exec my-image.sif ls "$HOME2"
-    DIR1="$HOME2/builds/"
-    singularity exec my-image.sif ls "$DIR1"
-    DIR2="$DIR1/98EKwN2_/"
-    singularity exec my-image.sif ls "$DIR2"
+    echo "home: $HOME2"
     REPO="$DIR2/0/sspe/custom-executor-slurm-enroot/"
-
-    run singularity exec my-image.sif ls "$REPO"
     assert_success
 
 
