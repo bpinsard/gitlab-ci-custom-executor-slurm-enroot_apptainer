@@ -111,6 +111,33 @@ EOF
 
 }
 
+
+@test "singularity sees directory hierarchy in Home" {
+
+    cd "$TEST_PLAYGROUND"
+    # we need an allocation for this, unfortunately.
+    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+
+    # Not to overwrite HOME
+    HOME2="/hkfs/home/project/hk-project-scs/hs2454/"
+    singularity exec my-image.sif ls $HOME2
+
+    singularity exec my-image.sif pwd
+
+    singularity exec my-image.sif ls $HOME2
+    DIR1="$HOME2/builds/"
+    singularity exec my-image.sif ls $DIR1
+    DIR2="$DIR1/98EKwN2_/"
+    singularity exec my-image.sif ls $DIR2
+    REPO="$DIR2/0/sspe/custom-executor-slurm-enroot/"
+
+    run singularity exec my-image.sif ls $REPO
+    assert_success
+
+
+}
+
+
 # bats test_tags=run,serial
 @test "singularity scripts able to write on the host" {
     # This may depend on the default binds in /etc/singularity/singularity.conf
