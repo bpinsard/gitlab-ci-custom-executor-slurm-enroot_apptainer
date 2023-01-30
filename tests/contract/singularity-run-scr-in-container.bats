@@ -24,7 +24,7 @@ function teardown() {
 
 }
 
-# bats test_tags=pullfail
+# bats test_tags=pullfail,serial
 @test "singularity pull does not work on horeka login node" {
     # Unfortunately this is the case at the moment (20230129) 
 
@@ -40,7 +40,7 @@ function teardown() {
 }
 
 
-# bats test_tags=pull
+# bats test_tags=pull,serial
 @test "singularity pull runs on the compute node, accept name for output image file and uses cache" {
 
     # shellcheck disable=SC2031
@@ -55,7 +55,7 @@ function teardown() {
 
 }
 
-# bats test_tags=run
+# bats test_tags=run,serial
 @test "singularity executes file in PWD without bind (exec no salloc)" {
     # This may depend on the default binds in /etc/singularity/singularity.conf
     cd "$TEST_PLAYGROUND"
@@ -82,7 +82,7 @@ EOF
 
 }
 
-# bats test_tags=run
+# bats test_tags=run,serial
 @test "singularity scripts able to write on the host" {
     # This may depend on the default binds in /etc/singularity/singularity.conf
     cd "$TEST_PLAYGROUND"
