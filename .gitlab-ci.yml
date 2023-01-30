@@ -11,7 +11,7 @@ unit-test-serial-pretest:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: preliminary
   script:
-    - make test-serial
+    - make test-onlythis
   after_script:
     - make joker
   tags:
