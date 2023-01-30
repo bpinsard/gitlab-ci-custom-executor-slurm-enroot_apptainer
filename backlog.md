@@ -153,6 +153,9 @@ This means that
   - [X] Unit
   - [ ] Integration
 - [ ] Uses paths inside `CUSTOM_ENV_CI_WS`
+  At the moment it is only about `SINGULARITY_CACHEDIR`.
+  - [X] Unit
+  - [ ] Integration
 
 ### run.sh
 
