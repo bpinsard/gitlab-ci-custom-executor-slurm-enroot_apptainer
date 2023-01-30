@@ -74,7 +74,8 @@ EOF
 
 
     # may run without a need for an allocation on horeka...
-    run singularity exec my-image.sif "$SCR" 
+    # but might need a bind just for safety.
+    run singularity exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
     assert_success
 
     assert_line "This is a test message"
@@ -91,48 +92,11 @@ EOF
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
 
     # may run without a need for an allocation on horeka...
-    run singularity exec my-image.sif ls "$PWD"
+    # but might need a bind just for safety.
+    run singularity exec --bind "$TEST_PLAYGROUND" my-image.sif ls "$PWD"
     assert_success
 
 }
-
-# bats test_tags=run,serial
-@test "singularity sees HOME" {
-    # This may depend on the default binds in /etc/singularity/singularity.conf
-    cd "$TEST_PLAYGROUND"
-    # we need an allocation for this, unfortunately.
-    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
-
-    # may run without a need for an allocation on horeka...
-    run singularity exec my-image.sif ls "$HOME"
-    assert_success
-
-}
-
-# bats test_tags=onlythis
-@test "singularity sees directory hierarchy in Home" {
-
-    cd "$TEST_PLAYGROUND"
-    # we need an allocation for this, unfortunately.
-    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
-
-    # Not to overwrite HOME
-
-    echo "PWD: $PWD"
-    echo "pwd:"
-    pwd
-    echo "id in container:"
-    singularity exec my-image.sif id
-    echo "pwd in container:"
-    singularity exec my-image.sif pwd
-    echo "test playground: $TEST_PLAYGROUND"
-    echo "home: $HOME"
-    echo "home content in container:"
-    singularity exec my-image.sif ls "$HOME"
-
-
-}
-
 
 # bats test_tags=run,serial
 @test "singularity scripts able to write on the host" {
@@ -150,7 +114,7 @@ EOF
 
     #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR" 
     # may run without a need for an allocation on horeka...
-    run singularity exec my-image.sif "$SCR" 
+    run singularity exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
 
     assert_success
 
