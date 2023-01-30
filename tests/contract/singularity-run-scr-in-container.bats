@@ -109,7 +109,7 @@ EOF
 
 }
 
-# bats test_tags=serial
+# bats test_tags=onlythis
 @test "singularity sees directory hierarchy in Home" {
 
     cd "$TEST_PLAYGROUND"

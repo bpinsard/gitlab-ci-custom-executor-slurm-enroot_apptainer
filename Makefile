@@ -10,8 +10,8 @@ test-report-parallel:
 test-report-serial:
 	./tests/bats/bin/bats --formatter junit --filter-tags serial tests/* > report-serial.xml
 
-test-serial:
-	./tests/bats/bin/bats --filter-tags serial tests/*
+test-onlythis:
+	./tests/bats/bin/bats --show-output-of-passing-tests --filter-tags onlythis tests/*
 
 # These targets are provided for convenience
 # to run just a directory-based subset of tests.
