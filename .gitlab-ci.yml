@@ -1,15 +1,15 @@
 
 stages:          # List of stages for jobs, and their order of execution
-  - preliminary
+  - onlythis
   - test
   - test-deploy
   - test-test-deploy
   - bootstrap
 
-unit-test-serial-pretest:
+unit-test-onlythis:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: preliminary
+  stage: onlythis
   script:
     - make test-onlythis
   after_script:

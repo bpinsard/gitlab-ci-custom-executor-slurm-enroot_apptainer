@@ -116,7 +116,7 @@ EOF
 
 }
 
-@test "singularity mounts single file in container and executes it without problems"{
+@test "singularity mounts single file in container and executes it without problems" {
 
     # we need an allocation for this, unfortunately.
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
@@ -138,7 +138,7 @@ EOF
 
 }
 
-@test "singularity mounts directory and single file in directory in container and executes it without problems"{
+@test "singularity mounts directory and single file in directory in container and executes it without problems" {
 
     # we need an allocation for this, unfortunately.
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
