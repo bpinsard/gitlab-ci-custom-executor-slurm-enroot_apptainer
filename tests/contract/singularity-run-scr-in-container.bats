@@ -57,7 +57,7 @@ function teardown() {
 }
 
 # bats test_tags=run,serial
-@test "singularity executes file in PWD without bind (exec no salloc)" {
+@test "singularity executes file in PWD with --bind (exec no salloc)" {
     # we need an allocation for this, unfortunately.
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
@@ -72,13 +72,16 @@ EOF
 
 
     # may run without a need for an allocation on horeka...
-    # but might need a bind just for safety.
+    # we need a bind just for safety,
+    # because on HoreKa /home is symlinked to /hkfs/home.
+    # Singularity only mounts /home by default
+    # so if by any chance you are using paths in /hkfs/home/
+    # they will not be seen inside the container.
     run singularity exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
     assert_success
 
     assert_line "This is a test message"
     assert_line "$TEST_PLAYGROUND/afile"
-
 
 }
 
@@ -95,7 +98,7 @@ EOF
 }
 
 # bats test_tags=run,serial
-@test "singularity scripts able to write on the host" {
+@test "singularity scripts able to write on the host without --writable" {
     # we need an allocation for this, unfortunately.
     srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
@@ -107,11 +110,19 @@ EOF
     chmod +x "$SCR"
 
     #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR" 
-    # may run without a need for an allocation on horeka...
+
+    # using --bind may not be necessary on HoreKa, but:
+    # we need a bind just for safety,
+    # because on HoreKa /home is symlinked to /hkfs/home.
+    # Singularity only mounts /home by default
+    # so if by any chance you are using paths in /hkfs/home/
+    # they will not be seen inside the container.
+    # The use of --writable is involved and it is anyway possible
+    # to write in the directories on the host.
+        
     run singularity exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
 
     assert_success
-
     assert_exists "$TEST_PLAYGROUND/afile"
 
 }
