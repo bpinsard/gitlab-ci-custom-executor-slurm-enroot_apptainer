@@ -12,6 +12,10 @@ fi
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
+
+WRAPPER_NAME=wrap_enroot
+
+
 # shellcheck source=./src/run-include.sh
 source "$SRC"/run-include.sh
 
@@ -24,7 +28,7 @@ case "$STEPNAME" in
         after_script|\
         cleanup_file_variables)
 
-    F="wrap_enroot"
+    F="$WRAPPER_NAME"
 
     _BNAME="$(basename "$ORIGINAL_SCRIPT")"
     SCRIPT=$(mktemp "$CUSTOM_ENV_CI_WS/cp-XXXXXX${_BNAME}")

@@ -70,6 +70,16 @@ function _donename(){
     echo "$DONE/$BNAME"
 }
 
+function _locationfname(){
+    JOB=$1
+    local ORIGINAL_LOCATIONS="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/ORIGINAL_LOCATIONS
+    local BNAME
+    BNAME="$(basename "$JOB")"
+    echo "$ORIGINAL_LOCATIONS/$BNAME"
+}
+
+
+
 function submit_to_custom_executor_queue() {
     local JOBSCRIPT=$1
 
@@ -82,6 +92,9 @@ function submit_to_custom_executor_queue() {
     local TODONAME
     TODONAME="$(_todoname "$JOBSCRIPT")"
     cp "$JOBSCRIPT" "$TODONAME"
+    local LOCATIONFNAME
+    LOCATIONFNAME="$(_locationfname "$JOBSCRIPT")"
+    pwd > "$LOCATIONFNAME"
     _log "Submitted $TODONAME to custom executor queue"
 }
 
@@ -175,6 +188,8 @@ function _custom_executor_queue () {
             BNAME="$(basename "$JOB")"
             local WNAME
             WNAME="$(_wname "$JOB")"
+            local LOCATIONFNAME
+            LOCATIONFNAME="$(_locationfname "$JOB")"
             if [ ! -f "$WNAME" ]
             then
                 _log "Processing $JOB ..."
@@ -186,7 +201,9 @@ function _custom_executor_queue () {
                  set +o pipefail
                  set +o errexit
                  set +o nounset
-                 ("$WNAME" &> "$OUTPUTNAME"
+                 (
+                  cd "$(cat "$LOCATIONFNAME")"
+                  "$WNAME" &> "$OUTPUTNAME"
                   echo $? > "$EXITVALUEFNAME" ) &
                  RUNNINGPID=$!
                  set -o nounset
@@ -220,7 +237,7 @@ function _custom_executor_queue () {
 }
 
 function _create_directories(){
-    for SUBDIR in TODO WORKING DONE OUTPUT
+    for SUBDIR in TODO WORKING DONE OUTPUT ORIGINAL_LOCATIONS
     do
         mkdir -p "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/$SUBDIR
     done

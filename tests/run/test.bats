@@ -220,7 +220,6 @@ EOF
 
 }
 
-# bats test_tags=failing
 @test "run exits with the same code as the script." {
     # shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102

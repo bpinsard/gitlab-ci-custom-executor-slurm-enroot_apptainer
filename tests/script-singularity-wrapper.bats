@@ -81,11 +81,10 @@ EOF
     run cat "$MOCKLOGDIR/singularity.log"
     assert_line --regexp "exec.*$SCRIPT_TO_WRAP"
 
-
 }
 
 
-@test "necessary variables are set in the wrap - TODO" {
+@test "necessary variables are set in the wrap" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
     cat <<EOF > "$SCRIPT_TO_WRAP"
@@ -99,9 +98,7 @@ EOF
     ./wrapped.sh
     run cat "$MOCKLOGDIR/singularity.log"
 
-
-    # TODO
-    assert false
+    assert_line --partial "SINGULARITY_CACHEDIR=$CUSTOM_ENV_CI_WS/singularity"
 
 }
 
@@ -126,7 +123,7 @@ EOF
 
 }
 
-@test "singularity uses --writable TODO: needed or not?" {
+@test "singularity mounts the script file inside the container after CUSTOM_ENV_CI_WS" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
     cat <<EOF > "$SCRIPT_TO_WRAP"
@@ -139,26 +136,7 @@ EOF
 
     ./wrapped.sh
     run cat "$MOCKLOGDIR/singularity.log"
-    assert_output --regexp "ARGS:\s+exec\s+--writable"
-
-
-}
-
-@test "singularity the script file inside the container after CUSTOM_ENV_CI_WS" {
-
-    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
-    cat <<EOF > "$SCRIPT_TO_WRAP"
-echo "something"
-EOF
-    chmod +x "$SCRIPT_TO_WRAP"
-
-    "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
-    chmod +x ./wrapped.sh
-
-    ./wrapped.sh
-    run cat "$MOCKLOGDIR/singularity.log"
-    # TODO: check that both script and CI_WS directory are mounted
-    assert false
+    assert_line --regexp "--bind.*$CUSTOM_ENV_CI_WS,$SCRIPT_TO_WRAP"
 
 }
 

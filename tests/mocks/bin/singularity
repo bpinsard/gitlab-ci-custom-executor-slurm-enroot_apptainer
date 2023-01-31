@@ -6,8 +6,19 @@ BASEMOCK="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"/basem
 # shellcheck source=./tests/mocks/bin/basemock
 source "$BASEMOCK" "$SINGULARITY_LOG" "$@"
 
+# Save singularity variables in the log
+{ env | grep -E '^SINGULARITY' | grep -v SINGULARITY_LOG >> "$SINGULARITY_LOG"; } || true
+
+
 if [[ -z "$SINGULARITY_CACHEDIR" ]]
 then
     SINGULARITY_CACHEDIR="$HOME/.singularity"
 fi
 mkdir -p "$SINGULARITY_CACHEDIR/cache"
+
+# if thes first argument is exec
+# execute last argument - notice the space
+if [[ "${1}" == exec ]]
+then
+    "${@: -1}"
+fi

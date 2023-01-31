@@ -105,7 +105,7 @@ wait_until_file_exists "$WORKSPACE/.env" 90
 cat <<EOF
 {
   "driver": {
-    "name": "ENROOT+Slurm driver",
+    "name": "Slurm driver+enroot/singularity",
     "version": "v0.0.1"
   },
 "job_env": {

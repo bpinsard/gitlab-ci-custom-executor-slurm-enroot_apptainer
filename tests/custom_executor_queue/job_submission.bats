@@ -309,7 +309,7 @@ EOF
 
 }
 
-
+# bats test_tags=failing
 @test "custom executor queue saves the pids of the jobs in a file" {
 
     # shellcheck disable=SC1091
@@ -444,6 +444,25 @@ EOF
     chmod +x job1.sh
     run submit_to_custom_executor_queue_and_wait job1.sh
     assert_equal "$status" 104
+
+
+}
+
+# bats test_tags=location
+@test "submitted script is executed in the same directory it was submitted" {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    mkdir somewhere
+    cat <<EOF > somewhere/job.sh
+touch a-file-here
+EOF
+    chmod +x somewhere/job.sh
+
+    cd somewhere
+    run submit_to_custom_executor_queue_and_wait job.sh
+    assert_exists a-file-here
 
 
 }

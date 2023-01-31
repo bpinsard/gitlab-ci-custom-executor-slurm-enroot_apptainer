@@ -16,3 +16,10 @@ function wrap_enroot(){
     chmod +x "$SCRIPT"-wrapped.sh 1>&2
     echo "$SCRIPT"-wrapped.sh
 }
+
+function wrap_singularity(){
+    local SCRIPT="$1"
+    "$SRC"/script-singularity-wrapper.sh "$(get_abs_path "$SCRIPT")" > "$SCRIPT"-wrapped.sh
+    chmod +x "$SCRIPT"-wrapped.sh 1>&2
+    echo "$SCRIPT"-wrapped.sh
+}
