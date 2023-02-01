@@ -17,22 +17,14 @@ unit-test-onlythis:
   tags:
     - shell
 
-unit-test-parallel:
+lint:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test-report-parallel JOBS=8
-  after_script:
-    - make joker
+    - make shellcheck
   tags:
     - shell
-  artifacts:
-    when: always
-    paths:
-      - report-parallel.xml
-    reports:
-      junit: report-parallel.xml
 
 
 unit-test-serial:
@@ -53,14 +45,23 @@ unit-test-serial:
       junit: report-serial.xml
 
 
-lint:
+unit-test-parallel:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make shellcheck
+    - make test-report-parallel JOBS=8
+  after_script:
+    - make joker
   tags:
     - shell
+  artifacts:
+    when: always
+    paths:
+      - report-parallel.xml
+    reports:
+      junit: report-parallel.xml
+
 
 
 update-ce-code:

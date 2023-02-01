@@ -29,8 +29,21 @@ THIS FILE IS MAINTAINED ON A BEST-EFFORT BASIS.
 - [X] custom executor queue should pick up jobs and execute them
 - [X] submitting jobs to the custom executor queue 
 - [X] the custom executor queue should give back stdin and stdout
-  (in the same file for simplicity)
+      (in the same file for simplicity)
 - [X] the exit code of the jobs should be stored somewhere accessible
+
+Additional features that should make it work more or less like slurm
+
+- [X] a script submitted to the system should be executed 
+      in the same directory as it was submitted
+- [X] when a script is submitted,
+      the environment at the submission should be used at runtime,
+      and will be merged on the environment in which the custom executor queue is running.
+- [X] not all variables from the submission environment are used,
+      based on a blacklist 
+      (we want some variables not to be changed 
+      when running in the custom executor queue)
+     
 
 
 ### configure.sh

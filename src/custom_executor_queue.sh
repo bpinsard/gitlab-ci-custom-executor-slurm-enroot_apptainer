@@ -78,6 +78,13 @@ function _locationfname(){
     echo "$ORIGINAL_LOCATIONS/$BNAME"
 }
 
+function _envfname(){
+    JOB=$1
+    local ENVS="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/ENVS
+    local BNAME
+    BNAME="$(basename "$JOB")"
+    echo "$ENVS/$BNAME.env"
+}
 
 
 function submit_to_custom_executor_queue() {
@@ -89,12 +96,20 @@ function submit_to_custom_executor_queue() {
     then
         return 45
     fi
+
     local TODONAME
     TODONAME="$(_todoname "$JOBSCRIPT")"
     cp "$JOBSCRIPT" "$TODONAME"
+
     local LOCATIONFNAME
     LOCATIONFNAME="$(_locationfname "$JOBSCRIPT")"
     pwd > "$LOCATIONFNAME"
+
+    local ENVFNAME
+    ENVFNAME="$(_envfname "$JOBSCRIPT")"
+    #env > "$ENVFNAME"
+    declare -p > "$ENVFNAME"
+
     _log "Submitted $TODONAME to custom executor queue"
 }
 
@@ -190,6 +205,8 @@ function _custom_executor_queue () {
             WNAME="$(_wname "$JOB")"
             local LOCATIONFNAME
             LOCATIONFNAME="$(_locationfname "$JOB")"
+            local ENVFNAME
+            ENVFNAME="$(_envfname "$JOB")"
             if [ ! -f "$WNAME" ]
             then
                 _log "Processing $JOB ..."
@@ -203,6 +220,9 @@ function _custom_executor_queue () {
                  set +o nounset
                  (
                   cd "$(cat "$LOCATIONFNAME")"
+                  # shellcheck disable=SC1090
+
+                  source <(purge_variables < "$ENVFNAME")
                   "$WNAME" &> "$OUTPUTNAME"
                   echo $? > "$EXITVALUEFNAME" ) &
                  RUNNINGPID=$!
@@ -237,7 +257,7 @@ function _custom_executor_queue () {
 }
 
 function _create_directories(){
-    for SUBDIR in TODO WORKING DONE OUTPUT ORIGINAL_LOCATIONS
+    for SUBDIR in TODO WORKING DONE OUTPUT ORIGINAL_LOCATIONS ENVS
     do
         mkdir -p "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/$SUBDIR
     done
@@ -250,4 +270,34 @@ function _current_time(){
 
 function _log() {
 	echo "$(date)" "$(hostname)" "$@" >> "${CUSTOM_EXECUTOR_QUEUE_LOGFILE}"
+}
+
+function purge_variables() {
+
+     # this might be extremely dumb
+     SCRIPT=$(mktemp .scriptXXXX)
+
+     declare -p | \
+     grep -E "declare -[aAilntux]*r"  | \
+     cut -d= -f1 | \
+     cut -d' ' -f3 | \
+     while read -r VARNAME
+     do
+         echo '/[[:blank:]]'"$VARNAME"'=/d;' >> "$SCRIPT"
+     done
+
+     PATTERN_BLACKLIST=('SLURM.*'
+                        'BASH.*'
+                        'BATS.*'
+                        'FUNCNAME' # known to cause problems
+                        'GROUPS') # known to cause problems
+
+     for PATTERN in "${PATTERN_BLACKLIST[@]}"
+     do
+         echo '/[[:blank:]]'"$PATTERN"'=/d;' >> "$SCRIPT"
+     done
+     sed --posix -f "$SCRIPT"
+     rm "$SCRIPT"
+
+
 }

@@ -64,11 +64,11 @@ function teardown() {
 }
 
 @test "prepare uses singularity when singularity is passed as first argument" {
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
     export CE_CONTAINER_NAME="GLCE_54321"
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
     export CE_IMAGEFILE="$CUSTOM_ENV_CI_WS/image_${CE_CONTAINER_NAME}.sqsh"
 
     prepare.sh singularity
@@ -77,6 +77,7 @@ function teardown() {
 
 }
 
+# bats test_tags=onlythis
 @test "prepare uses the custom executor queue" {
 
 
@@ -89,8 +90,13 @@ function teardown() {
 
     prepare.sh singularity
 
+    # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
-    assert_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/DONE/prepare-singularity.sh"
+
+
+    # shellcheck disable=SC2031
+    DONEFILE="$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/DONE/wrap.sh-*)"
+    assert_exists "$DONEFILE"
 
 
 }
