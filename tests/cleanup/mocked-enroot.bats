@@ -53,7 +53,7 @@ function teardown_file(){
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
 
-    "$SRC/cleanup-slurm.sh"
+    "$SRC/cleanup-slurm.sh" enroot
 
     # Out mock is not so clever, this does not work.
     # _helper(){ enroot list | wc -l; }
@@ -62,7 +62,7 @@ function teardown_file(){
     run cat "$MOCKLOGDIR/enroot.log"
     # shellcheck source=./src/enroot-containerlib.sh
     source "$SRC"/enroot-containerlib.sh
-    assert_output --regexp "remove.*$CE_CONTAINER_NAME"
+    assert_output --regexp "\bremove\b.*$CE_CONTAINER_NAME"
 
 }
 
@@ -74,7 +74,7 @@ function teardown_file(){
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
 
-    "$SRC/cleanup-slurm.sh"
+    "$SRC/cleanup-slurm.sh" enroot
 
     # shellcheck source=./src/enroot-containerlib.sh
     source "$SRC"/enroot-containerlib.sh
@@ -92,7 +92,7 @@ function teardown_file(){
         export CUSTOM_ENV_CI_JOB_IMAGE=""
         # shellcheck disable=SC1090
         source "$CE_QUEUE_ENV_PATH"
-        "$SRC/cleanup-slurm.sh"
+        "$SRC/cleanup-slurm.sh" enroot
         assert_not_exists "$MOCKLOGDIR/enroot.log"
     )
 }
@@ -109,7 +109,7 @@ function teardown_file(){
 
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
-    "$SRC/cleanup-slurm.sh"
+    "$SRC/cleanup-slurm.sh" enroot
 
     run cat "$MOCKLOGDIR/enroot.log"
     refute_line --regexp "\sremove\s"

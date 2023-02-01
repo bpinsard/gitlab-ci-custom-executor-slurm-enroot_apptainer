@@ -46,7 +46,7 @@ function teardown_file(){
 @test "cleanup calls scancel with the right job id" {
     wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
     echo "env file produced, calling cleanup"
-    "$SRC/cleanup-slurm.sh"
+    "$SRC/cleanup-slurm.sh" enroot
     echo "cleanup called."
 
     run cat "$MOCKLOGDIR/scancel.log"
@@ -58,7 +58,7 @@ function teardown_file(){
 @test "cleanup calls scancel --batch --signal=SIGUSR1 and -f" {
     wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
 
-    "$SRC/cleanup-slurm.sh"
+    "$SRC/cleanup-slurm.sh" enroot
 
     run cat "$MOCKLOGDIR/scancel.log"
 
@@ -70,7 +70,7 @@ function teardown_file(){
 
 @test "cleanup calls plain scancel after 5 seconds" {
 
-    "$SRC/cleanup-slurm.sh"  &
+    "$SRC/cleanup-slurm.sh"  enroot &
     wait_until_file_exists "$MOCKLOGDIR/scancel.log" 10
     refute  grep -q "ARGS: $CE_SLURM_JOB_ID" "$MOCKLOGDIR/scancel.log"
     # Additional 3 seconds for safety
@@ -86,7 +86,7 @@ function teardown_file(){
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
 
-    "$SRC/cleanup-slurm.sh"
+    "$SRC/cleanup-slurm.sh" enroot
 
     assert_dir_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
 
@@ -104,7 +104,7 @@ function teardown_file(){
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=1
 
-    "$SRC/cleanup-slurm.sh"
+    "$SRC/cleanup-slurm.sh" enroot
     assert_dir_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
     assert_dir_exists "$HOME/ce-debug/cews_$CUSTOM_ENV_CI_JOB_ID"
 
