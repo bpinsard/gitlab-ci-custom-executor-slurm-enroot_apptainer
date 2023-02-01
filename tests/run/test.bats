@@ -27,7 +27,7 @@ function setup() {
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
-    echo "Test setup phase completed."
+    echo "Test seuup phase completed."
     
     (
     # shellcheck source=./src/custom_executor_queue.sh
@@ -116,7 +116,7 @@ STEPS_OUT_CONTAINER=(get_sources
 }
 
 
-@test "run script should run its first argument" {
+@test "run script should run its second argument" {
 
 
     for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
@@ -129,7 +129,7 @@ touch script-output-"$STEP".txt
 EOF
     chmod +x ./script-"$STEP".sh
 
-    "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+    "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
 
     assert_exists script-output-"$STEP".txt
     done
@@ -151,7 +151,7 @@ touch script-output-"$STEP".txt
 EOF
        chmod +x ./script-"$STEP".sh
 
-       "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+       "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
 
        # shellcheck disable=SC2031
        run cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
@@ -173,7 +173,7 @@ touch script-output-"$STEP".txt
 EOF
     chmod +x ./script-"$STEP".sh
 
-    "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+    "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
     assert_exists script-output-"$STEP".txt
 
 }
@@ -189,13 +189,13 @@ touch script-output.txt
 EOF
        chmod +x ./script.sh
 
-       "$SRC"/run.sh ./script.sh prepare_script
+       "$SRC"/run.sh enroot ./script.sh prepare_script
        cat << EOF > script.sh
 sleep 3
 touch script-output-second-time.txt
 EOF
        chmod +x ./script.sh
-       "$SRC"/run.sh ./script.sh prepare_script
+       "$SRC"/run.sh enroot ./script.sh prepare_script
 
        assert_exists script-output-second-time.txt
 
@@ -213,7 +213,7 @@ echo "Hello from $STEP"
 EOF
     chmod +x ./script-"$STEP".sh
 
-    run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
 
     assert_output "Hello from $STEP"
     done
@@ -235,7 +235,7 @@ EOF
     chmod +x ./script-"$STEP".sh
 
     echo "Testing $STEP" >&3
-    run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
     assert_equal "$status" 42
     done
 
@@ -255,7 +255,7 @@ echo "won't run"
 EOF
     chmod +x ./script.sh
 
-    run "$SRC/run.sh" ./script.sh
+    run "$SRC/run.sh" enroot ./script.sh
 
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
 
@@ -278,7 +278,7 @@ echo "won't run"
 EOF
     chmod +x ./script.sh
 
-    run "$SRC/run.sh" ./script.sh get_sources
+    run "$SRC/run.sh" enroot ./script.sh get_sources
 
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     )
@@ -286,7 +286,7 @@ EOF
 
 }
 
-@test "run uses enroot for the steps \"in container\" " {
+@test "run uses enroot for the steps \"in container\" if enroot is specified as first arg" {
 
    STEPNAME="${STEPS_IN_CONTAINER[0]}"
    ENROOTLOG="$MOCKLOGDIR"/enroot.log
@@ -299,12 +299,33 @@ touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
 EOF
    chmod +x ./script-"$STEPNAME".sh
 
-   "$SRC/run.sh" ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   "$SRC/run.sh" enroot ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
    assert_exists "$ENROOTLOG"
 
 }
+
+@test "run uses singularity for the steps \"in container\" if singularity is specified as first arg" {
+
+   STEPNAME="${STEPS_IN_CONTAINER[0]}"
+   SINGULARITYLOG="$MOCKLOGDIR"/singularity.log
+   # cleanup
+   rm -f "$SINGULARITYLOG"
+   cat << EOF > script-"$STEPNAME".sh
+
+touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
+
+EOF
+   chmod +x ./script-"$STEPNAME".sh
+
+   "$SRC/run.sh" singularity ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+
+   assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
+   assert_exists "$SINGULARITYLOG"
+
+}
+
 
 
 @test "run does not run anything in a container if CUSTOM_ENV_CI_JOB_IMAGE not defined" {
@@ -322,7 +343,7 @@ EOF
 touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
 EOF
    chmod +x ./script-"$STEPNAME".sh
-   "$SRC/run.sh" ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   "$SRC/run.sh" enroot ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
    assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
    assert_not_exists "$ENROOTLOG"
    )
@@ -349,7 +370,7 @@ touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
 EOF
    chmod +x "$TMP_PLAYGROUND/script-$STEPNAME".sh
 
-   "$SRC/run.sh" "$TMP_PLAYGROUND/script-$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   "$SRC/run.sh" enroot "$TMP_PLAYGROUND/script-$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    (
    run cat "$ENROOTLOG"
@@ -363,13 +384,14 @@ EOF
 
 # bats test_tags=termination
 @test "run exit with error when slurm job has terminated, but script has not." {
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     # shellcheck disable=SC1090,SC2031
     source "$CE_QUEUE_ENV_PATH"
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC/custom_executor_queue.sh"
 
+    # shellcheck disable=SC2030
     for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
     do
 cat << EOF > script-"$STEP".sh
@@ -388,12 +410,26 @@ EOF
     touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
     ) &
 
-    run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_line "Abnormal termination of script, exiting."
 
     done
+
+}
+
+# bats test_tags=onlythis
+@test "run exits with error if not passed 3 arguments" {
+
+    # shellcheck disable=SC2031
+    export SYSTEM_FAILURE_EXIT_CODE=102
+
+    # shellcheck disable=SC2031
+    run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_line "Usage: run.sh <containerisation_backend> <script> <stepname>"
 
 }

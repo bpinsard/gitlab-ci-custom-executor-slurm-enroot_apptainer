@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 
-ORIGINAL_SCRIPT="${1}"
-STEPNAME="${2}"
+if [[ "$#" -ne 3 ]]
+then
+    echo "Usage: run.sh <containerisation_backend> <script> <stepname>" >&2
+    exit "$SYSTEM_FAILURE_EXIT_CODE"
+fi
+
+
+CONTAINERISATION_BACKEND="${1}"
+ORIGINAL_SCRIPT="${2}"
+STEPNAME="${3}"
 
 if [[ -z "$CE_QUEUE_ENV_PATH" ]]
 then
@@ -12,8 +20,16 @@ fi
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
-
-WRAPPER_NAME=wrap_enroot
+case "$CONTAINERISATION_BACKEND" in
+    enroot)
+        WRAPPER_NAME=wrap_enroot
+        ;;
+    singularity)
+        WRAPPER_NAME=wrap_singularity
+        ;;
+    *)
+        ;;
+esac
 
 
 # shellcheck source=./src/run-include.sh
