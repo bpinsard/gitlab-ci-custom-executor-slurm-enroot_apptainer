@@ -59,7 +59,7 @@ function teardown() {
     assert_file_exists "$CE_QUEUE_ENV_PATH"
 
 
-    "$SRC"/cleanup-slurm.sh
+    "$SRC"/cleanup-slurm.sh enroot
 
     run _helper
     assert_failure
@@ -85,7 +85,7 @@ function teardown() {
     assert_file_exists "$CE_QUEUE_ENV_PATH"
 
     echo -n "# Preparing job... " >&3
-    run "$SRC"/prepare-enroot.sh
+    run "$SRC"/prepare.sh enroot
     echo "done." >&3
     assert_success
     assert_dir_exists "$CUSTOM_ENV_CI_WS/.enroot"
@@ -98,7 +98,7 @@ EOF
     chmod +x "$STARTDIR"/get_sources_script.sh
 
     echo -n "# Running get_sources... " >&3
-    run "$SRC"/run.sh "$STARTDIR"/get_sources_script.sh get_sources
+    run "$SRC"/run.sh enroot "$STARTDIR"/get_sources_script.sh get_sources
     echo "done." >&3
 
     assert_line "Cloning dummy repository..."
@@ -114,13 +114,13 @@ EOF
     chmod +x "$STARTDIR"/build_script.sh
 
     echo -n "# Running build_script... " >&3
-    run "$SRC"/run.sh "$STARTDIR"/build_script.sh build_script
+    run "$SRC"/run.sh enroot "$STARTDIR"/build_script.sh build_script
     echo "done." >&3
 
     assert_line "Doing a lot of work..."
     assert_file_exists "$CUSTOM_ENV_CI_WS"/job-output.txt
 
-    "$SRC"/cleanup-slurm.sh
+    "$SRC"/cleanup-slurm.sh enroot
 
     # Check that the slurm job is over
     run _helper
