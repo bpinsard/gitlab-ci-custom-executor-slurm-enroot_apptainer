@@ -87,7 +87,7 @@ minimal-job:
 
 image-job:
   stage: test-test-deploy
-  image: ubuntu:latest
+  image: debian:latest
   tags:
     # This needs to match the tag of the test custom executor
     - slurm-enroot-test
@@ -108,7 +108,7 @@ artifact-job:
 
 artifact-image-job:
   stage: test-test-deploy
-  image: ubuntu:latest
+  image: debian:latest
   tags:
     # This needs to match the tag of the test custom executor
     - slurm-enroot-test
