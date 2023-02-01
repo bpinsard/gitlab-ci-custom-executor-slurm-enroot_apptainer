@@ -29,6 +29,7 @@ function setup() {
                  name
                  tags
                  cerepo # custom executor repository
+                 enroot
                  builds_dir
                  cache_dir
                 )
@@ -131,6 +132,24 @@ function teardown() {
     assert_output --regexp 'prepare-exec.*/this/path'
     assert_output --regexp 'run-exec.*/this/path'
     assert_output --regexp 'cleanup-exec.*/this/path'
+
+}
+
+@test "accepts --container-backend and passes it to gitlab-runner register" {
+
+ for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "container_backend" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --container-backend 'enroot' \
+
+    run cat "$MOCKLOGDIR"/gitlab-runner.log
+    assert_output --regexp '--custom-prepare-args.*enroot'
+    assert_output --regexp '--custom-run-args.*enroot'
+    assert_output --regexp '--custom-cleanup-args.*enroot'
 
 }
 

@@ -23,6 +23,8 @@ It accepts the following options:
                           associated to the runner being registered
     --ce-repo             The location of the custom executor code
                           (default: $REPO)
+    --container-backend   The backend used for containerised jobs,
+                          enroot or singularity
     --builds-dir          Directory where builds are stored
                           (default: $BUILDS_DIR_DEFAULT)
     --cache-dir           Directory where build cache is stored
@@ -49,6 +51,7 @@ OPTSTRING+=",description:"
 OPTSTRING+=",tags:"
 OPTSTRING+=",tag-list:"
 OPTSTRING+=",ce-repo:"
+OPTSTRING+=",container-backend:"
 OPTSTRING+=",builds-dir:"
 OPTSTRING+=",cache-dir:"
 OPTSTRING+=",help"
@@ -75,6 +78,9 @@ case "$1" in
     --ce-repo)
         CE_REPO="$2"
         ;;
+    --container-backend)
+        CONTAINER_BACKEND="$2"
+        ;;
     --builds-dir)
         BUILDS_DIR="$2"
         ;;
@@ -91,6 +97,7 @@ esac
 shift
 shift
 done
+
 
 if [ -z "$URL" ]
 then
@@ -126,6 +133,12 @@ then
         CE_REPO="$CE_REPO_DEFAULT"
     fi
 fi
+while [[ ! "$CONTAINER_BACKEND" =~ ^(enroot|singularity)$ ]]
+do
+   echo "Container backend (singularity or enroot):"
+   read -er CONTAINER_BACKEND
+done
+
 if [ -z "$BUILDS_DIR" ]
 then
 	echo "Location of the custom executor repository ($BUILDS_DIR_DEFAULT):"
@@ -165,9 +178,12 @@ gitlab-runner register \
     --custom-config-exec-timeout=200 \
     --custom-prepare-exec="$SRC/prepare-enroot.sh" \
     --custom-prepare-exec-timeout=200 \
+    --custom-prepare-args="$CONTAINER_BACKEND" \
     --custom-run-exec="$SRC/run.sh" \
+    --custom-run-args="$CONTAINER_BACKEND" \
     --custom-cleanup-exec="$SRC/cleanup-slurm.sh" \
     --custom-cleanup-exec-timeout=200 \
+    --custom-cleanup-args="$CONTAINER_BACKEND" \
     --custom-graceful-kill-timeout=200 \
     --custom-force-kill-timeout=200
 
