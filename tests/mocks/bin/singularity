@@ -16,9 +16,19 @@ then
 fi
 mkdir -p "$SINGULARITY_CACHEDIR/cache"
 
-# if thes first argument is exec
+# if the first argument is exec
 # execute last argument - notice the space
 if [[ "${1}" == exec ]]
 then
     "${@: -1}"
+fi
+
+# if the first argument
+if [[ "$1" =~ (pull|build) ]]
+then
+    # Should use a directory because the image could be a sandbox
+    if [[ "$#" -eq 3 ]]
+    then touch "$2"
+    else touch "image-default-name.sif"
+    fi
 fi
