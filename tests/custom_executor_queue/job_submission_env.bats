@@ -79,11 +79,15 @@ EOF
     # shellcheck disable=SC2034
     declare -r READONLY_VAR2=42
 
+    # shellcheck disable=SC2034
+    declare -ir BASHPID
+
     _helper() {
         # shellcheck disable=SC2317
         cat <<EOF | purge_variables
 declare -r READONLY_VAR1=12345
 declare -r READONLY_VAR2=09876
+declare -ir BASHPID
 declare -r READONLY_VAR=this-should-be-visible
 EOF
     }
@@ -91,6 +95,7 @@ EOF
     run _helper
     refute_output --partial "READONLY_VAR1"
     refute_output --partial "READONLY_VAR2"
+    refute_output --partial "BASHPID"
     assert_line "declare -r READONLY_VAR=this-should-be-visible"
 
 }
@@ -109,6 +114,7 @@ declare -x FUNCNAME=funcs
 declare -x GROUPS=somegroups
 declare -x SLURM_SOMETHING=somethingelse
 declare -x BASH_SOMETHING=yet-somethingelse
+declare -ir BASHPID
 declare -x DONTPURGETHIS=this-must-stay
 EOF
     }

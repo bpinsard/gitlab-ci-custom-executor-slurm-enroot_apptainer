@@ -284,6 +284,7 @@ function purge_variables() {
      while read -r VARNAME
      do
          echo '/[[:blank:]]'"$VARNAME"'=/d;' >> "$SCRIPT"
+         echo '/[[:blank:]]'"$VARNAME"'[[:blank:]]*$/d;' >> "$SCRIPT"
      done
 
      PATTERN_BLACKLIST=('SLURM.*'
@@ -295,6 +296,7 @@ function purge_variables() {
      for PATTERN in "${PATTERN_BLACKLIST[@]}"
      do
          echo '/[[:blank:]]'"$PATTERN"'=/d;' >> "$SCRIPT"
+         echo '/[[:blank:]]'"$PATTERN"'[[:blank:]]*$/d;' >> "$SCRIPT"
      done
      sed --posix -f "$SCRIPT"
      rm "$SCRIPT"
