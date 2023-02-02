@@ -107,16 +107,19 @@ function submit_to_custom_executor_queue() {
 
     local ENVFNAME
     ENVFNAME="$(_envfname "$JOBSCRIPT")"
-    #env > "$ENVFNAME"
-    declare -p > "$ENVFNAME"
+    touch "$ENVFNAME"
+    if [[ "$2" == "--with-env" ]]
+    then
+        declare -p > "$ENVFNAME"
+    fi
 
     _log "Submitted $TODONAME to custom executor queue"
 }
 
 
 function submit_to_custom_executor_queue_and_wait() {
+    submit_to_custom_executor_queue "$@"
     local JOB=$1
-    submit_to_custom_executor_queue "$JOB"
     DONENAME="$(_donename "$JOB")"
     OUTPUTNAME="$(_outputname "$JOB")"
     EXITVALUEFNAME="$(_exitvaluefname "$JOB")"
