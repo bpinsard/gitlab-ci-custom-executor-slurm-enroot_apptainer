@@ -83,6 +83,29 @@ EOF
 
 }
 
+@test "singularity exec is called with the image name" {
+
+    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "some thing to wrap"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+
+    source "$SRC/singularity-containerlib.sh"
+
+    assert_file_contains "$MOCKLOGDIR/singularity.log" "exec.*$CE_IMAGEFILE"
+
+
+
+
+}
+
+
 
 @test "necessary variables are set in the wrap" {
 

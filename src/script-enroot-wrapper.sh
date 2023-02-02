@@ -23,8 +23,10 @@ source "$SRC"/enroot-containerlib.sh
 cat <<EOF
 COMMAND=(enroot start 
          --rw 
-         --mount "$MOUNT" 
-	 -- "$CE_CONTAINER_NAME" "$TOWRAP")
+         --mount "$MOUNT"
+         --
+         "$CE_CONTAINER_NAME"
+         "$TOWRAP")
 "\${COMMAND[@]}"
 status=\$?
 if [[ "\$status" -ne 0 ]]

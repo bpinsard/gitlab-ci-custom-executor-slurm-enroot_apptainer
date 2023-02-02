@@ -12,9 +12,9 @@ source "$SRC"/singularity-containerlib.sh
 { env | grep -qE '^SINGULARITY'; } && declare -p ${!SINGULARITY*}
 
 cat <<EOF
-
 COMMAND=(singularity exec
          --bind "$CUSTOM_ENV_CI_WS,$TOWRAP"
+         "$CE_IMAGEFILE"
          "$TOWRAP")
 "\${COMMAND[@]}"
 status=\$?
