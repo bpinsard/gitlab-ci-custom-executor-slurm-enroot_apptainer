@@ -76,7 +76,29 @@ update-ce-code:
     - cd "$CI_TEST_CODE"
     - git pull $CI_REPOSITORY_URL
 
-minimal-job:
+ce-queue-debug-test:
+  stage: test-test-deploy
+  variables:
+    CE_DEBUG: 1
+  tags:
+    - shell
+  script:
+    - rm -rf "$HOME/ce-debug/"
+
+ce-queue-debug-post-test:
+  stage: test-test-deploy
+  needs:
+    - "ce-queue-debug-test"
+  tags:
+    - shell
+  script:
+    - |
+       [ -d "$HOME/ce-debug/" ]
+  after_script:
+    - rm -rf "$HOME/ce-debug/"
+
+
+minimal-job-enroot:
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
@@ -85,7 +107,7 @@ minimal-job:
     - echo "Test Test"
     - env | sort
 
-image-job:
+image-job-enroot:
   stage: test-test-deploy
   image: debian:latest
   tags:
@@ -96,7 +118,7 @@ image-job:
     - grep PRETTY /etc/os-release
     - env | sort
 
-artifact-job:
+artifact-job-enroot:
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
@@ -106,7 +128,7 @@ artifact-job:
     paths:
       - test-artifact.txt
 
-artifact-image-job:
+artifact-image-job-enroot:
   stage: test-test-deploy
   image: debian:latest
   tags:
@@ -118,7 +140,7 @@ artifact-image-job:
       - test-artifact.txt
 
 
-horeka-mpi-multinode-job:
+horeka-mpi-multinode-job-enroot:
   stage: test-test-deploy
   tags:
     - slurm-enroot-test
@@ -128,31 +150,8 @@ horeka-mpi-multinode-job:
     - |
       srun hostname
       [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
-      
 
-ce-queue-debug-test:
-  stage: test-test-deploy
-  variables:
-    CE_DEBUG: 1
-  tags:
-    - slurm-enroot-test
-  script:
-    - rm -rf "$HOME/ce-debug/"
-  
-ce-queue-debug-post-test:
-  stage: test-test-deploy
-  needs: 
-    - "ce-queue-debug-test"
-  tags:
-    - shell
-  script:
-    - |
-       [ -d "$HOME/ce-debug/" ]
-  after_script:
-    - rm -rf "$HOME/ce-debug/"
-
-
-unit-test-parallel-bootstrap:
+unit-test-parallel-bootstrap-enroot:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: bootstrap
@@ -169,8 +168,7 @@ unit-test-parallel-bootstrap:
     reports:
       junit: report-parallel.xml
 
-
-unit-test-serial-bootstrap:
+unit-test-serial-bootstrap-enroot:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: bootstrap
@@ -187,8 +185,7 @@ unit-test-serial-bootstrap:
     reports:
       junit: report-serial.xml
 
-
-lint-bootstrap:
+lint-bootstrap-enroot:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: bootstrap
@@ -199,3 +196,101 @@ lint-bootstrap:
 
        
 
+
+minimal-job-singularity:
+  stage: test-test-deploy
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-singularity-test
+  script:
+    - echo "Test Test"
+    - env | sort
+
+image-job-singularity:
+  stage: test-test-deploy
+  image: debian:latest
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-singularity-test
+  script:
+    - echo "Test Test using an image"
+    - grep PRETTY /etc/os-release
+    - env | sort
+
+artifact-job-singularity:
+  stage: test-test-deploy
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-singularity-test
+  script: touch test-artifact.txt
+  artifacts:
+    paths:
+      - test-artifact.txt
+
+artifact-image-job-singularity:
+  stage: test-test-deploy
+  image: debian:latest
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-singularity-test
+  script: cp /etc/os-release test-artifact-image.txt
+  artifacts:
+    paths:
+      - test-artifact.txt
+
+
+horeka-mpi-multinode-job-singularity:
+  stage: test-test-deploy
+  tags:
+    - slurm-singularity-test
+  variables:
+    COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --nodes 2 --ntasks-per-node=1"
+  script:
+    - |
+      srun hostname
+      [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
+
+unit-test-parallel-bootstrap-singularity:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap
+  script:
+    - make test-report-parallel JOBS=8
+  after_script:
+    - make joker
+  tags:
+    - slurm-singularity-test
+  artifacts:
+    when: always
+    paths:
+      - report-parallel.xml
+    reports:
+      junit: report-parallel.xml
+
+
+unit-test-serial-bootstrap-singularity:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap
+  script:
+    - make test-report-serial
+  after_script:
+    - make joker
+  tags:
+    - slurm-singularity-test
+  artifacts:
+    when: always
+    paths:
+      - report-serial.xml
+    reports:
+      junit: report-serial.xml
+
+
+lint-bootstrap-singularity:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap
+  script:
+    - make shellcheck
+  tags:
+    - slurm-singularity-test
