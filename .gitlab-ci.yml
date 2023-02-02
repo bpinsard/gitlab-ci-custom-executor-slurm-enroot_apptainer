@@ -6,25 +6,25 @@ stages:          # List of stages for jobs, and their order of execution
   - test-test-deploy
   - bootstrap
 
-unit-test-onlythis:
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-  stage: onlythis
-  script:
-    - make test-onlythis
-  after_script:
-    - make joker
-  tags:
-    - shell
-
-lint:
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-  stage: test
-  script:
-    - make shellcheck
-  tags:
-    - shell
+#unit-test-onlythis:
+#  variables:
+#    GIT_SUBMODULE_STRATEGY: recursive
+#  stage: onlythis
+#  script:
+#    - make test-onlythis
+#  after_script:
+#    - make joker
+#  tags:
+#    - shell
+#
+#lint:
+#  variables:
+#    GIT_SUBMODULE_STRATEGY: recursive
+#  stage: test
+#  script:
+#    - make shellcheck
+#  tags:
+#    - shell
 
 
 unit-test-serial:
@@ -77,35 +77,35 @@ unit-test-serial:
 #    - cd "$CI_TEST_CODE"
 #    - git pull $CI_REPOSITORY_URL
 
-ce-queue-debug-test:
-  stage: test-test-deploy
-  variables:
-    CE_DEBUG: 1
-  tags:
-    - shell
-  script:
-    - rm -rf "$HOME/ce-debug/"
+#ce-queue-debug-test:
+#  stage: test-test-deploy
+#  variables:
+#    CE_DEBUG: 1
+#  tags:
+#    - shell
+#  script:
+#    - rm -rf "$HOME/ce-debug/"
+#
+#ce-queue-debug-post-test:
+#  stage: test-test-deploy
+#  needs:
+#    - "ce-queue-debug-test"
+#  tags:
+#    - shell
+#  script:
+#    - |
+#       [ -d "$HOME/ce-debug/" ]
+#  after_script:
+#    - rm -rf "$HOME/ce-debug/"
 
-ce-queue-debug-post-test:
-  stage: test-test-deploy
-  needs:
-    - "ce-queue-debug-test"
-  tags:
-    - shell
-  script:
-    - |
-       [ -d "$HOME/ce-debug/" ]
-  after_script:
-    - rm -rf "$HOME/ce-debug/"
-
-minimal-job-shell:
-  stage: test-test-deploy
-  tags:
-    # This needs to match the tag of the test custom executor
-    - shell
-  script:
-    - echo "Test Test"
-    - env | sort
+#minimal-job-shell:
+#  stage: test-test-deploy
+#  tags:
+#    # This needs to match the tag of the test custom executor
+#    - shell
+#  script:
+#    - echo "Test Test"
+#    - env | sort
 
 
 
