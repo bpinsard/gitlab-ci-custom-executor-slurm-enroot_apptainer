@@ -108,7 +108,7 @@ function submit_to_custom_executor_queue() {
     local ENVFNAME
     ENVFNAME="$(_envfname "$JOBSCRIPT")"
     touch "$ENVFNAME"
-    if [[ "$2" == "--with-env" ]]
+    if [[ "$#" -eq 2 ]] && [[ "$2" == "--with-env" ]]
     then
         declare -p > "$ENVFNAME"
     fi

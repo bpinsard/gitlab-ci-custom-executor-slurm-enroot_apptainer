@@ -25,8 +25,7 @@ teardown(){
     stop_custom_executor_queue
     _common_teardown
 }
-
-@test "env vars exported at submission are available when job runs" {
+@test "env vars not exported to job env when not using --with-env" {
 
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
@@ -39,9 +38,32 @@ EOF
     chmod +x job.sh
 
     (
-
+    # shellcheck disable=SC2030
     export MY_VARIABLE="some-thing"
     run submit_to_custom_executor_queue_and_wait job.sh
+    assert_output ""
+    )
+
+
+}
+
+
+@test "env vars exported at submission are available when job runs when using --with-env" {
+
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    cat << EOF > job.sh
+    echo \$MY_VARIABLE
+
+EOF
+    chmod +x job.sh
+
+    (
+    # shellcheck disable=SC2031
+    export MY_VARIABLE="some-thing"
+    run submit_to_custom_executor_queue_and_wait job.sh --with-env
     assert_output "some-thing"
     )
 

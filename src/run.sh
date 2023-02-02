@@ -44,7 +44,6 @@ case "$STEPNAME" in
         after_script|\
         cleanup_file_variables)
 
-    echo "Running $STEPNAME in container with $WRAPPER_NAME" >&2 # DEBUG
     F="$WRAPPER_NAME"
 
     _BNAME="$(basename "$ORIGINAL_SCRIPT")"
@@ -62,7 +61,6 @@ case "$STEPNAME" in
         upload_artifacts_on_success|\
         upload_artifacts_on_failure)
 
-    echo "Running $STEPNAME without wrapping" >&2 # DEBUG
     F="nowrap"
     SCRIPT="$ORIGINAL_SCRIPT"
 
@@ -74,7 +72,6 @@ case "$STEPNAME" in
     ;;
 esac
 else
-    echo "Running $STEPNAME without wrapping" >&2 # DEBUG
     F="nowrap"
     SCRIPT="$ORIGINAL_SCRIPT"
 fi
