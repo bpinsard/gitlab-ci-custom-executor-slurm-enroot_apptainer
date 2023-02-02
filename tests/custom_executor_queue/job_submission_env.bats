@@ -80,14 +80,14 @@ EOF
     declare -r READONLY_VAR2=42
 
     # shellcheck disable=SC2034
-    declare -ir BASHPIDLIKE
+    declare -ir VARNOVALUE
 
     _helper() {
         # shellcheck disable=SC2317
         cat <<EOF | purge_variables
 declare -r READONLY_VAR1=12345
 declare -r READONLY_VAR2=09876
-declare -ir BASHPIDLIKE
+declare -ir VARNOVALUE
 declare -r READONLY_VAR=this-should-be-visible
 EOF
     }
