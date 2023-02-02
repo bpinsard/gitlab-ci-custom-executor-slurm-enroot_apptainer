@@ -96,6 +96,7 @@ EOF
 
     ./wrapped.sh
 
+    # shellcheck source=./src/singularity-containerlib.sh
     source "$SRC/singularity-containerlib.sh"
 
     assert_file_contains "$MOCKLOGDIR/singularity.log" "exec.*$CE_IMAGEFILE"
