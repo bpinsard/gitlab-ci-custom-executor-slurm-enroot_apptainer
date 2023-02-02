@@ -7,8 +7,9 @@ test:
 test-report-parallel:
 	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/* > report-parallel.xml
 
+# DEBUG: only run one test
 test-report-serial:
-	./tests/bats/bin/bats --formatter junit --filter-tags serial tests/* > report-serial.xml
+	./tests/bats/bin/bats --formatter junit --filter-tags serial,samename tests/* > report-serial.xml
 
 test-onlythis:
 	./tests/bats/bin/bats --show-output-of-passing-tests --filter-tags onlythis tests/*

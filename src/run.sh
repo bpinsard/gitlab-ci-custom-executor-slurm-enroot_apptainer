@@ -74,6 +74,7 @@ case "$STEPNAME" in
     ;;
 esac
 else
+    echo "Running $STEPNAME without wrapping" >&2 # DEBUG
     F="nowrap"
     SCRIPT="$ORIGINAL_SCRIPT"
 fi
