@@ -51,6 +51,7 @@ function teardown() {
 
 }
 
+
 @test "accepts --url" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
@@ -92,10 +93,10 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --name 'a fake name' \
+        --name 'a_fake_name' \
 
     run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial '--name="a fake name"'
+    assert_output --partial '--name=a_fake_name'
 
 }
 
@@ -185,6 +186,18 @@ function teardown() {
 
 }
 
+
+@test "prepare.sh is used as prepare-script" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
+
+    run cat "$MOCKLOGDIR"/gitlab-runner.log
+    assert_output --regexp '--custom-prepare-exec=.*/prepare.sh'
+
+}
 
 @test "complains if bad option is passed" {
 
