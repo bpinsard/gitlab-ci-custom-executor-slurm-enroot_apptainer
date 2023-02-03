@@ -122,7 +122,7 @@ EOF
     ./wrapped.sh
     run cat "$MOCKLOGDIR/singularity.log"
 
-    assert_line --partial "SINGULARITY_CACHEDIR=$CUSTOM_ENV_CI_WS/singularity"
+    assert_line --partial "SINGULARITY_CACHEDIR=$CUSTOM_ENV_CI_WS/.singularity"
 
 }
 

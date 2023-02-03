@@ -45,7 +45,7 @@ teardown() {
 @test "SINGULARITY_CACHEDIR is created in CI_WS" {
 
     prepare-singularity.sh
-    assert_dir_exists "$CUSTOM_ENV_CI_WS/singularity"
+    assert_dir_exists "$CUSTOM_ENV_CI_WS/.singularity"
 
 }
 

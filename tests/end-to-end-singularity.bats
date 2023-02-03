@@ -42,10 +42,13 @@ function teardown() {
 }
 
 
-# bats test_tags=configure,cleanup
-@test "configure and cleanup" {
+# bats test_tags=configure,prepare,cleanup
+@test "configure, prepare, and cleanup" {
 
     "$SRC"/configure-slurm.sh  | "$JOB_ENV_READER" > ./job-env
+
+    # shellcheck  disable=SC1091
+    source ./job-env
 
     # shellcheck disable=SC2317
     function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
@@ -53,13 +56,12 @@ function teardown() {
     run _helper
     assert_success
 
-    # shellcheck  disable=SC1091
-    source ./job-env
-
     assert_file_exists "$CE_QUEUE_ENV_PATH"
 
 
-    "$SRC"/cleanup-slurm.sh enroot
+    "$SRC"/prepare.sh singularity
+
+    "$SRC"/cleanup-slurm.sh singularity
 
     run _helper
     assert_failure
@@ -74,21 +76,21 @@ function teardown() {
 
     "$SRC"/configure-slurm.sh | "$JOB_ENV_READER" > ./job-env
 
+    # shellcheck  disable=SC1091
+    source ./job-env
+
     function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
     run _helper
     assert_success
 
 
-    # shellcheck  disable=SC1091
-    source ./job-env
-
     assert_file_exists "$CE_QUEUE_ENV_PATH"
 
     echo -n "# Preparing job... " >&3
-    run "$SRC"/prepare.sh enroot
+    run "$SRC"/prepare.sh singularity
     echo "done." >&3
     assert_success
-    assert_dir_exists "$CUSTOM_ENV_CI_WS/.enroot"
+    assert_dir_exists "$CUSTOM_ENV_CI_WS/.singularity"
 
     cat <<EOF > "$STARTDIR"/get_sources_script.sh
 #!/bin/bash
@@ -98,7 +100,7 @@ EOF
     chmod +x "$STARTDIR"/get_sources_script.sh
 
     echo -n "# Running get_sources... " >&3
-    run "$SRC"/run.sh enroot "$STARTDIR"/get_sources_script.sh get_sources
+    run "$SRC"/run.sh singularity "$STARTDIR"/get_sources_script.sh get_sources
     echo "done." >&3
 
     assert_line "Cloning dummy repository..."
@@ -114,13 +116,13 @@ EOF
     chmod +x "$STARTDIR"/build_script.sh
 
     echo -n "# Running build_script... " >&3
-    run "$SRC"/run.sh enroot "$STARTDIR"/build_script.sh build_script
+    run "$SRC"/run.sh singularity "$STARTDIR"/build_script.sh build_script
     echo "done." >&3
 
     assert_line "Doing a lot of work..."
     assert_file_exists "$CUSTOM_ENV_CI_WS"/job-output.txt
 
-    "$SRC"/cleanup-slurm.sh enroot
+    "$SRC"/cleanup-slurm.sh singularity
 
     # Check that the slurm job is over
     run _helper
