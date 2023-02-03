@@ -166,7 +166,7 @@ SRC="$CE_REPO"/src
 
 gitlab-runner register \
     --non-interactive \
-    --name=\""$NAME"\" \
+    --name="$NAME" \
     --url="$URL" \
     --registration-token="$REGISTRATION_TOKEN" \
     --executor="custom" \
@@ -176,7 +176,7 @@ gitlab-runner register \
     --custom_build_dir-enabled \
     --custom-config-exec="$SRC/configure-slurm.sh" \
     --custom-config-exec-timeout=200 \
-    --custom-prepare-exec="$SRC/prepare-enroot.sh" \
+    --custom-prepare-exec="$SRC/prepare.sh" \
     --custom-prepare-exec-timeout=200 \
     --custom-prepare-args="$CONTAINER_BACKEND" \
     --custom-run-exec="$SRC/run.sh" \
