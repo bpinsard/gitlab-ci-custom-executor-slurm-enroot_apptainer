@@ -10,5 +10,6 @@ if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
 then
     # In case this is a sandbox, we need to use rm -r
     # but I cowardly refuse to have rm -r in a script
+    echo "Removing $CE_IMAGEFILE"
     rm "$CE_IMAGEFILE"
 fi
