@@ -94,7 +94,6 @@ teardown() {
 }
 
 
-# bats test_tags=notworking
 @test "enroot remove called with yes"  {
 
     enroot create --name "$CE_CONTAINER_NAME" imagename-ignored.sqsh

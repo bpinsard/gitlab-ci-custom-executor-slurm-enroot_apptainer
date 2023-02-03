@@ -35,5 +35,5 @@ EOF
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
 
-    submit_to_custom_executor_queue_and_wait ./wrap.sh --with-env
+    submit_to_custom_executor_queue_and_wait ./wrap.sh # --with-env # DEBUG
 fi
