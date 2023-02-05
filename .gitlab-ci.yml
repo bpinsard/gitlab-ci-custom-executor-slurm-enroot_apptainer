@@ -75,19 +75,29 @@ update-ce-code:
     - cd "$CI_TEST_CODE"
     - git pull $CI_REPOSITORY_URL
 
-ce-queue-debug-test:
+# This test,
+# run with the slurm+enroot custom executor
+# should create a $HOME/ce-debug directory
+# because of CE_DEBUG=1
+ce-queue-debug-test-enroot:
   stage: test-test-deploy
   variables:
     CE_DEBUG: 1
   tags:
-    - shell
+    -  slurm-enroot-test
   script:
+    - echo "Making sure that $HOME/ce-debug/ does not exist before test cleanup..."
     - rm -rf "$HOME/ce-debug/"
 
-ce-queue-debug-post-test:
+# This test is a test for the enroot executor
+# checking that CUSTOM_ENV_CE_DEBUG=1
+# set in the `ce-queue-debug-test-enroot` test
+# caused the cleanup script to save the CE workspace
+# in $HOME
+ce-queue-debug-post-test-enroot:
   stage: test-test-deploy
   needs:
-    - "ce-queue-debug-test"
+    - "ce-queue-debug-test-enroot"
   tags:
     - shell
   script:
@@ -95,6 +105,48 @@ ce-queue-debug-post-test:
        [ -d "$HOME/ce-debug/" ]
   after_script:
     - rm -rf "$HOME/ce-debug/"
+
+# This test,
+# run with the slurm+singularity custom executor
+# should create a $HOME/ce-debug directory
+# because of CE_DEBUG=1
+ce-queue-debug-test-singularity:
+  stage: test-test-deploy
+  # Making sure this test runs
+  # after the test for the enroot version
+  # that could conflict with this one
+  # since both tests create and delete
+  # $HOME/ce-debug
+  needs:
+    - "ce-queue-debug-post-test-enroot"
+  variables:
+    CE_DEBUG: 1
+  tags:
+    -  slurm-singularity-test
+  script:
+    - echo "Making sure that $HOME/ce-debug/ does not exist before test cleanup..."
+    - rm -rf "$HOME/ce-debug/"
+
+# This test is a test for the singularity executor
+# checking that CUSTOM_ENV_CE_DEBUG=1
+# set in the `ce-queue-debug-test-singularity` test
+# caused the cleanup script to save the CE workspace
+# in $HOME
+ce-queue-debug-post-test-singularity:
+  stage: test-test-deploy
+  needs:
+    - "ce-queue-debug-test-singularity"
+  tags:
+    - shell
+  script:
+    - |
+       [ -d "$HOME/ce-debug/" ]
+  after_script:
+    - rm -rf "$HOME/ce-debug/"
+
+
+
+
 
 minimal-job-enroot:
   stage: test-test-deploy
