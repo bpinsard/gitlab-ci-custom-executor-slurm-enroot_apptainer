@@ -60,6 +60,15 @@ getopt -Q --name gitlab-runner-register-wrapper \
     --longoptions "$OPTSTRING"  \
     -- "$0" "$@"
 
+URL=""
+REGISTRATION_TOKEN=""
+NAME=""
+TAGS=""
+CE_REPO=""
+CONTAINER_BACKEND=""
+BUILDS_DIR=""
+CACHE_DIR=""
+
 while [ $# -gt 0 ] 
 do
 case "$1" in

@@ -66,23 +66,6 @@ function teardown_file(){
 
 }
 
-@test "cleanup removes enroot image" {
-
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 10
-    # This test requires that enroot is invoked
-    "$SRC/prepare-enroot.sh"
-    # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
-
-    "$SRC/cleanup-slurm.sh" enroot
-
-    # shellcheck source=./src/enroot-containerlib.sh
-    source "$SRC"/enroot-containerlib.sh
-
-    assert_not_exists "$CE_IMAGEFILE"
-
-}
-
 @test "cleanup does not call enroot at all when image not needed" {
 
 

@@ -426,6 +426,7 @@ EOF
     # shellcheck disable=SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
 
+    STEP="a-step-name"
     # shellcheck disable=SC2031
     run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
     assert_failure

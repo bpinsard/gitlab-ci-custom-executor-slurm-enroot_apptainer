@@ -15,8 +15,6 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # WORKSPACE DEFINITION #
 ########################
 
-# TODO: Test that this variables is set by the gitlab runner
-# TODO: Change this to a job-id related name
 set +o nounset
 if [[ -z "$CUSTOM_ENV_CI_WS" ]]
 then
@@ -31,8 +29,6 @@ WORKSPACE="$CUSTOM_ENV_CI_WS"/cews_"$CUSTOM_ENV_CI_JOB_ID"
 ##########
 # MOUNTS #
 ##########
-# shellcheck source=src/include.sh
-source "$SRC"/include.sh
 # shellcheck source=src/config-include.sh
 source "$SRC"/config-include.sh
 

@@ -117,6 +117,7 @@ EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    cat ./wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
@@ -136,14 +137,15 @@ EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    cat wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
     run cat "$MOCKLOGDIR/singularity.log"
 
     # shellcheck source=./src/singularity-containerlib.sh
-    CONTAINER_NAME=$( . "$SRC"/singularity-containerlib.sh; echo "$CE_CONTAINER_NAME")
-    assert_output --regexp "ARGS:\s+exec.*$CONTAINER_NAME"
+    CE_IMAGEFILE=$( . "$SRC"/singularity-containerlib.sh; echo "$CE_IMAGEFILE")
+    assert_output --regexp "ARGS:\s+exec.*$CE_IMAGEFILE"
 
 }
 
@@ -156,6 +158,7 @@ EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    cat wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh

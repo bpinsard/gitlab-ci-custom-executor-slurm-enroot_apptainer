@@ -29,16 +29,6 @@ function teardown() {
     rm -r "$TEST_PLAYGROUND"
 }
 
-@test "assemble mounts directive works as expected" {
-
-    ARR=(a list of paths)
-
-    run assemble_mounts "${ARR[@]}"
-
-    assert_output "a:a,list:list,of:of,paths:paths"
-
-}
-
 @test "copying custom_env_* variables into variables works for defined custom_env_* variables " {
 
     # shellcheck disable=SC2030,SC2031

@@ -29,10 +29,13 @@ else
 fi
 
 for VARIABLE in "${INPUT_VARIABLES[@]}"
-do if [[ -n "${!VARIABLE}" ]]
+do
+   set +o nounset
+   if [[ -n "${!VARIABLE}" ]]
    then
        echo "$VARIABLE"="${!VARIABLE}" >> "$SBATCH_LOG"
    fi
+   set -o nounset
 done
 
 # Execute first non-option argument

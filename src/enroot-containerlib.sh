@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set +o nounset
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
     if [ -z "$ENROOT_RUNTIME_PATH" ]
@@ -16,3 +17,4 @@ then
     fi
     export CE_CONTAINER_NAME="GLCE_$CUSTOM_ENV_CI_JOB_ID"
 fi
+set -o nounset

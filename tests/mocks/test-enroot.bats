@@ -62,7 +62,7 @@ teardown() {
 
 @test "enroot mock records its stdin when using remove" {
 
-
+    touch "$MOCKLOGDIR/.enroot-fakecontainers/thisthing"
     enroot remove thisthing < <(echo "some kind of input")
 
     # shellcheck disable=SC2031

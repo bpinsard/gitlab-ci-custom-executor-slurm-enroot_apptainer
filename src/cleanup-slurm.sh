@@ -33,7 +33,16 @@ source "$CE_QUEUE_ENV_PATH"
 
 
 # End lifetime of the CE queue workspace
-if [[ -n "$CUSTOM_ENV_CE_DEBUG" ]]
+set +o nounset
+if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
+then
+    DEBUG="YES"
+else
+    DEBUG="NO"
+fi
+set -o nounset
+
+if [[ "$DEBUG" == "YES" ]]
 then
    mkdir -p "$HOME/ce-debug/"
    mv  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE" "$HOME/ce-debug/""cews_$CUSTOM_ENV_CI_JOB_ID"
