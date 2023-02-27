@@ -24,6 +24,8 @@ function setup() {
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_ID=54321
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     (
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC"/custom_executor_queue.sh
@@ -48,15 +50,8 @@ function teardown() {
 }
 
 
-
+# bats test_tags=onlythis
 @test "prepare uses enroot when enroot is passed as first argument" {
-    # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
-    # shellcheck disable=SC2030
-    export CE_CONTAINER_NAME="GLCE_54321"
-    # shellcheck disable=SC2030
-    export CE_IMAGEFILE="$CUSTOM_ENV_CI_WS/image_${CE_CONTAINER_NAME}.sqsh"
-
     prepare.sh enroot
 
     assert_exists "$MOCKLOGDIR"/enroot.log
@@ -64,12 +59,6 @@ function teardown() {
 }
 
 @test "prepare uses singularity when singularity is passed as first argument" {
-    # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
-    # shellcheck disable=SC2030,SC2031
-    export CE_CONTAINER_NAME="GLCE_54321"
-    # shellcheck disable=SC2030,SC2031
-    export CE_IMAGEFILE="$CUSTOM_ENV_CI_WS/image_${CE_CONTAINER_NAME}.sqsh"
 
     prepare.sh singularity
 
@@ -77,16 +66,8 @@ function teardown() {
 
 }
 
-# bats test_tags=onlythis
 @test "prepare uses the custom executor queue" {
 
-
-    # shellcheck disable=SC2031
-    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
-    # shellcheck disable=SC2031
-    export CE_CONTAINER_NAME="GLCE_54321"
-    # shellcheck disable=SC2031
-    export CE_IMAGEFILE="$CUSTOM_ENV_CI_WS/image_${CE_CONTAINER_NAME}.sqsh"
 
     prepare.sh singularity
 

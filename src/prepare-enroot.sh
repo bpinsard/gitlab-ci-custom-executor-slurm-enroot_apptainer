@@ -7,6 +7,7 @@ source "$SRC"/enroot-containerlib.sh
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
+
     CE_IMAGEDIR="$(mktemp -d "$CUSTOM_ENV_CI_WS/imagedirXXXXX")"
     CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
     enroot import --output "$CE_IMAGEFILE" docker://"$CUSTOM_ENV_CI_JOB_IMAGE"

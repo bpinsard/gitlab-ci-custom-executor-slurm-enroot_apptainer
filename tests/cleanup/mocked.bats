@@ -96,7 +96,7 @@ function teardown_file(){
 
     wait_until_file_exists "$CE_QUEUE_ENV_PATH" 15
     # This test requires that the container is set up
-    "$SRC/prepare-enroot.sh"
+    "$SRC/prepare.sh" enroot
 
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"

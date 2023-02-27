@@ -14,7 +14,8 @@ function setup(){
 
     JOB_ENV_READER="$PROJECT_ROOT"/tests/mocks/bin/read-job-env.py
 
-    TEST_PLAYGROUND="$PWD/end-to-end-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/end-to-end-test-singularity-$BATS_TEST_NAME"
+    assert_dir_not_exists "$TEST_PLAYGROUND"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
 
@@ -47,6 +48,7 @@ function teardown() {
 
     "$SRC"/configure-slurm.sh  | "$JOB_ENV_READER" > ./job-env
 
+    assert_exists ./job-env
     # shellcheck  disable=SC1091
     source ./job-env
 
@@ -76,6 +78,7 @@ function teardown() {
 
     "$SRC"/configure-slurm.sh | "$JOB_ENV_READER" > ./job-env
 
+    assert_exists ./job-env
     # shellcheck  disable=SC1091
     source ./job-env
 
