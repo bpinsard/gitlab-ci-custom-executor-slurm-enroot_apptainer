@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 function export_custom_env_var_into_var_if_defined() {
+    # If a variable called `CUSTOM_ENV_$VAR` is defined
+    # in che current environment,
+    # then export its value as VAR.
 
     local VAR="$1"
 
@@ -13,18 +16,14 @@ function export_custom_env_var_into_var_if_defined() {
 
 }
 
-function check_custom_env_command_options_sbatch_for_forbidden_options(){
-    FORBIDDEN_OPTIONS=("$@")
-    for FORBIDDEN_OPTION in "${FORBIDDEN_OPTIONS[@]}"
-    do
-        echo "Checking $FORBIDDEN_OPTION" >&2
-        if [[ "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" =~ $FORBIDDEN_OPTION ]]
-        then
-            echo "Error: please do not use $FORBIDDEN_OPTION in \$COMMAND_OPTIONS_SBATCH." >&2
-            exit "$SYSTEM_FAILURE_EXIT_CODE"
-        fi
-    done
+function export_all_custom_env_var_into_var_if_defined() {
+    local SRC
+    SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
+    for VAR in $("$SRC"/slurm-utils/get-sbatch-input-env-list.sh)
+    do
+        export_custom_env_var_into_var_if_defined "$VAR"
+    done
 }
 
 
@@ -47,4 +46,84 @@ function wait_until_file_exists() {
         return 124
     fi
 
+}
+
+function check_custom_env_ci_ws_set(){
+    set +o nounset
+    if [[ -z "$CUSTOM_ENV_CI_WS" ]]
+    then
+        echo "ERROR: CUSTOM_ENV_CI_WS variable not defined." 1>&2
+        echo "       Please define the CI_WS variable in your gitlab CI/CD setup (See README)." 1>&2
+
+        exit "$SYSTEM_FAILURE_EXIT_CODE"
+    fi
+    set -o nounset
+}
+
+function check_or_set_custom_env_command_sbatch(){
+    set +o nounset
+    if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
+    then
+        echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
+        export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -n 1 -t 30"
+    fi
+    set -o nounset
+}
+
+
+function get_sbatch_command(){
+    local SRC
+    SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
+    local WORKSPACE="$1"
+    local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="$2"
+
+    # We DO want to split words here
+    # shellcheck disable=SC2206
+    COMMAND=(sbatch $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
+             --propagate=NONE
+             --parsable
+        	 --signal=B:USR1@15 # SIGUSR1 15 seconds before the end of the job.
+    	 )
+
+    # DEBUG OPTIONS
+
+    set +o nounset
+    if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
+    then
+        COMMAND+=( --input=/dev/null
+                   --output=/dev/null
+                   --error=/dev/null
+    	      )
+    fi
+    set -o nounset
+
+    # FINAL SBATCH INVOCATION
+    COMMAND+=("$SRC"/job.slurm "$WORKSPACE" "$SRC")
+
+    echo "${COMMAND[@]}"
+
+}
+
+function check_custom_env_command_options_sbatch_for_forbidden_options(){
+    FORBIDDEN_OPTIONS=("$@")
+    for FORBIDDEN_OPTION in "${FORBIDDEN_OPTIONS[@]}"
+    do
+        echo "Checking $FORBIDDEN_OPTION" >&2
+        if [[ "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" =~ $FORBIDDEN_OPTION ]]
+        then
+            echo "Error: please do not use $FORBIDDEN_OPTION in \$COMMAND_OPTIONS_SBATCH." >&2
+            exit "$SYSTEM_FAILURE_EXIT_CODE"
+        fi
+    done
+}
+
+# TODO: test
+function check_custom_env_command_options_sbatch_has_no_forbidden_options(){
+    for TOKEN in $(get_sbatch_command "WS" "")
+    do
+        if [[ "$TOKEN" =~ --[a-z_\-]+ ]]
+        then
+            check_custom_env_command_options_sbatch_for_forbidden_options "$BASH_REMATCH"
+        fi
+    done
 }

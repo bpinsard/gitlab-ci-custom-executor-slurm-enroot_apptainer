@@ -6,7 +6,8 @@ test:
 
 # This target does not work well (yet)
 test-and-coverage:
-	bashcov -- ./tests/bats/bin/bats -T --filter-tags !coverage-problematic tests/*
+	for batsfile in $$(git ls-files '*.bats'); do bashcov -- ./tests/bats/bin/bats -T "$$batsfile"; done
+	ps aux | grep 'tests/bats/libexec' | grep -v grep | awk '{print $$2}' | xargs kill
 
 test-report-parallel:
 	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/* > report-parallel.xml

@@ -29,7 +29,7 @@ function teardown() {
     rm -r "$TEST_PLAYGROUND"
 }
 
-@test "copying custom_env_* variables into variables works for defined custom_env_* variables " {
+@test "copying CUSTOM_ENV_* variables into variables works for defined CUSTOM_ENV_* variables " {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_TESTVARIABLE="avalue"
@@ -40,7 +40,7 @@ function teardown() {
 
 }
 
-@test "copying custom_env_* variables into variables does nothing for undefined custom_env_* variables " {
+@test "copying CUSTOM_ENV_* variables into variables does nothing for undefined CUSTOM_ENV_* variables " {
 
     unset CUSTOM_ENV_TESTVARIABLE
 
@@ -52,7 +52,7 @@ function teardown() {
 
 }
 
-@test "copying custom_env_* variables into variables and exporting works for defined custom_env_* variables " {
+@test "copying CUSTOM_ENV_* variables into variables and exporting works for defined CUSTOM_ENV_* variables " {
 
     # shellcheck disable=SC2031
     export CUSTOM_ENV_TESTVARIABLE="avalue"
@@ -63,5 +63,27 @@ function teardown() {
 
     assert_output --partial "TESTVARIABLE=avalue"
 
+
+}
+
+@test "check_custom_env_command_options_sbatch_for_forbidden_options fails when conflicts are present" {
+
+    CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--propagate=SOMETHING"
+
+    run check_custom_env_command_options_sbatch_for_forbidden_options "--propagate"
+
+    assert_failure
+
+
+
+}
+
+@test "check_custom_env_command_options_sbatch_for_forbidden_options succeeds when conflicts are NOT present" {
+
+    CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly"
+
+    run check_custom_env_command_options_sbatch_for_forbidden_options "--propagate"
+
+    assert_success
 
 }
