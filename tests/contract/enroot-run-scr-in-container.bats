@@ -15,12 +15,13 @@ function setup() {
 }
 
 function teardown() {
-    yes | enroot remove alpine-enroot-test
+    type -p enroot && { yes | enroot remove alpine-enroot-test; }
     rm -f alpine+latest.sqsh
     rm -rf "$TEST_PLAYGROUND"
 
 }
 
+# bats test_tags=coverage-problematic
 @test "enroot mounts single file in container and executes it without problems." {
 
     # shellcheck disable=SC2030
@@ -50,6 +51,7 @@ EOF
 
 }
 
+# bats test_tags=coverage-problematic
 @test "enroot CANNOT mount single file in container AND directory that contains it at the same time" {
 
     # shellcheck disable=SC2031

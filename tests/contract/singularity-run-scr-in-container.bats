@@ -127,6 +127,7 @@ EOF
 
 }
 
+# bats test_tags=coverage-problematic
 @test "singularity mounts single file in container and executes it without problems" {
 
     # we need an allocation for this, unfortunately.
@@ -149,6 +150,7 @@ EOF
 
 }
 
+# bats test_tags=coverage-problematic
 @test "singularity mounts directory and single file in directory in container and executes it without problems" {
 
     # we need an allocation for this, unfortunately.

@@ -36,16 +36,20 @@ source "$CE_QUEUE_ENV_PATH"
 set +o nounset
 if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
 then
-    DEBUG="YES"
-else
     DEBUG="NO"
+else
+    DEBUG="YES"
+fi
+if [[ -z "$CUSTOM_ENV_CE_DEBUG_DIR" ]]
+then
+   CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug"
 fi
 set -o nounset
 
 if [[ "$DEBUG" == "YES" ]]
 then
-   mkdir -p "$HOME/ce-debug/"
-   mv  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE" "$HOME/ce-debug/""cews_$CUSTOM_ENV_CI_JOB_ID"
+   mkdir -p "$CUSTOM_ENV_CE_DEBUG_DIR"
+   mv  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE" "$CUSTOM_ENV_CE_DEBUG_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"
 else
    rm -r "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
 fi

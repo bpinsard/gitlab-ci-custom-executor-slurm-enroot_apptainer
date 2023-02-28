@@ -30,6 +30,13 @@ function setup() {
 
     # shellcheck disable=SC1090
     source <( "$SRC/configure-slurm.sh" 3> /dev/null | read-job-env.py )
+    (
+        # shellcheck source=./src/enroot-containerlib.sh
+        source "$SRC/enroot-containerlib.sh"
+        mkdir "$MOCKLOGDIR/.enroot-fakecontainers"
+        touch "$MOCKLOGDIR/.enroot-fakecontainers/$CE_CONTAINER_NAME"
+
+    )
 
 
 }
@@ -37,10 +44,20 @@ function setup() {
 function teardown() {
     awk '{print $1}' "$MOCKLOGDIR"/pids.txt | xargs kill
     rm -rf "$TEST_PLAYGROUND"
-    rm -rf "$HOME/ce-debug/cews_$CUSTOM_ENV_CI_JOB_ID"
+    set +o nounset
+    if [ -n "$CUSTOM_ENV_CE_DEBUG_DIR" ]
+    then
+    rm -rf "$CUSTOM_ENV_CE_DEBUG_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"
+    fi
+    set -o nounset
 }
 function teardown_file(){
-    rm -rf "$HOME/ce-debug/"
+    set +o nounset
+    if [ -n "$CUSTOM_ENV_CE_DEBUG_DIR" ]
+    then
+    rm -rf "$CUSTOM_ENV_CE_DEBUG_DIR"
+    fi
+    set -o nounset
 }
 
 @test "cleanup calls scancel with the right job id" {
@@ -103,10 +120,12 @@ function teardown_file(){
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=1
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked"
 
     "$SRC/cleanup-slurm.sh" enroot
     assert_dir_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
-    assert_dir_exists "$HOME/ce-debug/cews_$CUSTOM_ENV_CI_JOB_ID"
+    assert_dir_exists "$CUSTOM_ENV_CE_DEBUG_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"
 
 
 }

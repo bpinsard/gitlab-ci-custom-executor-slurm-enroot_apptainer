@@ -9,13 +9,13 @@ source "$SRC"/singularity-containerlib.sh
 set +o nounset
 if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
 then
-    DEBUG="YES"
-else
     DEBUG="NO"
+else
+    DEBUG="YES"
 fi
 set -o nounset
 
-if [[ "$DEBUG" == "YES" ]]
+if [[ "$DEBUG" == "NO" ]]
 then
     # In case this is a sandbox, we need to use rm -r
     # but I cowardly refuse to have rm -r in a script

@@ -10,10 +10,12 @@ source "$BASEMOCK" "$SINGULARITY_LOG" "$@"
 { env | grep -E '^SINGULARITY' | grep -v SINGULARITY_LOG >> "$SINGULARITY_LOG"; } || true
 
 
+set +o nounset
 if [[ -z "$SINGULARITY_CACHEDIR" ]]
 then
     SINGULARITY_CACHEDIR="$HOME/.singularity"
 fi
+set -o nounset
 mkdir -p "$SINGULARITY_CACHEDIR/cache"
 
 # if the first argument is exec

@@ -12,7 +12,7 @@ then
     CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
     enroot import --output "$CE_IMAGEFILE" docker://"$CUSTOM_ENV_CI_JOB_IMAGE"
 
-    if { enroot list | grep "$CE_CONTAINER_NAME"; }
+    if { enroot list | grep "$CE_CONTAINER_NAME" &> /dev/null; }
     then enroot remove "$CE_CONTAINER_NAME" < <(echo yes)
     fi
     enroot create --name "$CE_CONTAINER_NAME" "$CE_IMAGEFILE"

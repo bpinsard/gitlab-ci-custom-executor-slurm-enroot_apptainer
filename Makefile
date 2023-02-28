@@ -4,10 +4,9 @@ test:
 	./tests/bats/bin/bats --jobs $(JOBS) -T --filter-tags !serial tests/*
 	./tests/bats/bin/bats -T --filter-tags serial tests/*
 
+# This target does not work well (yet)
 test-and-coverage:
-	bashcov --skip-uncovered -- ./tests/bats/bin/bats --jobs $(JOBS) -T --filter-tags !serial tests/*
-	bashcov --skip-uncovered -- ./tests/bats/bin/bats -T --filter-tags serial tests/*
-
+	bashcov -- ./tests/bats/bin/bats -T --filter-tags !coverage-problematic tests/*
 
 test-report-parallel:
 	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/* > report-parallel.xml
