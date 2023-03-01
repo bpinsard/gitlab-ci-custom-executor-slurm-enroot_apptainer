@@ -39,7 +39,9 @@ function teardown() {
 @test "if CUSTOM_ENV_CI_WS is not defined, clear error message and hint should be printed" {
 
     (
+        # shellcheck disable=SC2030
         export CUSTOM_ENV_CI_WS=""
+        # shellcheck disable=SC2030
         export SYSTEM_FAILURE_EXIT_CODE=102
         run "$SRC"/configure-slurm.sh 3> /dev/null
         assert_failure
@@ -48,5 +50,30 @@ function teardown() {
         assert_output --partial "Please define the CI_WS variable in your gitlab CI/CD setup (See README)."
     )
 
+
+}
+
+@test "if CUSTOM_ENV_COMMAND_OPTIONS_SBATCH contains a forbidden option, clear error message and hint should be printed." {
+
+    (
+        # shellcheck disable=SC2031
+        export SYSTEM_FAILURE_EXIT_CODE=102
+
+        # shellcheck source=./src/configure-slurm-include.sh
+        source "$SRC"/configure-slurm-include.sh
+        for TOKEN in $(get_sbatch_command "WS" "")
+        do
+            if [[ "$TOKEN" =~ --[a-z_\-]+ ]]
+            then
+                FORBIDDEN_OPTION="${BASH_REMATCH[0]}"
+                export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="$FORBIDDEN_OPTION"
+                run "$SRC"/configure-slurm.sh 3> /dev/null
+                assert_failure
+                assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+                assert_output --partial "Error: please do not use $FORBIDDEN_OPTION"
+                assert_output --partial "Error: forbidden option in COMMAND_OPTIONS_SBATCH."
+            fi
+        done
+    )
 
 }

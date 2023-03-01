@@ -82,7 +82,9 @@ teardown(){
 
          run _helper
          assert_output 0
+         set +o nounset
          assert [ -z "$CE_CONTAINER_NAME" ]
+         set -o nounset
     )
 }
 

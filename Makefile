@@ -4,6 +4,11 @@ test:
 	./tests/bats/bin/bats --jobs $(JOBS) -T --filter-tags !serial tests/*
 	./tests/bats/bin/bats -T --filter-tags serial tests/*
 
+# This target does not work well (yet)
+test-and-coverage:
+	for batsfile in $$(git ls-files '*.bats'); do bashcov -- ./tests/bats/bin/bats -T "$$batsfile"; done
+	ps aux | grep 'tests/bats/libexec' | grep -v grep | awk '{print $$2}' | xargs kill
+
 test-report-parallel:
 	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/* > report-parallel.xml
 
@@ -17,8 +22,8 @@ test-onlythis:
 # These targets are provided for convenience
 # to run just a directory-based subset of tests.
 
-test-include:
-	./tests/bats/bin/bats --jobs $(JOBS) -T tests/test-config-include.bats
+test-configure-slurm-include:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure-slurm/include.bats
 
 test-jobsub:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/custom_executor_queue/job_submission.bats
@@ -29,8 +34,8 @@ test-lifetime:
 test-contract:
 	./tests/bats/bin/bats tests/contract
 
-test-configure:
-	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure/
+test-configure-slurm:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure-slurm/
 
 test-run:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/run/

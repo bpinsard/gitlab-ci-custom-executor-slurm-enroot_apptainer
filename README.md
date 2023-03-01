@@ -175,3 +175,21 @@ In order for this to work:
   used in the test-deploy stage.
 
 
+### Test coverage
+
+In case one installs it on the machine 
+on which the tests are run,
+[`bashcov`](https://github.com/infertux/bashcov) 
+can be used to collect coverage information.
+
+The `test-and-coverage` target in the `Makefile`
+is provided with that aim.
+
+Unfortunately, `bashcov` does not seem 
+to interact perfectly
+with `bats`, and some tests hang while running,
+causing (possibly) erratic and nonsensical coverage information.
+
+
+
+

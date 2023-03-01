@@ -37,11 +37,22 @@ function setup() {
 function teardown() {
     awk '{print $1}' "$MOCKLOGDIR"/pids.txt | xargs kill
     rm -rf "$TEST_PLAYGROUND"
-    rm -rf "$HOME/ce-debug/cews_$CUSTOM_ENV_CI_JOB_ID"
+    set +o nounset
+    if [ -n "$CUSTOM_ENV_CE_DEBUG_DIR" ]
+    then
+    rm -rf "$CUSTOM_ENV_CE_DEBUG_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"
+    fi
+    set -o nounset
 }
 
+
 function teardown_file(){
-    rm -rf "$HOME/ce-debug/"
+    set +o nounset
+    if [ -n "$CUSTOM_ENV_CE_DEBUG_DIR" ]
+    then
+    rm -rf "$CUSTOM_ENV_CE_DEBUG_DIR"
+    fi
+    set -o nounset
 }
 
 
@@ -86,9 +97,13 @@ function teardown_file(){
 
     # shellcheck disable=SC2031
     export CUSTOM_ENV_CE_DEBUG=1
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-singularity"
+
 
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
+
     "$SRC/cleanup-slurm.sh" singularity
 
     # shellcheck source=./src/singularity-containerlib.sh

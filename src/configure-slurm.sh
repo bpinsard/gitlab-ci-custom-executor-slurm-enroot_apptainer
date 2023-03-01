@@ -11,97 +11,31 @@ set -o pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
-########################
-# WORKSPACE DEFINITION #
-########################
+# shellcheck source=src/configure-slurm-include.sh
+source "$SRC"/configure-slurm-include.sh
 
-# TODO: Test that this variables is set by the gitlab runner
-# TODO: Change this to a job-id related name
-set +o nounset
-if [[ -z "$CUSTOM_ENV_CI_WS" ]]
-then
-    echo "ERROR: CUSTOM_ENV_CI_WS variable not defined." 1>&2
-    echo "       Please define the CI_WS variable in your gitlab CI/CD setup (See README)." 1>&2
+check_custom_env_ci_ws_set
 
-    exit "$SYSTEM_FAILURE_EXIT_CODE"
-fi
-set -o nounset
+
+export_all_custom_env_var_into_var_if_defined
+
+check_or_set_custom_env_command_sbatch
+
+check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
+  echo "Error: forbidden option in COMMAND_OPTIONS_SBATCH.">&2
+  exit "$SYSTEM_FAILURE_EXIT_CODE"
+}
+
 WORKSPACE="$CUSTOM_ENV_CI_WS"/cews_"$CUSTOM_ENV_CI_JOB_ID"
 
-##########
-# MOUNTS #
-##########
-# shellcheck source=src/include.sh
-source "$SRC"/include.sh
-# shellcheck source=src/config-include.sh
-source "$SRC"/config-include.sh
+JOB_ID=$(eval "$(get_sbatch_command \
+                 "$WORKSPACE" \
+                 "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH")")
 
-############################
-# ENV VARIABLE TRANSLATION #
-############################
-
-for VAR in $("$SRC"/slurm-utils/get-sbatch-input-env-list.sh)
-do
-    export_custom_env_var_into_var_if_defined "$VAR"
-done
-
-###########################################################
-# CHECK ON THE VALUE OF CUSTOM_ENV_COMMAND_OPTIONS_SBATCH #
-###########################################################
-
-set +o nounset
-if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
-then
-    echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
-    CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -n 1 -t 30"
-fi
-set -o nounset
-
-
-########################
-# COMMAND CONSTRUCTION #
-########################
-# Forming the command step by step
-# Here we do want the variable to be split
-# shellcheck disable=SC2206
-COMMAND=(sbatch $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
-         --propagate=NONE
-         --parsable
-	 --signal=B:USR1@15 # SIGUSR1 15 seconds before the end of the job.
-	 )
-
-#################
-# DEBUG OPTIONS #
-#################
-
-set +o nounset
-if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
-then
-    COMMAND+=( --input=/dev/null
-               --output=/dev/null
-               --error=/dev/null
-	      )
-fi
-set -o nounset
-
-
-###########################
-# FINAL SBATCH INVOCATION #
-###########################
-COMMAND+=("$SRC"/job.slurm "$WORKSPACE" "$SRC")
-
-echo "${COMMAND[@]}" >&2
-JOB_ID=$("${COMMAND[@]}")
-
-while ! scontrol wait_job "$JOB_ID"
-do
-    sleep 3
-done
+wait_for_job_to_be_ready "$JOB_ID"
 wait_until_file_exists "$WORKSPACE/.env" 90
 
  
-
-
 cat <<EOF
 {
   "driver": {
