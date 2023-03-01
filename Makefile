@@ -83,4 +83,8 @@ shellcheck: shellcheck-stable/shellcheck
 # tend to linger around even if the tests are over. 
 # This might be due to a poor use of the library
 joker: # Batman's nemesis - kills all the bats
-	ps aux | grep 'tests/bats/libexec' | grep -v grep | awk '{print $$2}' | xargs kill
+	ps aux | grep 'tests/bats/libexec' | grep -v grep | awk '{print $$2}' | xargs kill 
+
+joker-on-steroids: # Batman's nemesis - kills all the bats
+	ps aux | grep 'tests/bats/libexec' | grep -v grep | awk '{print $$2}' | xargs kill -9
+
