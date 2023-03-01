@@ -128,6 +128,7 @@ function teardown() {
         2> "$STDERR" \
         3> /dev/null
 
+    echo "This variable should be empty: $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH"
     assert_file_contains "$STDERR" "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options"
 
 
