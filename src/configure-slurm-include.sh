@@ -127,7 +127,7 @@ function check_string_has_no_forbidden_options(){
 
             check_for_forbidden_option \
                 "$ALL_OPTIONS" \
-                "$BASH_REMATCH" || return 22
+                "${BASH_REMATCH[0]}" || return 22
         fi
     done
 }
