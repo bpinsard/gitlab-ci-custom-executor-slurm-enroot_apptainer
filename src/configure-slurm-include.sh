@@ -64,7 +64,11 @@ function check_or_set_custom_env_command_sbatch(){
     set +o nounset
     if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
     then
+        local SRC
+        SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
         echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
+        echo "         See header of job.slurm:" >&2
+        grep '#SBATCH' "$SRC/job.slurm" >&2
         export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -n 1 -t 30"
     fi
     set -o nounset
@@ -104,26 +108,34 @@ function get_sbatch_command(){
 
 }
 
-function check_custom_env_command_options_sbatch_for_forbidden_options(){
-    FORBIDDEN_OPTIONS=("$@")
-    for FORBIDDEN_OPTION in "${FORBIDDEN_OPTIONS[@]}"
-    do
-        echo "Checking $FORBIDDEN_OPTION" >&2
-        if [[ "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" =~ $FORBIDDEN_OPTION ]]
-        then
-            echo "Error: please do not use $FORBIDDEN_OPTION in \$COMMAND_OPTIONS_SBATCH." >&2
-            exit "$SYSTEM_FAILURE_EXIT_CODE"
-        fi
-    done
+function check_for_forbidden_option(){
+    ALL_OPTIONS="$1"
+    FORBIDDEN_OPTION="$2"
+    if [[ "$ALL_OPTIONS" =~ $FORBIDDEN_OPTION ]]
+    then
+        echo "Error: please do not use $FORBIDDEN_OPTION" >&2
+        return 22
+    fi
 }
 
-# TODO: test
-function check_custom_env_command_options_sbatch_has_no_forbidden_options(){
+function check_string_has_no_forbidden_options(){
+    ALL_OPTIONS="$1"
     for TOKEN in $(get_sbatch_command "WS" "")
     do
         if [[ "$TOKEN" =~ --[a-z_\-]+ ]]
         then
-            check_custom_env_command_options_sbatch_for_forbidden_options "$BASH_REMATCH"
+
+            check_for_forbidden_option \
+                "$ALL_OPTIONS" \
+                "$BASH_REMATCH" || return 22
         fi
+    done
+}
+
+function wait_for_job_to_be_ready(){
+    local JOB_ID="$1"
+    while ! scontrol wait_job "$JOB_ID"
+    do
+        sleep 3
     done
 }

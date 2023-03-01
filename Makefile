@@ -22,8 +22,8 @@ test-onlythis:
 # These targets are provided for convenience
 # to run just a directory-based subset of tests.
 
-test-include:
-	./tests/bats/bin/bats --jobs $(JOBS) -T tests/test-config-include.bats
+test-configure-slurm-include:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure-slurm/include.bats
 
 test-jobsub:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/custom_executor_queue/job_submission.bats
@@ -34,8 +34,8 @@ test-lifetime:
 test-contract:
 	./tests/bats/bin/bats tests/contract
 
-test-configure:
-	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure/
+test-configure-slurm:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure-slurm/
 
 test-run:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/run/

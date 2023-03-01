@@ -4,17 +4,17 @@
 # https://bats-core.readthedocs.io/en/stable/tutorial.html
 
 function setup() {
-    load './test_helper/bats-support/load' # for run
-    load './test_helper/bats-assert/load' # for assert_output and refute_output
-    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/.." > /dev/null 2>&1 && pwd)"
+    load '../test_helper/bats-support/load' # for run
+    load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
     # and loading, and also make the sbatch mock available.
     SRC="$PROJECT_ROOT/src"
     # shellcheck disable=SC1091
-    source "$SRC"/config-include.sh
+    source "$SRC"/configure-slurm-include.sh
 
-    TEST_PLAYGROUND="$PWD/config-include-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/configure-slurm-include-test-$BATS_TEST_NAME"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
@@ -66,24 +66,27 @@ function teardown() {
 
 }
 
-@test "check_custom_env_command_options_sbatch_for_forbidden_options fails when conflicts are present" {
+@test "check_for_forbidden_options fails when conflicts are present" {
 
-    CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--propagate=SOMETHING"
-
-    run check_custom_env_command_options_sbatch_for_forbidden_options "--propagate"
+    run check_for_forbidden_option "--propagate=SOMETHING" "--propagate"
 
     assert_failure
-
-
+    assert_equal "$status" 22
 
 }
 
-@test "check_custom_env_command_options_sbatch_for_forbidden_options succeeds when conflicts are NOT present" {
+@test "check_for_orbidden_options succeeds when conflicts are NOT present" {
 
-    CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly"
-
-    run check_custom_env_command_options_sbatch_for_forbidden_options "--propagate"
+    run check_for_forbidden_option "--partition=dev_cpuonly" "--propagate"
 
     assert_success
 
+}
+
+@test "check_string_has_no_forbidden_options fails when bad options used " {
+    for OPTION in --propagate --parsable --signal --input --output --error
+    do
+        run check_string_has_no_forbidden_options "$OPTION"
+        assert_failure
+    done
 }

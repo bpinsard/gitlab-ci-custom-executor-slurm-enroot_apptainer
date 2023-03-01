@@ -50,3 +50,27 @@ function teardown() {
 
 
 }
+
+@test "if CUSTOM_ENV_COMMAND_OPTIONS_SBATCH contains a forbidden option, clear error message and hint should be printed." {
+
+    (
+        export SYSTEM_FAILURE_EXIT_CODE=102
+
+        # shellcheck source=./src/configure-slurm-include.sh
+        source "$SRC"/configure-slurm-include.sh
+        for TOKEN in $(get_sbatch_command "WS" "")
+        do
+            if [[ "$TOKEN" =~ --[a-z_\-]+ ]]
+            then
+                FORBIDDEN_OPTION="$BASH_REMATCH"
+                export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="$FORBIDDEN_OPTION"
+                run "$SRC"/configure-slurm.sh 3> /dev/null
+                assert_failure
+                assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+                assert_output --partial "Error: please do not use $FORBIDDEN_OPTION"
+                assert_output --partial "Error: forbidden option in COMMAND_OPTIONS_SBATCH."
+            fi
+        done
+    )
+
+}

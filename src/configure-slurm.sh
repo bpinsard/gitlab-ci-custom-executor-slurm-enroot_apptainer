@@ -11,24 +11,28 @@ set -o pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
-# shellcheck source=src/config-include.sh
-source "$SRC"/config-include.sh
+# shellcheck source=src/configure-slurm-include.sh
+source "$SRC"/configure-slurm-include.sh
 
 check_custom_env_ci_ws_set
-WORKSPACE="$CUSTOM_ENV_CI_WS"/cews_"$CUSTOM_ENV_CI_JOB_ID"
+
 
 export_all_custom_env_var_into_var_if_defined
 
 check_or_set_custom_env_command_sbatch
 
-JOB_ID=$(eval "$(get_sbatch_command
-                 "$WORKSPACE"
+check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
+  echo "Error: forbidden option in COMMAND_OPTIONS_SBATCH.">&2
+  exit "$SYSTEM_FAILURE_EXIT_CODE"
+}
+
+WORKSPACE="$CUSTOM_ENV_CI_WS"/cews_"$CUSTOM_ENV_CI_JOB_ID"
+
+JOB_ID=$(eval "$(get_sbatch_command \
+                 "$WORKSPACE" \
                  "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH")")
 
-while ! scontrol wait_job "$JOB_ID"
-do
-    sleep 3
-done
+wait_for_job_to_be_ready "$JOB_ID"
 wait_until_file_exists "$WORKSPACE/.env" 90
 
  
