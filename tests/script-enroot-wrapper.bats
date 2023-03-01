@@ -90,8 +90,7 @@ EOF
 
     ./wrapped.sh
 
-    run cat "$MOCKLOGDIR/enroot.log"
-    assert_line --regexp "start.*$SCRIPT_TO_WRAP"
+    assert_file_contains "$MOCKLOGDIR/enroot.log" "start.*$SCRIPT_TO_WRAP"
 
 
 }
@@ -109,11 +108,10 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    run cat "$MOCKLOGDIR/enroot.log"
 
     for VARNAME in ENROOT_RUNTIME_PATH ENROOT_CACHE_PATH ENROOT_DATA_PATH
     do
-        assert_output --regexp "${VARNAME}.*${CUSTOM_ENV_CI_WS}"
+        assert_file_contains "$MOCKLOGDIR/enroot.log" "${VARNAME}.*${CUSTOM_ENV_CI_WS}"
     done
 
 
@@ -124,7 +122,7 @@ EOF
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
     cat <<EOF > "$SCRIPT_TO_WRAP"
-echo "something"
+echo "echoing something from the script to wrap"
 EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
@@ -132,11 +130,11 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    run cat "$MOCKLOGDIR/enroot.log"
 
     # shellcheck source=./src/enroot-containerlib.sh
     CONTAINER_NAME=$( . "$SRC"/enroot-containerlib.sh; echo "$CE_CONTAINER_NAME")
-    assert_output --regexp "ARGS:\s+start.*$CONTAINER_NAME"
+
+    assert_file_contains "$MOCKLOGDIR/enroot.log" "ARGS: start.*$CONTAINER_NAME"
 
 }
 
@@ -152,8 +150,7 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    run cat "$MOCKLOGDIR/enroot.log"
-    assert_output --regexp "ARGS:\s+start\s+--rw"
+    assert_file_contains "$MOCKLOGDIR/enroot.log" "ARGS: start.*--rw"
 
 
 }
@@ -187,8 +184,7 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    run cat "$MOCKLOGDIR/enroot.log"
-    assert_output --regexp "--mount.*$SCRIPT_TO_WRAP:$SCRIPT_TO_WRAP"
+    assert_file_contains "$MOCKLOGDIR/enroot.log" "\-\-mount.*$SCRIPT_TO_WRAP:$SCRIPT_TO_WRAP"
 
 }
 
@@ -205,8 +201,7 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    run cat "$MOCKLOGDIR/enroot.log"
-    assert_output --regexp "--mount.*$CUSTOM_ENV_CI_WS:$CUSTOM_ENV_CI_WS"
+    assert_file_contains "$MOCKLOGDIR/enroot.log" "\-\-mount.*$CUSTOM_ENV_CI_WS:$CUSTOM_ENV_CI_WS"
 
 }
 

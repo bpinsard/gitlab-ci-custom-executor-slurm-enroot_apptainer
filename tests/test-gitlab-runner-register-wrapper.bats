@@ -63,8 +63,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --url 'this.url.com'
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial '--url=this.url.com'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-url=this.url.com'
 
 }
 
@@ -79,8 +78,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --registration-token 'ASDASDASDASD'
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial '--registration-token=ASDASDASDASD'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-registration-token=ASDASDASDASD'
 
 }
 
@@ -95,8 +93,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --name 'a_fake_name' \
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial '--name=a_fake_name'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-name=a_fake_name'
 
 }
 
@@ -111,8 +108,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --tags 'tags-like-this'
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial '--tag-list=tags-like-this'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-tag-list=tags-like-this'
 
 }
 
@@ -128,11 +124,10 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --ce-repo '/this/path' \
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --regexp 'config-exec.*/this/path'
-    assert_output --regexp 'prepare-exec.*/this/path'
-    assert_output --regexp 'run-exec.*/this/path'
-    assert_output --regexp 'cleanup-exec.*/this/path'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'config-exec.*/this/path'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'prepare-exec.*/this/path'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'run-exec.*/this/path'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'cleanup-exec.*/this/path'
 
 }
 
@@ -147,10 +142,9 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --container-backend 'enroot' \
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --regexp '--custom-prepare-args.*enroot'
-    assert_output --regexp '--custom-run-args.*enroot'
-    assert_output --regexp '--custom-cleanup-args.*enroot'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*enroot'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*enroot'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*enroot'
 
 }
 
@@ -165,8 +159,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --builds-dir '/this/other/builds/dir' \
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --regexp 'builds-dir=/this/other/builds/dir'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'builds-dir=/this/other/builds/dir'
 
 }
 
@@ -181,8 +174,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --cache-dir '/this/other/cache/dir' \
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --regexp 'cache-dir=/this/other/cache/dir'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'cache-dir=/this/other/cache/dir'
 
 }
 
@@ -194,8 +186,7 @@ function teardown() {
         echo "$mock_datum"
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --regexp '--custom-prepare-exec=.*/prepare.sh'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-exec=.*/prepare.sh'
 
 }
 
@@ -236,8 +227,7 @@ function teardown() {
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial "--url=$URL_DEFAULT"
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-url=$URL_DEFAULT"
 
 }
 
@@ -253,8 +243,7 @@ function teardown() {
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial "--custom-config-exec=$PROJECT_ROOT/src/configure-slurm.sh"
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-custom-config-exec=$PROJECT_ROOT/src/configure-slurm.sh"
 
 }
 
@@ -270,8 +259,7 @@ function teardown() {
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial "--builds-dir=$HOME/gitlab-runner/builds"
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-builds-dir=$HOME/gitlab-runner/builds"
 
 }
 
@@ -287,8 +275,7 @@ function teardown() {
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
-    run cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_output --partial "--cache-dir=$HOME/gitlab-runner/cache"
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-cache-dir=$HOME/gitlab-runner/cache"
 
 }
 
@@ -300,8 +287,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
 
-    run cat "$MOCKLOGDIR"/systemctl.log
-    assert_output --partial "--user restart gitlab-runner.service"
+    assert_file_contains "$MOCKLOGDIR"/systemctl.log "\-\-user restart gitlab-runner.service"
 
 }
 

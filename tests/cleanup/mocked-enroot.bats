@@ -70,10 +70,9 @@ function teardown_file(){
     # _helper(){ enroot list | wc -l; }
 
 
-    run cat "$MOCKLOGDIR/enroot.log"
     # shellcheck source=./src/enroot-containerlib.sh
     source "$SRC"/enroot-containerlib.sh
-    assert_output --regexp "\bremove\b.*$CE_CONTAINER_NAME"
+    assert_file_contains "$MOCKLOGDIR/enroot.log" "\bremove\b.*$CE_CONTAINER_NAME"
 
 }
 

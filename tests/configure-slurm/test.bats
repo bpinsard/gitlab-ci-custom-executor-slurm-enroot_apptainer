@@ -91,8 +91,7 @@ function teardown() {
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
 
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "SBATCH_ACCOUNT=averyimportantone"
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log "SBATCH_ACCOUNT=averyimportantone"
 
 }
 
@@ -116,9 +115,7 @@ function teardown() {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
 
-    run cat "$MOCKLOGDIR"/sbatch.log
-
-    assert_output --partial "ARGS: $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH"
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log "ARGS: $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH"
 
 }
 
@@ -131,8 +128,7 @@ function teardown() {
         2> "$STDERR" \
         3> /dev/null
 
-    run cat "$STDERR"
-    assert_output --partial "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options"
+    assert_file_contains "$STDERR" "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options"
 
 
     run cat "$STDOUT"
@@ -145,8 +141,7 @@ function teardown() {
 
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-   assert_output --regexp '--partition=dev_cpuonly\s+-n\s+1\s+-t\s+30'
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log '\-\-partition=dev_cpuonly -n 1 -t 30'
 
 }
 
@@ -247,8 +242,7 @@ EOF
 
     "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null
 
-    run cat "$MOCKLOGDIR"/scontrol.log
-    assert_output --partial "wait_job"
+    assert_file_contains "$MOCKLOGDIR"/scontrol.log "wait_job"
 
 }
 

@@ -80,8 +80,7 @@ EOF
 
     wait_until_file_contains "$LOGFILE" "Processing.*job-123.sh" 30
 
-    run cat "$LOGFILE"
-    assert_output --regexp "Processing.*job-123.sh"
+    assert_file_contains "$LOGFILE" "Processing.*job-123.sh"
 
 }
 
@@ -98,8 +97,7 @@ EOF
     rm job-123.sh
 
     wait_until_file_contains "$LOGFILE" "Submitted.*job-123.sh" 30
-    run cat "$LOGFILE"
-    assert_output --regexp "Submitted.*job-123.sh"
+    assert_file_contains "$LOGFILE" "Submitted.*job-123.sh"
 
 }
 
@@ -118,8 +116,7 @@ EOF
     wait_until_file_exists "$LOGFILE" $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
 
     wait_until_file_contains "$LOGFILE" "job-123.sh has ended" 30
-    run cat "$LOGFILE"
-    assert_output --partial "job-123.sh has ended"
+    assert_file_contains "$LOGFILE" "job-123.sh has ended"
 
 }
 
@@ -149,8 +146,7 @@ EOF
     cat "$LOGFILE"
     wait_until_file_contains "$LOGFILE" "Processing.*job-1.sh" 30
 
-    run cat "$LOGFILE"
-    assert_output --regexp "Processing.*job-1.sh"
+    assert_file_contains "$LOGFILE" "Processing.*job-1.sh"
 
 
 }
@@ -198,8 +194,7 @@ EOF
     wait_until_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode 30
     assert_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode
 
-    run cat "$WORKDIR"/OUTPUT/job-1.sh.exitcode
-    assert_output "42"
+    assert_file_contains "$WORKDIR"/OUTPUT/job-1.sh.exitcode "42"
 
 }
 
@@ -238,8 +233,7 @@ EOF
     done
 
     wait_until_file_contains "$LOGFILE" "Stopping custom executor queue..." 30
-    run cat "$LOGFILE"
-    assert_output  --partial "Stopping custom executor queue..."
+    assert_file_contains "$LOGFILE" "Stopping custom executor queue..."
 
 }
 
@@ -367,8 +361,7 @@ EOF
         done
     done < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
 
-    run cat "$LOGFILE"
-    assert_output --partial "job-1.sh was terminated."
+    assert_file_contains "$LOGFILE" "job-1.sh was terminated."
 
 }
 

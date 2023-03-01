@@ -50,8 +50,7 @@ teardown(){
 
     sbatch --something --like --this echo
     # shellcheck disable=SC2031
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "--something --like --this"
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-something \-\-like \-\-this"
 
 }
 
@@ -62,8 +61,7 @@ teardown(){
     sbatch --something --like --this echo
     )
     # shellcheck disable=SC2031
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "SBATCH_GPUS=volta:3"
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log "SBATCH_GPUS=volta:3"
 }
 
 @test "sbatch mock records ONLY SBATCH-related environment variables in the proper list" {

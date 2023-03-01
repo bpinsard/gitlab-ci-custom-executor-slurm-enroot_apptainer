@@ -55,8 +55,7 @@ teardown() {
     enroot --something
 
     # shellcheck disable=SC2031
-    run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --partial "ENROOT_SOME_PATH"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_SOME_PATH"
 
 }
 
@@ -70,8 +69,7 @@ teardown() {
     enroot remove thisthing < <(echo "some kind of input")
 
     # shellcheck disable=SC2031
-    run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --partial "some kind of input"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "some kind of input"
 
 
 }

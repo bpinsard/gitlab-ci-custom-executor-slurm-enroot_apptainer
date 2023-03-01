@@ -78,8 +78,7 @@ EOF
 
     ./wrapped.sh
 
-    run cat "$MOCKLOGDIR/singularity.log"
-    assert_line --regexp "exec.*$SCRIPT_TO_WRAP"
+    assert_file_contains "$MOCKLOGDIR/singularity.log" "exec.*$SCRIPT_TO_WRAP"
 
 }
 
@@ -121,9 +120,7 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    run cat "$MOCKLOGDIR/singularity.log"
-
-    assert_line --partial "SINGULARITY_CACHEDIR=$CUSTOM_ENV_CI_WS/.singularity"
+    assert_file_contains "$MOCKLOGDIR/singularity.log" "SINGULARITY_CACHEDIR=$CUSTOM_ENV_CI_WS/.singularity"
 
 }
 
@@ -141,11 +138,10 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    run cat "$MOCKLOGDIR/singularity.log"
 
     # shellcheck source=./src/singularity-containerlib.sh
     CE_IMAGEFILE=$( . "$SRC"/singularity-containerlib.sh; echo "$CE_IMAGEFILE")
-    assert_output --regexp "ARGS:\s+exec.*$CE_IMAGEFILE"
+    assert_file_contains "$MOCKLOGDIR/singularity.log" "ARGS: exec.*$CE_IMAGEFILE"
 
 }
 
@@ -162,8 +158,7 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    run cat "$MOCKLOGDIR/singularity.log"
-    assert_line --regexp "--bind.*$CUSTOM_ENV_CI_WS,$SCRIPT_TO_WRAP"
+    assert_file_contains "$MOCKLOGDIR/singularity.log" "\-\-bind.*$CUSTOM_ENV_CI_WS,$SCRIPT_TO_WRAP"
 
 }
 

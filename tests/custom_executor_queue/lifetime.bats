@@ -160,8 +160,7 @@ teardown(){
 
     wait_until_file_contains "$LOGFILE" "Stopping custom executor queue..." 20
 
-    run cat "$LOGFILE"
-    assert_output  --partial "Stopping custom executor queue..."
+    assert_file_contains "$LOGFILE" "Stopping custom executor queue..."
 
 
 }
@@ -191,8 +190,7 @@ teardown(){
     done
 
     wait_until_file_contains "$LOGFILE" "Stopping custom executor queue..." 40
-    run cat "$LOGFILE"
-    assert_output  --partial "Stopping custom executor queue..."
+    assert_file_contains "$LOGFILE" "Stopping custom executor queue..."
 
 
 }

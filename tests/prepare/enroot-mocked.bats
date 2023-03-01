@@ -39,8 +39,7 @@ teardown() {
 
     prepare-enroot.sh
 
-    run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --regexp "ARGS:.*import.*docker://$CUSTOM_ENV_CI_JOB_IMAGE"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "ARGS:.*import.*docker://$CUSTOM_ENV_CI_JOB_IMAGE"
 
 }
 
@@ -58,18 +57,16 @@ teardown() {
 @test "enroot called with import and --output to specify an output file for the image based on CE_CONTAINER_NAME" {
 
     prepare-enroot.sh
-    run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --regexp "ARGS:.*import.*--output.*image.sqsh"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "ARGS:.*import.*--output.*image.sqsh"
 
 }
 
 @test "enroot environment variables set correctly" {
 
     prepare-enroot.sh
-    run cat "$MOCKLOGDIR"/enroot.log
-    assert_line --partial "ENROOT_RUNTIME_PATH=$CUSTOM_ENV_CI_WS/.enroot/run"
-    assert_line --partial "ENROOT_CACHE_PATH=$CUSTOM_ENV_CI_WS/.enroot/cache"
-    assert_line --partial "ENROOT_DATA_PATH=$CUSTOM_ENV_CI_WS/.enroot/data"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_RUNTIME_PATH=$CUSTOM_ENV_CI_WS/.enroot/run"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_CACHE_PATH=$CUSTOM_ENV_CI_WS/.enroot/cache"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_DATA_PATH=$CUSTOM_ENV_CI_WS/.enroot/data"
 
 }
 
@@ -78,7 +75,6 @@ teardown() {
 
     prepare-enroot.sh
     run cat "$MOCKLOGDIR"/enroot.log
-
     refute_line --partial "remove $CE_CONTAINER_NAME"
 
 }
@@ -87,9 +83,7 @@ teardown() {
 
     enroot create --name "$CE_CONTAINER_NAME" imagename-ignored.sqsh
     prepare-enroot.sh
-    run cat "$MOCKLOGDIR"/enroot.log
-
-    assert_line --partial "remove $CE_CONTAINER_NAME"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "remove $CE_CONTAINER_NAME"
 
 }
 

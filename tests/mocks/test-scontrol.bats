@@ -42,7 +42,6 @@ teardown(){
     # shellcheck disable=SC2031
     assert_exists "$MOCKLOGDIR"/scontrol.log
     # shellcheck disable=SC2031
-    run cat "$MOCKLOGDIR"/scontrol.log
-    assert_output --partial "ARGS: some thing"
+    assert_file_contains "$MOCKLOGDIR"/scontrol.log "ARGS: some thing"
 
 }

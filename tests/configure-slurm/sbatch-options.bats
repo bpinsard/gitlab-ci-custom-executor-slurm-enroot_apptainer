@@ -3,6 +3,7 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load'
     load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
@@ -43,8 +44,7 @@ function teardown() {
 @test "sbatch invoked with '--propagate=NONE'" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "--propagate=NONE"
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-propagate=NONE"
 
 
 }
@@ -52,8 +52,7 @@ function teardown() {
 @test "sbatch invoked with '--parsable'" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "--parsable"
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-parsable"
 
 
 }
@@ -61,8 +60,7 @@ function teardown() {
 @test "sbatch invoked with '--signal=B:USR1@15'" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
-    assert_output --partial "--signal=B:USR1@15"
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-signal=B:USR1@15"
 
 
 }
@@ -71,10 +69,9 @@ function teardown() {
 @test "sbatch invoked with --{input,output,error}=/dev/null" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    run cat "$MOCKLOGDIR"/sbatch.log
     for STREAM in input output error
     do
-    assert_output --partial "--${STREAM}=/dev/null"
+        assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-${STREAM}=/dev/null"
     done
 
 }

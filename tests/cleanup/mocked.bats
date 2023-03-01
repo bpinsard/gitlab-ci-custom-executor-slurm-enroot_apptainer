@@ -66,9 +66,7 @@ function teardown_file(){
     "$SRC/cleanup-slurm.sh" enroot
     echo "cleanup called."
 
-    run cat "$MOCKLOGDIR/scancel.log"
-
-    assert_line --partial "$CE_SLURM_JOB_ID"
+    assert_file_contains "$MOCKLOGDIR/scancel.log" "$CE_SLURM_JOB_ID"
 
 }
 
@@ -77,11 +75,11 @@ function teardown_file(){
 
     "$SRC/cleanup-slurm.sh" enroot
 
-    run cat "$MOCKLOGDIR/scancel.log"
+    assert_file_contains "$MOCKLOGDIR/scancel.log"
 
-    assert_line --partial "--signal=SIGUSR1"
-    assert_line --partial "--batch"
-    assert_line --partial "-f"
+    assert_file_contains "$MOCKLOGDIR/scancel.log" "\-\-signal=SIGUSR1"
+    assert_file_contains "$MOCKLOGDIR/scancel.log" "\-\-batch"
+    assert_file_contains "$MOCKLOGDIR/scancel.log" "\-f"
 
 }
 

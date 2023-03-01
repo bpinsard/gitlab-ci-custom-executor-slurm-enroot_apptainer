@@ -154,8 +154,7 @@ EOF
        "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
 
        # shellcheck disable=SC2031
-       run cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
-       assert_output --partial "script-$STEP.sh"
+       assert_file_contains "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" "script-$STEP.sh"
 
     done
 
@@ -373,10 +372,9 @@ EOF
    "$SRC/run.sh" enroot "$TMP_PLAYGROUND/script-$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    (
-   run cat "$ENROOTLOG"
    # shellcheck source=./src/enroot-containerlib.sh
    source "$SRC/enroot-containerlib.sh"
-   assert_line --regexp "start.*$CE_CONTAINER_NAME.*$CUSTOM_ENV_CI_WS/"
+   assert_file_contains "$ENROOTLOG" "start.*$CE_CONTAINER_NAME.*$CUSTOM_ENV_CI_WS/"
    )
 
 

@@ -37,8 +37,7 @@ teardown() {
 @test "singularity called with pull" {
 
     prepare-singularity.sh
-    run cat "$MOCKLOGDIR"/singularity.log
-    assert_line --regexp "ARGS:.*.*docker://$CUSTOM_ENV_CI_JOB_IMAGE"
+    assert_file_contains "$MOCKLOGDIR"/singularity.log "ARGS:.*.*docker://$CUSTOM_ENV_CI_JOB_IMAGE"
 
 }
 
@@ -52,8 +51,7 @@ teardown() {
 @test "singularity pull call specifies image file CI_WS/image-CI_JOB_ID.sif" {
 
     prepare-singularity.sh
-    run cat "$MOCKLOGDIR"/singularity.log
-    assert_line --regexp "ARGS:.*pull $CUSTOM_ENV_CI_WS/image-$CUSTOM_ENV_CI_JOB_ID.sif"
+    assert_file_contains "$MOCKLOGDIR"/singularity.log  "ARGS:.*pull $CUSTOM_ENV_CI_WS/image-$CUSTOM_ENV_CI_JOB_ID.sif"
 
 
 
