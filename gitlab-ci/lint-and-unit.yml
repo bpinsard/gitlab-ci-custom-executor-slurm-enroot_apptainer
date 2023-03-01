@@ -1,4 +1,5 @@
 lint:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
@@ -9,6 +10,7 @@ lint:
 
 
 unit-test-serial:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
@@ -27,6 +29,7 @@ unit-test-serial:
 
 
 unit-test-parallel:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test

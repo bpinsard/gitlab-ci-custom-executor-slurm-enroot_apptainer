@@ -3,6 +3,7 @@
 # should create a $HOME/ce-debug directory
 # because of CE_DEBUG=1
 ce-queue-debug-test-enroot:
+  dependencies: []
   stage: test-test-deploy
   variables:
     CE_DEBUG: 1

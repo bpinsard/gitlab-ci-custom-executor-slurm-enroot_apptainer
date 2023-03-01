@@ -1,7 +1,8 @@
 unit-test-parallel-bootstrap-enroot:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap
+  stage: bootstrap-enroot
   script:
     - make test-report-parallel JOBS=8
   after_script:
@@ -16,9 +17,10 @@ unit-test-parallel-bootstrap-enroot:
       junit: report-parallel.xml
 
 unit-test-serial-bootstrap-enroot:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap
+  stage: bootstrap-enroot
   script:
     - make test-report-serial
   after_script:
@@ -33,9 +35,10 @@ unit-test-serial-bootstrap-enroot:
       junit: report-serial.xml
 
 lint-bootstrap-enroot:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap
+  stage: bootstrap-enroot
   script:
     - make shellcheck
   tags:

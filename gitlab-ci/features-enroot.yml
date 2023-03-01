@@ -1,5 +1,6 @@
 
 minimal-job-enroot:
+  dependencies: []
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
@@ -9,6 +10,7 @@ minimal-job-enroot:
     - env | sort
 
 image-job-enroot:
+  dependencies: []
   stage: test-test-deploy
   image: debian:latest
   tags:
@@ -20,6 +22,7 @@ image-job-enroot:
     - env | sort
 
 artifact-job-enroot:
+  dependencies: []
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
@@ -30,6 +33,7 @@ artifact-job-enroot:
       - test-artifact.txt
 
 artifact-image-job-enroot:
+  dependencies: []
   stage: test-test-deploy
   image: debian:latest
   tags:
@@ -42,6 +46,7 @@ artifact-image-job-enroot:
 
 
 horeka-mpi-multinode-job-enroot:
+  dependencies: []
   stage: test-test-deploy
   tags:
     - slurm-enroot-test

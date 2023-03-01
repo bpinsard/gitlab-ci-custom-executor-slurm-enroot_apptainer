@@ -3,6 +3,7 @@
 # should create a $HOME/ce-debug directory
 # because of CE_DEBUG=1
 ce-queue-debug-test-singularity:
+  dependencies: []
   stage: test-test-deploy
   # Making sure this test runs
   # after the test for the enroot version

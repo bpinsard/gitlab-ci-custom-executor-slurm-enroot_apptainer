@@ -1,4 +1,5 @@
 minimal-job-singularity:
+  dependencies: []
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
@@ -8,6 +9,7 @@ minimal-job-singularity:
     - env | sort
 
 image-job-singularity:
+  dependencies: []
   stage: test-test-deploy
   image: debian:latest
   tags:
@@ -19,6 +21,7 @@ image-job-singularity:
     - env | sort
 
 artifact-job-singularity:
+  dependencies: []
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
@@ -29,6 +32,7 @@ artifact-job-singularity:
       - test-artifact.txt
 
 artifact-image-job-singularity:
+  dependencies: []
   stage: test-test-deploy
   image: debian:latest
   tags:
@@ -40,6 +44,7 @@ artifact-image-job-singularity:
       - test-artifact.txt
 
 horeka-mpi-multinode-job-singularity:
+  dependencies: []
   stage: test-test-deploy
   tags:
     - slurm-singularity-test

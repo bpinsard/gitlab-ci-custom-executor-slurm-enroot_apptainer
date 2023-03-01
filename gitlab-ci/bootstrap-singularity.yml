@@ -1,7 +1,8 @@
 unit-test-parallel-bootstrap-singularity:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap
+  stage: bootstrap-singularity
   script:
     - make test-report-parallel JOBS=8
   after_script:
@@ -17,9 +18,10 @@ unit-test-parallel-bootstrap-singularity:
 
 
 unit-test-serial-bootstrap-singularity:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap
+  stage: bootstrap-singularity
   script:
     - make test-report-serial
   after_script:
@@ -35,9 +37,10 @@ unit-test-serial-bootstrap-singularity:
 
 
 lint-bootstrap-singularity:
+  dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap
+  stage: bootstrap-singularity
   script:
     - make shellcheck
   tags:
