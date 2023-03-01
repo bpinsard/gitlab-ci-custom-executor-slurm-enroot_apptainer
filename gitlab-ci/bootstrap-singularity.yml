@@ -1,0 +1,44 @@
+unit-test-parallel-bootstrap-singularity:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap
+  script:
+    - make test-report-parallel JOBS=8
+  after_script:
+    - make joker
+  tags:
+    - slurm-singularity-test
+  artifacts:
+    when: always
+    paths:
+      - report-parallel.xml
+    reports:
+      junit: report-parallel.xml
+
+
+unit-test-serial-bootstrap-singularity:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap
+  script:
+    - make test-report-serial
+  after_script:
+    - make joker
+  tags:
+    - slurm-singularity-test
+  artifacts:
+    when: always
+    paths:
+      - report-serial.xml
+    reports:
+      junit: report-serial.xml
+
+
+lint-bootstrap-singularity:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap
+  script:
+    - make shellcheck
+  tags:
+    - slurm-singularity-test

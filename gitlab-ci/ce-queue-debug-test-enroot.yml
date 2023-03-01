@@ -1,0 +1,30 @@
+# This test,
+# run with the slurm+enroot custom executor
+# should create a $HOME/ce-debug directory
+# because of CE_DEBUG=1
+ce-queue-debug-test-enroot:
+  stage: test-test-deploy
+  variables:
+    CE_DEBUG: 1
+  tags:
+    -  slurm-enroot-test
+  script:
+    - echo "Making sure that $HOME/ce-debug/ does not exist before test cleanup..."
+    - rm -rf "$HOME/ce-debug/"
+
+# This test is a test for the enroot executor
+# checking that CUSTOM_ENV_CE_DEBUG=1
+# set in the `ce-queue-debug-test-enroot` test
+# caused the cleanup script to save the CE workspace
+# in $HOME
+ce-queue-debug-post-test-enroot:
+  stage: test-test-deploy
+  needs:
+    - "ce-queue-debug-test-enroot"
+  tags:
+    - shell
+  script:
+    - |
+       [ -d "$HOME/ce-debug/" ]
+  after_script:
+    - rm -rf "$HOME/ce-debug/"

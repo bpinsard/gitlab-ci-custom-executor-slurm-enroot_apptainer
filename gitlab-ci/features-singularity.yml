@@ -1,0 +1,51 @@
+minimal-job-singularity:
+  stage: test-test-deploy
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-singularity-test
+  script:
+    - echo "Test Test"
+    - env | sort
+
+image-job-singularity:
+  stage: test-test-deploy
+  image: debian:latest
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-singularity-test
+  script:
+    - echo "Test Test using an image"
+    - grep PRETTY /etc/os-release
+    - env | sort
+
+artifact-job-singularity:
+  stage: test-test-deploy
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-singularity-test
+  script: touch test-artifact.txt
+  artifacts:
+    paths:
+      - test-artifact.txt
+
+artifact-image-job-singularity:
+  stage: test-test-deploy
+  image: debian:latest
+  tags:
+    # This needs to match the tag of the test custom executor
+    - slurm-singularity-test
+  script: cp /etc/os-release test-artifact-image.txt
+  artifacts:
+    paths:
+      - test-artifact.txt
+
+horeka-mpi-multinode-job-singularity:
+  stage: test-test-deploy
+  tags:
+    - slurm-singularity-test
+  variables:
+    COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --nodes 2 --ntasks-per-node=1"
+  script:
+    - |
+      srun hostname
+      [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1

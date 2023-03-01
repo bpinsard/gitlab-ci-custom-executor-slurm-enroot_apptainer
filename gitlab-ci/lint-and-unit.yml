@@ -1,0 +1,44 @@
+lint:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test
+  script:
+    - make shellcheck
+  tags:
+    - shell
+
+
+unit-test-serial:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test
+  script:
+    - make test-report-serial
+  after_script:
+    - make joker
+  tags:
+    - shell
+  artifacts:
+    when: always
+    paths:
+      - report-serial.xml
+    reports:
+      junit: report-serial.xml
+
+
+unit-test-parallel:
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test
+  script:
+    - make test-report-parallel JOBS=8
+  after_script:
+    - make joker
+  tags:
+    - shell
+  artifacts:
+    when: always
+    paths:
+      - report-parallel.xml
+    reports:
+      junit: report-parallel.xml
