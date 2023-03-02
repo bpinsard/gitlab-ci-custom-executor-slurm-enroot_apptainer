@@ -18,6 +18,8 @@ setup(){
 }
 
 teardown(){
+    source "$WORKDIR"/.env
+    stop_custom_executor_queue
     _common_teardown
 }
 
