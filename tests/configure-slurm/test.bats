@@ -122,8 +122,9 @@ function teardown() {
 
 @test "when 'COMMAND_OPTIONS_SBATCH' is not defined, do complain on stderr" {
 
+
     # shellcheck disable=SC2031
-    echo "This variable should be empty: $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH=""
 
     local STDOUT="$TEST_PLAYGROUND/.stdout.test"
     local STDERR="$TEST_PLAYGROUND/.stderr.test"
