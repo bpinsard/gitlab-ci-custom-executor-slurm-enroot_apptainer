@@ -18,8 +18,6 @@ setup(){
 }
 
 teardown(){
-    source "$WORKDIR"/.env
-    stop_custom_executor_queue
     _common_teardown
 }
 
@@ -100,6 +98,7 @@ teardown(){
     # shellcheck disable=SC1091
     source "$WORKDIR/".env
     assert [ -d "${WORKDIR}" ]
+    stop_custom_executor_queue
 }
 
 @test "cleanup_custom_executor_queue_workspace deletes workspace" {
@@ -130,6 +129,9 @@ teardown(){
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
     assert_file_exists "$LOGFILE"
+    # shellcheck disable=SC1091
+    source "$WORKDIR/".env
+    stop_custom_executor_queue
 
 }
 
