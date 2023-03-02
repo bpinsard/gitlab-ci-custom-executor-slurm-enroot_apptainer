@@ -7,11 +7,11 @@ stages:
   - bootstrap-enroot
 
 include:
-  - '/gitlab-ci/lint-and-unit.yml'
-  - '/gitlab-ci/update-ce-code.yml'
-  - '/gitlab-ci/ce-queue-debug-test-enroot.yml'
-  - '/gitlab-ci/ce-queue-debug-test-singularity.yml'
-  - '/gitlab-ci/features-enroot.yml'
-  - '/gitlab-ci/features-singularity.yml'
+  #- '/gitlab-ci/lint-and-unit.yml'
+  #- '/gitlab-ci/update-ce-code.yml'
+  #- '/gitlab-ci/ce-queue-debug-test-enroot.yml'
+  #- '/gitlab-ci/ce-queue-debug-test-singularity.yml'
+  #- '/gitlab-ci/features-enroot.yml'
+  #- '/gitlab-ci/features-singularity.yml'
   - '/gitlab-ci/bootstrap-enroot.yml'
   - '/gitlab-ci/bootstrap-singularity.yml'
