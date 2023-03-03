@@ -110,6 +110,7 @@ function teardown() {
 
 @test "the content of 'COMMAND_OPTIONS_SBATCH' is passed to sbatch as part of the parameters" {
 
+    # shellcheck disable=SC2030
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
@@ -122,13 +123,15 @@ function teardown() {
 @test "when 'COMMAND_OPTIONS_SBATCH' is not defined, do complain on stderr" {
 
 
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH=""
+
     local STDOUT="$TEST_PLAYGROUND/.stdout.test"
     local STDERR="$TEST_PLAYGROUND/.stderr.test"
     "$SRC"/configure-slurm.sh 1> "$STDOUT" \
         2> "$STDERR" \
         3> /dev/null
 
-    echo "This variable should be empty: $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH"
     assert_file_contains "$STDERR" "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options"
 
 
