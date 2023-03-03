@@ -21,9 +21,11 @@ teardown(){
     _common_teardown
 }
 
+# bats test_tags=thisone
 @test "custom executor queue complains when invoked with the wrong number of arguments" {
 
-    refute start_custom_executor_queue many more args than needed 3> /dev/null
+    run start_custom_executor_queue many more args than needed 3> /dev/null
+    assert_failure
 
 }
 
@@ -34,6 +36,9 @@ teardown(){
     job_is_alive=$(jobs -r | wc -l)
     assert_equal "$job_is_alive" 1
 
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    stop_custom_executor_queue
 }
 
 @test "start_custom_executor_queue creates env file" {
@@ -44,6 +49,9 @@ teardown(){
     # (this might need to be updated)
     assert_equal "$(wc -l < "$WORKDIR"/.env)" 5
 
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    stop_custom_executor_queue
 }
 
 @test "sourcing env files gives you CUSTOM_EXECUTOR_QUEUE... variables" {
@@ -52,9 +60,22 @@ teardown(){
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
-    echo "sourcing environment..."
-    cat "$WORKDIR"/.env
     refute _no_custom_executor_queue_variables_declared
+
+    stop_custom_executor_queue
+}
+
+@test "SLURM_JOB_ID saved in .env when available as CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID" {
+
+    (
+        export SLURM_JOB_ID=987654321
+        start_custom_executor_queue "$WORKDIR" 3> /dev/null
+    )
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    assert_equal "$CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID" 987654321
+    stop_custom_executor_queue
 
 }
 
@@ -98,6 +119,7 @@ teardown(){
     # shellcheck disable=SC1091
     source "$WORKDIR/".env
     assert [ -d "${WORKDIR}" ]
+    stop_custom_executor_queue
 }
 
 @test "cleanup_custom_executor_queue_workspace deletes workspace" {
@@ -128,6 +150,9 @@ teardown(){
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
     assert_file_exists "$LOGFILE"
+    # shellcheck disable=SC1091
+    source "$WORKDIR/".env
+    stop_custom_executor_queue
 
 }
 

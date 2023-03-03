@@ -247,7 +247,6 @@ EOF
 
 }
 
-# bats test_tags=termination
 @test "when job script exits, a file named 'terminated' is produced" {
 
     "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null

@@ -389,7 +389,7 @@ EOF
         skip # We are very unlucky
     fi
     run submit_to_custom_executor_queue job1.sh
-    assert_equal "$status" 45
+    assert_equal "$status" 22
 
 
 }
@@ -457,5 +457,25 @@ EOF
     run submit_to_custom_executor_queue_and_wait job.sh
     assert_exists a-file-here
 
+
+}
+
+# bats test_tags=thisone
+@test "submit_to_custom_executor_queue checks that the job is still running" {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    stop_custom_executor_queue
+
+    cat <<EOF > job.sh
+echo "This should not run at all!"
+exit 1
+EOF
+    chmod +x job.sh
+
+    run submit_to_custom_executor_queue job.sh
+    assert_failure
+
+    assert_output "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_JOBID not running!"
 
 }

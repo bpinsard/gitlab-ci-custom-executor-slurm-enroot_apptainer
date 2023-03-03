@@ -50,7 +50,6 @@ function teardown() {
 }
 
 
-# bats test_tags=onlythis
 @test "prepare uses enroot when enroot is passed as first argument" {
     prepare.sh enroot
 

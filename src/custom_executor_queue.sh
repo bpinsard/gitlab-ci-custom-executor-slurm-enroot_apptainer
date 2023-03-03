@@ -24,6 +24,13 @@ function start_custom_executor_queue () {
     _custom_executor_queue > /dev/null &
     CUSTOM_EXECUTOR_QUEUE_JOBID=$!
 
+    set +o nounset
+    if [ -n "$SLURM_JOB_ID" ]
+    then
+        # shellcheck disable=SC2034
+        CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID="$SLURM_JOB_ID"
+    fi
+    set -o nounset
     # shellcheck disable=SC2086
     declare -p ${!CUSTOM_EXECUTOR_QUEUE*} > "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
 }
@@ -88,13 +95,18 @@ function _envfname(){
 
 
 function submit_to_custom_executor_queue() {
-    local JOBSCRIPT=$1
 
+    if ! custom_executor_queue_is_alive
+    then
+        echo "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_JOBID not running!"
+        return 1
+    fi
+    local JOBSCRIPT=$1
     local BNAME
     BNAME="$(basename "$JOBSCRIPT")"
     if [ -f  "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/TODO/$BNAME" ]
     then
-        return 45
+        return 22
     fi
 
     local TODONAME
@@ -118,7 +130,8 @@ function submit_to_custom_executor_queue() {
 
 
 function submit_to_custom_executor_queue_and_wait() {
-    submit_to_custom_executor_queue "$@"
+    submit_to_custom_executor_queue "$@" || exit "$SYSTEM_FAILURE_EXIT_CODE"
+
     local JOB=$1
     DONENAME="$(_donename "$JOB")"
     OUTPUTNAME="$(_outputname "$JOB")"
@@ -137,12 +150,13 @@ function submit_to_custom_executor_queue_and_wait() {
     mv "$DONENAME" "$DONENAME"-"$TIME"
     cat "$OUTPUTNAME"
     read -r EXITVALUE < "$EXITVALUEFNAME"
-    exit "$EXITVALUE"
+    return "$EXITVALUE"
 
 }
 
 
 function custom_executor_queue_is_alive () {
+    # TODO: check for slurm job
     ps --pid "$CUSTOM_EXECUTOR_QUEUE_JOBID" > /dev/null
 }
 

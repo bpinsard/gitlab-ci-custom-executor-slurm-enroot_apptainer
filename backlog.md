@@ -31,6 +31,14 @@ THIS FILE IS MAINTAINED ON A BEST-EFFORT BASIS.
 - [X] the custom executor queue should give back stdin and stdout
       (in the same file for simplicity)
 - [X] the exit code of the jobs should be stored somewhere accessible
+- [ ] when a script is submitted, 
+      it should be checked that the custom executor queue is running.
+      This might require checking the status of the process of the custom executor queue
+      (the relative pid must be stored in the right place)
+      and/or that the slurm job where the custom executor queue is running
+      is still up.
+
+      
 
 Additional features that should make it work more or less like slurm
 
