@@ -47,7 +47,7 @@ teardown(){
     assert_file_exists "$WORKDIR"/.env
     # There are 5 variables that need to be declared
     # (this might need to be updated)
-    assert_equal "$(wc -l < "$WORKDIR"/.env)" 5
+    assert_equal "$(wc -l < "$WORKDIR"/.env)" 6
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -84,7 +84,7 @@ teardown(){
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     stop_custom_executor_queue
-    refute ps --pid "$CUSTOM_EXECUTOR_QUEUE_JOBID" > /dev/null
+    refute ps --pid "$CUSTOM_EXECUTOR_QUEUE_PID" > /dev/null
 
 }
 
@@ -95,7 +95,7 @@ teardown(){
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     stop_custom_executor_queue
-    refute ps --pid "$CUSTOM_EXECUTOR_QUEUE_JOBID" > /dev/null
+    refute ps --pid "$CUSTOM_EXECUTOR_QUEUE_PID" > /dev/null
 
 }
 
@@ -111,8 +111,8 @@ teardown(){
     # custom_executor_queue should now be dead
     refute custom_executor_queue_is_alive
 
-
 }
+
 
 @test "custom executor queue ensures workdir exists" {
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
@@ -169,7 +169,7 @@ teardown(){
     refute_output  --partial "Stopping custom executor queue..."
 
     wait_until_file_contains "$LOGFILE" "Starting custom executor queue." 20
-    kill -s SIGUSR1 "$CUSTOM_EXECUTOR_QUEUE_JOBID"
+    kill -s SIGUSR1 "$CUSTOM_EXECUTOR_QUEUE_PID"
     # killing might take a while, but not forever
     declare -i count
     count=0
@@ -204,7 +204,7 @@ teardown(){
     refute_output  --partial "Stopping custom executor queue..."
 
     wait_until_file_contains "$LOGFILE" "Starting custom executor queue." 20
-    kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_JOBID"
+    kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_PID"
     # killing might take a while, but not forever
     declare -i count
     count=0

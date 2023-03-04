@@ -221,7 +221,7 @@ EOF
     rm job-1.sh
     sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME+1))
 
-    kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_JOBID"
+    kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_PID"
     # killing might take a while
     # but should not take 10 seconds,
     # the submitted job should die as well
@@ -344,7 +344,7 @@ EOF
     rm job-1.sh
     sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME+1))
 
-    kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_JOBID"
+    kill -s SIGTERM "$CUSTOM_EXECUTOR_QUEUE_PID"
     # killing might take a while
     while custom_executor_queue_is_alive
     do
@@ -476,6 +476,6 @@ EOF
     run submit_to_custom_executor_queue job.sh
     assert_failure
 
-    assert_output "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_JOBID not running!"
+    assert_output "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
 
 }

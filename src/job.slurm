@@ -23,9 +23,9 @@ echo -n "done. Waiting." >&2
 source "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/.env
 
 # shellcheck disable=SC2064
-trap "kill -s SIGUSR1 $CUSTOM_EXECUTOR_QUEUE_JOBID; wait; exit" SIGUSR1
+trap "kill -s SIGUSR1 $CUSTOM_EXECUTOR_QUEUE_PID; wait; exit" SIGUSR1
 # shellcheck disable=SC2064
-trap "kill -s SIGTERM $CUSTOM_EXECUTOR_QUEUE_JOBID; wait; exit" SIGTERM
+trap "kill -s SIGTERM $CUSTOM_EXECUTOR_QUEUE_PID; wait; exit" SIGTERM
 # shellcheck disable=SC2064
 trap "touch $CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated;" EXIT
 

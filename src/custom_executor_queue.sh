@@ -22,7 +22,8 @@ function start_custom_executor_queue () {
     touch "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
 
     _custom_executor_queue > /dev/null &
-    CUSTOM_EXECUTOR_QUEUE_JOBID=$!
+    CUSTOM_EXECUTOR_QUEUE_PID=$!
+    CUSTOM_EXECUTOR_QUEUE_HOSTNAME=$(hostname)
 
     set +o nounset
     if [ -n "$SLURM_JOB_ID" ]
@@ -98,7 +99,7 @@ function submit_to_custom_executor_queue() {
 
     if ! custom_executor_queue_is_alive
     then
-        echo "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_JOBID not running!"
+        echo "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
         return 1
     fi
     local JOBSCRIPT=$1
@@ -156,13 +157,17 @@ function submit_to_custom_executor_queue_and_wait() {
 
 
 function custom_executor_queue_is_alive () {
-    # TODO: check for slurm job
-    ps --pid "$CUSTOM_EXECUTOR_QUEUE_JOBID" > /dev/null
+    if [[ "$CUSTOM_EXECUTOR_QUEUE_HOSTNAME" == "$(hostname)" ]]
+    then
+        ps --pid "$CUSTOM_EXECUTOR_QUEUE_PID" &> /dev/null
+    else
+        scontrol wait_job "$CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID" &> /dev/null
+    fi
 }
 
 function stop_custom_executor_queue () {
     stop_all
-    kill "$CUSTOM_EXECUTOR_QUEUE_JOBID"
+    kill "$CUSTOM_EXECUTOR_QUEUE_PID"
     while custom_executor_queue_is_alive
     do
     sleep 1

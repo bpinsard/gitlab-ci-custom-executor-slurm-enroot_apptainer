@@ -66,7 +66,7 @@ function teardown() {
     # shellcheck disable=SC1090
     source "$CEQ_ENV"
 
-    assert ps -q "$CUSTOM_EXECUTOR_QUEUE_JOBID"
+    assert ps -q "$CUSTOM_EXECUTOR_QUEUE_PID"
 
 }
 
