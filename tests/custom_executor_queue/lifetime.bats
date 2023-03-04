@@ -45,9 +45,17 @@ teardown(){
 
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
     assert_file_exists "$WORKDIR"/.env
-    # There are 5 variables that need to be declared
+    # There are 6 variables that need to be declared
     # (this might need to be updated)
-    assert_equal "$(wc -l < "$WORKDIR"/.env)" 6
+    set +o nounset
+    if [ -n "$SLURM_JOB_ID" ]
+    then
+        NVAR=7
+    else
+        NVAR=6
+    fi
+    set -o nounset
+    assert_equal "$(wc -l < "$WORKDIR"/.env)" "$NVAR"
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
