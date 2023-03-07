@@ -6,7 +6,7 @@ set -o pipefail
 
 
 function start_custom_executor_queue () {
-    if [[ $# -gt 1 ]]
+    if [[ $# -gt 2 ]]
     then
         echo "Too many arguments to 'start_custom_executor_queue', exiting" >&2
         return 1
@@ -15,6 +15,14 @@ function start_custom_executor_queue () {
     # In seconds
     CUSTOM_EXECUTOR_QUEUE_CYCLETIME=3 # DEBUG
     CUSTOM_EXECUTOR_QUEUE_WORKSPACE="$1"
+    if [ "$#" -eq 2 ]
+    then
+
+        CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC="$2"
+    else
+        CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=300 # seconds
+    fi
+
     _create_directories
     CUSTOM_EXECUTOR_QUEUE_LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
     CUSTOM_EXECUTOR_QUEUE_JOBPIDS="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/pids.txt
@@ -272,6 +280,14 @@ function _custom_executor_queue () {
         if [ "$(jobs)" ]
         then
           date +%s > "$CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY"
+        else
+          if [[ "$(idle_time)" -ge "$CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC" ]]
+          then
+                 _log "Idle time $CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC reached, exiting."
+                 break
+          else
+              _log "Idling for $(idle_time)/$CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC"
+          fi
         fi
         local CYCLESTART="$SECONDS"
         local CYCLEEND="$((CYCLESTART + CUSTOM_EXECUTOR_QUEUE_CYCLETIME))"
@@ -329,5 +345,12 @@ function purge_variables() {
      sed --posix -f "$SCRIPT"
      rm "$SCRIPT"
 
+
+}
+
+function idle_time(){
+     TIME_NOW="$(date +%s)"
+     TIME_LAST_ACTIVITY="$(cat "$CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY")"
+     echo "$((TIME_NOW-TIME_LAST_ACTIVITY))"
 
 }

@@ -86,8 +86,8 @@ EOF
 #bats test_tags=onlythis
 @test "after a given idle time, the custom executor queue stops running" {
 
-    export IDLE_TIME_SEC=10
-    (start_custom_executor_queue "$WORKDIR"  3> /dev/null)
+    export IDLE_TIME_SEC=5
+    (start_custom_executor_queue "$WORKDIR"  "$IDLE_TIME_SEC" 3> /dev/null)
 
     source "$WORKDIR"/.env
     assert custom_executor_queue_is_alive
@@ -95,6 +95,8 @@ EOF
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
     sleep $IDLE_TIME_SEC
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
 
     refute custom_executor_queue_is_alive
 
