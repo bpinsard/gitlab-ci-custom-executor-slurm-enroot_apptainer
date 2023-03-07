@@ -31,6 +31,10 @@ test-jobsub:
 test-lifetime:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/custom_executor_queue/lifetime.bats
 
+test-ce:
+	./tests/bats/bin/bats --jobs $(JOBS) -T tests/custom_executor_queue/*.bats
+
+
 test-contract:
 	./tests/bats/bin/bats tests/contract
 
@@ -88,3 +92,5 @@ joker: # Batman's nemesis - kills all the bats
 joker-on-steroids: # Batman's nemesis - kills all the bats
 	ps aux | grep 'tests/bats/libexec' | grep -v grep | awk '{print $$2}' | xargs kill -9
 
+clean:
+	bash ./utils/clean.sh

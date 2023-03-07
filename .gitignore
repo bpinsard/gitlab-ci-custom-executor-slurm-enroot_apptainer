@@ -3,3 +3,4 @@ report.xml
 shellcheck-stable/
 *.swp
 coverage/
+trashcan

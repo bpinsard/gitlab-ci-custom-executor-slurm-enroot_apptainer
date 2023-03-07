@@ -21,7 +21,6 @@ teardown(){
     _common_teardown
 }
 
-# bats test_tags=thisone
 @test "custom executor queue complains when invoked with the wrong number of arguments" {
 
     run start_custom_executor_queue many more args than needed 3> /dev/null
@@ -50,9 +49,9 @@ teardown(){
     set +o nounset
     if [ -n "$SLURM_JOB_ID" ]
     then
-        NVAR=7
+        NVAR=8
     else
-        NVAR=6
+        NVAR=7
     fi
     set -o nounset
     assert_equal "$(wc -l < "$WORKDIR"/.env)" "$NVAR"

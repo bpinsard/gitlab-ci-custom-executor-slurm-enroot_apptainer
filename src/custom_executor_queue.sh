@@ -14,12 +14,13 @@ function start_custom_executor_queue () {
     declare -i CUSTOM_EXECUTOR_QUEUE_CYCLETIME
     # In seconds
     CUSTOM_EXECUTOR_QUEUE_CYCLETIME=3 # DEBUG
-    CUSTOM_EXECUTOR_QUEUE_WORKSPACE=$1
+    CUSTOM_EXECUTOR_QUEUE_WORKSPACE="$1"
     _create_directories
     CUSTOM_EXECUTOR_QUEUE_LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
     CUSTOM_EXECUTOR_QUEUE_JOBPIDS="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/pids.txt
     touch "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
     touch "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
+    CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/last_activity
 
     _custom_executor_queue > /dev/null &
     CUSTOM_EXECUTOR_QUEUE_PID=$!
@@ -212,6 +213,7 @@ function _custom_executor_queue () {
     trap emergency_stop SIGTERM SIGUSR1
     # shellcheck disable=SC2064
     trap "touch $CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated;" EXIT
+    date +%s > "$CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY"
 
     _log "Starting custom executor queue."
     local SUBMITTEDPID
@@ -267,6 +269,10 @@ function _custom_executor_queue () {
             fi
         done
         shopt -u nullglob
+        if [ "$(jobs)" ]
+        then
+          date +%s > "$CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY"
+        fi
         local CYCLESTART="$SECONDS"
         local CYCLEEND="$((CYCLESTART + CUSTOM_EXECUTOR_QUEUE_CYCLETIME))"
         while [[ "$SECONDS" -lt "$CYCLEEND" ]]
