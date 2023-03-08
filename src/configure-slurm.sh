@@ -36,8 +36,10 @@ JOB_ID=$(eval "$(get_sbatch_command \
                  "$WORKSPACE" \
                  "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH")")
 
+
 wait_for_job_to_be_ready "$JOB_ID"
 wait_until_file_exists "$WORKSPACE/.env" 90
+save_slurm_environment > "$WORKSPACE/slurmenv"
 
  
 cat <<EOF

@@ -139,6 +139,19 @@ function wait_for_job_to_be_ready(){
         sleep 3
     done
 }
+
+function save_slurm_environment(){
+
+    set +o nounset
+    for VAR in $("$SRC"/slurm-utils/get-sbatch-input-env-list.sh)
+    do
+       echo "$VAR=${!VAR}"
+    done
+    echo COMMAND_OPTIONS_SBATCH="$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH"
+    set -o nounset
+
+}
+
 function find_available_workspace_name(){
 
     ROOT="$1"
