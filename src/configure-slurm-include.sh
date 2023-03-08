@@ -175,7 +175,34 @@ function find_available_workspace_name(){
     done
     echo "$CANDIDATE"
 
+}
+
+function get_slurm_jobid(){
+    (
+    local WORKSPACE="$1"
+    source "$WORKSPACE/.env"
+    echo "$CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID"
+    )
+}
 
 
+function find_remaining_time_in_allocation(){
+
+    local WORKSPACE="$1"
+
+    JOBID="$(get_slurm_jobid "$WORKSPACE")"
+    export JOBID
+
+
+    read -r STATE END_TIME < <(squeue -j "$JOBID"  --Format=State,EndTime 2> /dev/null| tail -n 1)
+
+    if [[ "$STATE" == "RUNNING" ]]
+    then
+        NOW_UNIX="$(date +%s)"
+        END_TIME_UNIX="$(date --date="$END_TIME" +%s)"
+        echo $((END_TIME_UNIX - NOW_UNIX))
+    else
+        echo 0
+    fi
 
 }

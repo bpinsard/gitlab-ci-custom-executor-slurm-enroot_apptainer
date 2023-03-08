@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+SQUEUE_LOG=$MOCKLOGDIR/squeue.log
+
+BASEMOCK="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"/basemock
+# shellcheck source=./tests/mocks/bin/basemock
+source "$BASEMOCK" "$SQUEUE_LOG" "$@"
+
+# we only need this mock for very specific cases
+
+while [ "$#" -gt 0 ]
+do
+case "$1" in
+     -j)
+        case "$2" in
+            34343434)
+               JOBTYPE="run10min"
+               ;;
+            45454545)
+               JOBTYPE="completing-unexpectedly"
+               ;;
+            *)
+               JOBTYPE="wrong-or-completed"
+               ;;
+        esac
+        shift
+        shift
+        ;;
+     --Format=State,EndTime)
+        PRINT=1
+        shift
+        ;;
+     *)
+        echo "Operation not supported by mock"
+        exit 1
+esac
+done
+
+if [ "$PRINT" ]
+then
+    case "$JOBTYPE" in
+        "run10min")
+            printf "%-20s%-20s\n" "STATE" "END_TIME"
+            printf "%-20s%-20s\n" "RUNNING" "$(date --date="+10 min" +%Y-%m-%dT%H:%M:%S)"
+        ;;
+        "completing-unexpectedly")
+            printf "%-20s%-20s\n" "STATE" "END_TIME"
+            printf "%-20s%-20s\n" "COMPLETING" "$(date --date="+10 min" +%Y-%m-%dT%H:%M:%S)"
+        ;;
+        "wrong-or-completed")
+            echo "slurm_load_jobs error: Invalid job id specified" >&2
+            exit 1
+        ;;
+    esac
+else
+    echo "Not printing anything useful."
+fi

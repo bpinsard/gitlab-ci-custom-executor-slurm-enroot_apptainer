@@ -6,13 +6,16 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test-utils' # for assert_output and refute_output
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
-    # To make scripts in /src available for sourcing
-    # and loading, and also make the sbatch mock available.
+    load_mocks
+
     SRC="$PROJECT_ROOT/src"
     # shellcheck disable=SC1091
     source "$SRC"/configure-slurm-include.sh
+
+
 
     TEST_PLAYGROUND="$PWD/configure-slurm-include-test-$BATS_TEST_NAME"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
@@ -108,5 +111,54 @@ function teardown() {
 
     assert_failure
     assert_output "Not an existing directory: $TEST_PLAYGROUND/something"
+
+}
+
+@test "get_slurm_jobid gets the slurm job id from the .env file in the directory given as input" {
+
+    WS="$TEST_PLAYGROUND/cews_something"
+    mkdir "$WS"
+    SLURM_JOB_ID=34343434
+    echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
+
+    run get_slurm_jobid "$WS"
+    assert_output "$SLURM_JOB_ID"
+
+}
+
+@test "find_remaining_time_in_allocation of good job gives 600 sec (mock)" {
+
+    SLURM_JOB_ID=34343434 # good, according to the mock
+    WS="$TEST_PLAYGROUND/cews_something"
+    mkdir "$WS"
+    echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
+
+
+    run find_remaining_time_in_allocation "$WS"
+    assert_output 600
+
+}
+
+@test "find_remaining_time_in_allocation of completing job gives 0 sec (mock)" {
+
+    SLURM_JOB_ID=45454545 # completing, according to the mock
+    WS="$TEST_PLAYGROUND/cews_something"
+    mkdir "$WS"
+    echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
+
+    run find_remaining_time_in_allocation "$WS"
+    assert_output 0
+
+}
+
+@test "find_remaining_time_in_allocation of bad job gives 0 sec (mock)" {
+
+    SLURM_JOB_ID=11111111111 # not among mock's options
+    WS="$TEST_PLAYGROUND/cews_something"
+    mkdir "$WS"
+    echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
+
+    run find_remaining_time_in_allocation "$WS"
+    assert_output 0
 
 }

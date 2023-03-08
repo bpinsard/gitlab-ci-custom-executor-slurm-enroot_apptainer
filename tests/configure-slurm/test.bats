@@ -29,6 +29,7 @@ function setup() {
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    export CUSTOM_ENV_CI_JOB_ID=54321
 
     mkdir "$CUSTOM_ENV_CI_WS/cews_0"
     mkdir "$CUSTOM_ENV_CI_WS/cews_1"

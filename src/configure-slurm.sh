@@ -27,7 +27,9 @@ check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
 }
 
 
+SLURMENV_CANDIDATE="$CUSTOM_ENV_CI_WS/slurmenv_candidate_$CUSTOM_ENV_CI_JOB_ID"
 
+save_slurm_environment > "$SLURMENV_CANDIDATE"
 
 WORKSPACE="$(find_available_workspace_name "$CUSTOM_ENV_CI_WS"/cews_)"
 
@@ -39,8 +41,8 @@ JOB_ID=$(eval "$(get_sbatch_command \
 
 wait_for_job_to_be_ready "$JOB_ID"
 wait_until_file_exists "$WORKSPACE/.env" 90
-save_slurm_environment > "$WORKSPACE/slurmenv"
 
+mv "$SLURMENV_CANDIDATE" "$WORKSPACE/slurmenv"
  
 cat <<EOF
 {
@@ -54,5 +56,3 @@ cat <<EOF
   }
 }
 EOF
-
-
