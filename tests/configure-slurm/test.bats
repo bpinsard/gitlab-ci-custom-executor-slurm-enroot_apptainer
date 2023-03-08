@@ -146,14 +146,6 @@ function teardown() {
 
 }
 
-@test "when 'COMMAND_OPTIONS_SBATCH' is not defined, use --partition=dev_cpuonly -n 1 -t 30" {
-
-
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
-    assert_file_contains "$MOCKLOGDIR"/sbatch.log '\-\-partition=dev_cpuonly -n 1 -t 30'
-
-}
-
 @test "script outputs valid json" {
 
     function _helper() {

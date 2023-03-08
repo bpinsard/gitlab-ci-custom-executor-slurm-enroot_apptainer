@@ -2,6 +2,9 @@
 #SBATCH --output /home/hk-project-scs/%u/cetest%J.out  
 #SBATCH --error /home/hk-project-scs/%u/cetest%J.err  
 #SBATCH --job-name GitLabCustomExec
+#SBATCH --partition dev_cpuonly
+#SBATCH --ntasks 1
+#SBATCH --time 30
 
 
 if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
