@@ -90,3 +90,23 @@ function teardown() {
         assert_failure
     done
 }
+
+@test "find_available_workspace_name gives cews_N with N>=0 the smallest so that cews_N does not exist" {
+
+    mkdir "$TEST_PLAYGROUND/cews_0"
+    mkdir "$TEST_PLAYGROUND/cews_1"
+    touch "$TEST_PLAYGROUND/cews_2"
+    run find_available_workspace_name "$TEST_PLAYGROUND/cews_"
+    assert_output "$TEST_PLAYGROUND/cews_3"
+
+}
+
+@test "find_available_workspace_name errors if stem does not exist" {
+
+
+    run find_available_workspace_name "$TEST_PLAYGROUND/something/cews_"
+
+    assert_failure
+    assert_output "Not an existing directory: $TEST_PLAYGROUND/something"
+
+}

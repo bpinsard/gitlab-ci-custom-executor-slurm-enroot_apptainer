@@ -69,7 +69,7 @@ function check_or_set_custom_env_command_sbatch(){
         echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
         echo "         See header of job.slurm:" >&2
         grep '#SBATCH' "$SRC/job.slurm" >&2
-        export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -n 1 -t 30"
+        export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH=""
     fi
     set -o nounset
 }
@@ -138,4 +138,31 @@ function wait_for_job_to_be_ready(){
     do
         sleep 3
     done
+}
+function find_available_workspace_name(){
+
+    ROOT="$1"
+    ROOTDIR="$(dirname "$ROOT")"
+    if [[ ! -d "$ROOTDIR" ]]
+    then
+        echo "Not an existing directory: $ROOTDIR"
+        return 22
+    fi
+
+    N=0;
+    while true
+    do
+       CANDIDATE="$ROOT$N"
+       if [[ -d "$CANDIDATE" ]] || [[ -f "$CANDIDATE" ]]
+       then
+           N=$((N+1))
+       else
+           break
+       fi
+    done
+    echo "$CANDIDATE"
+
+
+
+
 }

@@ -6,8 +6,6 @@
 # ssh <horeka-host> bash < this-script.sh
 
 
-# These
-
 function get_line_from_content() {
     CONTENT=$1
     man sbatch | grep -n "$CONTENT" | cut -d: -f1

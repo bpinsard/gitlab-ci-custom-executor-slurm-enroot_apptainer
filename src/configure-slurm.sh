@@ -26,7 +26,11 @@ check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
   exit "$SYSTEM_FAILURE_EXIT_CODE"
 }
 
-WORKSPACE="$CUSTOM_ENV_CI_WS"/cews_"$CUSTOM_ENV_CI_JOB_ID"
+
+
+
+WORKSPACE="$(find_available_workspace_name "$CUSTOM_ENV_CI_WS"/cews_)"
+
 
 JOB_ID=$(eval "$(get_sbatch_command \
                  "$WORKSPACE" \
