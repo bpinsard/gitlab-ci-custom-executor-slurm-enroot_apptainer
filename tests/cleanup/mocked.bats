@@ -61,7 +61,7 @@ function teardown_file(){
 }
 
 @test "cleanup calls scancel with the right job id" {
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 90
     echo "env file produced, calling cleanup"
     "$SRC/cleanup-slurm.sh" enroot
     echo "cleanup called."
@@ -71,7 +71,7 @@ function teardown_file(){
 }
 
 @test "cleanup calls scancel --batch --signal=SIGUSR1 and -f" {
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 90
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 90
 
     "$SRC/cleanup-slurm.sh" enroot
 
@@ -87,6 +87,7 @@ function teardown_file(){
 
     "$SRC/cleanup-slurm.sh"  enroot &
     wait_until_file_exists "$MOCKLOGDIR/scancel.log" 10
+    cat "$MOCKLOGDIR/scancel.log"
     refute  grep -q "ARGS: $CE_SLURM_JOB_ID" "$MOCKLOGDIR/scancel.log"
     # Additional 3 seconds for safety
     sleep 5 3
@@ -97,9 +98,9 @@ function teardown_file(){
 
 @test "cleanup removes the custom executor queue workspace" {
 
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 10
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_WORKSPACE/.env"
 
     "$SRC/cleanup-slurm.sh" enroot
 
@@ -109,12 +110,12 @@ function teardown_file(){
 
 @test "cleanup copies the CE queue workspace to ~/ce-debug/cews_.../ if CUSTOM_ENV_CE_DEBUG is set" {
 
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 15
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 15
     # This test requires that the container is set up
     "$SRC/prepare.sh" enroot
 
     # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_WORKSPACE/.env"
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=1
@@ -131,9 +132,9 @@ function teardown_file(){
 @test "cleanup should complain if the wrong backend is passed as an argument" {
 
     export SYSTEM_FAILURE_EXIT_CODE=102
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 10
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_WORKSPACE/.env"
 
     run "$SRC/cleanup-slurm.sh" nonexisting-backend
     assert_failure

@@ -6,7 +6,7 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 source "$SRC"/include.sh
 
 
-function terminate_slurm_allocation(){
+function terminate_slurm_allocation () {
     local SLURM_JOB_ID="$1"
     # "soft" cleanup
     scancel --batch --signal=SIGUSR1 -f "$SLURM_JOB_ID"

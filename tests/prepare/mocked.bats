@@ -29,19 +29,19 @@ function setup() {
     (
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC"/custom_executor_queue.sh
-    start_custom_executor_queue "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID" 3> /dev/null
+    start_custom_executor_queue "$CUSTOM_ENV_CI_WS/cews_0" 3> /dev/null
     )
-    export CE_QUEUE_ENV_PATH="$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
+    export CE_QUEUE_WORKSPACE="$CUSTOM_ENV_CI_WS/cews_0"/.env
 
 
     echo "Test setup phase completed."
 }
 
 function teardown() {
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 30
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 30
 
     # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_WORKSPACE/.env"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
@@ -71,7 +71,7 @@ function teardown() {
     prepare.sh singularity
 
     # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_WORKSPACE/.env"
 
 
     # shellcheck disable=SC2031

@@ -34,7 +34,7 @@ EOF
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC/custom_executor_queue.sh"
     # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_WORKSPACE/.env"
 
     submit_to_custom_executor_queue_and_wait "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
 fi

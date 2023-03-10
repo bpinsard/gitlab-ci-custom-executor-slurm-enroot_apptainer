@@ -38,8 +38,7 @@ function teardown(){
     "version": "v0.0.1"
   },
 "job_env": {
-    "CE_SLURM_JOB_ID": "1234723",
-    "CE_QUEUE_ENV_PATH" : "/some/path/.env"
+    "CE_QUEUE_WORKSPACE" : "/some/path"
   }
 }
 
@@ -47,7 +46,6 @@ EOF
 
     run read-job-env.py < json-output
 
-    assert_line 'export CE_SLURM_JOB_ID=1234723'
-    assert_line 'export CE_QUEUE_ENV_PATH=/some/path/.env'
+    assert_line 'export CE_QUEUE_WORKSPACE=/some/path'
 
 }

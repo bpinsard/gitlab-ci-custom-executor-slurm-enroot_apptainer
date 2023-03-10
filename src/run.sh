@@ -11,9 +11,9 @@ CONTAINERISATION_BACKEND="${1}"
 ORIGINAL_SCRIPT="${2}"
 STEPNAME="${3}"
 
-if [[ -z "$CE_QUEUE_ENV_PATH" ]]
+if [[ -z "$CE_QUEUE_WORKSPACE" ]]
 then
-    echo "CE_QUEUE_ENV_PATH not defined." >&2
+    echo "CE_QUEUE_WORKSPACE not defined." >&2
     exit "$SYSTEM_FAILURE_EXIT_CODE"
 fi
 
@@ -79,7 +79,7 @@ fi
 # shellcheck source=./src/custom_executor_queue.sh
 source "$SRC/custom_executor_queue.sh"
 # shellcheck disable=SC1090
-source "$CE_QUEUE_ENV_PATH"
+source "$CE_QUEUE_WORKSPACE/.env"
 
 WRAPPED="$("$F" "$SCRIPT")"
 submit_to_custom_executor_queue_and_wait "$WRAPPED" "JOB_$CUSTOM_ENV_CI_JOB_ID"

@@ -58,11 +58,11 @@ function teardown_file(){
 
 @test "cleanup removes enroot container" {
 
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 10
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     # This test requires that enroot is invoked
     "$SRC/prepare-enroot.sh"
     # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_WORKSPACE/.env"
 
     "$SRC/cleanup-slurm.sh" enroot
 
@@ -79,12 +79,12 @@ function teardown_file(){
 @test "cleanup does not call enroot at all when image not needed" {
 
 
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 10
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     (
         export CUSTOM_ENV_CI_JOB_IMAGE=""
         # shellcheck disable=SC1090
-        source "$CE_QUEUE_ENV_PATH"
+        source "$CE_QUEUE_WORKSPACE/.env"
         "$SRC/cleanup-slurm.sh" enroot
         assert_not_exists "$MOCKLOGDIR/enroot.log"
     )
@@ -92,7 +92,7 @@ function teardown_file(){
 
 @test "enroot container should not be removed if CUSTOM_ENV_CE_DEBUG is set" {
 
-    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 10
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     # We need this preparation step for container stuff
     "$SRC/prepare-enroot.sh"
@@ -103,7 +103,7 @@ function teardown_file(){
     export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-enroot"
 
     # shellcheck disable=SC1090
-    source "$CE_QUEUE_ENV_PATH"
+    source "$CE_QUEUE_WORKSPACE/.env"
     "$SRC/cleanup-slurm.sh" enroot
 
     run cat "$MOCKLOGDIR/enroot.log"

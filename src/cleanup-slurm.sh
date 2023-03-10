@@ -33,7 +33,7 @@ then
 fi
 
 # shellcheck disable=SC1090
-source "$CE_QUEUE_ENV_PATH"
+source "$CE_QUEUE_WORKSPACE/.env"
 
 
 # End lifetime of the CE queue workspace

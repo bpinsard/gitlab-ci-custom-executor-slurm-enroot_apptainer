@@ -51,8 +51,7 @@ cat <<EOF
     "version": "v0.0.1"
   },
 "job_env": {
-    "CE_SLURM_JOB_ID": "$JOB_ID",
-    "CE_QUEUE_ENV_PATH" : "$WORKSPACE/.env"
+    "CE_QUEUE_WORKSPACE" : "$WORKSPACE"
   }
 }
 EOF

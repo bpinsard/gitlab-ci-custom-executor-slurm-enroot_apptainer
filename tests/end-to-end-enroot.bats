@@ -58,7 +58,7 @@ function teardown() {
     run _helper
     assert_success
 
-    assert_file_exists "$CE_QUEUE_ENV_PATH"
+    assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
 
     "$SRC"/prepare.sh enroot
@@ -87,7 +87,7 @@ function teardown() {
     assert_success
 
 
-    assert_file_exists "$CE_QUEUE_ENV_PATH"
+    assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
     echo -n "# Preparing job... " >&3
     run "$SRC"/prepare.sh enroot

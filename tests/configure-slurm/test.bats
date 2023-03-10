@@ -198,7 +198,7 @@ function teardown() {
 
 }
 
-@test "script output has job_env.CE_SLURM_JOB_ID which contains the JOB ID of the allocation" {
+@test "script output has job_env.CE_QUEUE_WORKSPACE (where the .env created by start_custom_executor_queue lives)" {
 
     function _helper() {
 
@@ -206,25 +206,7 @@ cat <<EOF > scr.py
 import json
 import sys
 dump = json.load(sys.stdin)
-int(dump["job_env"]["CE_SLURM_JOB_ID"])
-EOF
-    "$SRC"/configure-slurm.sh 3> /dev/null | python3 scr.py
-    }
-
-    run _helper
-    assert_success
-
-}
-
-@test "script output has job_env.CE_QUEUE_ENV_PATH (where the .env created by start_custom_executor_queue lives)" {
-
-    function _helper() {
-
-cat <<EOF > scr.py
-import json
-import sys
-dump = json.load(sys.stdin)
-print(dump["job_env"]["CE_QUEUE_ENV_PATH"])
+print(dump["job_env"]["CE_QUEUE_WORKSPACE"])
 EOF
     "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null | python3 scr.py
     }
@@ -232,7 +214,7 @@ EOF
     run _helper
     assert_success
 
-    assert_output "$CEQ_ENV"
+    assert_output "$CUSTOM_ENV_CI_WS/cews_3"
     wait_until_file_exists "$CEQ_ENV" 20
     assert_file_exists "$CEQ_ENV"
 
