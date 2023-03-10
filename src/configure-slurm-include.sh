@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
+source "$SRC/include.sh"
+
 function export_custom_env_var_into_var_if_defined() {
     # If a variable called `CUSTOM_ENV_$VAR` is defined
     # in che current environment,
@@ -177,22 +180,12 @@ function find_available_workspace_name(){
 
 }
 
-function get_slurm_jobid(){
-    (
-    local WORKSPACE="$1"
-    source "$WORKSPACE/.env"
-    echo "$CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID"
-    )
-}
-
-
 function find_remaining_time_in_allocation(){
 
     local WORKSPACE="$1"
 
+    local JOBID
     JOBID="$(get_slurm_jobid "$WORKSPACE")"
-    export JOBID
-
 
     read -r STATE END_TIME < <(squeue -j "$JOBID"  --Format=State,EndTime 2> /dev/null| tail -n 1)
 
@@ -206,3 +199,4 @@ function find_remaining_time_in_allocation(){
     fi
 
 }
+

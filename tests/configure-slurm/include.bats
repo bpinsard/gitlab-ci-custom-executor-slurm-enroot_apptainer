@@ -153,12 +153,38 @@ function teardown() {
 
 @test "find_remaining_time_in_allocation of bad job gives 0 sec (mock)" {
 
-    SLURM_JOB_ID=11111111111 # not among mock's options
+    SLURM_JOB_ID=11111111111 # not among mock's options, invalid job or already terminated
     WS="$TEST_PLAYGROUND/cews_something"
     mkdir "$WS"
     echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
 
     run find_remaining_time_in_allocation "$WS"
     assert_output 0
+
+}
+
+@test "allocation_is_alive succeeds for a job that is running" {
+
+    SLURM_JOB_ID=34343434 # good, according to the mock
+    WS="$TEST_PLAYGROUND/cews_something"
+    mkdir "$WS"
+    echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
+
+
+    run allocation_is_alive "$WS"
+    assert_success
+
+}
+
+@test "allocation_is_alive fails for a job that is not running" {
+
+    SLURM_JOB_ID=11111111111 # not among mock's options, invalid job or already terminated
+    WS="$TEST_PLAYGROUND/cews_something"
+    mkdir "$WS"
+    echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
+
+
+    run allocation_is_alive "$WS"
+    assert_failure
 
 }

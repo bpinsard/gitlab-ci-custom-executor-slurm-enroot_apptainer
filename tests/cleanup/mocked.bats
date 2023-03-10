@@ -127,3 +127,16 @@ function teardown_file(){
 
 
 }
+
+@test "cleanup should complain if the wrong backend is passed as an argument" {
+
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    wait_until_file_exists "$CE_QUEUE_ENV_PATH" 10
+    # shellcheck disable=SC1090
+    source "$CE_QUEUE_ENV_PATH"
+
+    run "$SRC/cleanup-slurm.sh" nonexisting-backend
+    assert_failure
+    assert_output "ERROR: Not a valid backend: nonexisting-backend"
+
+}

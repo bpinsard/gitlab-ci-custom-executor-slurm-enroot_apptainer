@@ -2,12 +2,14 @@
 
 CONTAINERISATION_BACKEND="${1}"
 
-# "soft" cleanup
-scancel --batch --signal=SIGUSR1 -f "$CE_SLURM_JOB_ID"
-sleep 5
-# "hard" cleanup - in case SIGUSR1 did not work
-scancel "$CE_SLURM_JOB_ID"
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
+# shellcheck source=src/cleanup-slurm-include.sh
+source "$SRC"/cleanup-slurm-include.sh
+
+
+# TODO: This should not happen anymore
+terminate_slurm_allocation "$CE_SLURM_JOB_ID"
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
@@ -24,6 +26,8 @@ then
             source "$SRC/singularity-cleanup.sh"
             ;;
         *)
+            echo "ERROR: Not a valid backend: $CONTAINERISATION_BACKEND"
+            exit "$SYSTEM_FAILURE_EXIT_CODE"
             ;;
     esac
 fi
@@ -40,6 +44,7 @@ then
 else
     DEBUG="YES"
 fi
+
 if [[ -z "$CUSTOM_ENV_CE_DEBUG_DIR" ]]
 then
    CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug"
@@ -49,6 +54,8 @@ set -o nounset
 if [[ "$DEBUG" == "YES" ]]
 then
    mkdir -p "$CUSTOM_ENV_CE_DEBUG_DIR"
+   # TODO: Change this, this move cannot happen now at the end of the job,
+   #       it must happen at the end of the pipeline
    mv  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE" "$CUSTOM_ENV_CE_DEBUG_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"
 else
    rm -r "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
