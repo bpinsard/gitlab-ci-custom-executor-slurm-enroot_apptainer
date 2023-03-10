@@ -26,6 +26,43 @@ teardown(){
     _common_teardown
 }
 
+@test "submit_to_custom_executor_queue takes job tag as second arg" {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > job.sh
+    echo "Hello"
+EOF
+    chmod +x job.sh
+
+    run submit_to_custom_executor_queue job.sh JOB-54321
+    assert_success
+
+}
+
+@test "submit_to_custom_executor_queue records job name in file called WORKSPACE/TAG" {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > job-abc.sh
+    echo "Hello"
+EOF
+    chmod +x job-abc.sh
+
+    run submit_to_custom_executor_queue job.sh JOB-54321
+
+    assert_exists "$WORKDIR/JOB-54321"
+    assert_file_contains "$WORKDIR/JOB-54321" "job.sh"
+
+
+}
+
+
+
+
+
 @test "submitted jobs to custom executor queue get executed" {
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -35,7 +72,7 @@ touch "$TEST_PLAYGROUND"/test-job-results.txt
 EOF
     chmod +x job.sh
 
-    submit_to_custom_executor_queue job.sh
+    submit_to_custom_executor_queue job.sh JOB-5432
     rm job.sh
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1 1
     local RESULT
@@ -55,7 +92,7 @@ echo "A new line" >> $TEST_PLAYGROUND/test-job-results.txt
 EOF
     chmod +x job.sh
 
-    submit_to_custom_executor_queue job.sh
+    submit_to_custom_executor_queue job.sh JOB-5432
     rm job.sh
     # We wait 2 cycle times
     sleep $((2*CUSTOM_EXECUTOR_QUEUE_CYCLETIME))
@@ -74,7 +111,7 @@ EOF
 
     touch job-123.sh
     chmod +x job-123.sh
-    submit_to_custom_executor_queue job-123.sh
+    submit_to_custom_executor_queue job-123.sh JOB-5432
     rm job-123.sh
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
 
@@ -93,7 +130,7 @@ EOF
     touch job-123.sh
     chmod +x job-123.sh
 
-    submit_to_custom_executor_queue job-123.sh
+    submit_to_custom_executor_queue job-123.sh JOB-5432
     rm job-123.sh
 
     wait_until_file_contains "$LOGFILE" "Submitted.*job-123.sh" 30
@@ -110,7 +147,7 @@ EOF
     touch job-123.sh
     chmod +x job-123.sh
 
-    submit_to_custom_executor_queue job-123.sh
+    submit_to_custom_executor_queue job-123.sh JOB-5432
     rm job-123.sh
 
     wait_until_file_exists "$LOGFILE" $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
@@ -133,7 +170,7 @@ EOF
     chmod +x job-1.sh
     sleep 1
     # We should miss the first iteration
-    submit_to_custom_executor_queue job-1.sh
+    submit_to_custom_executor_queue job-1.sh JOB-5432
     rm job-1.sh
     sleep 1
 
@@ -163,7 +200,7 @@ EOF
 
     chmod +x job-1.sh
 
-    submit_to_custom_executor_queue job-1.sh
+    submit_to_custom_executor_queue job-1.sh JOB-5432
     rm job-1.sh
     local OUT="$WORKDIR"/OUTPUT/job-1.sh.out
     wait_until_file_exists "$OUT" 10
@@ -189,7 +226,7 @@ EOF
 
     chmod +x job-1.sh
 
-    submit_to_custom_executor_queue job-1.sh
+    submit_to_custom_executor_queue job-1.sh JOB-5432
     rm job-1.sh
     wait_until_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode 30
     assert_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode
@@ -217,7 +254,7 @@ EOF
 
     chmod +x job-1.sh
 
-    submit_to_custom_executor_queue job-1.sh
+    submit_to_custom_executor_queue job-1.sh JOB-5432
     rm job-1.sh
     sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME+1))
 
@@ -273,7 +310,10 @@ EOF
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
-    assert_equal 0 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
+
+
+    # shellcheck disable=SC2012
+    assert_equal 0 "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )"
 
     cat <<EOF > job.sh
 # So that it will take long enough
@@ -283,14 +323,14 @@ do
 done
 EOF
     chmod +x job.sh
-    submit_to_custom_executor_queue job.sh
+    submit_to_custom_executor_queue job.sh JOB-5432
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
 
     cat <<EOF > job.sh
 # I am an unfortunate job.
 touch "$WORKDIR/result.out"
 EOF
-    submit_to_custom_executor_queue job.sh || exit
+    submit_to_custom_executor_queue job.sh JOB-5432 || exit
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
     # job.sh MUST NOT have executed
     assert_file_not_exists "$WORKDIR/result.out"
@@ -304,22 +344,29 @@ EOF
 }
 
 # bats test_tags=failing
-@test "custom executor queue saves the pids of the jobs in a file" {
+@test "custom executor queue saves the pid of the each job in a separate file" {
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
-    assert_equal 0 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
+    # shellcheck disable=SC2012
+    assert_equal 0 "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )"
 
-    touch job1.sh
+    cat <<EOF > job1.sh
+    sleep 5
+EOF
     chmod +x job1.sh
-    submit_to_custom_executor_queue job1.sh
+    submit_to_custom_executor_queue job1.sh JOB-5432
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
-    assert_equal 1 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
+    # shellcheck disable=SC2012
+    assert_equal 1 "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )"
 
-    submit_to_custom_executor_queue job1.sh
+    cp job1.sh job2.sh
+    submit_to_custom_executor_queue job2.sh JOB-5432
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
-    assert_equal 2 "$( wc -l < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS" )"
+
+    # shellcheck disable=SC2012
+    assert_equal 2 "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )"
 
 }
 
@@ -340,7 +387,7 @@ EOF
 
     chmod +x job-1.sh
 
-    submit_to_custom_executor_queue job-1.sh
+    submit_to_custom_executor_queue job-1.sh JOB-5432
     rm job-1.sh
     sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME+1))
 
@@ -352,14 +399,16 @@ EOF
     done
 
     # killing subprocesses might take a while
-    while read -r CHILD_PID
+    shopt -s nullglob
+    for PIDFILE in "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS/*
     do
+        read -r CHILD_PID < "$PIDFILE"
         while ps --pid "$CHILD_PID" > /dev/null
         do
             echo "waiting for $CHILD_PID to end."
             sleep 1
         done
-    done < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
+    done
 
     assert_file_contains "$LOGFILE" "job-1.sh was terminated."
 
@@ -381,14 +430,14 @@ EOF
     chmod +x job1.sh
     while [ ! -f "$WORKDIR"/TODO/job1.sh ]
     do
-        submit_to_custom_executor_queue job1.sh
+        submit_to_custom_executor_queue job1.sh JOB-5432
     done
 
     if [ ! -f "$WORKDIR"/TODO/job1.sh ]
     then
         skip # We are very unlucky
     fi
-    run submit_to_custom_executor_queue job1.sh
+    run submit_to_custom_executor_queue job1.sh JOB-5432
     assert_equal "$status" 22
 
 
@@ -404,7 +453,7 @@ sleep 5
 touch $WORKDIR/output
 EOF
     chmod +x job1.sh
-    run submit_to_custom_executor_queue_and_wait job1.sh
+    run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
     assert_success
 
     assert_exists "$WORKDIR/output"
@@ -421,7 +470,7 @@ EOF
 echo this is the output
 EOF
     chmod +x job1.sh
-    run submit_to_custom_executor_queue_and_wait job1.sh
+    run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
     assert_output "this is the output"
 
 }
@@ -435,7 +484,7 @@ EOF
 exit 104
 EOF
     chmod +x job1.sh
-    run submit_to_custom_executor_queue_and_wait job1.sh
+    run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
     assert_equal "$status" 104
 
 
@@ -454,7 +503,7 @@ EOF
     chmod +x somewhere/job.sh
 
     cd somewhere
-    run submit_to_custom_executor_queue_and_wait job.sh
+    run submit_to_custom_executor_queue_and_wait job.sh JOB-5432
     assert_exists a-file-here
 
 
@@ -473,9 +522,10 @@ exit 1
 EOF
     chmod +x job.sh
 
-    run submit_to_custom_executor_queue job.sh
+    run submit_to_custom_executor_queue job.sh JOB-5432
     assert_failure
 
     assert_output "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
 
 }
+

@@ -82,4 +82,4 @@ source "$SRC/custom_executor_queue.sh"
 source "$CE_QUEUE_ENV_PATH"
 
 WRAPPED="$("$F" "$SCRIPT")"
-submit_to_custom_executor_queue_and_wait "$WRAPPED"
+submit_to_custom_executor_queue_and_wait "$WRAPPED" "JOB_$CUSTOM_ENV_CI_JOB_ID"

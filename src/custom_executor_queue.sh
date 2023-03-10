@@ -25,9 +25,7 @@ function start_custom_executor_queue () {
 
     _create_directories
     CUSTOM_EXECUTOR_QUEUE_LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
-    CUSTOM_EXECUTOR_QUEUE_JOBPIDS="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/pids.txt
     touch "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
-    touch "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
     CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/last_activity
 
     _custom_executor_queue > /dev/null &
@@ -103,6 +101,14 @@ function _envfname(){
     echo "$ENVS/$BNAME.env"
 }
 
+function _pidfname(){
+    JOB=$1
+    local PIDS="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/PIDS
+    local BNAME
+    BNAME="$(basename "$JOB")"
+    echo "$PIDS/$BNAME"
+}
+
 
 function submit_to_custom_executor_queue() {
 
@@ -111,10 +117,12 @@ function submit_to_custom_executor_queue() {
         echo "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
         return 1
     fi
-    local JOBSCRIPT=$1
+    local JOBSCRIPT="$1"
+    local JOBTAG="$2"
+
     local BNAME
     BNAME="$(basename "$JOBSCRIPT")"
-    if [ -f  "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/TODO/$BNAME" ]
+    if [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/TODO/$BNAME" ]
     then
         return 22
     fi
@@ -122,6 +130,7 @@ function submit_to_custom_executor_queue() {
     local TODONAME
     TODONAME="$(_todoname "$JOBSCRIPT")"
     cp "$JOBSCRIPT" "$TODONAME"
+    echo "$BNAME" > "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/$JOBTAG"
 
     local LOCATIONFNAME
     LOCATIONFNAME="$(_locationfname "$JOBSCRIPT")"
@@ -130,7 +139,7 @@ function submit_to_custom_executor_queue() {
     local ENVFNAME
     ENVFNAME="$(_envfname "$JOBSCRIPT")"
     touch "$ENVFNAME"
-    if [[ "$#" -eq 2 ]] && [[ "$2" == "--with-env" ]]
+    if [[ "$#" -eq 3 ]] && [[ "$3" == "--with-env" ]]
     then
         declare -p > "$ENVFNAME"
     fi
@@ -193,8 +202,11 @@ function list_all_child_pids() {
 
 function stop_all () {
     _log "Stopping custom executor queue..."
-    while read -r CHILD_PID
+
+    shopt -s nullglob
+    for PIDFILE in "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS/*
     do
+        read -r CHILD_PID < "$PIDFILE"
         if ps --pid "$CHILD_PID" > /dev/null
         then
             _log "Sending SIGTERM to process $CHILD_PID"
@@ -202,7 +214,7 @@ function stop_all () {
         else
             _log "Process $CHILD_PID has already completed."
         fi
-    done < "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
+    done
     _log "Sent kill signal to all the jobs"
 }
 
@@ -246,6 +258,8 @@ function _custom_executor_queue () {
                 OUTPUTNAME="$(_outputname "$JOB")"
                 EXITVALUEFNAME="$(_exitvaluefname "$JOB")"
                 (
+                 PIDFILE=$(_pidfname "$JOB")
+                 echo "$BASHPID" > "$PIDFILE"
                  # shellcheck disable=SC2064
                  set +o pipefail
                  set +o errexit
@@ -263,6 +277,7 @@ function _custom_executor_queue () {
                  set -o pipefail
                  trap 'kill '"$RUNNINGPID"'; \
                        _log "'"$BNAME"' was terminated."; \
+                       rm '"$PIDFILE"'; \
                        exit 0' SIGTERM
                  wait $RUNNINGPID
                  DONENAME="$(_donename "$JOB")"
@@ -271,7 +286,6 @@ function _custom_executor_queue () {
                 ) &
                 SUBMITTEDPID=$!
                 _log "$BNAME (PID=$SUBMITTEDPID) launched."
-                echo "$SUBMITTEDPID" >> "$CUSTOM_EXECUTOR_QUEUE_JOBPIDS"
             else
                 _log "Waiting on $JOB, $BNAME still in progess..."
             fi
@@ -301,7 +315,7 @@ function _custom_executor_queue () {
 }
 
 function _create_directories(){
-    for SUBDIR in TODO WORKING DONE OUTPUT ORIGINAL_LOCATIONS ENVS
+    for SUBDIR in TODO WORKING DONE OUTPUT ORIGINAL_LOCATIONS ENVS PIDS
     do
         mkdir -p "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/$SUBDIR
     done

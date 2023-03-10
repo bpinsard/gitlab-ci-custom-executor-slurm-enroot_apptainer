@@ -36,7 +36,7 @@ EOF
     export CUSTOM_ENV_CI_WS
     mkdir -p "$CUSTOM_ENV_CI_WS" # This should not be needed
 
-    CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/.env
+    CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env
 
 }
 
@@ -114,7 +114,7 @@ EOF
     chmod +x job.sh
 
 
-    submit_to_custom_executor_queue job.sh
+    submit_to_custom_executor_queue job.sh JOB-"$CUSTOM_ENV_CI_JOB_ID"
 
 
     # DEBUG: This check is flaky.

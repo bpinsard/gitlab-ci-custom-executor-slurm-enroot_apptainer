@@ -16,6 +16,7 @@ then
         *)
             ;;
     esac
+    WRAP="./wrap-prepare-$CUSTOM_ENV_CI_JOB_ID.sh"
 
     # We cannot submit the scripts as they are
     # because the custom executor queue logic
@@ -24,16 +25,16 @@ then
     # when they are executed
     # and they will not be able to find
     # the other scripts in the repository.
-    cat <<EOF > ./wrap.sh
+    cat <<EOF > "$WRAP"
 #!/bin/bash
 "$SCRIPT"
 EOF
-    chmod +x ./wrap.sh
+    chmod +x "$WRAP"
 
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC/custom_executor_queue.sh"
     # shellcheck disable=SC1090
     source "$CE_QUEUE_ENV_PATH"
 
-    submit_to_custom_executor_queue_and_wait ./wrap.sh # --with-env # DEBUG
+    submit_to_custom_executor_queue_and_wait "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
 fi

@@ -75,7 +75,7 @@ function teardown() {
 
 
     # shellcheck disable=SC2031
-    DONEFILE="$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/DONE/wrap.sh-*)"
+    DONEFILE="$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/DONE/wrap-prepare-*)"
     assert_exists "$DONEFILE"
 
 

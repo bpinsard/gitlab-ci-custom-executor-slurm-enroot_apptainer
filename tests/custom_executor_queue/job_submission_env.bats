@@ -25,6 +25,7 @@ teardown(){
     stop_custom_executor_queue
     _common_teardown
 }
+
 @test "env vars not exported to job env when not using --with-env" {
 
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
@@ -40,7 +41,7 @@ EOF
     (
     # shellcheck disable=SC2030
     export MY_VARIABLE="some-thing"
-    run submit_to_custom_executor_queue_and_wait job.sh
+    run submit_to_custom_executor_queue_and_wait job.sh JOB-54321
     assert_output ""
     )
 
@@ -63,7 +64,7 @@ EOF
     (
     # shellcheck disable=SC2031
     export MY_VARIABLE="some-thing"
-    run submit_to_custom_executor_queue_and_wait job.sh --with-env
+    run submit_to_custom_executor_queue_and_wait job.sh JOB-54321 --with-env
     assert_output "some-thing"
     )
 
@@ -85,7 +86,7 @@ EOF
     (
 
     export SLURM_SOMETHING="some-thing"
-    run submit_to_custom_executor_queue_and_wait job.sh
+    run submit_to_custom_executor_queue_and_wait job.sh JOB-54321
     assert_output ""
     )
 

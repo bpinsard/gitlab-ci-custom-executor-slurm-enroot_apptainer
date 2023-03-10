@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 setup(){
     load 'common_setup'
@@ -44,6 +44,7 @@ teardown(){
 
     TIME1=$(cat "$WORKDIR/last_activity")
 
+    # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
@@ -70,8 +71,9 @@ sleep 20
 EOF
 
     chmod +x ./job.sh
+    # shellcheck disable=SC1091
     source "$WORKDIR"/.env
-    submit_to_custom_executor_queue ./job.sh
+    submit_to_custom_executor_queue ./job.sh JOB-54321
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
@@ -89,6 +91,7 @@ EOF
     export IDLE_TIME_SEC=5
     (start_custom_executor_queue "$WORKDIR"  "$IDLE_TIME_SEC" 3> /dev/null)
 
+    # shellcheck disable=SC1091
     source "$WORKDIR"/.env
     assert custom_executor_queue_is_alive
 

@@ -4,6 +4,7 @@
 function get_slurm_jobid(){
     (
     local WORKSPACE="$1"
+    # shellcheck disable=SC1091
     source "$WORKSPACE/.env"
     echo "$CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID"
     )
