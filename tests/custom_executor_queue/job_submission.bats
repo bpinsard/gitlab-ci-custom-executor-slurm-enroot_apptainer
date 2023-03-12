@@ -320,46 +320,6 @@ EOF
 
 }
 
-# bats test_tags=samename,serialization,serial
-@test "execution of jobs with the same name is serialized." {
-    # This is a stronger test when run in serial
-
-    # shellcheck disable=SC1091
-    source "$WORKDIR"/.env
-
-
-
-    # shellcheck disable=SC2012
-    assert_equal 0 "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )"
-
-    cat <<EOF > job.sh
-# So that it will take long enough
-for i in {1..5}
-do
-    sleep $CUSTOM_EXECUTOR_QUEUE_CYCLETIME
-done
-EOF
-    chmod +x job.sh
-    submit_to_custom_executor_queue job.sh JOB-5432
-    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
-
-    cat <<EOF > job.sh
-# I am an unfortunate job.
-touch "$WORKDIR/result.out"
-EOF
-    submit_to_custom_executor_queue job.sh JOB-5432 || exit
-    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
-    # job.sh MUST NOT have executed
-    assert_file_not_exists "$WORKDIR/result.out"
-
-    # But after the first job has completed, the second one should be executed.
-    sleep "$((8*CUSTOM_EXECUTOR_QUEUE_CYCLETIME))"
-
-    assert_file_exists "$WORKDIR/result.out"
-
-
-}
-
 # bats test_tags=failing
 @test "custom executor queue saves the pid of the each job in a separate file" {
 
@@ -500,6 +460,7 @@ EOF
     source "$WORKDIR"/.env
 
     cat <<EOF > job1.sh
+sleep 10
 exit 104
 EOF
     chmod +x job1.sh

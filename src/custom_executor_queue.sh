@@ -274,22 +274,20 @@ function _custom_executor_queue () {
                  set +o pipefail
                  set +o errexit
                  set +o nounset
-                 (
-                  cd "$(cat "$LOCATIONFNAME")"
-                  # shellcheck disable=SC1090
-
-                  source <(purge_variables < "$ENVFNAME")
-                  "$WNAME" &> "$OUTPUTNAME"
-                  echo $? > "$EXITVALUEFNAME" ) &
+                 cd "$(cat "$LOCATIONFNAME")"
+                 # shellcheck disable=SC1090
+                 source <(purge_variables < "$ENVFNAME")
+                 "$WNAME" &> "$OUTPUTNAME" &
                  RUNNINGPID=$!
-                 set -o nounset
-                 set -o errexit
-                 set -o pipefail
                  trap 'kill '"$RUNNINGPID"'; \
                        _log "'"$BNAME"' was terminated."; \
                        rm '"$PIDFILE"'; \
-                       exit 0' SIGTERM
-                 wait $RUNNINGPID
+                       exit 0' SIGTERM SIGUSR1
+                 wait "$RUNNINGPID"
+                 echo $? > "$EXITVALUEFNAME"
+                 set -o nounset
+                 set -o errexit
+                 set -o pipefail
                  DONENAME="$(_donename "$JOB")"
                  mv "$WNAME" "$DONENAME"
                  _log "$BNAME has ended."
@@ -379,3 +377,17 @@ function idle_time(){
 
 }
 
+function cancel_job_group() {
+    JOBTAG="$1"
+    local SUBJOBPID
+    #for BNAME in $(cat "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/$JOBTAG")
+    while read -r BNAME
+    do
+        if [ -f "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$BNAME" ]
+        then
+            read -r SUBJOBPID < "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$BNAME"
+            kill -s SIGTERM "$SUBJOBPID"
+        fi
+    done < "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/$JOBTAG"
+
+}
