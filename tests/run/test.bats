@@ -14,7 +14,6 @@ function setup() {
     SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/run-test-$BATS_TEST_NAME"
-    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     # outside CUSTOM_ENV_CI_WS
     TMP_PLAYGROUND=$(mktemp -d /tmp/run-testXXXXXXX)
@@ -40,7 +39,7 @@ function setup() {
 function teardown() {
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 30
 
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
@@ -121,7 +120,7 @@ STEPS_OUT_CONTAINER=(get_sources
 
     for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
     do
-    echo "# testing $STEP..." >&3
+    echo "# testing $STEP..."
 cat << EOF > script-"$STEP".sh
 
 touch script-output-"$STEP".txt
@@ -138,7 +137,7 @@ EOF
 
 @test "all steps run in the custom executor queue" {
 
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
     for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
@@ -162,7 +161,7 @@ EOF
 
 @test "run blocks until the script is executed" {
 
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
     STEP="${STEPS_IN_CONTAINER[0]}"
@@ -179,7 +178,7 @@ EOF
 
 
 @test "if two submitted scripts have the same name, run will wait till the end of the second" {
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
        cat << EOF > script.sh
@@ -201,7 +200,7 @@ EOF
 }
 
 @test "run outputs what the script outputs." {
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
     for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
     do
@@ -222,7 +221,7 @@ EOF
 @test "run exits with the same code as the script." {
     # shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
     for STEP in "${STEPS_IN_CONTAINER[0]}" "${STEPS_OUT_CONTAINER[0]}"
     do
@@ -233,7 +232,7 @@ exit 42
 EOF
     chmod +x ./script-"$STEP".sh
 
-    echo "Testing $STEP" >&3
+    echo "Testing $STEP"
     run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
     assert_equal "$status" 42
     done
@@ -242,7 +241,7 @@ EOF
 
 @test "run exits with \$SYSTEM_FAILURE_EXIT_CODE if an erroneus step name is given" {
 
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
@@ -384,7 +383,7 @@ EOF
 @test "run exit with error when slurm job has terminated, but script (in container) has not." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
-    # shellcheck disable=SC1090,SC2031
+    # shellcheck disable=SC1091,SC2031
     source "$CE_QUEUE_WORKSPACE/.env"
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC/custom_executor_queue.sh"
@@ -398,7 +397,7 @@ sleep 100
 EOF
     chmod +x ./script-"$STEP".sh
 
-    echo "Testing $STEP" >&3
+    echo "Testing $STEP"
 
     (
     sleep 5
@@ -420,7 +419,7 @@ EOF
 @test "run exit with error when slurm job has terminated, but script (not in container) has not." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
-    # shellcheck disable=SC1090,SC2031
+    # shellcheck disable=SC1091,SC2031
     source "$CE_QUEUE_WORKSPACE/.env"
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC/custom_executor_queue.sh"
@@ -434,7 +433,7 @@ sleep 100
 EOF
     chmod +x ./script-"$STEP".sh
 
-    echo "Testing $STEP" >&3
+    echo "Testing $STEP"
 
     (
     sleep 5
@@ -458,7 +457,7 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
-    # shellcheck disable=SC1090,SC2031
+    # shellcheck disable=SC1091,SC2031
     source "$CE_QUEUE_WORKSPACE/.env"
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC/custom_executor_queue.sh"
@@ -472,7 +471,7 @@ echo "this should not run anyway"
 EOF
     chmod +x ./script-"$STEP".sh
 
-    echo "Testing $STEP" >&3
+    echo "Testing $STEP"
 
     stop_custom_executor_queue
 

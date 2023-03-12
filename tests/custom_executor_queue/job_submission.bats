@@ -59,7 +59,20 @@ EOF
 
 }
 
+@test "submit_to_custom_executor_queue outputs new file basename (for tracking)" {
 
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > job-abc.sh
+    echo "Hello"
+EOF
+    chmod +x job-abc.sh
+
+    run submit_to_custom_executor_queue job-abc.sh JOB-54321
+    assert_output --regexp "job-abc.sh-1"
+
+}
 
 
 
@@ -147,13 +160,14 @@ EOF
     touch job-123.sh
     chmod +x job-123.sh
 
-    submit_to_custom_executor_queue job-123.sh JOB-5432
+    TODONAME="$(submit_to_custom_executor_queue job-123.sh JOB-5432)"
     rm job-123.sh
 
     wait_until_file_exists "$LOGFILE" $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
+    SUBJOBNAME="$(basename "$TODONAME")"
 
-    wait_until_file_contains "$LOGFILE" "job-123.sh has ended" 30
-    assert_file_contains "$LOGFILE" "job-123.sh has ended"
+    wait_until_file_contains "$LOGFILE" "$SUBJOBNAME has ended" 30
+    assert_file_contains "$LOGFILE" "$SUBJOBNAME has ended"
 
 }
 
@@ -188,7 +202,7 @@ EOF
 
 }
 
-@test "job stdout and stderr are both stored in \$WORKSPACE/OUTPUT/<jobfilename>.out" {
+@test "job stdout and stderr are both stored in \$WORKSPACE/OUTPUT/<jobfilename>-??.out" {
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -200,9 +214,10 @@ EOF
 
     chmod +x job-1.sh
 
-    submit_to_custom_executor_queue job-1.sh JOB-5432
+    TODONAME="$(submit_to_custom_executor_queue job-1.sh JOB-5432)"
     rm job-1.sh
-    local OUT="$WORKDIR"/OUTPUT/job-1.sh.out
+    SUBJOBNAME="$(basename "$TODONAME")"
+    local OUT="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$SUBJOBNAME".out
     wait_until_file_exists "$OUT" 10
     assert_file_exists "$OUT"
 
@@ -226,12 +241,14 @@ EOF
 
     chmod +x job-1.sh
 
-    submit_to_custom_executor_queue job-1.sh JOB-5432
+    TODONAME="$(submit_to_custom_executor_queue job-1.sh JOB-5432)"
     rm job-1.sh
-    wait_until_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode 30
-    assert_file_exists "$WORKDIR"/OUTPUT/job-1.sh.exitcode
+    SUBJOBNAME="$(basename "$TODONAME")"
+    local EXITCODE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/OUTPUT/$SUBJOBNAME".exitcode
+    wait_until_file_exists "$EXITCODE" 30
+    assert_file_exists "$EXITCODE"
 
-    assert_file_contains "$WORKDIR"/OUTPUT/job-1.sh.exitcode "42"
+    assert_file_contains "$EXITCODE" "42"
 
 }
 
@@ -387,7 +404,7 @@ EOF
 
     chmod +x job-1.sh
 
-    submit_to_custom_executor_queue job-1.sh JOB-5432
+    TODONAME="$(submit_to_custom_executor_queue job-1.sh JOB-5432)"
     rm job-1.sh
     sleep $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME+1))
 
@@ -409,13 +426,14 @@ EOF
             sleep 1
         done
     done
+    SUBJOBNAME="$(basename "$TODONAME")"
 
-    assert_file_contains "$LOGFILE" "job-1.sh was terminated."
+    assert_file_contains "$LOGFILE" "$SUBJOBNAME was terminated."
 
 }
 
 # bats test_tags=samename,serial
-@test "attempting to submit 2 jobs with the same name too fast causes error" {
+@test "attempting to submit 2 jobs with the same name too fast DOES NOT causes error" {
 # Using serial here because this test might fail
 # if there is too much congestion:
 # the first script might be snatched
@@ -428,17 +446,18 @@ EOF
 echo "A line of output"
 EOF
     chmod +x job1.sh
-    while [ ! -f "$WORKDIR"/TODO/job1.sh ]
+    SUBJOBNAME="job1.sh-1"
+    while [ ! -f "$WORKDIR"/TODO/"$SUBJOBNAME" ]
     do
-        submit_to_custom_executor_queue job1.sh JOB-5432
+        TODONAME="$(submit_to_custom_executor_queue job1.sh JOB-5432)"
     done
 
-    if [ ! -f "$WORKDIR"/TODO/job1.sh ]
+    if [ ! -f "$TODONAME" ]
     then
         skip # We are very unlucky
     fi
     run submit_to_custom_executor_queue job1.sh JOB-5432
-    assert_equal "$status" 22
+    assert_success
 
 
 }
@@ -509,7 +528,6 @@ EOF
 
 }
 
-# bats test_tags=thisone
 @test "submit_to_custom_executor_queue checks that the job is still running" {
 
     # shellcheck disable=SC1091
@@ -529,3 +547,23 @@ EOF
 
 }
 
+# bats test_tags=onlythis
+@test "when submitting a script, the content of the SCRID file is increased by one" {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    cat <<EOF > job.sh
+echo "This should not run at all!"
+exit 1
+EOF
+    chmod +x job.sh
+
+    ORIGINAL="$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")"
+
+    submit_to_custom_executor_queue job.sh JOB-5432
+
+    NEW="$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")"
+
+    assert_equal "$NEW" "$((ORIGINAL+1))"
+
+}

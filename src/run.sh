@@ -78,7 +78,7 @@ fi
 
 # shellcheck source=./src/custom_executor_queue.sh
 source "$SRC/custom_executor_queue.sh"
-# shellcheck disable=SC1090
+# shellcheck disable=SC1091
 source "$CE_QUEUE_WORKSPACE/.env"
 
 WRAPPED="$("$F" "$SCRIPT")"

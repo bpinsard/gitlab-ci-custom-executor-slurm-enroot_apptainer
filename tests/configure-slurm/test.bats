@@ -75,7 +75,6 @@ function teardown() {
 
 }
 
-# bats test_tags=onlythis
 @test "custom executor queue uses CUSTOM_ENV_CI_WS/cews_N as a workspace" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate

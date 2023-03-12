@@ -40,7 +40,7 @@ function setup() {
 function teardown() {
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 30
 
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
@@ -70,7 +70,7 @@ function teardown() {
 
     prepare.sh singularity
 
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
 

@@ -4,7 +4,6 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-
 function start_custom_executor_queue () {
     if [[ $# -gt 2 ]]
     then
@@ -17,7 +16,6 @@ function start_custom_executor_queue () {
     CUSTOM_EXECUTOR_QUEUE_WORKSPACE="$1"
     if [ "$#" -eq 2 ]
     then
-
         CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC="$2"
     else
         CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=300 # seconds
@@ -27,6 +25,8 @@ function start_custom_executor_queue () {
     CUSTOM_EXECUTOR_QUEUE_LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
     touch "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
     CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/last_activity
+    CUSTOM_EXECUTOR_QUEUE_SCRID_FILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/scridcount
+    echo 1 > "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE"
 
     _custom_executor_queue > /dev/null &
     CUSTOM_EXECUTOR_QUEUE_PID=$!
@@ -43,15 +43,16 @@ function start_custom_executor_queue () {
     declare -p ${!CUSTOM_EXECUTOR_QUEUE*} > "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
 }
 
-function _todoname() {
-
+function _todoname(){
+    local JOB SCRID
     JOB=$1
+    SCRID=$2
     local TODO="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
     local BNAME
     BNAME="$(basename "$JOB")"
-    echo "$TODO/$BNAME"
-
+    echo "${TODO}/${BNAME}-${SCRID}"
 }
+
 
 function _wname(){
     JOB=$1
@@ -111,26 +112,35 @@ function _pidfname(){
 
 
 function submit_to_custom_executor_queue() {
-
     if ! custom_executor_queue_is_alive
     then
-        echo "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
+        echo -n "ERROR: Custom executor queue process " >&2
+        echo    "$CUSTOM_EXECUTOR_QUEUE_PID not running!" >&2
         return 1
     fi
-    local JOBSCRIPT="$1"
+    local ORIG_JOBSCRIPT="$1"
     local JOBTAG="$2"
 
+    local SCRID
+    SCRID=$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")
+    while ! (set -o noclobber; echo > "$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")")
+    do
+        echo "increasing scrid: $SCRID" >&2
+        SCRID=$((SCRID+1))
+    done
+    # NOTE: This is not race-free at all.
+    echo $((SCRID+1)) > "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE"
+    local TODONAME
+    TODONAME="$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")"
+    echo "$TODONAME"
+    cp "$ORIG_JOBSCRIPT" "$TODONAME"
+    chmod +x "$TODONAME"
+
+    local JOBSCRIPT
+    JOBSCRIPT="$TODONAME"
     local BNAME
     BNAME="$(basename "$JOBSCRIPT")"
-    if [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/TODO/$BNAME" ]
-    then
-        return 22
-    fi
-
-    local TODONAME
-    TODONAME="$(_todoname "$JOBSCRIPT")"
-    cp "$JOBSCRIPT" "$TODONAME"
-    echo "$BNAME" > "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/$JOBTAG"
+    echo "$BNAME" >> "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/$JOBTAG"
 
     local LOCATIONFNAME
     LOCATIONFNAME="$(_locationfname "$JOBSCRIPT")"
@@ -149,12 +159,11 @@ function submit_to_custom_executor_queue() {
 
 
 function submit_to_custom_executor_queue_and_wait() {
-    submit_to_custom_executor_queue "$@" || exit "$SYSTEM_FAILURE_EXIT_CODE"
+    TODONAME="$(submit_to_custom_executor_queue "$@")" || exit "$SYSTEM_FAILURE_EXIT_CODE"
 
-    local JOB=$1
-    DONENAME="$(_donename "$JOB")"
-    OUTPUTNAME="$(_outputname "$JOB")"
-    EXITVALUEFNAME="$(_exitvaluefname "$JOB")"
+    DONENAME="$(_donename "$TODONAME")"
+    OUTPUTNAME="$(_outputname "$TODONAME")"
+    EXITVALUEFNAME="$(_exitvaluefname "$TODONAME")"
     while [ ! -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     do
         sleep 1
@@ -175,6 +184,7 @@ function submit_to_custom_executor_queue_and_wait() {
 
 
 function custom_executor_queue_is_alive () {
+
     if [[ "$CUSTOM_EXECUTOR_QUEUE_HOSTNAME" == "$(hostname)" ]]
     then
         ps --pid "$CUSTOM_EXECUTOR_QUEUE_PID" &> /dev/null
@@ -291,7 +301,7 @@ function _custom_executor_queue () {
             fi
         done
         shopt -u nullglob
-        if [ "$(jobs)" ]
+        if [ "$(jobs -rp)" ]
         then
           date +%s > "$CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY"
         else
@@ -368,3 +378,4 @@ function idle_time(){
      echo "$((TIME_NOW-TIME_LAST_ACTIVITY))"
 
 }
+

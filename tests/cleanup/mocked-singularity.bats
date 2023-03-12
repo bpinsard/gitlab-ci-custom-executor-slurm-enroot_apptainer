@@ -61,7 +61,7 @@ function teardown_file(){
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     # This test requires that singularity is invoked
     "$SRC/prepare-singularity.sh"
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
     "$SRC/cleanup-slurm.sh" singularity
@@ -81,7 +81,7 @@ function teardown_file(){
     (
         # shellcheck disable=SC2030
         export CUSTOM_ENV_CI_JOB_IMAGE=""
-        # shellcheck disable=SC1090
+        # shellcheck disable=SC1091
         source "$CE_QUEUE_WORKSPACE/.env"
         "$SRC/cleanup-slurm.sh" singularity
         assert_not_exists "$MOCKLOGDIR/singularity.log"
@@ -101,7 +101,7 @@ function teardown_file(){
     export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-singularity"
 
 
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
     "$SRC/cleanup-slurm.sh" singularity

@@ -32,7 +32,7 @@ then
     esac
 fi
 
-# shellcheck disable=SC1090
+# shellcheck disable=SC1091
 source "$CE_QUEUE_WORKSPACE/.env"
 
 

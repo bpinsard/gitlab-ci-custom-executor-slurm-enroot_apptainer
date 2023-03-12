@@ -85,14 +85,40 @@ EOF
 
 }
 
-#bats test_tags=onlythis
 @test "after a given idle time, the custom executor queue stops running" {
 
+    # shellcheck disable=SC2030
     export IDLE_TIME_SEC=5
     (start_custom_executor_queue "$WORKDIR"  "$IDLE_TIME_SEC" 3> /dev/null)
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
+    assert custom_executor_queue_is_alive
+
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+    sleep $IDLE_TIME_SEC
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+
+    refute custom_executor_queue_is_alive
+
+}
+
+@test "custom executor queue exits for idle time even after a job was submitted" {
+
+
+    # shellcheck disable=SC2031
+    export IDLE_TIME_SEC=5
+    (start_custom_executor_queue "$WORKDIR"  "$IDLE_TIME_SEC" 3> /dev/null)
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    touch job.sh
+    chmod +x ./job.sh
+
+    submit_to_custom_executor_queue ./job.sh JOB-54321
     assert custom_executor_queue_is_alive
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
