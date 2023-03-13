@@ -31,7 +31,7 @@ function setup() {
     source "$SRC"/custom_executor_queue.sh
     start_custom_executor_queue "$CUSTOM_ENV_CI_WS/cews_0" 3> /dev/null
     )
-    export CE_QUEUE_WORKSPACE="$CUSTOM_ENV_CI_WS/cews_0"/.env
+    export CE_QUEUE_WORKSPACE="$CUSTOM_ENV_CI_WS/cews_0"
 
 
     echo "Test setup phase completed."
