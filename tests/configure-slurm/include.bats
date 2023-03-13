@@ -126,7 +126,7 @@ function teardown() {
 
 }
 
-@test "find_remaining_time_in_allocation of good job gives 600 sec (mock)" {
+@test "find_remaining_time_sec_in_allocation of good job gives 600 sec (mock)" {
 
     SLURM_JOB_ID=34343434 # good, according to the mock
     WS="$TEST_PLAYGROUND/cews_something"
@@ -134,31 +134,31 @@ function teardown() {
     echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
 
 
-    run find_remaining_time_in_allocation "$WS"
+    run find_remaining_time_sec_in_allocation "$WS"
     assert_output 600
 
 }
 
-@test "find_remaining_time_in_allocation of completing job gives 0 sec (mock)" {
+@test "find_remaining_time_sec_in_allocation of completing job gives 0 sec (mock)" {
 
     SLURM_JOB_ID=45454545 # completing, according to the mock
     WS="$TEST_PLAYGROUND/cews_something"
     mkdir "$WS"
     echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
 
-    run find_remaining_time_in_allocation "$WS"
+    run find_remaining_time_sec_in_allocation "$WS"
     assert_output 0
 
 }
 
-@test "find_remaining_time_in_allocation of bad job gives 0 sec (mock)" {
+@test "find_remaining_time_sec_in_allocation of bad job gives 0 sec (mock)" {
 
     SLURM_JOB_ID=11111111111 # not among mock's options, invalid job or already terminated
     WS="$TEST_PLAYGROUND/cews_something"
     mkdir "$WS"
     echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
 
-    run find_remaining_time_in_allocation "$WS"
+    run find_remaining_time_sec_in_allocation "$WS"
     assert_output 0
 
 }

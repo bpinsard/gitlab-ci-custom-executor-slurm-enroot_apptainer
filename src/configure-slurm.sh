@@ -5,6 +5,10 @@
 # using the slurm OCI support
 
 if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
+if [ -z "$CUSTOM_ENV_JOB_TIME_SEC" ]
+then
+  CUSTOM_ENV_JOB_TIME_SEC=600
+fi
 set -o nounset
 set -o errexit
 set -o pipefail
@@ -15,7 +19,6 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 source "$SRC"/configure-slurm-include.sh
 
 check_custom_env_ci_ws_set
-
 
 export_all_custom_env_var_into_var_if_defined
 
@@ -28,22 +31,34 @@ check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
 
 
 SLURMENV_CANDIDATE="$CUSTOM_ENV_CI_WS/slurmenv_candidate_$CUSTOM_ENV_CI_JOB_ID"
-
 save_slurm_environment > "$SLURMENV_CANDIDATE"
 
-WORKSPACE="$(find_available_workspace_name "$CUSTOM_ENV_CI_WS"/cews_)"
 
+WORKSPACE=""
+shopt -s nullglob
+for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
+do
+  if allocation_is_compatible "$SLURMENV_CANDIDATE" "$CUSTOM_ENV_JOB_TIME_SEC" "$DIR"
+  then
+    WORKSPACE="$DIR"
+  fi
+done
 
-JOB_ID=$(eval "$(get_sbatch_command \
-                 "$WORKSPACE" \
-                 "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH")")
+if [ -z "$WORKSPACE" ]
+then
+    # finding a new workspace
+    WORKSPACE="$(find_available_workspace_name "$CUSTOM_ENV_CI_WS"/cews_)"
 
+    JOB_ID=$(eval "$(get_sbatch_command \
+                     "$WORKSPACE" \
+                     "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH")")
 
-wait_for_job_to_be_ready "$JOB_ID"
-wait_until_file_exists "$WORKSPACE/.env" 90
+    wait_for_job_to_be_ready "$JOB_ID"
+    wait_until_file_exists "$WORKSPACE/.env" 90
 
-mv "$SLURMENV_CANDIDATE" "$WORKSPACE/slurmenv"
- 
+    mv "$SLURMENV_CANDIDATE" "$WORKSPACE/slurmenv"
+fi
+
 cat <<EOF
 {
   "driver": {

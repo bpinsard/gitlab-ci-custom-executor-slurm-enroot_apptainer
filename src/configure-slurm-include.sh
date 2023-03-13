@@ -181,7 +181,7 @@ function find_available_workspace_name(){
 
 }
 
-function find_remaining_time_in_allocation(){
+function find_remaining_time_sec_in_allocation(){
 
     local WORKSPACE="$1"
 
@@ -201,3 +201,33 @@ function find_remaining_time_in_allocation(){
 
 }
 
+
+function has_at_least_half_idle_time_left(){
+    local WORKSPACE=$1
+
+    (
+        # shellcheck disable=SC1091
+        source "$WORKSPACE/.env"
+        # shellcheck source=./src/custom_executor_queue.sh
+        source "$SRC/custom_executor_queue.sh"
+        at_least_half_idle_time_is_left
+    )
+}
+
+
+function allocation_is_compatible(){
+    local SLURMENV=$1
+    local JOB_TIME_SEC=$2
+    local WORKSPACE=$3
+
+    [[ -f "$WORKSPACE/.env" ]] &&
+    [[ -f "$WORKSPACE/slurmenv" ]] &&
+    [[ $(diff "$SLURMENV" "$WORKSPACE/slurmenv" | wc -l ) -eq 0 ]] &&
+    has_at_least_half_idle_time_left "$WORKSPACE" &&
+    {
+    ! has_slurm_job_id "$WORKSPACE"  ||
+    { has_slurm_job_id "$WORKSPACE"  &&
+    [[ "$JOB_TIME_SEC" -lt $(find_remaining_time_sec_in_allocation "$WORKSPACE")  ]]; };
+    }
+
+}

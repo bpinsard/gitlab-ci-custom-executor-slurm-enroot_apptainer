@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 
-function has_slurm_job_id(){
-    (
+function has_ce_env(){
     local WORKSPACE="$1"
+    [ -f "$WORKSPACE/.env" ]
+
+}
+
+function has_slurm_job_id(){
+    local WORKSPACE="$1"
+    has_ce_env "$WORKSPACE" &&
     grep -q CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID "$WORKSPACE/.env"
-    )
 }
 
 function get_slurm_jobid(){
-    (
     local WORKSPACE="$1"
     # shellcheck disable=SC1091
     source "$WORKSPACE/.env"
     echo "$CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID"
-    )
 }
 
 

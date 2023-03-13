@@ -247,3 +247,75 @@ EOF
     assert_exists "$CUSTOM_ENV_CI_WS/cews_3/terminated"
 
 }
+
+# bats test_tags=thisone
+@test "when envs match, the allocation is reused" {
+
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
+
+
+    assert_equal "$(diff env1 env2 | wc -l )" 0
+    assert_file_contains env1 "cews_3"
+
+}
+
+# bats test_tags=thisone
+@test "when envs match and time is enough, the allocation is reused" {
+
+    # shellcheck disable=SC2030
+    export SLURM_JOB_ID=34343434 # the squeue mock gives us 10 min more
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_JOB_TIME_SEC=500
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
+
+    assert_equal "$(diff env1 env2 | wc -l )" 0
+    assert_file_contains env1 "cews_3"
+}
+# bats test_tags=thisone
+@test "when envs match but time does not, the allocation is not reused" {
+
+    # shellcheck disable=SC2031
+    export SLURM_JOB_ID=34343434 # the squeue mock gives us 10 min more
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_JOB_TIME_SEC=1200
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
+
+    assert_file_contains env1 "cews_3"
+    assert_file_contains env2 "cews_4"
+
+}
+
+# bats test_tags=thisone
+@test "custom executor max idle time sec can be set via env var" {
+
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=4
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+
+    # shellcheck disable=SC1091
+    source ./env1
+    assert_file_contains "$CE_QUEUE_WORKSPACE/.env" 'CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC="4"'
+
+}
+
+# bats test_tags=thisone
+@test "when there is too little idle time left, the allocation is not reused" {
+
+    # shellcheck disable=SC2031
+    export CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=20
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+
+    sleep 10
+
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
+
+    assert_file_contains env1 "cews_3"
+    assert_file_contains env2 "cews_4"
+
+}

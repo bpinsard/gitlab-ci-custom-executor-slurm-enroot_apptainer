@@ -18,7 +18,12 @@ function start_custom_executor_queue () {
     then
         CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC="$2"
     else
+        set +o nounset
+        if [ -z "$CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC" ]
+        then
         CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=300 # seconds
+        fi
+        set -o nounset
     fi
 
     _create_directories
@@ -403,5 +408,8 @@ function request_cancel_job_group() {
     JOBTAG=$1
     touch "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/CANC_REQS/$JOBTAG"
 
+}
 
+function at_least_half_idle_time_is_left(){
+    [ $((2*$(idle_time))) -lt "$CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC"  ]
 }
