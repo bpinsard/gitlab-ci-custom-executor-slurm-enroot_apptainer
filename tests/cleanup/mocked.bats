@@ -30,12 +30,12 @@ function setup() {
 
     # shellcheck disable=SC1090
     source <( "$SRC/configure-slurm.sh" 3> /dev/null | read-job-env.py )
+
     (
         # shellcheck source=./src/enroot-containerlib.sh
         source "$SRC/enroot-containerlib.sh"
         mkdir "$MOCKLOGDIR/.enroot-fakecontainers"
         touch "$MOCKLOGDIR/.enroot-fakecontainers/$CE_CONTAINER_NAME"
-
     )
 
 
@@ -47,62 +47,80 @@ function teardown() {
     set +o nounset
     if [ -n "$CUSTOM_ENV_CE_DEBUG_DIR" ]
     then
-        rm -rf "$CUSTOM_ENV_CE_DEBUG_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"
+        rm -r "$CUSTOM_ENV_CE_DEBUG_DIR/cews_*"
     fi
     set -o nounset
 }
+
 function teardown_file(){
     set +o nounset
     if [ -n "$CUSTOM_ENV_CE_DEBUG_DIR" ]
     then
-    rm -rf "$CUSTOM_ENV_CE_DEBUG_DIR"
+    rm -r "$CUSTOM_ENV_CE_DEBUG_DIR"
     fi
     set -o nounset
 }
 
 @test "cleanup removes old custom executor queue workspaces" {
 
-    assert false # not yet implemented
+    # creating some fake workspaces,
+    # with slurm jobs ids
+    # that the squeue mock think are dead
+
+    # This should be removed
+    mkdir -p "$CUSTOM_ENV_CI_WS/cews_10"
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=111111" >> "$CUSTOM_ENV_CI_WS/cews_10/.env"
+    # This should stay
+    mkdir -p "$CUSTOM_ENV_CI_WS/cews_11"
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CUSTOM_ENV_CI_WS/cews_11/.env"
+    # This should be removed
+    mkdir -p "$CUSTOM_ENV_CI_WS/cews_21"
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=1111111" >> "$CUSTOM_ENV_CI_WS/cews_21/.env"
+
 
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
-    # shellcheck disable=SC1091
-    source "$CE_QUEUE_WORKSPACE/.env"
 
     "$SRC/cleanup-slurm.sh" enroot
 
-    assert_dir_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
+    assert_dir_not_exists "$CUSTOM_ENV_CI_WS/cews_10"
+    assert_dir_exists "$CUSTOM_ENV_CI_WS/cews_11"
+    assert_dir_not_exists "$CUSTOM_ENV_CI_WS/cews_21"
+
 
 }
 
+
+
 @test "cleanup copies the CE queue workspaces to ~/ce-debug/cews_.../ if CUSTOM_ENV_CE_DEBUG is set" {
 
-    assert false # not yet implemented
+    # This should be removed
+    mkdir -p "$CUSTOM_ENV_CI_WS/cews_10"
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=111111" >> "$CUSTOM_ENV_CI_WS/cews_10/.env"
+    # This should stay
+    mkdir -p "$CUSTOM_ENV_CI_WS/cews_11"
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CUSTOM_ENV_CI_WS/cews_11/.env"
+    # This should be removed
+    mkdir -p "$CUSTOM_ENV_CI_WS/cews_21"
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=1111111" >> "$CUSTOM_ENV_CI_WS/cews_21/.env"
 
-    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 15
-    # This test requires that the container is set up
-    "$SRC/prepare.sh" enroot
 
-    # shellcheck disable=SC1091
-    source "$CE_QUEUE_WORKSPACE/.env"
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=1
-    # shellcheck disable=SC2030
-    export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked"
-
     "$SRC/cleanup-slurm.sh" enroot
-    assert_dir_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
-    assert_dir_exists "$CUSTOM_ENV_CE_DEBUG_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"
+
+    assert_dir_exists "$HOME/ce-debug/cews_10"
+    assert_dir_not_exists "$HOME/ce-debug/cews_11"
+    assert_dir_exists "$HOME/ce-debug/cews_21"
 
 
 }
 
 @test "cleanup should complain if the wrong backend is passed as an argument" {
-
+    #shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
-    # shellcheck disable=SC1091
-    source "$CE_QUEUE_WORKSPACE/.env"
 
     run "$SRC/cleanup-slurm.sh" nonexisting-backend
     assert_failure
@@ -110,20 +128,69 @@ function teardown_file(){
 
 }
 
+@test "cleanup scancels slurm job with SIGUSR1 if CUSTOM_ENV_KILL_SLURM is set to 1"  {
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=987654321" >> "$CE_QUEUE_WORKSPACE/.env"
+
+    export CUSTOM_ENV_KILL_SLURM=1
+    "$SRC/cleanup-slurm.sh" enroot
+
+    assert_exists "$MOCKLOGDIR/scancel.log"
+    cat "$MOCKLOGDIR/scancel.log"
+    assert_file_contains "$MOCKLOGDIR/scancel.log" "ARGS: --batch --signal=SIGUSR1 -f 987654321"
+    sleep 5 2
+    assert_file_contains "$MOCKLOGDIR/scancel.log" "ARGS: 987654321"
+
+
+
+}
+
+@test "if CUSTOM_ENV_CE_DEBUG is set, save current WS"  {
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CE_QUEUE_WORKSPACE/.env"
+
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG=1
+    "$SRC/cleanup-slurm.sh" enroot
+
+    assert_dir_exists "$HOME/ce-debug/cews_0"
+
+}
+
+
 @test "cleanup asks for cancellation of scripts that belong to current CI_JOB" {
 
-    assert false # not yet implemented
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
-}
+    # shellcheck disable=SC1091
+    source "$CE_QUEUE_WORKSPACE"/.env
 
-@test "cleanup scancels slurm job with SIGUSR1 if CUSTOM_ENV_KILL_SLURM is set to 1"  {
+    source "$PROJECT_ROOT/src/custom_executor_queue.sh"
 
-    assert false # not yet implemented
+    cat <<EOF > job.sh
+sleep 100
+EOF
 
-}
+    chmod +x ./job.sh
 
-@test "cleanup kills slurm job with plain scancel after 5 sec if CUSTOM_ENV_KILL_SLURM is set to 1"  {
 
-    assert false # not yet implemented
+    TODONAME1="$(submit_to_custom_executor_queue ./job.sh JOB_"$CUSTOM_ENV_CI_JOB_ID")"
+    TODONAME2="$(submit_to_custom_executor_queue ./job.sh JOB_"$CUSTOM_ENV_CI_JOB_ID")"
+
+    # 2 seconds more for safety
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
+
+    JOBSUBNAME1="$(basename "$TODONAME1")"
+    JOBSUBNAME2="$(basename "$TODONAME2")"
+
+    "$SRC/cleanup-slurm.sh" enroot
+
+    # 2 seconds more for safety
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
+
+    assert_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$JOBSUBNAME1"
+    assert_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$JOBSUBNAME2"
+
+
 
 }

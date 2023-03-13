@@ -225,6 +225,7 @@ function stop_all () {
             _log "Process $CHILD_PID has already completed."
         fi
     done
+    shopt -u nullglob
     _log "Sent kill signal to all the jobs"
 }
 
@@ -248,6 +249,7 @@ function _custom_executor_queue () {
     _log "Starting custom executor queue."
     local SUBMITTEDPID
     local TODO="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
+    local CANC_REQS="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/CANC_REQS
     while true
     do
         shopt -s nullglob
@@ -298,6 +300,11 @@ function _custom_executor_queue () {
                 _log "Waiting on $JOB, $BNAME still in progess..."
             fi
         done
+        for CANC_REQ in "$CANC_REQS"/*
+        do
+            cancel_job_group "$(basename "$CANC_REQ")"
+            rm "$CANC_REQ"
+        done
         shopt -u nullglob
         if [ "$(jobs -rp)" ]
         then
@@ -323,7 +330,7 @@ function _custom_executor_queue () {
 }
 
 function _create_directories(){
-    for SUBDIR in TODO WORKING DONE OUTPUT ORIGINAL_LOCATIONS ENVS PIDS
+    for SUBDIR in TODO WORKING DONE OUTPUT ORIGINAL_LOCATIONS ENVS PIDS CANC_REQS
     do
         mkdir -p "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/$SUBDIR
     done
@@ -389,5 +396,12 @@ function cancel_job_group() {
             kill -s SIGTERM "$SUBJOBPID"
         fi
     done < "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/$JOBTAG"
+
+}
+
+function request_cancel_job_group() {
+    JOBTAG=$1
+    touch "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/CANC_REQS/$JOBTAG"
+
 
 }

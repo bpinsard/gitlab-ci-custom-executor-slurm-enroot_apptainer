@@ -3,13 +3,50 @@
 CONTAINERISATION_BACKEND="${1}"
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-
 # shellcheck source=src/cleanup-slurm-include.sh
 source "$SRC"/cleanup-slurm-include.sh
 
 
-# TODO: This should not happen anymore
-terminate_slurm_allocation "$CE_SLURM_JOB_ID"
+# End lifetime of the CE queue workspace
+set +o nounset
+if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
+then
+    DEBUG="NO"
+else
+    DEBUG="YES"
+fi
+
+if [[ -z "$CUSTOM_ENV_CE_DEBUG_DIR" ]]
+then
+   CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug"
+fi
+
+if [[ "$CUSTOM_ENV_KILL_SLURM" -eq 1 ]] && has_slurm_job_id "$CE_QUEUE_WORKSPACE"
+then
+   KILL_SLURM="YES"
+else
+   KILL_SLURM="NO"
+fi
+
+set -o nounset
+
+
+# Cleaning up old workspaces
+shopt -s nullglob
+for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
+do
+    if ! allocation_is_alive "$DIR" && [[ "$DIR" != "$CE_QUEUE_WORKSPACE" ]]
+    then
+       if [ "$DEBUG" == "YES" ]
+       then
+           mv "$DIR" "$CUSTOM_ENV_CE_DEBUG_DIR"/
+       else
+           rm -r "$DIR"
+       fi
+    fi
+done
+shopt -u nullglob
+
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
@@ -32,32 +69,18 @@ then
     esac
 fi
 
+if [[ "$KILL_SLURM" == "YES" ]]
+then
+   terminate_slurm_allocation "$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
+fi
+if [[ "$DEBUG" == "YES" ]]
+then
+   cp -r "$CE_QUEUE_WORKSPACE" "$CUSTOM_ENV_CE_DEBUG_DIR/"
+fi
+
+# shellcheck source=./src/custom_executor_queue.sh
+source "$SRC/custom_executor_queue.sh"
 # shellcheck disable=SC1091
 source "$CE_QUEUE_WORKSPACE/.env"
 
-
-# End lifetime of the CE queue workspace
-set +o nounset
-if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
-then
-    DEBUG="NO"
-else
-    DEBUG="YES"
-fi
-
-if [[ -z "$CUSTOM_ENV_CE_DEBUG_DIR" ]]
-then
-   CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug"
-fi
-set -o nounset
-
-if [[ "$DEBUG" == "YES" ]]
-then
-   mkdir -p "$CUSTOM_ENV_CE_DEBUG_DIR"
-   # TODO: Change this, this move cannot happen now at the end of the job,
-   #       it must happen at the end of the pipeline
-   mv  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE" "$CUSTOM_ENV_CE_DEBUG_DIR/cews_$CUSTOM_ENV_CI_JOB_ID"
-else
-   rm -r "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
-fi
-
+request_cancel_job_group "JOB_$CUSTOM_ENV_CI_JOB_ID"

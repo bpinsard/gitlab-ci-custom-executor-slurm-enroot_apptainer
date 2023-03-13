@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+function has_slurm_job_id(){
+    (
+    local WORKSPACE="$1"
+    grep -q CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID "$WORKSPACE/.env"
+    )
+}
 
 function get_slurm_jobid(){
     (
@@ -15,9 +21,10 @@ function allocation_is_alive(){
 
     local WORKSPACE="$1"
 
-    JOBID="$(get_slurm_jobid "$WORKSPACE")"
-    export JOBID
-
-    squeue -j "$JOBID"  --Format=State,EndTime &> /dev/null
+    if has_slurm_job_id "$WORKSPACE"
+    then
+        JOBID="$(get_slurm_jobid "$WORKSPACE")"
+        squeue -j "$JOBID"  --Format=State,EndTime &> /dev/null
+    fi
 
 }
