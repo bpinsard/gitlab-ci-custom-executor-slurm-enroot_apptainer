@@ -122,15 +122,15 @@ EOF
     chmod +x job.sh
 
 
-    submit_to_custom_executor_queue job.sh JOB-"$CUSTOM_ENV_CI_JOB_ID"
-
+    TODONAME="$(submit_to_custom_executor_queue job.sh JOB-"$CUSTOM_ENV_CI_JOB_ID")"
+    BNAME="$(basename "$TODONAME")"
 
     # DEBUG: This check is flaky.
     #        Adding 10 seconds just in case there is a delay
     #        of unknown reason.
     #        I honestly do not understand the reason why this
     #        additional delay is sometimes necessary.
-    run wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/OUTPUT/job.sh.out \
+    run wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME" \
         $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
 
 
