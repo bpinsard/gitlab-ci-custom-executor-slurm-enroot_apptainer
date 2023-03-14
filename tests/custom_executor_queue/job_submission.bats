@@ -528,3 +528,42 @@ EOF
     assert_equal "$NEW" "$((ORIGINAL+1))"
 
 }
+
+@test "submit_to_custom_executor_queue returns error and useful error message if no JOBTAG is given" {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    cat <<EOF > job.sh
+touch "$TEST_PLAYGROUND/this-should-not-exist"
+EOF
+    chmod +x job.sh
+
+    run submit_to_custom_executor_queue job.sh
+    assert_failure
+    assert_output --regexp "Usage: .* script jobtag \[--with-env\]"
+
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
+
+    assert_not_exist "$TEST_PLAYGROUND/this-should-not-exist"
+
+}
+
+
+@test "--with-env not mistaken for job tag" {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    cat <<EOF > job.sh
+touch "$TEST_PLAYGROUND/this-should-not-exist"
+EOF
+    chmod +x job.sh
+
+    run submit_to_custom_executor_queue job.sh --with-env
+    assert_failure
+    assert_output --regexp "Usage: .* script jobtag \[--with-env\]"
+
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
+
+    assert_not_exist "$TEST_PLAYGROUND/this-should-not-exist"
+
+}

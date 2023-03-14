@@ -117,6 +117,12 @@ function _pidfname(){
 
 
 function submit_to_custom_executor_queue() {
+
+    if [ "$#" -lt 2 ] || [[ "$2" =~ --with-env ]]
+    then
+        echo "Usage: $0 script jobtag [--with-env]"
+        exit 95
+    fi
     if ! custom_executor_queue_is_alive
     then
         echo -n "ERROR: Custom executor queue process " >&2
