@@ -13,6 +13,7 @@ function setup(){
     export SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
+    
     echo "# Creating test playground in $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     export TEST_PLAYGROUND
@@ -130,8 +131,8 @@ EOF
     #        of unknown reason.
     #        I honestly do not understand the reason why this
     #        additional delay is sometimes necessary.
-    run wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME" \
-        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2))
+    run wait_until_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out" \
+        $((CUSTOM_EXECUTOR_QUEUE_CYCLETIME*2+10))
 
 
     if [ "$status" -ne 0 ]
@@ -147,8 +148,8 @@ EOF
     echo "Logfile so far:"
     cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
     echo "end of logfile"
-    assert_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out"
-    assert_file_contains "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/job.sh.out" 'Hello'
+    assert_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out"
+    assert_file_contains "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out" 'Hello'
 
 
 
