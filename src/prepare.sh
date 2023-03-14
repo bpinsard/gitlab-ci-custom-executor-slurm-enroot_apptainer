@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo  "Using workspace $CE_QUEUE_WORKSPACE..." >&2
+echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
@@ -9,11 +9,11 @@ then
     CONTAINERISATION_BACKEND="${1}"
     case "$CONTAINERISATION_BACKEND" in
         enroot)
-            echo "Using Enroot backend..." >&2
+            echo "[PREPARE] Using Enroot backend..." >&2
             SCRIPT="$SRC/prepare-enroot.sh"
             ;;
         singularity)
-            echo "Using Singularity backend..." >&2
+            echo "[PREPARE] Using Singularity backend..." >&2
             SCRIPT="$SRC/prepare-singularity.sh"
             ;;
         *)
@@ -41,5 +41,5 @@ EOF
 
     submit_to_custom_executor_queue_and_wait "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
 else
-    echo "No image selected." >&2
+    echo "[PREPARE] No image selected." >&2
 fi

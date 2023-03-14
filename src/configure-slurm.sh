@@ -25,7 +25,7 @@ export_all_custom_env_var_into_var_if_defined
 check_or_set_custom_env_command_sbatch
 
 check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
-  echo "Error: forbidden option in COMMAND_OPTIONS_SBATCH.">&2
+  echo "[CONFIGURE] Error: forbidden option in COMMAND_OPTIONS_SBATCH.">&2
   exit "$SYSTEM_FAILURE_EXIT_CODE"
 }
 
@@ -41,7 +41,7 @@ do
   if allocation_is_compatible "$SLURMENV_CANDIDATE" "$CUSTOM_ENV_JOB_TIME_SEC" "$DIR"
   then
     WORKSPACE="$DIR"
-    echo "Created suitable workspace in $WORKSPACE" >&2
+    echo "[CONFIGURE] Found suitable workspace in $WORKSPACE" >&2
   fi
 done
 
@@ -58,7 +58,7 @@ then
     wait_until_file_exists "$WORKSPACE/.env" 90
 
     mv "$SLURMENV_CANDIDATE" "$WORKSPACE/slurmenv"
-    echo "Created suitable workspace in $WORKSPACE" >&2
+    echo "[CONFIGURE] Created suitable workspace in $WORKSPACE" >&2
 fi
 
 cat <<EOF
