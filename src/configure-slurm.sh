@@ -41,6 +41,7 @@ do
   if allocation_is_compatible "$SLURMENV_CANDIDATE" "$CUSTOM_ENV_JOB_TIME_SEC" "$DIR"
   then
     WORKSPACE="$DIR"
+    echo "Created suitable workspace in $WORKSPACE" >&2
   fi
 done
 
@@ -57,6 +58,7 @@ then
     wait_until_file_exists "$WORKSPACE/.env" 90
 
     mv "$SLURMENV_CANDIDATE" "$WORKSPACE/slurmenv"
+    echo "Created suitable workspace in $WORKSPACE" >&2
 fi
 
 cat <<EOF

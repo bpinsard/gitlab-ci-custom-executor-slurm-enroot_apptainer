@@ -39,8 +39,10 @@ do
     then
        if [ "$DEBUG" == "YES" ]
        then
+           echo "Movig old workspace $DIR to $CUSTOM_ENV_CE_DEBUG_DIR for further inspection..." >&2
            mv "$DIR" "$CUSTOM_ENV_CE_DEBUG_DIR"/
        else
+           echo "Removing old workspace $DIR..." >&2
            rm -r "$DIR"
        fi
     fi
@@ -71,6 +73,7 @@ fi
 
 if [[ "$KILL_SLURM" == "YES" ]]
 then
+   echo "Terminating slurm allocation in $CE_QUEUE_WORKSPACE" >&2
    terminate_slurm_allocation "$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
 fi
 if [[ "$DEBUG" == "YES" ]]
