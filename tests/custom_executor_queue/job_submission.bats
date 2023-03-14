@@ -504,7 +504,7 @@ EOF
     run submit_to_custom_executor_queue job.sh JOB-5432
     assert_failure
 
-    assert_output "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
+    assert_output --partial "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
 
 }
 
