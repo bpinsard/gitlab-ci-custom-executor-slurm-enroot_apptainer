@@ -14,6 +14,9 @@ function setup(){
 
     JOB_ENV_READER="$PROJECT_ROOT"/tests/mocks/bin/read-job-env.py
 
+    # shellcheck source=./src/include.sh
+    source "$SRC/include.sh"
+
     TEST_PLAYGROUND="$PWD/end-to-end-test-enroot-$BATS_TEST_NAME"
     assert_dir_not_exists "$TEST_PLAYGROUND"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
@@ -32,6 +35,7 @@ function setup(){
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
 
+    export CUSTOM_ENV_KILL_SLURM=1
     }
 
 function teardown() {
@@ -49,8 +53,11 @@ function teardown() {
     "$SRC"/configure-slurm.sh  | "$JOB_ENV_READER" > ./job-env
 
     assert_exists ./job-env
+    assert_file_contains ./job-env "CE_QUEUE_WORKSPACE"
     # shellcheck  disable=SC1091
     source ./job-env
+
+    CE_SLURM_JOB_ID="$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
 
     # shellcheck disable=SC2317
     function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
@@ -68,9 +75,6 @@ function teardown() {
     run _helper
     assert_failure
 
-
-
-
 }
 
 # bats test_tags=configure,prepare,cleanup,run
@@ -79,8 +83,11 @@ function teardown() {
     "$SRC"/configure-slurm.sh | "$JOB_ENV_READER" > ./job-env
 
     assert_exists ./job-env
+    assert_file_contains ./job-env "CE_QUEUE_WORKSPACE"
     # shellcheck  disable=SC1091
     source ./job-env
+
+    CE_SLURM_JOB_ID="$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
 
     function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
     run _helper
