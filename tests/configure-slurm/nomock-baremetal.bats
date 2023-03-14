@@ -21,10 +21,10 @@ function setup(){
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    cat << EOF > get_jobid.py
+    cat << EOF > get_workspace.py
 import sys, json
 dump = json.load(sys.stdin)
-print(dump["job_env"]["CE_SLURM_JOB_ID"])
+print(dump["job_env"]["CE_QUEUE_WORKSPACE"])
 EOF
 
 
@@ -65,7 +65,11 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
-    JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
+    # shellcheck source=./src/include.sh
+    source "$SRC/include.sh"
+    JOB_ID="$(get_slurm_jobid "$WORKSPACE")"
+
 
     # scontrol is slow, so it might query the job information
     # before it is actually available
@@ -88,7 +92,11 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 3 -n 1"
-    JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
+    # shellcheck source=./src/include.sh
+    source "$SRC/include.sh"
+    JOB_ID="$(get_slurm_jobid "$WORKSPACE")"
+
 
     # scontrol is slow, so it might query the job information
     # before it is actually available
@@ -155,7 +163,10 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 2 -n 1"
-    JOB_ID=$("$SRC"/configure-slurm.sh | python3 get_jobid.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
+    # shellcheck source=./src/include.sh
+    source "$SRC/include.sh"
+    JOB_ID="$(get_slurm_jobid "$WORKSPACE")"
 
     # scontrol is slow, so it might query the job information
     # before it is actually available
