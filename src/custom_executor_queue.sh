@@ -127,6 +127,7 @@ function submit_to_custom_executor_queue() {
     then
         echo -n "ERROR: Custom executor queue process " >&2
         echo    "$CUSTOM_EXECUTOR_QUEUE_PID not running!" >&2
+	echo -n "       or slurm job terminated." >&2
         return 1
     fi
     local ORIG_JOBSCRIPT="$1"
