@@ -40,8 +40,11 @@ do
     then
        if [ "$DEBUG" == "YES" ]
        then
-           echo "[CLEANUP] Movig old workspace $DIR to $CUSTOM_ENV_CE_DEBUG_DIR for further inspection..." >&2
-           mv "$DIR" "$CUSTOM_ENV_CE_DEBUG_DIR"/
+           echo "[CLEANUP] Moving old workspace $DIR to $CUSTOM_ENV_CE_DEBUG_DIR for further inspection..." >&2
+
+           mkdir -p "$CUSTOM_ENV_CE_DEBUG_DIR"
+           rm -r "${CUSTOM_ENV_CE_DEBUG_DIR:?}/$(basename "$DIR")"
+           mv "$DIR" "$CUSTOM_ENV_CE_DEBUG_DIR"
        else
            echo "[CLEANUP] Removing old workspace $DIR..." >&2
            rm -r "$DIR"
