@@ -7,6 +7,11 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # shellcheck source=src/cleanup-slurm-include.sh
 source "$SRC"/cleanup-slurm-include.sh
 
+SLURMENV_CANDIDATE="$CUSTOM_ENV_CI_WS/slurmenv_candidate_$CUSTOM_ENV_CI_JOB_ID"
+if [ -f "$SLURMENV_CANDIDATE" ]
+then
+   rm "$SLURMENV_CANDIDATE"
+fi
 
 # End lifetime of the CE queue workspace
 set +o nounset
@@ -29,6 +34,10 @@ else
    KILL_SLURM="NO"
 fi
 
+if [[ -z "$CUSTOM_ENV_CI_JOB_IMAGE" ]] # TODO: test
+then
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+fi
 set -o nounset
 
 
