@@ -51,7 +51,11 @@ function teardown() {
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
     awk '{print $1}' "$MOCKLOGDIR"/pids.txt | xargs kill
-    rm -r "$TEST_PLAYGROUND"
+    while [ -d "$TEST_PLAYGROUND" ]
+    do
+        rm -r "$TEST_PLAYGROUND" || echo "Failed removal, retrying in one sec..."
+        sleep 1
+    done
 
 }
 
@@ -74,7 +78,7 @@ function teardown() {
 }
 
 
-@test "custom executor queue is started in slurm allocation" {
+@test "custom executor queue is started in (mocked) slurm allocation" {
 
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
