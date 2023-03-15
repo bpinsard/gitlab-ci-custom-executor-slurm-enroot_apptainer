@@ -31,6 +31,7 @@ then
     # the other scripts in the repository.
     cat <<EOF > "$WRAP"
 #!/bin/bash
+export CUSTOM_ENV_CI_JOB_IMAGE="$CUSTOM_ENV_CI_JOB_IMAGE"
 "$SCRIPT"
 EOF
     chmod +x "$WRAP"
