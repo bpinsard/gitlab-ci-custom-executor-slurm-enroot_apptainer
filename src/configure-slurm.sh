@@ -38,6 +38,8 @@ WORKSPACE=""
 shopt -s nullglob
 for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
 do
+  echo "[CONFIGURE] Testing $SLURMENV_CANDIDATE $CUSTOM_ENV_JOB_TIME_SEC $DIR" >&2
+
   if allocation_is_compatible "$SLURMENV_CANDIDATE" "$CUSTOM_ENV_JOB_TIME_SEC" "$DIR"
   then
     WORKSPACE="$DIR"

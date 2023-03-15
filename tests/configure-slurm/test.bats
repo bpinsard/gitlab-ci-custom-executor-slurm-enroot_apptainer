@@ -33,7 +33,10 @@ function setup() {
 
     mkdir "$CUSTOM_ENV_CI_WS/cews_0"
     mkdir "$CUSTOM_ENV_CI_WS/cews_1"
+    touch "$CUSTOM_ENV_CI_WS/cews_1/.env"
     mkdir "$CUSTOM_ENV_CI_WS/cews_2"
+    touch "$CUSTOM_ENV_CI_WS/cews_2/.env"
+    touch "$CUSTOM_ENV_CI_WS/cews_2/slurmenv"
 
 
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_3/.env"
@@ -58,6 +61,15 @@ function teardown() {
 
     run cat "$MOCKLOGDIR"/sbatch.log
     refute_line --partial '--container'
+
+}
+
+@test "Relevant diagnostics is given when testing workspaces" {
+
+    run "$SRC"/configure-slurm.sh 3> /dev/null
+    assert_output --regexp "cews_0 has no env"
+    assert_output --regexp "cews_1 has no slurmenv"
+    assert_output --regexp "slurmenv is different for .*cews_2"
 
 }
 
@@ -248,12 +260,14 @@ EOF
 
 }
 
-# bats test_tags=thisone
 @test "when envs match, the allocation is reused" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+    cat env1
+
 
     "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
+    cat env2
 
 
     assert_equal "$(diff env1 env2 | wc -l )" 0
@@ -261,7 +275,6 @@ EOF
 
 }
 
-# bats test_tags=thisone
 @test "when envs match and time is enough, the allocation is reused" {
 
     # shellcheck disable=SC2030
@@ -275,7 +288,6 @@ EOF
     assert_equal "$(diff env1 env2 | wc -l )" 0
     assert_file_contains env1 "cews_3"
 }
-# bats test_tags=thisone
 @test "when envs match but time does not, the allocation is not reused" {
 
     # shellcheck disable=SC2031
@@ -291,7 +303,6 @@ EOF
 
 }
 
-# bats test_tags=thisone
 @test "custom executor max idle time sec can be set via env var" {
 
     # shellcheck disable=SC2030,SC2031
@@ -304,7 +315,6 @@ EOF
 
 }
 
-# bats test_tags=thisone
 @test "when there is too little idle time left, the allocation is not reused" {
 
     # shellcheck disable=SC2031
