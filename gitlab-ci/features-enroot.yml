@@ -51,7 +51,7 @@ horeka-mpi-multinode-job-enroot:
   tags:
     - slurm-enroot-test
   variables:
-    COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --nodes 2 --ntasks-per-node=1"
+    COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:
     - |
       srun hostname
