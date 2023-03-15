@@ -300,6 +300,7 @@ function _custom_executor_queue () {
                        exit 0' SIGTERM SIGUSR1
                  wait "$RUNNINGPID"
                  echo $? > "$EXITVALUEFNAME"
+                 rm "$PIDFILE" # TODO: TEST FOR THIS
                  set -o nounset
                  set -o errexit
                  set -o pipefail
@@ -407,6 +408,7 @@ function cancel_job_group() {
         if [ -f "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$BNAME" ]
         then
             read -r SUBJOBPID < "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$BNAME"
+            _log "Killing $BNAME with $SUBJOBPID"
             kill -s SIGTERM "$SUBJOBPID"
         fi
     done < "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/$JOBTAG"
