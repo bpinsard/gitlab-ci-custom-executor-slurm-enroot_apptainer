@@ -124,7 +124,7 @@ function teardown_file(){
 
     run "$SRC/cleanup-slurm.sh" nonexisting-backend
     assert_failure
-    assert_output "ERROR: Not a valid backend: nonexisting-backend"
+    assert_line --partial "ERROR: Not a valid backend: nonexisting-backend"
 
 }
 

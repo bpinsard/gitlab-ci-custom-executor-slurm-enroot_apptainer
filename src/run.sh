@@ -6,14 +6,14 @@ then
     exit "$SYSTEM_FAILURE_EXIT_CODE"
 fi
 
-
 CONTAINERISATION_BACKEND="${1}"
 ORIGINAL_SCRIPT="${2}"
 STEPNAME="${3}"
+echo "[RUN] Running $2 / $3 on $1"
 
 if [[ -z "$CE_QUEUE_WORKSPACE" ]]
 then
-    echo "CE_QUEUE_WORKSPACE not defined." >&2
+    echo "[RUN] CE_QUEUE_WORKSPACE not defined." >&2
     exit "$SYSTEM_FAILURE_EXIT_CODE"
 fi
 
@@ -67,7 +67,7 @@ case "$STEPNAME" in
     ;;
 
     *)
-        echo "Step name not recognized: $STEPNAME" >&2
+        echo "[RUN] Step name not recognized: $STEPNAME" >&2
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     ;;
 esac
@@ -82,4 +82,5 @@ source "$SRC/custom_executor_queue.sh"
 source "$CE_QUEUE_WORKSPACE/.env"
 
 WRAPPED="$("$F" "$SCRIPT")"
+echo "[RUN] Submitting wrapped script ($WRAPPED) to custom executor queue..."
 submit_to_custom_executor_queue_and_wait "$WRAPPED" "JOB_$CUSTOM_ENV_CI_JOB_ID"

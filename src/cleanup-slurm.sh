@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+echo "[CLEANUP] Cleaning up..." >&2
 CONTAINERISATION_BACKEND="${1}"
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
@@ -31,7 +32,7 @@ fi
 set -o nounset
 
 
-# Cleaning up old workspaces
+echo "[CLEANUP] Removing old workspaces..." >&2
 shopt -s nullglob
 for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
 do
@@ -57,10 +58,12 @@ then
 
     case "$CONTAINERISATION_BACKEND" in
         enroot)
+            echo "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
             # shellcheck source=./src/enroot-cleanup.sh
             source "$SRC/enroot-cleanup.sh"
             ;;
         singularity)
+            echo "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
             # shellcheck source=./src/singularity-cleanup.sh
             source "$SRC/singularity-cleanup.sh"
             ;;

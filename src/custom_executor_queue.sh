@@ -132,6 +132,7 @@ function submit_to_custom_executor_queue() {
     fi
     local ORIG_JOBSCRIPT="$1"
     local JOBTAG="$2"
+    _log "Received request to execute $ORIG_JOBSCRIPT under $JOBTAG"
 
     local SCRID
     SCRID=$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")
