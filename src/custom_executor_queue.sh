@@ -315,6 +315,7 @@ function _custom_executor_queue () {
         done
         for CANC_REQ in "$CANC_REQS"/*
         do
+            _log "Requested cancellation of $CANC_REQ"
             cancel_job_group "$(basename "$CANC_REQ")"
             rm "$CANC_REQ"
         done
