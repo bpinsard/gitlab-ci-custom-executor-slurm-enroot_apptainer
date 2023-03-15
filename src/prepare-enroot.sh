@@ -8,6 +8,9 @@ source "$SRC"/enroot-containerlib.sh
 
 CE_IMAGEDIR="$(mktemp -d "$CUSTOM_ENV_CI_WS/imagedirXXXXX")"
 CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
+
+echo "[PREPARE] Enroot: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
+
 COMMAND=(enroot
          import
          --output
