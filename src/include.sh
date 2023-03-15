@@ -24,10 +24,11 @@ function allocation_is_alive(){
 
     local WORKSPACE="$1"
 
-    if has_slurm_job_id "$WORKSPACE"
-    then
+    has_slurm_job_id "$WORKSPACE" && {
         JOBID="$(get_slurm_jobid "$WORKSPACE")"
         squeue -j "$JOBID"  --Format=State,EndTime &> /dev/null
-    fi
+    }
+    # TODO: test that we need this branch
+    #       What do we do for local ce that has no slurm job id?
 
 }
