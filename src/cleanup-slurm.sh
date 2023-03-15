@@ -59,6 +59,10 @@ do
            rm -r "$DIR"
        fi
     fi
+    if allocation_is_alive "$DIR"
+    then
+       echo "[CLEANUP] Allocation in $DIR is still alive." >&2
+    fi
 done
 shopt -u nullglob
 

@@ -47,7 +47,9 @@ case "$STEPNAME" in
     F="$WRAPPER_NAME"
 
     _BNAME="$(basename "$ORIGINAL_SCRIPT")"
-    SCRIPT=$(mktemp "$CUSTOM_ENV_CI_WS/cp-XXXXXX${_BNAME}")
+    SCRIPT=$(mktemp "$CE_QUEUE_WORKSPACE/cp-XXXXXX${_BNAME}")
+    # TODO: test that the script is actually inside CE_QUEUE workspace
+    #       and does not pollute CI_WS.
     cat "$ORIGINAL_SCRIPT" > "$SCRIPT"
     chmod +x "$SCRIPT"
 
