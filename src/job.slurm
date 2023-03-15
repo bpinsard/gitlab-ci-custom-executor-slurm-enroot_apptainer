@@ -32,7 +32,7 @@ trap "kill -s SIGTERM $CUSTOM_EXECUTOR_QUEUE_PID; wait; exit" SIGTERM
 # shellcheck disable=SC2064
 trap "touch $CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated;" EXIT
 
-while true
+while ps --pid "$CUSTOM_EXECUTOR_QUEUE_PID"  > /dev/null # TODO:test
 do 
 	sleep  1
 done
