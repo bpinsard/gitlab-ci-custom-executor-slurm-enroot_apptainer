@@ -4,6 +4,7 @@ echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
+    echo  "[PREPARE] Using image $CUSTOM_ENV_CI_JOB_IMAGE" >&2
     SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
     CONTAINERISATION_BACKEND="${1}"

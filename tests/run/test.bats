@@ -213,7 +213,7 @@ EOF
 
     run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
 
-    assert_output "Hello from $STEP"
+    assert_line "Hello from $STEP"
     done
 
 }

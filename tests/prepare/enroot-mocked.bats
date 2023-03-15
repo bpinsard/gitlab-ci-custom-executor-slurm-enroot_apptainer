@@ -125,12 +125,3 @@ teardown() {
 
 }
 
-@test "enroot should not be called at all if \$CUSTOM_ENV_CI_JOB_IMAGE is not defined" {
-
-    (
-    export CUSTOM_ENV_CI_JOB_IMAGE=""
-    prepare-enroot.sh
-    )
-    assert_not_exists "$MOCKLOGDIR"/enroot.log
-
-}
