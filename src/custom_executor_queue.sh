@@ -289,7 +289,7 @@ function _custom_executor_queue () {
                  set +o pipefail
                  set +o errexit
                  set +o nounset
-                 cd "$(cat "$LOCATIONFNAME")"
+                 # cd "$(cat "$LOCATIONFNAME")" # DEBUG: This might cause problems.
                  # shellcheck disable=SC1090
                  source <(purge_variables < "$ENVFNAME")
                  "$WNAME" &> "$OUTPUTNAME" &
