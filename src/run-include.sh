@@ -12,14 +12,26 @@ function nowrap(){
 
 function wrap_enroot(){
     local SCRIPT="$1"
-    "$SRC"/script-enroot-wrapper.sh "$(get_abs_path "$SCRIPT")" > "$SCRIPT"-wrapped.sh
+    cat <<EOF > "$SCRIPT"-wrapped.sh
+#!/bin/bash
+export CUSTOM_ENV_CI_JOB_IMAGE="$CUSTOM_ENV_CI_JOB_IMAGE" # TODO: add test
+export CUSTOM_ENV_CI_JOB_ID="$CUSTOM_ENV_CI_JOB_ID"       # TODO: add test
+"$SCRIPT"
+EOF
+    "$SRC"/script-enroot-wrapper.sh "$(get_abs_path "$SCRIPT")" >> "$SCRIPT"-wrapped.sh
     chmod +x "$SCRIPT"-wrapped.sh 1>&2
     echo "$SCRIPT"-wrapped.sh
 }
 
 function wrap_singularity(){
     local SCRIPT="$1"
-    "$SRC"/script-singularity-wrapper.sh "$(get_abs_path "$SCRIPT")" > "$SCRIPT"-wrapped.sh
+    cat <<EOF > "$SCRIPT"-wrapped.sh
+#!/bin/bash
+export CUSTOM_ENV_CI_JOB_IMAGE="$CUSTOM_ENV_CI_JOB_IMAGE" # TODO: add test
+export CUSTOM_ENV_CI_JOB_ID="$CUSTOM_ENV_CI_JOB_ID"       # TODO: add test
+"$SCRIPT"
+EOF
+    "$SRC"/script-singularity-wrapper.sh "$(get_abs_path "$SCRIPT")" >> "$SCRIPT"-wrapped.sh
     chmod +x "$SCRIPT"-wrapped.sh 1>&2
     echo "$SCRIPT"-wrapped.sh
 }
