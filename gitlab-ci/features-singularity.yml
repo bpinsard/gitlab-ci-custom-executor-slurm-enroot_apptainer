@@ -64,4 +64,5 @@ env-job-singularity:
   variables:
     ENV_VAR_1: 55
   script:
+    - env | grep ENV_VAR_1
     - test $ENV_VAR_1 -eq 55
