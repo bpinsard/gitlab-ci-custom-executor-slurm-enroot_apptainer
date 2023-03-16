@@ -16,7 +16,6 @@ function wrap_enroot(){
 #!/bin/bash
 export CUSTOM_ENV_CI_JOB_IMAGE="$CUSTOM_ENV_CI_JOB_IMAGE" # TODO: add test
 export CUSTOM_ENV_CI_JOB_ID="$CUSTOM_ENV_CI_JOB_ID"       # TODO: add test
-"$SCRIPT"
 EOF
     "$SRC"/script-enroot-wrapper.sh "$(get_abs_path "$SCRIPT")" >> "$SCRIPT"-wrapped.sh
     chmod +x "$SCRIPT"-wrapped.sh 1>&2
@@ -29,7 +28,6 @@ function wrap_singularity(){
 #!/bin/bash
 export CUSTOM_ENV_CI_JOB_IMAGE="$CUSTOM_ENV_CI_JOB_IMAGE" # TODO: add test
 export CUSTOM_ENV_CI_JOB_ID="$CUSTOM_ENV_CI_JOB_ID"       # TODO: add test
-"$SCRIPT"
 EOF
     "$SRC"/script-singularity-wrapper.sh "$(get_abs_path "$SCRIPT")" >> "$SCRIPT"-wrapped.sh
     chmod +x "$SCRIPT"-wrapped.sh 1>&2
