@@ -157,7 +157,7 @@ which include unit test, a test deployment,
 a number of tests of the deployed executor
 (this includes a job with artifacts, 
 one in a container,
-a multi-node job (<- TODO))
+a multi-node job 
 
 At the beginning of the pipeline,
 the jobs are run using a shell executor,
