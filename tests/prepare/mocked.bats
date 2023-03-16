@@ -23,15 +23,15 @@ function setup() {
 
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
-    export CUSTOM_ENV_CI_JOB_ID=54321
-    # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    export CE_QUEUE_WORKSPACE="$CUSTOM_ENV_CI_WS/cews_0"
     (
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC"/custom_executor_queue.sh
-    start_custom_executor_queue "$CUSTOM_ENV_CI_WS/cews_0" 3> /dev/null
+    start_custom_executor_queue "$CE_QUEUE_WORKSPACE" 3> /dev/null
     )
-    export CE_QUEUE_WORKSPACE="$CUSTOM_ENV_CI_WS/cews_0"
+    export CUSTOM_ENV_CI_JOB_ID=54321
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
 
 
     echo "Test setup phase completed."
