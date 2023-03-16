@@ -84,8 +84,14 @@ source "$SRC/custom_executor_queue.sh"
 source "$CE_QUEUE_WORKSPACE/.env"
 
 WRAPPED="$("$F" "$SCRIPT")"
+
 echo "[RUN] Submitting wrapped script ($WRAPPED) to custom executor queue..."
 echo "[RUN] Wrap to be executed:" >&2
-cat "$WRAPPED" >&2
+if [[ "$WRAPPED" == "$ORIGINAL_SCRIPT" ]]
+then
+    echo "<same as received>"
+else
+    cat "$WRAPPED" >&2
+fi
 
 submit_to_custom_executor_queue_and_wait "$WRAPPED" "JOB_$CUSTOM_ENV_CI_JOB_ID"

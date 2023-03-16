@@ -44,6 +44,7 @@ do
   then
     WORKSPACE="$DIR"
     echo "[CONFIGURE] Found suitable workspace in $WORKSPACE" >&2
+    echo "[CONFIGURE] Slurm job: $(get_slurm_jobid "$WORKSPACE")" >&2
   fi
 done
 
