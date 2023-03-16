@@ -97,9 +97,8 @@ function teardown() {
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
     echo -n "# Preparing job... " >&3
-    run "$SRC"/prepare.sh enroot
+    "$SRC"/prepare.sh enroot
     echo "done." >&3
-    assert_success
     assert_dir_exists "$CUSTOM_ENV_CI_WS/.enroot"
 
     cat <<EOF > "$STARTDIR"/get_sources_script.sh
