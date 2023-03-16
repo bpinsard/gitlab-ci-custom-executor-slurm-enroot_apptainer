@@ -300,7 +300,7 @@ function _custom_executor_queue () {
                        exit 0' SIGTERM SIGUSR1
                  wait "$RUNNINGPID"
                  echo $? > "$EXITVALUEFNAME"
-                 rm "$PIDFILE" # TODO: TEST FOR THIS
+                 rm "$PIDFILE"
                  set -o nounset
                  set -o errexit
                  set -o pipefail
