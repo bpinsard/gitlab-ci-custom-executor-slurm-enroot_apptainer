@@ -62,6 +62,6 @@ env-job-singularity:
   tags:
     - slurm-singularity-test
   variables:
-    - ENV_VAR_1: 55
+    ENV_VAR_1: 55
   script:
     - test $ENV_VAR_1 -eq 55
