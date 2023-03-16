@@ -263,22 +263,6 @@ EOF
     assert_exists "$CUSTOM_ENV_CI_WS/cews_3/terminated"
 
 }
-
-@test "when envs match, the allocation is reused" {
-
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
-    cat env1
-
-
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
-    cat env2
-
-
-    assert_equal "$(diff env1 env2 | wc -l )" 0
-    assert_file_contains env1 "cews_3"
-
-}
-
 @test "when envs match and time is enough, the allocation is reused" {
 
     # shellcheck disable=SC2030
@@ -306,7 +290,6 @@ EOF
     assert_file_contains env2 "cews_4"
 
 }
-
 @test "custom executor max idle time sec can be set via env var" {
 
     # shellcheck disable=SC2030,SC2031
@@ -318,7 +301,6 @@ EOF
     assert_file_contains "$CE_QUEUE_WORKSPACE/.env" 'CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC="4"'
 
 }
-
 @test "when there is too little idle time left, the allocation is not reused" {
 
     # shellcheck disable=SC2031

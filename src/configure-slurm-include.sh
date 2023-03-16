@@ -219,19 +219,20 @@ function allocation_is_compatible(){
     local SLURMENV=$1
     local JOB_TIME_SEC=$2
     local WORKSPACE=$3
+    local ANC="Allocation not compatible: "
     # shellcheck disable=SC2015
     { [[ -f "$WORKSPACE/.env" ]] ||
-          { echo "$WORKSPACE has no env" >&2 && return 1; } } &&
+          { echo "$ANC $WORKSPACE has no env" >&2 && return 1; } } &&
     { [[ -f "$WORKSPACE/slurmenv" ]] ||
-          { echo "$WORKSPACE has no slurmenv" >&2 && return 1; } } &&
+          { echo "$ANC $WORKSPACE has no slurmenv" >&2 && return 1; } } &&
     { [[ $(diff "$SLURMENV" "$WORKSPACE/slurmenv" | wc -l ) -eq 0 ]] ||
-          { echo "slurmenv is different for $WORKSPACE" >&2 && return 1; } } &&
+          { echo "$ANC slurmenv is different for $WORKSPACE" >&2 && return 1; } } &&
     { has_at_least_half_idle_time_left "$WORKSPACE" ||
-          { echo "not enough idle time left in $WORKSPACE" >&2 && return 1; } } &&
+          { echo "$ANC not enough idle time left in $WORKSPACE" >&2 && return 1; } } &&
     { ! has_slurm_job_id "$WORKSPACE"  ||
     [ "$JOB_TIME_SEC" -lt "$(find_remaining_time_sec_in_allocation "$WORKSPACE")"  ] &&
-        echo "Should succeed!" >&2; } || {
-        echo "$WORKSPACE has slurm job id but not enough time in the allocation" >&2 && return 1 ;
+        echo "Allocation Compatible: $WORKSPACE" >&2; } || {
+        echo "$ANC $WORKSPACE has slurm job id but not enough time in the allocation" >&2 && return 1 ;
     }
 
 }
