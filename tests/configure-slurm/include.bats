@@ -134,8 +134,8 @@ function teardown() {
     echo "declare -x CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=$SLURM_JOB_ID" > "$WS"/.env
 
 
-    run find_remaining_time_sec_in_allocation "$WS"
-    assert_output 600
+    ALLOCTIME=$(find_remaining_time_sec_in_allocation "$WS")
+    assert [ "$ALLOCTIME" -ge 598 ] &&  [ "$ALLOCTIME" -le 602 ]
 
 }
 

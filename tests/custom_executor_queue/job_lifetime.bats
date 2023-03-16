@@ -294,8 +294,7 @@ EOF
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
-    # shellcheck disable=SC2012
-    assert_equal "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )" 0
+    assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 0
 
     cat <<EOF > job1.sh
     sleep  "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
@@ -308,19 +307,16 @@ EOF
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
 
-    # shellcheck disable=SC2012
-    assert_equal "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )" 2
+    assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 2
 
 }
 
-# bats test_tags=failing
 @test "when a script ends, his pid is removed from the PIDS directory" {
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
 
-    # shellcheck disable=SC2012
-    #assert_equal 0 "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )"
+    assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 0
 
     cat <<EOF > job1.sh
     sleep  "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
@@ -344,9 +340,9 @@ EOF
     echo "PIds after submission:"
     ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS
     echo "pids count:"
-    ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l
-    # shellcheck disable=SC2012
-    assert_equal "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )" 2
+    find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l
+
+    assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 2
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
@@ -354,8 +350,8 @@ EOF
     echo "PIds after a while:"
     ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS
     echo "pids count:"
-    ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l
-    # shellcheck disable=SC2012
-    assert_equal "$(ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS | wc -l )" 1
+    find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l
+
+    assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 1
 
 }
