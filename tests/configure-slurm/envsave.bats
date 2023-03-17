@@ -39,7 +39,7 @@ function teardown() {
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
     awk '{print $1}' "$MOCKLOGDIR"/pids.txt | xargs kill
-    rm -r "$TEST_PLAYGROUND"
+    try_to_remove_dir "$TEST_PLAYGROUND"
 
 }
 

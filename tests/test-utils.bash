@@ -70,3 +70,21 @@ function scontrol_pre_wait_job_with_deadline() {
     fi
 
 }
+
+function try_to_remove_dir(){
+    local DIR_TO_REMOVE=$1
+
+    local TRIES
+    TRIES=0
+    while ! rm -r "$DIR_TO_REMOVE"
+    do
+        if [ "$TRIES" -eq 5 ] # Max tries 5
+        then
+            return 1
+        fi
+        echo "# Retrying in 5 sec failed removal of $DIR_TO_REMOVE " >&3
+        sleep 5
+        TRIES=$((TRIES+1))
+
+    done
+}
