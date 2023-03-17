@@ -24,7 +24,7 @@ setup(){
 
 teardown() {
 
-    rm -r "$TEST_PLAYGROUND"
+    try_to_remove_dir "$TEST_PLAYGROUND"
 
 }
 @test "enroot mock complains if no log location is given" {

@@ -4,6 +4,7 @@
 function setup() {
     load './test_helper/bats-support/load' # for run
     load './test_helper/bats-assert/load' # for assert_output and refute_output
+    load './test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
@@ -24,7 +25,7 @@ function setup() {
     }
 
 function teardown() {
-    rm -r "$TEST_PLAYGROUND"
+    try_to_remove_dir "$TEST_PLAYGROUND"
 }
 
 

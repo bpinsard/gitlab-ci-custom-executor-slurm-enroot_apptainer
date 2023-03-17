@@ -51,8 +51,8 @@ function teardown() {
           echo "Waiting for job $JOB_ID to terminate..."
           sleep 5
       done
-      echo rm -r "$TEST_PLAYGROUND"
-      rm -r "$TEST_PLAYGROUND"
+      echo try_to_remove_dir "$TEST_PLAYGROUND"
+      try_to_remove_dir "$TEST_PLAYGROUND"
     fi
 }
 

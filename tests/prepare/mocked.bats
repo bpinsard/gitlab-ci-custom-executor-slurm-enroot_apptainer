@@ -45,7 +45,7 @@ function teardown() {
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
     stop_custom_executor_queue
-    rm -r "$TEST_PLAYGROUND"
+    try_to_remove_dir "$TEST_PLAYGROUND"
 
 }
 

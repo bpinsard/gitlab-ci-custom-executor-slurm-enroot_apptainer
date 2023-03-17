@@ -53,7 +53,7 @@ function teardown() {
     awk '{print $1}' "$MOCKLOGDIR"/pids.txt | xargs kill
     while [ -d "$TEST_PLAYGROUND" ]
     do
-        rm -r "$TEST_PLAYGROUND" || echo "Failed removal, retrying in one sec..."
+        try_to_remove_dir "$TEST_PLAYGROUND" || echo "Failed removal, retrying in one sec..."
         sleep 1
     done
 

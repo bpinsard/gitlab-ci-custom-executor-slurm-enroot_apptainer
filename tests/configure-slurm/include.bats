@@ -5,8 +5,8 @@
 
 function setup() {
     load '../test_helper/bats-support/load' # for run
-    load '../test_helper/bats-assert/load' # for assert_output and refute_output
-    load '../test-utils' # for assert_output and refute_output
+    load '../test_helper/bats-assert/load'
+    load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     load_mocks
@@ -29,7 +29,7 @@ function setup() {
 
 
 function teardown() {
-    rm -r "$TEST_PLAYGROUND"
+    try_to_remove_dir "$TEST_PLAYGROUND"
 }
 
 @test "copying CUSTOM_ENV_* variables into variables works for defined CUSTOM_ENV_* variables " {

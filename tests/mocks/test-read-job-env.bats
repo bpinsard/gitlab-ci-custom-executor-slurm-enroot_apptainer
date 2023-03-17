@@ -24,7 +24,7 @@ function setup() {
 
 function teardown(){
 
-    rm -r "$TEST_PLAYGROUND"
+    try_to_remove_dir "$TEST_PLAYGROUND"
 
 
 }

@@ -25,7 +25,7 @@ teardown(){
         awk '{print $1}' "$MOCKLOGDIR"/pids.txt | xargs kill
     fi
 
-    rm -r "$TEST_PLAYGROUND"
+    try_to_remove_dir "$TEST_PLAYGROUND"
 }
 
 @test "sbatch mock complains if no log location is given" {
