@@ -195,7 +195,6 @@ EOF
 
 }
 
-# bats test_tags=onlythis
 @test "when CUSTOM_ENV_CI_JOB_IMAGE is not set, no errors (set to empty string)" {
 
     unset CUSTOM_ENV_CI_JOB_IMAGE

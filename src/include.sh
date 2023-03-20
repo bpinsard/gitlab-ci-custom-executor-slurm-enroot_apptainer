@@ -28,7 +28,5 @@ function allocation_is_alive(){
         JOBID="$(get_slurm_jobid "$WORKSPACE")"
         squeue -j "$JOBID"  --Format=State,EndTime &> /dev/null
     }
-    # TODO: test that we need this branch
-    #       What do we do for local ce that has no slurm job id?
 
 }

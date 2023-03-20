@@ -451,7 +451,6 @@ EOF
 
 }
 
-# bats test_tags=onlythis
 @test "run exits with error if slurm custom executor queue is not running at submission time" {
 
 
@@ -495,5 +494,34 @@ EOF
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_line "Usage: run.sh <containerisation_backend> <script> <stepname>"
+
+}
+
+@test "run does not produce files out of CE_QUEUE_WORKSPACE" {
+
+
+
+
+    cat <<EOF > script.sh
+echo "hello"
+EOF
+    chmod +x ./script.sh
+
+    touch "$TEST_PLAYGROUND/enroot.log"
+
+    ls "$TEST_PLAYGROUND" > files-before-run
+
+    # shellcheck disable=SC2031
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    "$SRC/run.sh" enroot ./script.sh prepare_script
+
+    ls "$TEST_PLAYGROUND" > files-after-run
+
+    echo "Files before run:"
+    cat files-before-run
+    echo "Files after run:"
+    cat files-after-run
+
+    assert_equal "$(diff files-before-run files-after-run | wc -l )" 0
 
 }

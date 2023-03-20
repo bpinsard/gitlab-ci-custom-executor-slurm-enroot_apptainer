@@ -217,7 +217,6 @@ EOF
 
 }
 
-# bats test_tags=onlythis
 @test "when submitting a script, the content of the SCRID file is increased by one" {
 
     # shellcheck disable=SC1091
