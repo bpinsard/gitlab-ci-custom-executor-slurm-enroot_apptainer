@@ -50,6 +50,7 @@ function teardown() {
     do
         sleep 1
     done
+    sleep 2
     refute ps --pid "$JOB_SLURM_PID"
 
 }
