@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 function setup(){
     load '../test_helper/bats-support/load' # for run
@@ -38,7 +38,9 @@ function teardown() {
     sleep 2
     CEQ_ENV="$TEST_PLAYGROUND/cews_0"/.env
     assert_exists "$CEQ_ENV"
+    # shellcheck disable=SC1090
     source "$CEQ_ENV"
+    # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC/custom_executor_queue.sh"
 
     sleep 2
