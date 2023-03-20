@@ -485,7 +485,7 @@ EOF
 
 @test "run exits with error if not passed 3 arguments" {
 
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
 
     STEP="a-step-name"
@@ -511,7 +511,7 @@ EOF
 
     ls "$TEST_PLAYGROUND" > files-before-run
 
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     "$SRC/run.sh" enroot ./script.sh prepare_script
 
