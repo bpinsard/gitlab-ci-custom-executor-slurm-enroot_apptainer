@@ -15,7 +15,8 @@ ce-queue-debug-test-singularity:
   variables:
     CE_DEBUG: 1
   tags:
-    -  slurm-singularity-test
+    - slurm
+    - singularity
   script:
     - echo "Making sure that $HOME/ce-debug/ does not exist before test cleanup..."
     - rm -rf "$HOME/ce-debug/"

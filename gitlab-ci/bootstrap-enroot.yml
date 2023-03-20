@@ -8,7 +8,8 @@ unit-test-parallel-bootstrap-enroot:
   after_script:
     - make joker
   tags:
-    - slurm-enroot-test
+    - slurm
+    - enroot
   artifacts:
     when: always
     paths:
@@ -26,7 +27,8 @@ unit-test-serial-bootstrap-enroot:
   after_script:
     - make joker
   tags:
-    - slurm-enroot-test
+    - slurm
+    - enroot
   artifacts:
     when: always
     paths:
@@ -42,4 +44,5 @@ lint-bootstrap-enroot:
   script:
     - make shellcheck
   tags:
-    - slurm-enroot-test
+    - slurm
+    - enroot

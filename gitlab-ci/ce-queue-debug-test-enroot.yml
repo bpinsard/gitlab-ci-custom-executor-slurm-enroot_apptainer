@@ -8,7 +8,8 @@ ce-queue-debug-test-enroot:
   variables:
     CE_DEBUG: 1
   tags:
-    -  slurm-enroot-test
+    - slurm
+    - enroot
   script:
     - echo "Making sure that $HOME/ce-debug/ does not exist before test cleanup..."
     - rm -rf "$HOME/ce-debug/"

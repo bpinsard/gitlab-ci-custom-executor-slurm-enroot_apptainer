@@ -183,7 +183,7 @@ Every time we run the pipeline:
   of the custom executor
   (through the tag mechanism)
 
-### GitLab CI configuration (WORK IN PROGRESS)
+### GitLab CI configuration
 
 The GitLab CI configuration included in this repository
 is made up of a number of stages
@@ -201,12 +201,17 @@ and the later stages are run using the deployed
 custom executor code.
 
 In order for this to work:
-- a "normal" executor needs to be registered
+- a "normal" executor needs to be registered,
+  tagged `shell`
   (a shell executor would work just fine)
 - a custom gitlab runner needs to be registered 
   and properly configured 
   so that it uses the scripts in the test directory
   used in the test-deploy stage.
+  For this, one can use 
+  ``` bash
+  ./utils/gitlab-runner-register-wrapper.sh --tags=slurm --container-backends=both
+  ```
 
 
 ### Test coverage

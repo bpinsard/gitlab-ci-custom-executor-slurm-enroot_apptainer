@@ -4,7 +4,8 @@ minimal-job-enroot:
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
-    - slurm-enroot-test
+    - slurm
+    - enroot
   script:
     - echo "Test Test"
     - env | sort
@@ -15,7 +16,8 @@ image-job-enroot:
   image: debian:latest
   tags:
     # This needs to match the tag of the test custom executor
-    - slurm-enroot-test
+    - slurm
+    - enroot
   script:
     - echo "Test Test using an image"
     - grep PRETTY /etc/os-release
@@ -26,7 +28,8 @@ artifact-job-enroot:
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
-    - slurm-enroot-test
+    - slurm
+    - enroot
   script: touch test-artifact.txt
   artifacts:
     paths:
@@ -38,7 +41,8 @@ artifact-image-job-enroot:
   image: debian:latest
   tags:
     # This needs to match the tag of the test custom executor
-    - slurm-enroot-test
+    - slurm
+    - enroot
   script: cp /etc/os-release test-artifact-image.txt
   artifacts:
     paths:
@@ -49,7 +53,8 @@ horeka-mpi-multinode-job-enroot:
   dependencies: []
   stage: test-test-deploy
   tags:
-    - slurm-enroot-test
+    - slurm
+    - enroot
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:
@@ -61,7 +66,8 @@ env-job-enroot:
   dependencies: []
   stage: test-test-deploy
   tags:
-    - slurm-enroot-test
+    - slurm
+    - enroot
   variables:
     ENV_VAR_1: 55
   script:

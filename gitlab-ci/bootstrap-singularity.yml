@@ -8,7 +8,8 @@ unit-test-parallel-bootstrap-singularity:
   after_script:
     - make joker
   tags:
-    - slurm-singularity-test
+    - slurm
+    - singularity
   artifacts:
     when: always
     paths:
@@ -27,7 +28,8 @@ unit-test-serial-bootstrap-singularity:
   after_script:
     - make joker
   tags:
-    - slurm-singularity-test
+    - slurm
+    - singularity
   artifacts:
     when: always
     paths:
@@ -44,4 +46,5 @@ lint-bootstrap-singularity:
   script:
     - make shellcheck
   tags:
-    - slurm-singularity-test
+    - slurm
+    - singularity

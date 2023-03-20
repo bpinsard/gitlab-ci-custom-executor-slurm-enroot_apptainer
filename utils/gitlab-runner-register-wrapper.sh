@@ -51,6 +51,7 @@ It accepts the following options:
 
 In case some of the needed information is not provided using
 command line options, it will be asked for in an interactive way.
+
 EOF
 
 
@@ -74,9 +75,9 @@ OPTSTRING+=",builds-dir:"
 OPTSTRING+=",cache-dir:"
 OPTSTRING+=",help"
 
-getopt -Q --name gitlab-runner-register-wrapper \
-    --longoptions "$OPTSTRING"  \
-    -- "$0" "$@"
+export OPTSTRING
+
+SANITIZED_OPTS=$(getopt --name gitlab-runner-register-wrapper --longoptions "$OPTSTRING" -- "$0" "$@")
 
 URL=""
 REGISTRATION_TOKEN=""
@@ -87,41 +88,57 @@ CONTAINER_BACKENDS=""
 BUILDS_DIR=""
 CACHE_DIR=""
 
-while [ $# -gt 0 ] 
+eval set -- "$SANITIZED_OPTS"
+
+
+while [ $# -gt 0 ]
 do
 case "$1" in
     --url)
         URL="$2"
+        shift
         ;;
     --registration-token)
         REGISTRATION_TOKEN="$2"
+        shift
         ;;
     --name|--description)
         NAME="$2"
+        shift
         ;;
     --tags|--tag-list)
         TAGS="$2"
+        shift
         ;;
     --ce-repo)
         CE_REPO="$2"
+        shift
         ;;
     --container-backends)
         CONTAINER_BACKENDS="$2"
+        shift
         ;;
     --builds-dir)
         BUILDS_DIR="$2"
+        shift
         ;;
     --cache-dir)
         CACHE_DIR="$2"
+        shift
         ;;
     --help)
         show_help
+        exit 0
+        ;;
+    --)
+        echo "-- reached"
         ;;
     *)
         echo "Unexpected arguments or options:" "$@"
+        exit 22
         ;;
+
 esac
-shift
 shift
 done
 

@@ -3,7 +3,8 @@ minimal-job-singularity:
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
-    - slurm-singularity-test
+    - slurm
+    - singularity
   script:
     - echo "Test Test"
     - env | sort
@@ -14,7 +15,8 @@ image-job-singularity:
   image: debian:latest
   tags:
     # This needs to match the tag of the test custom executor
-    - slurm-singularity-test
+    - slurm
+    - singularity
   script:
     - echo "Test Test using an image"
     - grep PRETTY /etc/os-release
@@ -25,7 +27,8 @@ artifact-job-singularity:
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
-    - slurm-singularity-test
+    - slurm
+    - singularity
   script: touch test-artifact.txt
   artifacts:
     paths:
@@ -37,7 +40,8 @@ artifact-image-job-singularity:
   image: debian:latest
   tags:
     # This needs to match the tag of the test custom executor
-    - slurm-singularity-test
+    - slurm
+    - singularity
   script: cp /etc/os-release test-artifact-image.txt
   artifacts:
     paths:
@@ -47,7 +51,8 @@ horeka-mpi-multinode-job-singularity:
   dependencies: []
   stage: test-test-deploy
   tags:
-    - slurm-singularity-test
+    - slurm
+    - singularity
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:
@@ -60,7 +65,8 @@ env-job-singularity:
   dependencies: []
   stage: test-test-deploy
   tags:
-    - slurm-singularity-test
+    - slurm
+    - singularity
   variables:
     ENV_VAR_1: 55
   script:

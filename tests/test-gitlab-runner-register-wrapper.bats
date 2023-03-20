@@ -41,7 +41,6 @@ function teardown() {
 
 @test "mock called" {
 
-
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
         echo "$mock_datum"
@@ -388,8 +387,10 @@ function teardown() {
 @test "during registration, the tags for the runner are printed out when using enroot backend" {
 
   function _helper(){
+     # shellcheck disable=SC2317
      for mock_datum in "${MOCK_INPUTS[@]}"
      do
+         # shellcheck disable=SC2317
          echo "$mock_datum"
      done | "$UTILS"/gitlab-runner-register-wrapper.sh
   }
