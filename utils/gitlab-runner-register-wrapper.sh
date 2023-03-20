@@ -226,7 +226,7 @@ do
 
    gitlab-runner register \
        --non-interactive \
-       --name="$NAME" \
+       --name="$NAME ($CONTAINER_BACKEND)" \
        --url="$URL" \
        --registration-token="$REGISTRATION_TOKEN" \
        --executor="custom" \
