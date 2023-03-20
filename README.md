@@ -1,28 +1,42 @@
-# Gitlab custom executor using Slurm + Enroot
+# GitLab custom executor using Slurm + Enroot/Singularity
 
 This is a [custom executor for GitLab](https://docs.gitlab.com/runner/executors/custom.html)
 written taking inspiration from https://github.com/ginkgo-project/gitlab-hpc-ci-cb 
-and from Holger Obermaier's Slurm and enroot custom executor.
+and from Holger Obermaier's Slurm and Enroot custom executor.
+
+## What it does
+
+It allows the user to launch jobs from GitLab CI 
+on a SLURM-based HPC cluster (only HoreKa tested so far).
+If sufficient conditions are met,
+multiple CI jobs can be queued on a single Slurm Job.
+The runner will create a new Slurm allocation for a job 
+if it cannot determine whether a suitable existing allocation exists.
+
+The user can influence the parameters of the Slurm Job allocation
+by setting [`sbatch` input variables](https://slurm.schedmd.com/sbatch.html)
+in the CI configuration file,
+and by setting the environment variable `COMMAND_OPTIONS_SBATCH` 
+to a string of `sbatch` command line parameters 
+(this is needed to set the number of tasks, for example).
 
 ## Usage
 
-### Setup of the custom executor on HoreKa
+### GitLab CI setup - background 
 
-### Gitlab CI setup
-
-A gitlab runner needs to be registered on HoreKa
+A GitLab runner needs to be registered on HoreKa
 using the `gitlab-runner register` command,
 (see the [official documentation](https://docs.gitlab.com/runner/register/)
 for a general idea,
-the invocation and launch of the gitlab runner 
+the invocation and launch of the GitLab runner 
 depends on the configuration
 of the system the runner is supposed to run on).
 
 The `gitlab-runner register` command
-invoked without options
+invoked *without options*
 will ask clearly for what is needed
 in an interactive way,
-i.e., the `gitlab-=ci coordinator` url,
+i.e., the `gitlab-ci coordinator` url,
 the registration token 
 (which can both be obtained 
 in the "Runners" section 
@@ -30,10 +44,6 @@ of the CI/CD panel
 in the Settings page
 of the project on the gitlab web interface),
 the tags we want to give to the runner
-(any job defined in the pipeline setup, 
-e.g. the `.gitlab-ci.yml` file in the repository,
-will be launched on the runner
-if its tags are a subset of the runner tags),
 and a description.
 
 After that, one needs to manually modify the configuration file
@@ -41,14 +51,27 @@ After that, one needs to manually modify the configuration file
 and add the location of the scripts
 that make up the custom driver.
 
+#### What are runner tags?
+
+Tags are a mechanism which allows us 
+to choose which runner can process a given job
+in a pipeline.
+A jobs defined in a pipeline setup
+(e.g. the `.gitlab-ci.yml` file in the repository)
+will be launched on a runner
+if the tags of the job are a subset of the runner.
+
+### GitLab CI setup - the wrapper
+
 In this repository 
-is included a wrapper for the command `gitlab-runner register`
+a wrapper for the command `gitlab-runner register` is included,
 `utils/gitlab-runner-register-wrapper.sh`,
-which streamlines the most tedious part 
-of the registration of a runner that uses a custom executor,
+which streamlines the most tedious parts
+of the registration of a runner that uses 
+the custom executor written here,
 removing the need to manually modify 
-the gitlab runner configuration file
-and using some reasonable defaults.
+the GitLab runner configuration file
+while using some reasonable defaults.
 
 The command
 ``` bash
@@ -56,10 +79,10 @@ $ utils/gitlab-runner-register-wrapper.sh --help
 ```
 explains the usage of the wrapper.
 
-
 #### Workspace for the custom executor
 
-The variable `CI_WS` must be set 
+In order to use the custom executor,
+the variable `CI_WS` must be set 
 to a path you have access to on HoreKa.
 
 This can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/),
@@ -70,7 +93,6 @@ This variable needs to be an absolute path
 pointing to an existing directory 
 you have write privileges on.
 
-
 #### Job tags
 
 In order for a particular job to use the custom executor,
@@ -78,8 +100,8 @@ one possible way is to use the `tags:` section.
 The tags of the job need to be a subset of the tags 
 with which the runner was set up.
 The tags for a specific runner
-only exist on the Gitlab web interface,
-and can be changed there.
+are set at the registration step,
+but can be changed on the  GitLab web interface.
 
 ## Development and maintenance
 ### Debug
@@ -95,6 +117,12 @@ out of the builds dir so that
 the results can be inspected.
 
 This debuggability feature might need to be expanded.
+If you find any issues with the runner,
+
+### Linting
+
+`shellcheck` is used for linting.
+
 
 ### Tests
 
@@ -112,14 +140,15 @@ Notice that this will NOT run all the tests.
 Some tests which are more complex 
 need to be run on the HoreKa cluster.
 
-### Linting
-
-`shellcheck` is used for linting.
-
-#### Unit tests
-
 Unit tests require the [bats framework](https://github.com/bats-core)
 installed as a collection of submodules.
+
+#### Unit Tests
+
+A large number of unit tests have been written,
+that rely on mocks of various command line utilities
+to run on any machine that does not have 
+`slurm`, `Singularity` or `Enroot`.
 
 #### Contract tests
 
@@ -127,16 +156,21 @@ These contract tests probe the different interactions
 that we assume our software will have with the external system
 (e.g., HoreKa).
 
-
 #### End to end tests on HoreKa
 
 In order to fully test the custom executor, 
 we need to do the following steps.
 
 Once:
-- set up a custom executor with `gitlab-runner register` 
-
-- set up the custom executor as a systemd service
+- set up a custom executor with `gitlab-runner register`,
+  or using the wrapper
+- set up the custom executor as a systemd service,
+  or just just launch it as a process in a tmux session.
+  Notice that in order to have the systemd service running
+  you need either to have a session active
+  or to have *lingering* enabled.
+  To have *lingering* enabled, 
+  please ask a System Administrator.
 
 Every time we run the pipeline:
 
@@ -149,9 +183,9 @@ Every time we run the pipeline:
   of the custom executor
   (through the tag mechanism)
 
-### Gitlab CI configuration (WORK IN PROGRESS)
+### GitLab CI configuration (WORK IN PROGRESS)
 
-The Gitlab CI configuration included in this repository
+The GitLab CI configuration included in this repository
 is made up of a number of stages
 which include unit test, a test deployment,
 a number of tests of the deployed executor

@@ -131,16 +131,16 @@ function teardown() {
 
 }
 
-@test "accepts --container-backend and passes it to gitlab-runner register" {
+@test "accepts --container-backends and passes it to gitlab-runner register" {
 
  for mock_datum in "${MOCK_INPUTS[@]}"
     do
-        if [[ "$mock_datum" != "container_backend" ]]
+        if [[ "$mock_datum" != "container_backends" ]]
         then
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backend 'enroot' \
+        --container-backends 'enroot' \
 
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*enroot'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*enroot'
@@ -279,7 +279,7 @@ function teardown() {
 
 }
 
-@test "systemctl --user restart gitlab-runner.service is called" {
+@test "systemctl --user restart gitlab-runner.service is NOT called" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
@@ -287,7 +287,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
 
-    assert_file_contains "$MOCKLOGDIR"/systemctl.log "\-\-user restart gitlab-runner.service"
+    assert_not_exists "$MOCKLOGDIR"/systemctl.log
 
 }
 
@@ -338,9 +338,84 @@ function teardown() {
 
     run "$UTILS"/gitlab-runner-register-wrapper.sh --help
 
-    assert_output --partial "(default: $URL_DEFAULT)"
-    assert_output --partial "(default: $PROJECT_ROOT)"
-    assert_output --partial "(default: $HOME/gitlab-runner/builds)"
-    assert_output --partial "(default: $HOME/gitlab-runner/cache)"
+    assert_output --partial "$URL_DEFAULT"
+    assert_output --partial "$PROJECT_ROOT"
+    assert_output --partial "$HOME/gitlab-runner/builds"
+    assert_output --partial "$HOME/gitlab-runner/cache"
+
+}
+
+@test "accepts multiple container backends" {
+
+ for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "enroot" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --container-backends both
+
+    cat "$MOCKLOGDIR"/gitlab-runner.log
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*enroot'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*enroot'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*enroot'
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*singularity'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*singularity'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*singularity'
+
+}
+
+@test "when using both, one runner is registered with tag enroot and the other with tag singularity" {
+
+ for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "enroot" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --container-backends both
+
+    cat "$MOCKLOGDIR"/gitlab-runner.log
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags,enroot'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags,singularity'
+
+}
+
+
+@test "during registration, the tags for the runner are printed out when using enroot backend" {
+
+  function _helper(){
+     for mock_datum in "${MOCK_INPUTS[@]}"
+     do
+         echo "$mock_datum"
+     done | "$UTILS"/gitlab-runner-register-wrapper.sh
+  }
+
+  run _helper
+
+  assert_line --regexp "Runner using enroot backend set with tags=\"tags\""
+
+}
+
+@test "during registration, the tags for the runner are printed out when using both backends" {
+
+  function _helper(){
+     for mock_datum in "${MOCK_INPUTS[@]}"
+     do
+        if [[ "$mock_datum" != "enroot" ]]
+        then
+        echo "$mock_datum"
+        fi
+     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --container-backends both
+  }
+
+  run _helper
+
+  assert_line --regexp "Runner using enroot backend set with tags=\"tags,enroot\""
+  assert_line --regexp "Runner using singularity backend set with tags=\"tags,singularity\""
 
 }
