@@ -194,3 +194,18 @@ EOF
 
 
 }
+
+# bats test_tags=onlythis
+@test "when CUSTOM_ENV_CI_JOB_IMAGE is not set, no errors (set to empty string)" {
+
+    unset CUSTOM_ENV_CI_JOB_IMAGE
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+
+    run "$SRC/cleanup-slurm.sh" enroot
+    assert_success
+    assert_not_exists "$MOCKLOGDIR/enroot.log"
+
+
+
+}

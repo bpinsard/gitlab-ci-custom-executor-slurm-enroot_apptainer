@@ -34,7 +34,7 @@ else
    KILL_SLURM="NO"
 fi
 
-if [[ -z "$CUSTOM_ENV_CI_JOB_IMAGE" ]] # TODO: test
+if [[ -z "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
     export CUSTOM_ENV_CI_JOB_IMAGE=""
 fi
