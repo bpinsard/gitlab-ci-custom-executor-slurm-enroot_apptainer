@@ -15,7 +15,7 @@ COMMAND=(enroot
          import
          --output
          "$CE_IMAGEFILE"
-         docker://"$CUSTOM_ENV_CI_JOB_IMAGE")
+         "$CUSTOM_ENV_CI_JOB_IMAGE")
 
 "${COMMAND[@]}" || {
     echo "ERROR: command failed: ${COMMAND[*]}";

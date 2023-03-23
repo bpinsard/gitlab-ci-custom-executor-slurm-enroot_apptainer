@@ -9,7 +9,7 @@ setup(){
     SRC="$PROJECT_ROOT"/src
 
     export CUSTOM_ENV_CI_WS="/a/dir/ectory"
-    export CUSTOM_ENV_CI_JOB_IMAGE=an-image:latest
+    export CUSTOM_ENV_CI_JOB_IMAGE=docker://an-image:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
 }

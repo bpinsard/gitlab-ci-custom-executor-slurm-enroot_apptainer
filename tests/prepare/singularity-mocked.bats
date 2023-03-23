@@ -37,7 +37,7 @@ teardown() {
 @test "singularity called with pull" {
 
     prepare-singularity.sh
-    assert_file_contains "$MOCKLOGDIR"/singularity.log "ARGS:.*.*docker://$CUSTOM_ENV_CI_JOB_IMAGE"
+    assert_file_contains "$MOCKLOGDIR"/singularity.log "ARGS:.*pull.*$CUSTOM_ENV_CI_JOB_IMAGE"
 
 }
 

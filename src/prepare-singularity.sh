@@ -10,7 +10,7 @@ echo "[PREPARE] Singularity: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGE
 COMMAND=(singularity
          pull
          "$CE_IMAGEFILE"
-         docker://"$CUSTOM_ENV_CI_JOB_IMAGE")
+         "$CUSTOM_ENV_CI_JOB_IMAGE")
 
 "${COMMAND[@]}" || {
     echo "ERROR: command failed: ${COMMAND[*]}";

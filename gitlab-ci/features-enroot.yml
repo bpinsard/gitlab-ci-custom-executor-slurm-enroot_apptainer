@@ -13,7 +13,7 @@ minimal-job-enroot:
 image-job-enroot:
   dependencies: []
   stage: test-test-deploy
-  image: debian:latest
+  image: docker://registry-1.docker.io/debian:latest
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
@@ -38,7 +38,7 @@ artifact-job-enroot:
 artifact-image-job-enroot:
   dependencies: []
   stage: test-test-deploy
-  image: debian:latest
+  image: docker://registry-1.docker.io/debian:latest
   tags:
     # This needs to match the tag of the test custom executor
     - slurm

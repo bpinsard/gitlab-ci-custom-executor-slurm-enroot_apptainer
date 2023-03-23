@@ -24,7 +24,7 @@ function setup() {
     cd "$STARTDIR" || exit
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
-    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env

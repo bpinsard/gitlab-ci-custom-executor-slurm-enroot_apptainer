@@ -22,7 +22,7 @@ function setup() {
     cd "$STARTDIR" || exit
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
-    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CE_CONTAINER_NAME="GLCE_54321"
     export CE_IMAGEFILE="$CUSTOM_ENV_CI_WS/image_${CE_CONTAINER_NAME}.sqsh"
@@ -39,7 +39,7 @@ teardown() {
 
     prepare-enroot.sh
 
-    assert_file_contains "$MOCKLOGDIR"/enroot.log "ARGS:.*import.*docker://$CUSTOM_ENV_CI_JOB_IMAGE"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log 'ARGS:.*import.*'"$CUSTOM_ENV_CI_JOB_IMAGE"
 
 }
 
