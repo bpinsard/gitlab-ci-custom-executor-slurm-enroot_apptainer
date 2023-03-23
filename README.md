@@ -103,6 +103,34 @@ The tags for a specific runner
 are set at the registration step,
 but can be changed on the  GitLab web interface.
 
+### CI jobs in containers on HoreKa
+
+The custom executor can use [Singularity/Apptainer](https://apptainer.org/)
+or [Enroot](https://github.com/NVIDIA/enroot) to run jobs in containers
+(this relies on Singularity/Apptainer or Enroot to be installed
+on HoreKa).
+
+In order to use those, make sure you set the `image:` tag 
+of the CI job in the same format as Singularity/Apptainer or Enroot expect it.
+
+Singularity is quite more flexible and it will accept 
+the `name:tag` format as an image specification,
+while Enroot needs a 
+[more precise specification](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md#usage).
+
+#### Authentication to DockerHub and 
+
+DockerHub has a pull rate limiting in place of 200 pulls every 6 hours.
+For non authenticated users it applies to *the IP address*,
+while for authenticated users it applies to a single user account.
+If you are hitting a pull rate limit, consider authenticating.
+
+Singularity and Enroot have different authentication mechanisms. 
+
+TODO: Elaborate [...]
+
+
+
 ## Development and maintenance
 ### Debug
 
