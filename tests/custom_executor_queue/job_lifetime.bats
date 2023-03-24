@@ -289,6 +289,7 @@ EOF
 
 }
 
+# bats test_tags=serial
 @test "custom executor queue saves the pid of the each job in a separate file" {
 
     # shellcheck disable=SC1091
