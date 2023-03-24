@@ -81,7 +81,7 @@ function teardown() {
 
 }
 
-@test "sbatch NOT invoked with --{input,output,error}=/dev/null when CUSTOM_ENV_CE_DEBUG is set." {
+@test "sbatch NOT invoked with --{output,error}=/dev/null when CUSTOM_ENV_CE_DEBUG is set." {
 
     (
     export CUSTOM_ENV_CE_DEBUG=1
