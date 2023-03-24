@@ -89,6 +89,7 @@ function teardown() {
 @test "check_string_has_no_forbidden_options fails when bad options used " {
     for OPTION in --propagate --parsable --signal --input --output --error
     do
+        echo "Testing $OPTION..."
         run check_string_has_no_forbidden_options "$OPTION"
         assert_failure
     done

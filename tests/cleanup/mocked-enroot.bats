@@ -12,7 +12,7 @@ function setup() {
     load_mocks
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND="$PWD/cleanup-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/cleanup-test-enroot-mocked-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
 
