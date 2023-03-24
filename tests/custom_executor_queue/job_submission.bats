@@ -92,6 +92,7 @@ EOF
 }
 # This test is inherently flakier than the others
 # when run in a oversubscribed manner.
+# bats test_tags=serial
 @test "custom_executor_queue cycles at the given interval" {
 
     # shellcheck disable=SC1091
