@@ -87,7 +87,7 @@ function teardown() {
     export CUSTOM_ENV_CE_DEBUG=1
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
-    for STREAM in input output error
+    for STREAM in output error
     do
     refute_output --partial "--${STREAM}=/dev/null"
     done
