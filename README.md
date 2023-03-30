@@ -118,7 +118,7 @@ the `name:tag` format as an image specification,
 while Enroot needs a 
 [more precise specification](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md#usage).
 
-#### Authentication to DockerHub and 
+#### Authentication to DockerHub
 
 DockerHub has a pull rate limiting in place of 200 pulls every 6 hours.
 For non authenticated users it applies to *the IP address*,
@@ -127,7 +127,22 @@ If you are hitting a pull rate limit, consider authenticating.
 
 Singularity and Enroot have different authentication mechanisms. 
 
+DockerHub access tokens can be configured to have a smaller scope,
+and according to [the documentation](https://docs.docker.com/docker-hub/access-tokens/)
+they can be used in any place where a password is needed.
+
 TODO: Elaborate [...]
+
+Singularity can use the `SINGULARITY_DOCKER_USERNAME`
+and `SINGULARITY_DOCKER_PASSWORD`. 
+These can be set on the GitlabCI interface. 
+
+Additionally, Singularity can store credentials in its cache file.
+
+
+
+##### Enroot
+
 
 
 
