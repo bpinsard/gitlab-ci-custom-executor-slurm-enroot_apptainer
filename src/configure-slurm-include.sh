@@ -102,6 +102,11 @@ function get_sbatch_command(){
                    --output=/dev/null
                    --error=/dev/null
     	      )
+    else
+        COMMAND+=( --input=/dev/null
+                   --output=/home/hk-project-scs/%u/cetest%J.out
+                   --error=/home/hk-project-scs/%u/cetest%J.err
+        )
     fi
     set -o nounset
 

@@ -131,7 +131,7 @@ case "$1" in
         exit 0
         ;;
     --)
-        echo "-- reached"
+	break
         ;;
     *)
         echo "Unexpected arguments or options:" "$@"
@@ -179,13 +179,13 @@ then
 fi
 while [[ ! "$CONTAINER_BACKENDS" =~ ^(enroot|singularity|both)$ ]]
 do
-   echo "Container backend (singularity or enroot):"
+   echo "Container backend ('singularity', 'enroot' or 'both' - type unquoted):"
    read -er CONTAINER_BACKENDS
 done
 
 if [ -z "$BUILDS_DIR" ]
 then
-	echo "Location of the custom executor repository ($BUILDS_DIR_DEFAULT):"
+	echo "Location of the builds directory ($BUILDS_DIR_DEFAULT):"
 	read -er BUILDS_DIR
     if [ -z "$BUILDS_DIR" ]
     then
@@ -194,7 +194,7 @@ then
 fi
 if [ -z "$CACHE_DIR" ]
 then
-	echo "Location of the custom executor repository ($CACHE_DIR_DEFAULT):"
+	echo "Location of the cache directory ($CACHE_DIR_DEFAULT):"
 	read -er CACHE_DIR
     if [ -z "$CACHE_DIR" ]
     then

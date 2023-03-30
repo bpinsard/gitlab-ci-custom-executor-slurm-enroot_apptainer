@@ -12,7 +12,7 @@ function setup() {
     load_mocks
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/sbatch-options-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR=$TEST_PLAYGROUND
@@ -70,6 +70,10 @@ function teardown() {
 @test "sbatch invoked with --{input,output,error}=/dev/null" {
 
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    echo "sbatch mock log:"
+    echo "===================="
+    cat "$MOCKLOGDIR/sbatch.log"
+    echo "===================="
     for STREAM in input output error
     do
         assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-${STREAM}=/dev/null"
@@ -77,13 +81,13 @@ function teardown() {
 
 }
 
-@test "sbatch NOT invoked with --{input,output,error}=/dev/null when CUSTOM_ENV_CE_DEBUG is set." {
+@test "sbatch NOT invoked with --{output,error}=/dev/null when CUSTOM_ENV_CE_DEBUG is set." {
 
     (
     export CUSTOM_ENV_CE_DEBUG=1
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
-    for STREAM in input output error
+    for STREAM in output error
     do
     refute_output --partial "--${STREAM}=/dev/null"
     done
