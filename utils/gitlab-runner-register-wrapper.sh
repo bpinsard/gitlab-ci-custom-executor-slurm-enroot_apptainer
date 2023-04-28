@@ -208,11 +208,11 @@ declare -A TAGS_ARR
 
 if [[ "$CONTAINER_BACKENDS" == singularity ]]
 then
-    CONTAINER_BACKENDS_ARR=( singularity )
+    CONTAINER_BACKENDS_ARR=(singularity)
     TAGS_ARR[singularity]="$TAGS"
 elif [[ "$CONTAINER_BACKENDS" == enroot ]]
 then
-    CONTAINER_BACKENDS_ARR=( enroot )
+    CONTAINER_BACKENDS_ARR=(enroot)
     TAGS_ARR[enroot]="$TAGS"
 else
     CONTAINER_BACKENDS_ARR=(enroot singularity)
