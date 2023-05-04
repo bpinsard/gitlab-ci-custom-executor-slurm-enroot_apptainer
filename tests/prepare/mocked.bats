@@ -80,3 +80,31 @@ function teardown() {
 
 
 }
+
+@test "prepare exits with error when CUSTOM_ENV_CI_JOB_IMAGE is set but enroot or singularity are not passed as arguments" {
+
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    run prepare.sh none
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
+
+}
+
+@test "prepare communicates the containerisation backend" {
+    (
+    CUSTOM_ENV_CI_JOB_IMAGE=""
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    run prepare.sh none
+    assert_output --regexp "Containerisation backend: none"
+    )
+}
+
+@test "prepare exits with error if the containerisation backend is not enroot, singularity or none" {
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    run prepare.sh some-random-string
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_output --regexp "Invalid containerisation backend: some-random-string"
+
+}

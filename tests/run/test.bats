@@ -499,9 +499,6 @@ EOF
 
 @test "run does not produce files out of CE_QUEUE_WORKSPACE" {
 
-
-
-
     cat <<EOF > script.sh
 echo "hello"
 EOF
@@ -524,4 +521,40 @@ EOF
 
     assert_equal "$(diff files-before-run files-after-run | wc -l )" 0
 
+}
+
+# bats test_tags=onlythis
+@test "run exits with error if the containerisation backend is not enroot, singularity or none" {
+
+
+    cat <<EOF > script.sh
+echo "hello"
+EOF
+    chmod +x ./script.sh
+
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    run "$SRC/run.sh" some-invalid-string ./script.sh prepare_script
+
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_output --regexp "Invalid containerisation backend: some-invalid-string"
+
+}
+
+
+
+@test "run complains if 'none' is passed as an argument and image is used" {
+
+    cat <<EOF > script.sh
+echo "hello"
+EOF
+    chmod +x ./script.sh
+    #shellcheck disable=SC2030
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    run "$SRC/run.sh" none ./script.sh prepare_script
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
 }

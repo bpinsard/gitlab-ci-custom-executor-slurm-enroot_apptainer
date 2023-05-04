@@ -63,6 +63,9 @@ done
 shopt -u nullglob
 
 
+
+echo -n "[CLEANUP] "; validate_containerisation_backend "$CONTAINERISATION_BACKEND" "$CUSTOM_ENV_CI_JOB_IMAGE"
+
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
     SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"

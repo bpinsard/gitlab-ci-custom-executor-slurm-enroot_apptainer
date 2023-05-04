@@ -32,8 +32,8 @@ It accepts the following options:
                           $REPO
 
     --container-backends  The backend used for containerised jobs,
-                          i.e., "enroot", "singularity" or "both".
-                          When using "both", two runners will be
+                          i.e., "enroot", "singularity" or "all".
+                          When using "all", two runners will be
                           registered, and one will have the
                           "enroot" tag added to its tag list, while
                           the other will have the "singularity" tag
@@ -177,9 +177,9 @@ then
         CE_REPO="$CE_REPO_DEFAULT"
     fi
 fi
-while [[ ! "$CONTAINER_BACKENDS" =~ ^(enroot|singularity|both)$ ]]
+while [[ ! "$CONTAINER_BACKENDS" =~ ^(enroot|singularity|all)$ ]]
 do
-   echo "Container backend ('singularity', 'enroot' or 'both' - type unquoted):"
+   echo "Container backend ('singularity', 'enroot' or 'all' - type unquoted):"
    read -er CONTAINER_BACKENDS
 done
 

@@ -30,3 +30,25 @@ function allocation_is_alive(){
     }
 
 }
+
+function validate_containerisation_backend(){
+
+    local CONTAINERISATION_BACKEND="$1"
+    local CI_JOB_IMAGE="$2"
+
+    if [ -n "$CI_JOB_IMAGE" ] && [ "$CONTAINERISATION_BACKEND" == "none" ]
+    then
+        echo "Error: Job requires a container image but 'none' selected as backend. "
+        exit "$SYSTEM_FAILURE_EXIT_CODE"
+    fi
+    case "$CONTAINERISATION_BACKEND" in
+    enroot|singularity|none)
+        echo "Containerisation backend: $CONTAINERISATION_BACKEND" >&2
+        ;;
+    *)
+        echo "Invalid containerisation backend: $CONTAINERISATION_BACKEND" >&2
+        exit "$SYSTEM_FAILURE_EXIT_CODE"
+        ;;
+    esac
+
+}

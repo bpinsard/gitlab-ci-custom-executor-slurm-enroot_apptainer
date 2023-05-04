@@ -1,23 +1,32 @@
 #!/usr/bin/env bash
 
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
+# shellcheck source=./src/include.sh
+source "$SRC/include.sh"
+
 echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
+
+CONTAINERISATION_BACKEND="${1}"
+
+
+echo -n "[PREPARE] "; validate_containerisation_backend "$CONTAINERISATION_BACKEND" "$CUSTOM_ENV_CI_JOB_IMAGE"
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
     echo  "[PREPARE] Using image $CUSTOM_ENV_CI_JOB_IMAGE" >&2
-    SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
-    CONTAINERISATION_BACKEND="${1}"
     case "$CONTAINERISATION_BACKEND" in
         enroot)
-            echo "[PREPARE] Using Enroot backend..." >&2
-            SCRIPT="$SRC/prepare-enroot.sh"
+            PREPARE_SCRIPT="$SRC/prepare-enroot.sh"
             ;;
         singularity)
-            echo "[PREPARE] Using Singularity backend..." >&2
-            SCRIPT="$SRC/prepare-singularity.sh"
+            PREPARE_SCRIPT="$SRC/prepare-singularity.sh"
             ;;
         *)
+            echo "[PREPARE] Error: No valid container backend specified"
+            echo "[PREPARE]        (i.e., singularity or enroot)"
+            echo "[PREPARE]        but job requires a container image."
+            exit 22
             ;;
     esac
     WRAP="./wrap-prepare-$CUSTOM_ENV_CI_JOB_ID.sh"
@@ -35,7 +44,7 @@ export SINGULARITY_DOCKER_USERNAME="$CUSTOM_ENV_SINGULARITY_DOCKER_USERNAME" # T
 export SINGULARITY_DOCKER_PASSWORD="$CUSTOM_ENV_SINGULARITY_DOCKER_PASSWORD" # TODO: add test
 export CUSTOM_ENV_CI_JOB_IMAGE="$CUSTOM_ENV_CI_JOB_IMAGE"
 export CUSTOM_ENV_CI_JOB_ID="$CUSTOM_ENV_CI_JOB_ID"
-"$SCRIPT"
+"$PREPARE_SCRIPT"
 EOF
     chmod +x "$WRAP"
 

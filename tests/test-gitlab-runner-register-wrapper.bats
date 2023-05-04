@@ -353,7 +353,7 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backends both
+        --container-backends all
 
     cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*enroot'
@@ -366,7 +366,7 @@ function teardown() {
 
 }
 
-@test "when using both, one runner is registered with tag enroot and the other with tag singularity" {
+@test "when using all, one runner is registered with tag enroot, another with tag singularity and another without them" {
 
  for mock_datum in "${MOCK_INPUTS[@]}"
     do
@@ -375,11 +375,12 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backends both
+        --container-backends all
 
     cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags,enroot'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags,singularity'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags$'
 
 }
 
@@ -411,7 +412,7 @@ function teardown() {
         echo "$mock_datum"
         fi
      done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backends both
+        --container-backends all
   }
 
   run _helper

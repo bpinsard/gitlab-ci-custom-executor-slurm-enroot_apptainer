@@ -117,16 +117,42 @@ function teardown_file(){
 
 }
 
-@test "cleanup should complain if the wrong backend is passed as an argument" {
+@test "cleanup should complain if the wrong backend is passed as an argument and image is used" {
+
     #shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     run "$SRC/cleanup-slurm.sh" nonexisting-backend
     assert_failure
-    assert_line --partial "ERROR: Not a valid backend: nonexisting-backend"
-
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_output --regexp "Invalid containerisation backend: nonexisting-backend"
 }
+
+@test "cleanup should be happy if 'none' is passed as an argument and image is not used" {
+
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    #shellcheck disable=SC2030
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    run "$SRC/cleanup-slurm.sh" none
+    assert_success
+}
+
+@test "cleanup complains if 'none' is passed as an argument and image is used" {
+
+    #shellcheck disable=SC2030
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    run "$SRC/cleanup-slurm.sh" none
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
+}
+
+
 
 @test "cleanup scancels slurm job with SIGUSR1 if CUSTOM_ENV_KILL_SLURM is set to 1"  {
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
@@ -204,7 +230,5 @@ EOF
     run "$SRC/cleanup-slurm.sh" enroot
     assert_success
     assert_not_exists "$MOCKLOGDIR/enroot.log"
-
-
 
 }
