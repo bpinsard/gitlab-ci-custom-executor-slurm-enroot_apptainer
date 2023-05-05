@@ -241,3 +241,18 @@ function allocation_is_compatible(){
     }
 
 }
+
+function create_job_slurm(){
+
+    local TEMPLATE="$1"
+    local DEFAULT_PARTITION="$2"
+    local OUTDIR="$3"
+
+    mkdir -p "$OUTDIR"
+
+    sed 's/%CUSTOM_ENV_DEFAULT_PARTITION%/'"$DEFAULT_PARTITION"'/' "$TEMPLATE"  \
+        > "$OUTDIR/job.slurm"
+
+    echo "$OUTDIR/job.slurm"
+
+}

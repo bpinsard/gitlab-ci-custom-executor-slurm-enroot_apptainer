@@ -6,6 +6,7 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load'
+    load '../test_helper/bats-file/load'
     load '../test-utils'
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
@@ -187,5 +188,21 @@ function teardown() {
 
     run allocation_is_alive "$WS"
     assert_failure
+
+}
+
+@test "create_job_slurm creates job.slurm in CUSTOM_ENV_CI_WS and returns the location" {
+
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ciws"
+
+    CUSTOM_ENV_SLURM_DEFAULT_PARTITION=default_partition_name
+
+    run create_job_slurm "$SRC/job.slurm.template" \
+                         "$CUSTOM_ENV_SLURM_DEFAULT_PARTITION" \
+                         "$CUSTOM_ENV_CI_WS"
+
+    assert_output "$CUSTOM_ENV_CI_WS/job.slurm"
+    assert_exists "$CUSTOM_ENV_CI_WS/job.slurm"
+    assert_file_contains "$CUSTOM_ENV_CI_WS/job.slurm" default_partition_name
 
 }

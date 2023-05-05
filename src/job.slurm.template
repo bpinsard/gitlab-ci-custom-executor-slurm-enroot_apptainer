@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH --job-name GitLabCustomExec
-#SBATCH --partition dev_cpuonly
+#SBATCH --partition %CUSTOM_ENV_DEFAULT_PARTITION%
 #SBATCH --ntasks 1
 #SBATCH --time 30
 
