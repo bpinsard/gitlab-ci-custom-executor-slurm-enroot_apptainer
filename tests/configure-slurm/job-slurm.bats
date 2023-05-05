@@ -22,7 +22,7 @@ function setup(){
     cd "$STARTDIR" || exit
 
 
-    local JOB_SLURM
+    declare -g JOB_SLURM
     # shellcheck source=./src/configure-slurm-include.sh
     JOB_SLURM="$(source "$SRC/configure-slurm-include.sh";
                  create_job_slurm "$SRC/job.slurm.template" \
@@ -42,11 +42,14 @@ function teardown() {
 
 @test "job.slurm does finish when the custom executor queue process stops" {
 
+    echo "JS: $JOB_SLURM"
+    echo "Running $JOB_SLURM..."
+    assert [ -x "$JOB_SLURM" ]
     # shellcheck disable=SC2031
     ( "$JOB_SLURM"  "$TEST_PLAYGROUND/cews_0" "$SRC") &
     JOB_SLURM_PID=$!
 
-    sleep 10
+    sleep 2
     CEQ_ENV="$TEST_PLAYGROUND/cews_0"/.env
     assert_exists "$CEQ_ENV"
     # shellcheck disable=SC1090
