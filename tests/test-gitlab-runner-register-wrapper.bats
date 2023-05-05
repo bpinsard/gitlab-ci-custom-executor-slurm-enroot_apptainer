@@ -32,6 +32,7 @@ function setup() {
                  enroot
                  builds_dir
                  cache_dir
+                 ci_ws
                 )
     }
 
@@ -158,7 +159,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --builds-dir '/this/other/builds/dir' \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'builds-dir=/this/other/builds/dir'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-builds-dir=/this/other/builds/dir'
 
 }
 
@@ -173,11 +174,25 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --cache-dir '/this/other/cache/dir' \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'cache-dir=/this/other/cache/dir'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-cache-dir=/this/other/cache/dir'
 
 }
 
 
+@test "accepts --ci-ws and passes it to gitlab-runner register" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "ci_ws" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --ci-ws '/this/other/directory' \
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-env CI_WS=/this/other/directory'
+
+}
 @test "prepare.sh is used as prepare-script" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
@@ -278,6 +293,21 @@ function teardown() {
 
 }
 
+@test "default value for CI WS is used if left blank" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "ci_ws" ]]
+        then
+            echo "$mock_datum"
+        else
+            echo
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-env CI_WS=$HOME/gitlab-runner"
+
+}
 @test "systemctl --user restart gitlab-runner.service is NOT called" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"

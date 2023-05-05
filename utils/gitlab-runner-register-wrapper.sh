@@ -5,6 +5,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}" )/.." > /dev/null 2>&1 && pwd)"
 URL_DEFAULT="https://scs-gitlab.scc.kit.edu/"
 BUILDS_DIR_DEFAULT="$HOME/gitlab-runner/builds"
 CACHE_DIR_DEFAULT="$HOME/gitlab-runner/cache"
+CI_WS_DEFAULT="$HOME/gitlab-runner"
 
 
 function show_help() {
@@ -47,6 +48,11 @@ It accepts the following options:
                           default:
                           $CACHE_DIR_DEFAULT
 
+    --ci-ws               Workspace for the internals
+                          of the custom executor.
+                          default:
+                          $CI_WS_DEFAULT
+
     --help                Show this help and exit.
 
 In case some of the needed information is not provided using
@@ -73,6 +79,7 @@ OPTSTRING+=",ce-repo:"
 OPTSTRING+=",container-backends:"
 OPTSTRING+=",builds-dir:"
 OPTSTRING+=",cache-dir:"
+OPTSTRING+=",ci-ws:"
 OPTSTRING+=",help"
 
 export OPTSTRING
@@ -124,6 +131,10 @@ case "$1" in
         ;;
     --cache-dir)
         CACHE_DIR="$2"
+        shift
+        ;;
+    --ci-ws)
+        CI_WS="$2"
         shift
         ;;
     --help)
@@ -201,7 +212,15 @@ then
         CACHE_DIR="$CACHE_DIR_DEFAULT"
     fi
 fi
-
+if [ -z "$CI_WS" ]
+then
+	echo "Location of the Custom Executor Workspace ($CI_WS_DEFAULT):"
+	read -er CI_WS
+    if [ -z "$CI_WS" ]
+    then
+        CI_WS="$CI_WS_DEFAULT"
+    fi
+fi
 SRC="$CE_REPO"/src
 
 declare -A TAGS_ARR
@@ -235,6 +254,7 @@ do
        --tag-list="${TAGS_ARR[$CONTAINER_BACKEND]}" \
        --builds-dir="$BUILDS_DIR" \
        --cache-dir="$CACHE_DIR" \
+       --env CI_WS="$CI_WS" \
        --custom_build_dir-enabled \
        --custom-config-exec="$SRC/configure-slurm.sh" \
        --custom-config-exec-timeout=200 \

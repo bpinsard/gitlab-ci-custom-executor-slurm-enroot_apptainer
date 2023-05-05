@@ -85,13 +85,19 @@ In order to use the custom executor,
 the variable `CI_WS` must be set 
 to a path you have access to on HoreKa.
 
-This can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/),
+The recommended way is to define it 
+in the private configuration of the custom executor,
+on the machine where the runner is registered.
+The `gitlab-runner-register-wrapper.sh` scripts
+provides a way to set it.
+Alternatively, it can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/),
 e.g. [in the `.gitlab-ci.yml` file](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-gitlab-ciyml-file)
 or in [web interface](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-ui).
 
 This variable needs to be an absolute path
 pointing to an existing directory 
 you have write privileges on.
+
 
 #### Job tags
 
