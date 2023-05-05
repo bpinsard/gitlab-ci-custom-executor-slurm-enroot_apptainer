@@ -532,6 +532,7 @@ echo "hello"
 EOF
     chmod +x ./script.sh
 
+    #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     run "$SRC/run.sh" some-invalid-string ./script.sh prepare_script
 
@@ -549,8 +550,9 @@ EOF
 echo "hello"
 EOF
     chmod +x ./script.sh
-    #shellcheck disable=SC2030
+    #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
+    #shellcheck disable=SC2031
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     run "$SRC/run.sh" none ./script.sh prepare_script

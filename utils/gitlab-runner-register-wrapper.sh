@@ -214,10 +214,12 @@ elif [[ "$CONTAINER_BACKENDS" == enroot ]]
 then
     CONTAINER_BACKENDS_ARR=(enroot)
     TAGS_ARR[enroot]="$TAGS"
-else
-    CONTAINER_BACKENDS_ARR=(enroot singularity)
+elif [[ "$CONTAINER_BACKENDS" == all ]]
+then
+    CONTAINER_BACKENDS_ARR=(enroot singularity slurm)
     TAGS_ARR[singularity]="$TAGS",singularity
     TAGS_ARR[enroot]="$TAGS",enroot
+    TAGS_ARR[slurm]="$TAGS"
 fi
 
 for CONTAINER_BACKEND in ${CONTAINER_BACKENDS_ARR[@]}

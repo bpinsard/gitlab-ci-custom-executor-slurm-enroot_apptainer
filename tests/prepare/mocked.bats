@@ -83,6 +83,7 @@ function teardown() {
 
 @test "prepare exits with error when CUSTOM_ENV_CI_JOB_IMAGE is set but enroot or singularity are not passed as arguments" {
 
+    #shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
     run prepare.sh none
     assert_failure
@@ -93,7 +94,9 @@ function teardown() {
 
 @test "prepare communicates the containerisation backend" {
     (
+    #shellcheck disable=SC2030,SC2031
     CUSTOM_ENV_CI_JOB_IMAGE=""
+    #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     run prepare.sh none
     assert_output --regexp "Containerisation backend: none"
@@ -101,6 +104,8 @@ function teardown() {
 }
 
 @test "prepare exits with error if the containerisation backend is not enroot, singularity or none" {
+
+    #shellcheck disable=SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     run prepare.sh some-random-string
     assert_failure

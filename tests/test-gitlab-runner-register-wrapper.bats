@@ -377,10 +377,15 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --container-backends all
 
-    cat "$MOCKLOGDIR"/gitlab-runner.log
+    _check_number_calls(){
+     grep -c "ARGS:" "$MOCKLOGDIR"/gitlab-runner.log
+    }
+    run _check_number_calls
+    assert_output 3
+
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags,enroot'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags,singularity'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags$'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags '
 
 }
 

@@ -132,7 +132,7 @@ function teardown_file(){
 @test "cleanup should be happy if 'none' is passed as an argument and image is not used" {
 
     export CUSTOM_ENV_CI_JOB_IMAGE=""
-    #shellcheck disable=SC2030
+    #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
@@ -142,7 +142,7 @@ function teardown_file(){
 
 @test "cleanup complains if 'none' is passed as an argument and image is used" {
 
-    #shellcheck disable=SC2030
+    #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
