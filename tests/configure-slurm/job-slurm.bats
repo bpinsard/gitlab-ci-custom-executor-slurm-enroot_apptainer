@@ -46,7 +46,7 @@ function teardown() {
     ( "$JOB_SLURM"  "$TEST_PLAYGROUND/cews_0" "$SRC") &
     JOB_SLURM_PID=$!
 
-    sleep 2
+    sleep 10
     CEQ_ENV="$TEST_PLAYGROUND/cews_0"/.env
     assert_exists "$CEQ_ENV"
     # shellcheck disable=SC1090
