@@ -5,7 +5,8 @@ update-ce-code:
     - shell
   script:
     # This needs to match the one used in the configured test custom executor
-    # This variable needs to be present in CI/CD settings
+    # This variable needs to be present in CI/CD settings or in the gitlab runner settings
+    - echo "$CI_TEST_CODE" # DEBUG
     - test -n "$CI_TEST_CODE"
     - test -d "$CI_TEST_CODE"
     - cd "$CI_TEST_CODE"
