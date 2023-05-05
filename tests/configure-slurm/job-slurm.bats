@@ -21,6 +21,16 @@ function setup(){
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
+
+    local JOB_SLURM
+    # shellcheck source=./src/configure-slurm-include.sh
+    JOB_SLURM="$(source "$SRC/configure-slurm-include.sh";
+                 create_job_slurm "$SRC/job.slurm.template" \
+                                  default-partition-name \
+                                 "$TEST_PLAYGROUND")"
+    export JOB_SLURM
+
+
     echo "Test setup phase completed."
 
 }
@@ -32,7 +42,8 @@ function teardown() {
 
 @test "job.slurm does finish when the custom executor queue process stops" {
 
-    ( "$SRC/job.slurm"  "$TEST_PLAYGROUND/cews_0" "$SRC") &
+    # shellcheck disable=SC2031
+    ( "$JOB_SLURM"  "$TEST_PLAYGROUND/cews_0" "$SRC") &
     JOB_SLURM_PID=$!
 
     sleep 2
@@ -40,7 +51,7 @@ function teardown() {
     assert_exists "$CEQ_ENV"
     # shellcheck disable=SC1090
     source "$CEQ_ENV"
-    # shellcheck source=./src/custom_executor_queue.sh
+    # shellcheck source=./src/custom_executor_queue.sh disable=SC2031
     source "$SRC/custom_executor_queue.sh"
 
     sleep 2

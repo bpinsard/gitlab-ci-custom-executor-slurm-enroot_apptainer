@@ -26,6 +26,7 @@ function setup() {
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
+    export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
     echo "Test setup phase completed."
 }
 
@@ -61,7 +62,7 @@ function teardown() {
 
         # shellcheck source=./src/configure-slurm-include.sh
         source "$SRC"/configure-slurm-include.sh
-        for TOKEN in $(get_sbatch_command "WS" "")
+        for TOKEN in $(get_sbatch_command "WS" "" "" )
         do
             if [[ "$TOKEN" =~ --[a-z_\-]+ ]]
             then

@@ -37,6 +37,7 @@ EOF
     export CUSTOM_ENV_CI_WS
     mkdir -p "$CUSTOM_ENV_CI_WS" # This should not be needed
 
+    export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env
 
 }

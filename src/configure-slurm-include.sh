@@ -65,14 +65,15 @@ function check_custom_env_ci_ws_set(){
 }
 
 function check_or_set_custom_env_command_sbatch(){
+    local JOBSLURM="$1"
     set +o nounset
     if [[ -z "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" ]]
     then
         local SRC
         SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
         echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
-        echo "         See header of job.slurm:" >&2
-        grep '#SBATCH' "$SRC/job.slurm" >&2
+        echo "         See header of $JOBSLURM" >&2
+        grep '#SBATCH' "$JOBSLURM" >&2
         export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH=""
     fi
     set -o nounset
@@ -84,6 +85,7 @@ function get_sbatch_command(){
     SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
     local WORKSPACE="$1"
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="$2"
+    local SCRIPT="$3"
 
     # We DO want to split words here
     # shellcheck disable=SC2206
@@ -111,7 +113,7 @@ function get_sbatch_command(){
     set -o nounset
 
     # FINAL SBATCH INVOCATION
-    COMMAND+=("$SRC"/job.slurm "$WORKSPACE" "$SRC")
+    COMMAND+=("$SCRIPT" "$WORKSPACE" "$SRC")
 
     echo "${COMMAND[@]}"
 
@@ -129,7 +131,7 @@ function check_for_forbidden_option(){
 
 function check_string_has_no_forbidden_options(){
     ALL_OPTIONS="$1"
-    for TOKEN in $(get_sbatch_command "WS" "")
+    for TOKEN in $(get_sbatch_command "WS" "" "")
     do
         if [[ "$TOKEN" =~ --[a-z_\-]+ ]]
         then
@@ -253,6 +255,7 @@ function create_job_slurm(){
     sed 's/%CUSTOM_ENV_DEFAULT_PARTITION%/'"$DEFAULT_PARTITION"'/' "$TEMPLATE"  \
         > "$OUTDIR/job.slurm"
 
+    chmod +x "$OUTDIR/job.slurm"
     echo "$OUTDIR/job.slurm"
 
 }

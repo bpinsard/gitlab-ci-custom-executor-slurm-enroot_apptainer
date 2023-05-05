@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-set -o nounset
-set -o errexit
-set -o pipefail
+# set -o nounset # DEBUG
+# set -o errexit # DEBUG
+# set -o pipefail# DEBUG
 
 function start_custom_executor_queue () {
     if [[ $# -gt 2 ]]

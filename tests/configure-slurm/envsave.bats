@@ -26,6 +26,7 @@ function setup() {
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
+    export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
 
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env
     echo "Test setup phase completed."

@@ -9,9 +9,9 @@ if [ -z "$CUSTOM_ENV_JOB_TIME_SEC" ]
 then
   CUSTOM_ENV_JOB_TIME_SEC=600
 fi
-set -o nounset
-set -o errexit
-set -o pipefail
+#set -o nounset # DEBUG
+#set -o errexit # DEBUG
+#set -o pipefail # DEBUG
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
@@ -22,12 +22,7 @@ check_custom_env_ci_ws_set
 
 export_all_custom_env_var_into_var_if_defined
 
-check_or_set_custom_env_command_sbatch
 
-check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
-  echo "[CONFIGURE] Error: forbidden option in COMMAND_OPTIONS_SBATCH.">&2
-  exit "$SYSTEM_FAILURE_EXIT_CODE"
-}
 
 
 SLURMENV_CANDIDATE="$CUSTOM_ENV_CI_WS/slurmenv_candidate_$CUSTOM_ENV_CI_JOB_ID"
@@ -53,9 +48,21 @@ then
     # finding a new workspace
     WORKSPACE="$(find_available_workspace_name "$CUSTOM_ENV_CI_WS"/cews_)"
 
+    JOBSLURM="$(create_job_slurm "$SRC/job.slurm.template" \
+                                 "$CUSTOM_ENV_DEFAULT_PARTITION" \
+                                 "$WORKSPACE")"
+
+    check_or_set_custom_env_command_sbatch "$JOBSLURM"
+
+    check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
+      echo "[CONFIGURE] Error: forbidden option in COMMAND_OPTIONS_SBATCH.">&2
+      exit "$SYSTEM_FAILURE_EXIT_CODE"
+    }
+
     JOB_ID=$(eval "$(get_sbatch_command \
                      "$WORKSPACE" \
-                     "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH")")
+                     "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
+                     "$JOBSLURM")")
 
     wait_for_job_to_be_ready "$JOB_ID"
     wait_until_file_exists "$WORKSPACE/.env" 90

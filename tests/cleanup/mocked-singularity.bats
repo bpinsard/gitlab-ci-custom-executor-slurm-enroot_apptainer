@@ -25,6 +25,7 @@ function setup() {
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
+    export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
     echo "Test setup phase completed."
 
 

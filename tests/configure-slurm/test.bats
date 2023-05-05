@@ -30,6 +30,7 @@ function setup() {
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
+    export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
 
     mkdir "$CUSTOM_ENV_CI_WS/cews_0"
     mkdir "$CUSTOM_ENV_CI_WS/cews_1"
@@ -313,5 +314,15 @@ EOF
 
     assert_file_contains env1 "cews_3"
     assert_file_contains env2 "cews_4"
+
+}
+
+@test "configure-slurm creates job.slurm from template in a workspace and submits it with sbatch" {
+
+    "$SRC"/configure-slurm.sh 3> /dev/null
+
+    NEWJOBSLURM="$CUSTOM_ENV_CI_WS/cews_3/job.slurm"
+    assert_exist "$NEWJOBSLURM"
+    assert_file_contains "$MOCKLOGDIR"/sbatch.log "$NEWJOBSLURM"
 
 }
