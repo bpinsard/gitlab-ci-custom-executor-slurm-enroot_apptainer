@@ -9,9 +9,9 @@ if [ -z "$CUSTOM_ENV_JOB_TIME_SEC" ]
 then
   CUSTOM_ENV_JOB_TIME_SEC=600
 fi
-#set -o nounset # DEBUG
-#set -o errexit # DEBUG
-#set -o pipefail # DEBUG
+set -o nounset
+set -o errexit
+set -o pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
