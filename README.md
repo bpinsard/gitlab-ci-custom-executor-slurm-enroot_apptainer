@@ -254,10 +254,15 @@ In order for this to work:
 - a "normal" executor needs to be registered,
   tagged `shell`
   (a shell executor would work just fine),
-  adding the flag `--env CI_TEST_CODE=/where/the/ce/code/lives`
-  (the `CI_TEST_CODE` variable
-  determines where the custom executor code
-  will be deployed).
+  adding the flags:
+  - `--env CI_TEST_CODE=/where/the/ce/code/lives` 
+    (the `CI_TEST_CODE` variable
+    determines where the custom executor code
+    will be deployed);
+  - `--env DEFAULT_PARTITION=...`
+    (the `DEFAULT_PARTITION` variable
+    determines what Slurm partition 
+    will be used by default);
 - a custom gitlab runner needs to be registered 
   and properly configured 
   so that it uses the scripts in the test directory
