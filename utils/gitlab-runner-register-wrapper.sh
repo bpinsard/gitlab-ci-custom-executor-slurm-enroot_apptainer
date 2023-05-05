@@ -6,6 +6,9 @@ URL_DEFAULT="https://scs-gitlab.scc.kit.edu/"
 BUILDS_DIR_DEFAULT="$HOME/gitlab-runner/builds"
 CACHE_DIR_DEFAULT="$HOME/gitlab-runner/cache"
 CI_WS_DEFAULT="$HOME/gitlab-runner"
+# We might be clever here and choose a different default
+# based on the name of the node we are on.
+DEFAULT_PARTITION_DEFAULT="dev_cpuonly"
 
 
 function show_help() {
@@ -53,6 +56,12 @@ It accepts the following options:
                           default:
                           $CI_WS_DEFAULT
 
+    --default-partition   The default Slurm partition to use
+                          (can be overridden using the right
+                          environment variables)
+                          default:
+                          $DEFAULT_PARTITION_DEFAULT
+
     --help                Show this help and exit.
 
 In case some of the needed information is not provided using
@@ -80,6 +89,7 @@ OPTSTRING+=",container-backends:"
 OPTSTRING+=",builds-dir:"
 OPTSTRING+=",cache-dir:"
 OPTSTRING+=",ci-ws:"
+OPTSTRING+=",default-partition:"
 OPTSTRING+=",help"
 
 export OPTSTRING
@@ -94,6 +104,8 @@ CE_REPO=""
 CONTAINER_BACKENDS=""
 BUILDS_DIR=""
 CACHE_DIR=""
+CI_WS=""
+DEFAULT_PARTITION=""
 
 eval set -- "$SANITIZED_OPTS"
 
@@ -135,6 +147,10 @@ case "$1" in
         ;;
     --ci-ws)
         CI_WS="$2"
+        shift
+        ;;
+    --default-partition)
+        DEFAULT_PARTITION="$2"
         shift
         ;;
     --help)
@@ -221,6 +237,15 @@ then
         CI_WS="$CI_WS_DEFAULT"
     fi
 fi
+if [ -z "$DEFAULT_PARTITION" ]
+then
+	echo "Location of the Custom Executor Workspace ($DEFAULT_PARTITION_DEFAULT):"
+	read -er DEFAULT_PARTITION
+    if [ -z "$DEFAULT_PARTITION" ]
+    then
+        DEFAULT_PARTITION="$DEFAULT_PARTITION_DEFAULT"
+    fi
+fi
 SRC="$CE_REPO"/src
 
 declare -A TAGS_ARR
@@ -255,6 +280,7 @@ do
        --builds-dir="$BUILDS_DIR" \
        --cache-dir="$CACHE_DIR" \
        --env CI_WS="$CI_WS" \
+       --env DEFAULT_PARTITION="$DEFAULT_PARTITION" \
        --custom_build_dir-enabled \
        --custom-config-exec="$SRC/configure-slurm.sh" \
        --custom-config-exec-timeout=200 \

@@ -33,6 +33,7 @@ function setup() {
                  builds_dir
                  cache_dir
                  ci_ws
+                 default-partition
                 )
     }
 
@@ -193,6 +194,23 @@ function teardown() {
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-env CI_WS=/this/other/directory'
 
 }
+
+@test "accepts --default-partition and passes it to gitlab-runner register" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "default-partition" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --default-partition 'a-default-partition' \
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+                         '\-\-env DEFAULT_PARTITION=a-default-partition'
+
+}
+
 @test "prepare.sh is used as prepare-script" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
@@ -306,6 +324,22 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-env CI_WS=$HOME/gitlab-runner"
+
+}
+
+@test "default value for DEFAULT_PARTITION is used if left blank" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "default-partition" ]]
+        then
+            echo "$mock_datum"
+        else
+            echo
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-env DEFAULT_PARTITION=dev_cpuonly"
 
 }
 @test "systemctl --user restart gitlab-runner.service is NOT called" {
