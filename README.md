@@ -251,6 +251,13 @@ and the later stages are run using the deployed
 custom executor code.
 
 In order for this to work:
+- depending on the machine where the tests are supposed to run,
+  set `.gitlab-ci-bwuc2.yml` or `.gitlab-ci-horeka.yml`
+  as the CI/CD configuration file on the GitLab CI web interface
+  (Settings -> CI/CD -> General Pipelines).
+  The difference between these files is only that they include
+  slightly different tests, that differ only in the choice of the partition
+  for a multi-node mpi job.
 - a "normal" executor needs to be registered,
   tagged `shell`
   (a shell executor would work just fine),
@@ -263,6 +270,11 @@ In order for this to work:
     (the `DEFAULT_PARTITION` variable
     determines what Slurm partition 
     will be used by default);
+  This runner will be used for 
+  the first run of the test suite and the linting,
+  and for the update of the custom executor code
+  that is necessary for the bootstrap
+  (this is done int the test-deploy stage)
 - a custom gitlab runner needs to be registered 
   and properly configured 
   so that it uses the scripts in the test directory
@@ -271,6 +283,25 @@ In order for this to work:
   ``` bash
   ./utils/gitlab-runner-register-wrapper.sh --tags=slurm --container-backends=all
   ```
+  This will register 3 runners,
+  one with the `singularity, slurm` tags,
+  one with the `enroot, slurm` tags,
+  and another with the `slurm` tag.
+  In order to make sure that 
+  the tests for the slurm-only runner 
+  are run only in on the third runner,
+  the `slurm-only` tag has been added 
+  to those tests.
+  As a result, one need to add 
+  the `slurm-only` tag to the last runner.
+  Runner tags can only be managed 
+  either at the registration stage
+  or later on the GitLab web interface,
+  in Settings -> CI/CD -> Runner,
+  under "Assigned project runners". 
+  Each runner can be edited individually 
+  and the list of tags can be changed there.
+
 
 
 ### Test coverage
