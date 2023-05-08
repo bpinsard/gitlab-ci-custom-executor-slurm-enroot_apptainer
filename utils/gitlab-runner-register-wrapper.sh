@@ -260,10 +260,10 @@ then
     TAGS_ARR[enroot]="$TAGS"
 elif [[ "$CONTAINER_BACKENDS" == all ]]
 then
-    CONTAINER_BACKENDS_ARR=(enroot singularity slurm)
+    CONTAINER_BACKENDS_ARR=(enroot singularity none)
     TAGS_ARR[singularity]="$TAGS",singularity
     TAGS_ARR[enroot]="$TAGS",enroot
-    TAGS_ARR[slurm]="$TAGS"
+    TAGS_ARR[none]="$TAGS"
 fi
 
 for CONTAINER_BACKEND in ${CONTAINER_BACKENDS_ARR[@]}

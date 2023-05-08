@@ -19,3 +19,4 @@ include:
   - '/gitlab-ci/bootstrap-slurm-only.yml'
   - '/gitlab-ci/bootstrap-enroot.yml'
   - '/gitlab-ci/bootstrap-singularity.yml'
+  - '/gitlab-ci/bwuc2-specific.yml'

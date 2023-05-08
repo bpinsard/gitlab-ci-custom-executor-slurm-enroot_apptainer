@@ -1,0 +1,38 @@
+bwuc2-mpi-multinode-job-singularity:
+  dependencies: []
+  stage: system-specific
+  tags:
+    - slurm
+    - singularity
+  variables:
+    COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
+  script:
+    - |
+      srun hostname
+      [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
+
+bwuc2-mpi-multinode-job-enroot:
+  dependencies: []
+  stage: system-specific
+  tags:
+    - slurm
+    - enroot
+  variables:
+    COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
+  script:
+    - |
+      srun hostname
+      [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
+
+bwuc2-mpi-multinode-job-slurm-only:
+  dependencies: []
+  stage: system-specific
+  tags:
+    - slurm
+    - slurm-only
+  variables:
+    COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
+  script:
+    - |
+      srun hostname
+      [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
