@@ -239,7 +239,7 @@ then
 fi
 if [ -z "$DEFAULT_PARTITION" ]
 then
-	echo "Location of the Custom Executor Workspace ($DEFAULT_PARTITION_DEFAULT):"
+	echo "Name of the Slurm partition to use by default ($DEFAULT_PARTITION_DEFAULT):"
 	read -er DEFAULT_PARTITION
     if [ -z "$DEFAULT_PARTITION" ]
     then
