@@ -47,14 +47,29 @@ artifact-image-job-singularity:
     paths:
       - test-artifact.txt
 
+bwuc2-mpi-multinode-job-singularity:
+  dependencies: []
+  stage: test-test-deploy
+  tags:
+    - slurm
+    - singularity
+    - bwuc2
+  variables:
+    COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
+  script:
+    - |
+      srun hostname
+      [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
+
 horeka-mpi-multinode-job-singularity:
   dependencies: []
   stage: test-test-deploy
   tags:
     - slurm
     - singularity
+    - horeka
   variables:
-    COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
+    COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:
     - |
       srun hostname
