@@ -18,14 +18,6 @@ if it cannot determine whether a suitable existing allocation exists.
 If a Slurm job allocation is idling for some amount of time
 (300 seconds, but this can be reduced), 
 it will terminate itself in order to avoid wasting resources.
-
-The user can influence the parameters of the Slurm Job allocation
-by setting [`sbatch` input variables](https://slurm.schedmd.com/sbatch.html)
-in the CI configuration file,
-and by setting the environment variable `COMMAND_OPTIONS_SBATCH` 
-to a string of `sbatch` command line parameters 
-(this is needed to set the number of tasks, for example).
-
 ## Usage
 
 ### GitLab CI setup: runner registration
@@ -86,7 +78,7 @@ the plain `gitlab-runner register` command
 and/or to modify the GitLab runner configuration file
 that by default lives in `$HOME/.gitlab-runner/config.toml`.
 
-#### About runner tags?
+#### About runner tags
 
 Tags are a mechanism which allows 
 to choose which runner can process a given job
@@ -101,10 +93,11 @@ in two cases:
 - or the runner is allowed to execute untagged jobs.
 
 This can be particularly useful 
-to make sure that some CI/CD jobs 
+to make sure that specific CI/CD jobs 
 are executed only on machines that 
 have the right hardware or software setup,
 for example.
+
 #### Workspace for the custom executor
 
 In order to use the custom executor,
@@ -190,18 +183,37 @@ DockerHub access tokens can be configured to have a smaller scope,
 and according to [the documentation](https://docs.docker.com/docker-hub/access-tokens/)
 they can be used in any place where a password is needed.
 
+**NOTE: It is a very dangerous practice to save access credentials
+in a software repository, e.g. in the .gitlab-ci.yml file.
+Use one of the numerous alternatives.**
+
+#### Singularity
+
 Singularity can use the `SINGULARITY_DOCKER_USERNAME`
 and `SINGULARITY_DOCKER_PASSWORD` environment variables.
 These can be set on the GitLabCI interface.
 Additionally, Singularity can store credentials in its cache file.
 
-**NOTE: It is a very dangerous practice to save access credentials
-in a software repository, e.g. in the .gitlab-ci.yml file.
-Use one of the numerous alternatives.**
+More information can be found [here](https://singularity-userdoc.readthedocs.io/en/latest/singularity_and_docker.html#authentication-in-the-environment).
 
+##### Apptainer (newer version of Singularity)
+
+Relevant information can be found [here](https://apptainer.org/docs/user/latest/endpoint.html#managing-oci-registries).
 
 ##### Enroot
 
+Relevant information about enroot's authentication method,
+is available at the [documentation of the enroot import command](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md).
+
+
+### Slurm allocation settings
+
+The user can influence the parameters of the Slurm Job allocation
+by setting [`sbatch` input variables](https://slurm.schedmd.com/sbatch.html)
+in the CI configuration file,
+and by setting the environment variable `COMMAND_OPTIONS_SBATCH` 
+to a string of `sbatch` command line parameters 
+(this is needed to set the number of tasks, for example).
 
 
 
