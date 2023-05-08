@@ -1,0 +1,50 @@
+unit-test-parallel-bootstrap-slurm-only:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap-slurm-only
+  script:
+    - make test-report-parallel JOBS=8
+  after_script:
+    - make joker
+  tags:
+    - slurm
+    - slurm-only
+  artifacts:
+    when: always
+    paths:
+      - report-parallel.xml
+    reports:
+      junit: report-parallel.xml
+
+
+unit-test-serial-bootstrap-slurm-only:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap-slurm-only
+  script:
+    - make test-report-serial
+  after_script:
+    - make joker
+  tags:
+    - slurm
+    - slurm-only
+  artifacts:
+    when: always
+    paths:
+      - report-serial.xml
+    reports:
+      junit: report-serial.xml
+
+
+lint-bootstrap-slurm-only:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: bootstrap-slurm-only
+  script:
+    - make shellcheck
+  tags:
+    - slurm
+    - slurm-only

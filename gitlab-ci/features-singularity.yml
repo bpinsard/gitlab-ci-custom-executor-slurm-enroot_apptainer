@@ -49,7 +49,7 @@ artifact-image-job-singularity:
 
 bwuc2-mpi-multinode-job-singularity:
   dependencies: []
-  stage: test-test-deploy
+  stage: system-specific
   tags:
     - slurm
     - singularity
@@ -63,7 +63,7 @@ bwuc2-mpi-multinode-job-singularity:
 
 horeka-mpi-multinode-job-singularity:
   dependencies: []
-  stage: test-test-deploy
+  stage: system-specific
   tags:
     - slurm
     - singularity

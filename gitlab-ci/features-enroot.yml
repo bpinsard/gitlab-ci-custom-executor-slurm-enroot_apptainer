@@ -51,7 +51,7 @@ artifact-image-job-enroot:
 
 bwuc2-mpi-multinode-job-enroot:
   dependencies: []
-  stage: test-test-deploy
+  stage: system-specific
   tags:
     - slurm
     - enroot
@@ -65,7 +65,7 @@ bwuc2-mpi-multinode-job-enroot:
 
 horeka-mpi-multinode-job-enroot:
   dependencies: []
-  stage: test-test-deploy
+  stage: system-specific
   tags:
     - slurm
     - enroot
