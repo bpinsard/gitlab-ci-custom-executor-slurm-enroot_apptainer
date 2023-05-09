@@ -36,12 +36,14 @@ It accepts the following options:
                           $REPO
 
     --container-backends  The backend used for containerised jobs,
-                          i.e., "enroot", "singularity" or "all".
-                          When using "all", two runners will be
-                          registered, and one will have the
-                          "enroot" tag added to its tag list, while
-                          the other will have the "singularity" tag
-                          added to its tag list.
+                          i.e., "enroot", "singularity", "none" or "all".
+                          When using "all", 3 runners will be registered,
+                          one will have the "enroot" tag
+                          added to the supplied tag list,
+                          another will have the "singularity" tag
+                          added to the supplied tag list,
+                          and the third one will have nothing
+                          added to the supplied tag list.
 
     --builds-dir          Directory where builds are stored
                           default:
@@ -204,7 +206,7 @@ then
         CE_REPO="$CE_REPO_DEFAULT"
     fi
 fi
-while [[ ! "$CONTAINER_BACKENDS" =~ ^(enroot|singularity|all)$ ]]
+while [[ ! "$CONTAINER_BACKENDS" =~ ^(enroot|singularity|none|all)$ ]]
 do
    echo "Container backend ('singularity', 'enroot' or 'all' - type unquoted):"
    read -er CONTAINER_BACKENDS
@@ -258,6 +260,10 @@ elif [[ "$CONTAINER_BACKENDS" == enroot ]]
 then
     CONTAINER_BACKENDS_ARR=(enroot)
     TAGS_ARR[enroot]="$TAGS"
+elif [[ "$CONTAINER_BACKENDS" == none ]]
+then
+    CONTAINER_BACKENDS_ARR=(none)
+    TAGS_ARR[none]="$TAGS"
 elif [[ "$CONTAINER_BACKENDS" == all ]]
 then
     CONTAINER_BACKENDS_ARR=(enroot singularity none)
