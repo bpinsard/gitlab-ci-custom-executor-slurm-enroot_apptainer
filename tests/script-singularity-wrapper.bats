@@ -95,8 +95,8 @@ EOF
 
     ./wrapped.sh
 
-    # shellcheck source=./src/singularity-containerlib.sh
-    source "$SRC/singularity-containerlib.sh"
+    # shellcheck source=./src/containerlib-singularity.sh
+    source "$SRC/containerlib-singularity.sh"
 
     assert_file_contains "$MOCKLOGDIR/singularity.log" "exec.*$CE_IMAGEFILE"
 
@@ -139,8 +139,8 @@ EOF
 
     ./wrapped.sh
 
-    # shellcheck source=./src/singularity-containerlib.sh
-    CE_IMAGEFILE=$( . "$SRC"/singularity-containerlib.sh; echo "$CE_IMAGEFILE")
+    # shellcheck source=./src/containerlib-singularity.sh
+    CE_IMAGEFILE=$( . "$SRC"/containerlib-singularity.sh; echo "$CE_IMAGEFILE")
     assert_file_contains "$MOCKLOGDIR/singularity.log" "ARGS: exec.*$CE_IMAGEFILE"
 
 }

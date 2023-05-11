@@ -67,8 +67,8 @@ function teardown_file(){
 
     "$SRC/cleanup-slurm.sh" singularity
 
-    # shellcheck source=./src/singularity-containerlib.sh
-    source "$SRC"/singularity-containerlib.sh
+    # shellcheck source=./src/containerlib-singularity.sh
+    source "$SRC"/containerlib-singularity.sh
 
     assert_not_exists "$CE_IMAGEFILE"
 
@@ -107,8 +107,8 @@ function teardown_file(){
 
     "$SRC/cleanup-slurm.sh" singularity
 
-    # shellcheck source=./src/singularity-containerlib.sh
-    source "$SRC"/singularity-containerlib.sh
+    # shellcheck source=./src/containerlib-singularity.sh
+    source "$SRC"/containerlib-singularity.sh
 
     assert_exists "$CE_IMAGEFILE"
 

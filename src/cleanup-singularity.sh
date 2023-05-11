@@ -2,8 +2,8 @@
 
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-# shellcheck source=./src/singularity-containerlib.sh
-source "$SRC"/singularity-containerlib.sh
+# shellcheck source=./src/containerlib-singularity.sh
+source "$SRC"/containerlib-singularity.sh
 
 
 set +o nounset

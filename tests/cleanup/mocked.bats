@@ -33,8 +33,8 @@ function setup() {
     source <( "$SRC/configure-slurm.sh" 3> /dev/null | read-job-env.py )
 
     (
-        # shellcheck source=./src/enroot-containerlib.sh
-        source "$SRC/enroot-containerlib.sh"
+        # shellcheck source=./src/containerlib-enroot.sh
+        source "$SRC/containerlib-enroot.sh"
         mkdir "$MOCKLOGDIR/.enroot-fakecontainers"
         touch "$MOCKLOGDIR/.enroot-fakecontainers/$CE_CONTAINER_NAME"
     )

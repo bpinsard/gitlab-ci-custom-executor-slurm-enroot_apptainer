@@ -131,8 +131,8 @@ EOF
 
     ./wrapped.sh
 
-    # shellcheck source=./src/enroot-containerlib.sh
-    CONTAINER_NAME=$( . "$SRC"/enroot-containerlib.sh; echo "$CE_CONTAINER_NAME")
+    # shellcheck source=./src/containerlib-enroot.sh
+    CONTAINER_NAME=$( . "$SRC"/containerlib-enroot.sh; echo "$CE_CONTAINER_NAME")
 
     assert_file_contains "$MOCKLOGDIR/enroot.log" "ARGS: start.*$CONTAINER_NAME"
 

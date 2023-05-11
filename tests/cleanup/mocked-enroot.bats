@@ -71,8 +71,8 @@ function teardown_file(){
     # _helper(){ enroot list | wc -l; }
 
 
-    # shellcheck source=./src/enroot-containerlib.sh
-    source "$SRC"/enroot-containerlib.sh
+    # shellcheck source=./src/containerlib-enroot.sh
+    source "$SRC"/containerlib-enroot.sh
     assert_file_contains "$MOCKLOGDIR/enroot.log" "\bremove\b.*$CE_CONTAINER_NAME"
 
 }

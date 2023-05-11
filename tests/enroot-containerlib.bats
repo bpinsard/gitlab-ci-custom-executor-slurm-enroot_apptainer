@@ -25,8 +25,8 @@ teardown(){
     # shellcheck disable=SC2030
     export ENROOT_RUNTIME_PATH="$CUSTOM_ENV_CI_WS/already/defined"
 
-    # shellcheck source=./src/enroot-containerlib.sh
-    source "$SRC"/enroot-containerlib.sh
+    # shellcheck source=./src/containerlib-enroot.sh
+    source "$SRC"/containerlib-enroot.sh
 
     run echo "$ENROOT_RUNTIME_PATH"
 
@@ -40,8 +40,8 @@ teardown(){
     # shellcheck disable=SC2030,SC2031
     export ENROOT_CACHE_PATH="$CUSTOM_ENV_CI_WS/already/defined"
 
-    # shellcheck source=./src/enroot-containerlib.sh
-    source "$SRC"/enroot-containerlib.sh
+    # shellcheck source=./src/containerlib-enroot.sh
+    source "$SRC"/containerlib-enroot.sh
 
     run echo "$ENROOT_CACHE_PATH"
 
@@ -55,8 +55,8 @@ teardown(){
     # shellcheck disable=SC2030,SC2031
     export ENROOT_DATA_PATH="$CUSTOM_ENV_CI_WS/already/defined"
 
-    # shellcheck source=./src/enroot-containerlib.sh
-    source "$SRC"/enroot-containerlib.sh
+    # shellcheck source=./src/containerlib-enroot.sh
+    source "$SRC"/containerlib-enroot.sh
 
     run echo "$ENROOT_DATA_PATH"
 
@@ -72,8 +72,8 @@ teardown(){
         # shellcheck disable=SC2030
         export CUSTOM_ENV_CI_JOB_IMAGE=""
 
-        # shellcheck source=./src/enroot-containerlib.sh
-        source "$SRC"/enroot-containerlib.sh
+        # shellcheck source=./src/containerlib-enroot.sh
+        source "$SRC"/containerlib-enroot.sh
 
          _helper() {
              # shellcheck disable=SC2317
@@ -90,8 +90,8 @@ teardown(){
 
 @test "ENROOT_*_PATHS variables should be all inside CUSTOM_ENV_CI_WS" {
 
- # shellcheck source=./src/enroot-containerlib.sh
- source "$SRC"/enroot-containerlib.sh
+ # shellcheck source=./src/containerlib-enroot.sh
+ source "$SRC"/containerlib-enroot.sh
  for VARNAME in ${!ENROOT*}
  do
      run echo "${!VARNAME}"
@@ -103,8 +103,8 @@ teardown(){
 @test "variable CE_CONTAINER_NAME contains CUSTOM_ENV_CI_JOB_ID" {
 
 
- # shellcheck source=./src/enroot-containerlib.sh
- source "$SRC"/enroot-containerlib.sh
+ # shellcheck source=./src/containerlib-enroot.sh
+ source "$SRC"/containerlib-enroot.sh
 
  run echo "$CE_CONTAINER_NAME"
  assert_output --partial "$CUSTOM_ENV_CI_JOB_ID"

@@ -4,8 +4,8 @@ TOWRAP="$1"
 [[ "$TOWRAP" =~ ^/ ]] || { echo "Needs absolute path to script to wrap." >&2; exit 22; }
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-# shellcheck source=./src/enroot-containerlib.sh
-source "$SRC"/singularity-containerlib.sh
+# shellcheck source=./src/containerlib-singularity.sh
+source "$SRC"/containerlib-singularity.sh
 
 # This line will print the environment variables
 # shellcheck disable=SC2086

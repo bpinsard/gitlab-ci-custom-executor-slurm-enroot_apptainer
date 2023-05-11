@@ -371,8 +371,8 @@ EOF
    "$SRC/run.sh" enroot "$TMP_PLAYGROUND/script-$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    (
-   # shellcheck source=./src/enroot-containerlib.sh
-   source "$SRC/enroot-containerlib.sh"
+   # shellcheck source=./src/containerlib-enroot.sh
+   source "$SRC/containerlib-enroot.sh"
    assert_file_contains "$ENROOTLOG" "start.*$CE_CONTAINER_NAME.*$CUSTOM_ENV_CI_WS/"
    )
 

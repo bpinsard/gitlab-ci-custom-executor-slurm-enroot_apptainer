@@ -74,13 +74,13 @@ then
     case "$CONTAINERISATION_BACKEND" in
         enroot)
             echo "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
-            # shellcheck source=./src/enroot-cleanup.sh
-            source "$SRC/enroot-cleanup.sh"
+            # shellcheck source=./src/cleanup-enroot.sh
+            source "$SRC/cleanup-enroot.sh"
             ;;
         singularity)
             echo "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
-            # shellcheck source=./src/singularity-cleanup.sh
-            source "$SRC/singularity-cleanup.sh"
+            # shellcheck source=./src/cleanup-singularity.sh
+            source "$SRC/cleanup-singularity.sh"
             ;;
         *)
             echo "[CLEANUP] ERROR: Not a valid backend: $CONTAINERISATION_BACKEND"

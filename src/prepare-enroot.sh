@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
-# shellcheck source=./src/enroot-containerlib.sh
-source "$SRC"/enroot-containerlib.sh
+# shellcheck source=./src/containerlib-enroot.sh
+source "$SRC"/containerlib-enroot.sh
 
 CE_IMAGEDIR="$(mktemp -d "$CUSTOM_ENV_CI_WS/imagedirXXXXX")"
 
