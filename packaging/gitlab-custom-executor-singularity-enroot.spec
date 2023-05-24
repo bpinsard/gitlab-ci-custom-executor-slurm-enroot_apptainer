@@ -1,5 +1,5 @@
 #!/usr/bin/env rpm
-Name:     gitlab-custom-executor-singularity-enroot
+Name:     gitlab-custom-executor-slurm-singularity-enroot
 Version:  1.0
 Release:  1
 Source0:  rpmbuild.tar
@@ -10,6 +10,7 @@ Summary:  GitLab-Runner custom executor using Slurm with Enroot or Singularity
 Requires: git
 Requires: git-lfs
 Requires: gitlab-runner
+Prefix:   /usr/share/gitlab-runner/custom-executor-slurm-singularity-enroot
 
 %description
 GitLab Runner offers the Custom Executor mechanism
@@ -29,7 +30,7 @@ and an associated script to ease the user configuration.
 %setup -q -n %{name}
 
 %install
-make install \
+make -f packaging/Makefile install \
     DESTDIR="${RPM_BUILD_ROOT}" \
     PREFIX="%{prefix}" \
     VERSION="v%{version}-%{release}"

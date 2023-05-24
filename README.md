@@ -387,5 +387,17 @@ with `bats`, and some tests hang while running,
 causing (possibly) erratic and nonsensical coverage information.
 
 
+## Packaging
+
+The scripts and this documentation 
+can be collected into a `RPM` package
+with the following command,
+which uses `rpmbuild` under the hood:
+```
+make -f packaging/Makefile rpm
+```
+The information necessary for building the package
+are in the `packaging` directory.
+
 
 
