@@ -1,5 +1,7 @@
 rpm-package:
   dependencies: []
+  tags:
+    - shell
   stage: packaging
   script:
     make -f packaging/Makefile rpmbuild.tar
