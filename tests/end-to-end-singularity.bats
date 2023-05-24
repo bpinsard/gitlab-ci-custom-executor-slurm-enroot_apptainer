@@ -37,6 +37,13 @@ function setup(){
 
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
+      # If we are in a testing environment,
+      # it might be that CUSTOM_ENV_DEFAULT_PARTITION is not defined
+      # while DEFAULT_PARTITION is defined instead.
+      CUSTOM_ENV_DEFAULT_PARTITION="$DEFAULT_PARTITION"
+    fi
+    if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
+    then
       echo "Error:CUSTOM_ENV_DEFAULT_PARTITION not defined"
       exit 1
     fi
