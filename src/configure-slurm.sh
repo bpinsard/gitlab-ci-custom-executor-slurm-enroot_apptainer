@@ -45,12 +45,17 @@ done
 
 if [ -z "$WORKSPACE" ]
 then
+    echo "[CONFIGURE] No suitable workspace found." >&2
+
     # finding a new workspace
     WORKSPACE="$(find_available_workspace_name "$CUSTOM_ENV_CI_WS"/cews_)"
+    echo "[CONFIGURE] Creating workspace $WORKSPACE ..." >&2
 
     JOBSLURM="$(create_job_slurm "$SRC/job.slurm.template" \
                                  "$CUSTOM_ENV_DEFAULT_PARTITION" \
                                  "$WORKSPACE")"
+
+    echo "[CONFIGURE] Creating job script at $JOBSLURM ..." >&2
 
     check_or_set_custom_env_command_sbatch "$JOBSLURM"
 
@@ -64,11 +69,12 @@ then
                      "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
                      "$JOBSLURM")")
 
+    echo "[CONFIGURE] Submitted job $JOB_ID ..." >&2
     wait_for_job_to_be_ready "$JOB_ID"
     wait_until_file_exists "$WORKSPACE/.env" 90
 
     mv "$SLURMENV_CANDIDATE" "$WORKSPACE/slurmenv"
-    echo "[CONFIGURE] Created suitable workspace in $WORKSPACE" >&2
+    echo "[CONFIGURE] Configured workspace in $WORKSPACE" >&2
 fi
 
 cat <<EOF
