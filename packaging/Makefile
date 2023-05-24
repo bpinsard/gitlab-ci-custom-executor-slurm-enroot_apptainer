@@ -23,11 +23,10 @@ DOC               := README.md
 MAKEFILE          := packaging/Makefile
 SPECFILE          := packaging/gitlab-custom-executor-singularity-enroot.spec
 VERSION           := v1.0
-PREFIX            := /usr/share/gitlab-runner/custom-executor-slurm-container
+PREFIX            := /usr/share/gitlab-runner/custom-executor-slurm-singularity-enroot
 DATA_DIR          := $(DESTDIR)$(PREFIX)
 
 .PHONY: install
-
 install: $(SCRIPTS_SRC_RWX) $(SCRIPTS_SRC_RW) $(SCRIPTS_UTILS_RWX) $(Makefile)
 	install --directory --verbose "$(DATA_DIR)/"
 	install --directory --verbose "$(DATA_DIR)/src"
@@ -43,9 +42,8 @@ install: $(SCRIPTS_SRC_RWX) $(SCRIPTS_SRC_RW) $(SCRIPTS_UTILS_RWX) $(Makefile)
 	sed -i -e "s@<PREFIX>@$(PREFIX)@g" -e "s@<VERSION>@$(VERSION)@" "$(DATA_DIR)/$(DOC)"
 
 .INTERMEDIATE: rpmbuild.tar
-rpmbuild.tar: $(SCRIPTS_SRC_RWS) $(SCRIPTS_SRC_RW) $(SCRIPT_UTILS_RWX) $(DOC) $(MAKEFILE) $(SPECFILE)
-	#tar --create --verbose --transform='s@^@gitlab-runner-custom-executor-enroot/@g' --file="$@" $^
-	tar --create --verbose --file="$@" $^
+rpmbuild.tar: $(SCRIPTS_SRC_RWX) $(SCRIPTS_SRC_RW) $(SCRIPTS_UTILS_RWX) $(DOC) $(MAKEFILE) $(SPECFILE)
+	tar --create --verbose --transform='s@^@gitlab-custom-executor-slurm-singularity-enroot/@g' --file="$@" $^
 
 .PHONY: rpm
 rpm: rpmbuild.tar
