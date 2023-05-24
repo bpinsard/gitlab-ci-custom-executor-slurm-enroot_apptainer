@@ -78,7 +78,7 @@ the plain `gitlab-runner register` command
 and/or to modify the GitLab runner configuration file
 that by default lives in `$HOME/.gitlab-runner/config.toml`.
 
-#### About runner tags
+#### Runner tags and job tags
 
 Tags are a mechanism which allows 
 to choose which runner can process a given job
@@ -92,11 +92,12 @@ in two cases:
   a subset of the tags of the runner
 - or the runner is allowed to execute untagged jobs.
 
-This can be particularly useful 
-to make sure that specific CI/CD jobs 
-are executed only on machines that 
-have the right hardware or software setup,
-for example.
+The tags of the runner are defined 
+at the runner registration stage
+(and can be later changed on the GitLab web interface),
+while the tags for the jobs are set
+in the `tags:` section of the job definition
+in the CI/CD configuration file (i.e., typically, `.gitlab-ci.yml`).
 
 #### Workspace for the custom executor
 
@@ -117,17 +118,6 @@ or in [web interface](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-var
 This variable needs to be an absolute path
 pointing to an existing directory 
 you have write privileges on.
-
-
-#### Job tags
-
-In order for a particular job to use the custom executor,
-one possible way is to use the `tags:` section.
-The tags of the job need to be a subset of the tags 
-with which the runner was set up.
-The tags for a specific runner
-are set at the registration step,
-but can be changed on the  GitLab web interface.
 
 ### CI jobs in containers on HoreKa
 
@@ -152,7 +142,7 @@ can be used to register runners
 for a general idea,
 the invocation and launch of the GitLab runner 
 depends on the configuration
-of the system the runner is supposed to run on).
+of the system the runner sits on).
 
 After that, one generally needs to manually modify the configuration file
 (by default, `$HOME/.gitlab-runner/config.toml`),
