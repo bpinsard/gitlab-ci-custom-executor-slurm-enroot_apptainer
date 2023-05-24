@@ -4,6 +4,7 @@ horeka-mpi-multinode-job-singularity:
   tags:
     - slurm
     - singularity
+    - horeka
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:
@@ -17,6 +18,7 @@ horeka-mpi-multinode-job-enroot:
   tags:
     - slurm
     - enroot
+    - horeka
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:
@@ -30,6 +32,7 @@ horeka-mpi-multinode-job-slurm-only:
   tags:
     - slurm
     - slurm-only
+    - horeka
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:

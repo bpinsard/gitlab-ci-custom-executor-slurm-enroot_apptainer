@@ -4,6 +4,7 @@ bwuc2-mpi-multinode-job-singularity:
   tags:
     - slurm
     - singularity
+    - bwuc2
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:
@@ -17,6 +18,7 @@ bwuc2-mpi-multinode-job-enroot:
   tags:
     - slurm
     - enroot
+    - bwuc2
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:
@@ -30,6 +32,7 @@ bwuc2-mpi-multinode-job-slurm-only:
   tags:
     - slurm
     - slurm-only
+    - bwuc2
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
   script:

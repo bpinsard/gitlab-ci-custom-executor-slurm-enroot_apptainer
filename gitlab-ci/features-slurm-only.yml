@@ -21,20 +21,6 @@ artifact-job-slurm-only:
     paths:
       - test-artifact.txt
 
-bwuc2-mpi-multinode-job-slurm-only:
-  dependencies: []
-  stage: system-specific
-  tags:
-    - slurm
-    - slurm-only
-    - bwuc2
-  variables:
-    COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"
-  script:
-    - |
-      srun hostname
-      [ "$(srun hostname | sort -u | wc -l)" -eq 2 ] || exit 1
-
 env-job-slurm-only:
   dependencies: []
   stage: test-test-deploy
