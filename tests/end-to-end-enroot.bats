@@ -35,6 +35,8 @@ function setup(){
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
 
+    echo "ENVIRONMENT:"
+    env | sort
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
       echo "Error:CUSTOM_ENV_DEFAULT_PARTITION not defined"
