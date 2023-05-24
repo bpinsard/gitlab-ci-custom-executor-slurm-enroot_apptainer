@@ -89,9 +89,13 @@ function _on_horeka () {
    local MOCK="$PROJECT_ROOT"/tests/mocks
    local SRC="$PROJECT_ROOT"/src
 
-   N=$(diff <("$SRC"/slurm-utils/_get-sbatch-input-env-list.sh | sort )  \
-            <( "$MOCK"/bin/get-sbatch-input-env-list.sh | sort )  \
-   | wc -l)
+   "$SRC"/slurm-utils/_get-sbatch-input-env-list.sh | sort > real
+   "$MOCK"/bin/get-sbatch-input-env-list.sh | sort  > mock
+
+   diff real mock | tee diff-real-mock
+
+   N=$( wc -l < diff-real-mock)
+
    assert_equal "$N" 0
 
 
