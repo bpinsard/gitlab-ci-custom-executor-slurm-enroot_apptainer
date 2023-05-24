@@ -1,0 +1,8 @@
+rpm-package:
+  dependencies: []
+  stage: packaging
+  script:
+    make -f packaging/Makefile rpmbuild.tar
+  artifacts:
+    paths:
+      - rpmbuild.tar
