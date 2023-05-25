@@ -51,6 +51,8 @@ function teardown() {
 
     sleep 2
     CEQ_ENV="$TEST_PLAYGROUND/cews_0"/.env
+    echo "Content of TEST_PLAYGROUND ($TEST_PLAYGROUND):"
+    find "$TEST_PLAYGROUND"
     assert_exists "$CEQ_ENV"
     # shellcheck disable=SC1090
     source "$CEQ_ENV"
