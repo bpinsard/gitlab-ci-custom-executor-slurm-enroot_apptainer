@@ -7,25 +7,58 @@ and from Holger Obermaier's Slurm and Enroot custom executor.
 ## What it does
 
 It allows the user to launch jobs from GitLab CI
-on a SLURM-based HPC cluster (only HoreKa tested so far).
-The runner resides on the login nodes, 
-and requests allocations on the compute nodes 
+on a SLURM-based HPC cluster 
+(only HoreKa and BWUniCluster 2.0 tested so far).
+The `gitlab-runner` process is launched 
+and resides on the login nodes, 
+and requests resources via Slurm on the compute nodes 
 to run all the stages of the CI/CD jobs.
-If sufficient conditions are met,
+If /sufficient/ conditions are met,
 multiple CI/CD jobs can use a single Slurm job allocation.
 The runner will create a new Slurm allocation for a CI/CD job 
-if it cannot determine whether a suitable existing allocation exists.
+if it cannot find a suitable existing allocation.
 If a Slurm job allocation is idling for some amount of time
 (100 seconds, but this can be changed) 
 it will terminate itself in order to avoid wasting resources.
+
 ## Usage
+### GitLab CI setup: terminology 
+
+For convenience, a brief explanation 
+of the terms used in this documentation:
+More info can be obtained [here](https://docs.gitlab.com/runner/)
+
+- the `gitlab-runner` executable. 
+  It is a standalone program that 
+  manages the communication with the GitLab instance,
+  and provides some standard mechanisms of execution
+  and customization hooks.
+- the runner: a resource that can run CI jobs.
+  A runner can be created/registered for a GitLab repository,
+  for a GitLab instance or a GitLab group. 
+- the executor: the underlying mechanism 
+  that will concretely execute the CI jobs
+  More info can be obtained [here](https://docs.gitlab.com/runner/executors/)
+- the custom executor: a custom version of the executor,
+  composed of a number of scripts
+  representing the customization hooks of the runner.
+  More info can be obtained [here](https://docs.gitlab.com/runner/executors/custom.html)
+
+### GitLab CI setup: installing the custom executor code
+
+To set up this executor on a HPC system,
+either:
+- clone this repository on the system,
+- make sure this code is available on the system,
+  in the system directories
+- create a  tarball with all the necessary code
+  (which can be produced using the `Makefile` 
+  in the `packaging` directory),
+  and extract it on the system.
 
 ### GitLab CI setup: runner registration
-
-To set up this runner on a HPC system,
-clone this repository on the system,
-or make sure this code is available on the system.
-Then make use of the script named
+To register a new runner
+make use of the script named
 `gitlab-runner-register-wrapper.sh`,
 which is available in the `utils` directory
 of this repository.
@@ -34,16 +67,22 @@ it is a wrapper around the `gitlab-runner register` command
 that streamlines the registration of a runner 
 based on the scripts in this repository.
 
+To register a runner for a repository,
+navigate to the web interface of your GitLab instance,
+to the repository you want, and to Settings -> CI/CD -> Runners.
+
 Invoked *without options*
 will ask clearly for what is needed
 in an interactive way.
-The most important options are:
+The most important inputs and options are:
 - the `gitlab-ci coordinator` URL,
   i.e., the URL of the server 
-  where the repository live;
+  where the repository live
+  (retrieve this from the CI runner setting web page);
 - the project registration token,
   needed by the runner to query 
-  the gitlab server for CI jobs;
+  the gitlab server for CI jobs
+  (retrieve this from the CI runner setting web page);
 - a description, or name, for the runner
 - the tags we want to give to the runner (optional)
 - the containerisation backend 
@@ -54,15 +93,8 @@ The most important options are:
 - the default Slurm partition that we want to use 
   for our jobs.
 Other options are available, 
-but for those it is likely 
-that the default values proposed
-are acceptable.
-
-The coordinator url 
-and the registration token
-can both be obtained 
-from the GitLab web interface,
-in Settings -> CI/CD -> Runners.
+but the wrapper should propose 
+reasonable values for those.
 
 The command
 ``` bash
@@ -109,30 +141,18 @@ to a path you have access to
 The recommended way is to define it 
 in the private configuration of the custom executor,
 on the machine where the runner is registered.
-The `gitlab-runner-register-wrapper.sh` scripts
-provides a way to set it.
+The `gitlab-runner-register-wrapper.sh` script
+sets it to a reasonable default (`$HOME/gitlab-runner/`).
+
 Alternatively, it can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/),
 e.g. [in the `.gitlab-ci.yml` file](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-gitlab-ciyml-file)
-or in [web interface](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-ui).
+in [web interface](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-ui).
+or in the `environment` section of the configuration file
+of the runner (typically, `$HOME/.gitlab-runner/config.toml`).
 
 This variable needs to be an absolute path
 pointing to an existing directory 
 you have write privileges on.
-
-### CI jobs in containers on HoreKa
-
-The custom executor can use [Singularity/Apptainer](https://apptainer.org/)
-or [Enroot](https://github.com/NVIDIA/enroot) to run jobs in containers
-(this relies on Singularity/Apptainer or Enroot to be installed
-on HoreKa).
-
-In order to use those, make sure you set the `image:` tag 
-of the CI job in the same format as Singularity/Apptainer or Enroot expect it.
-
-Singularity is quite more flexible and it will accept 
-the `name:tag` format as an image specification,
-while Enroot needs a 
-[more precise specification](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md#usage).
 
 #### The plain `gitlab-runner register` command
 
@@ -160,7 +180,37 @@ in multiple places,
 in particular adding the paths to all the scripts 
 and setting environment variables.
 
-#### Authentication to DockerHub
+
+### CI jobs in containers on HoreKa and bwUniCluster 2.0
+
+The custom executor can use [Singularity/Apptainer](https://apptainer.org/)
+or [Enroot](https://github.com/NVIDIA/enroot) to run jobs in containers
+(this relies on Singularity/Apptainer or Enroot to be installed
+on the HPC system in use).
+
+In order to use those, make sure you set the `image:` tag 
+of the CI job in the same format as Singularity/Apptainer or Enroot expect it.
+Both Apptainer and Enroot do support image specification in a format like
+`docker://debian:latest`.
+
+The format for the image specification for Enroot is described 
+[here](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md#usage)
+(the `enroot import` command is used under the hood),
+while the one for Apptainer is described
+[here](https://apptainer.org/docs/user/main/cli/apptainer_pull.html)
+(the `singularity pull` command is used under the hood).
+
+**Note:** it is not possible to execute root commands 
+in Singularity containers on HoreKa or bwUnicluster 2.0.
+With Enroot it is theoretically possible to use the `--root` option 
+for the command `enroot start`, 
+but it is not implemented at the moment.
+
+
+### Authentication to DockerHub
+
+When using images with uri starting with `docker://`,
+the image will be pulled from DockerHub (if it is not cached).
 
 DockerHub has a pull rate limiting in place of 200 pulls every 6 hours.
 For non authenticated users it applies to *the IP address*,
@@ -205,9 +255,8 @@ and by setting the environment variable `COMMAND_OPTIONS_SBATCH`
 to a string of `sbatch` command line parameters 
 (this is needed to set the number of tasks, for example).
 
+## Development and maintenance of the custom executor code
 
-
-## Development and maintenance
 ### Debug
 
 In some cases, the code looks at a variable called `CUSTOM_ENV_CE_DEBUG` 
@@ -222,6 +271,7 @@ the results can be inspected.
 
 This debuggability feature might need to be expanded.
 If you find any issues with the runner,
+please let us know.
 
 ### Linting
 
@@ -237,7 +287,6 @@ will:
   not including test depencencies).
 
 ### Tests
-
 
 Unit tests require the [BATS framework](https://github.com/bats-core)
 installed as a collection of submodules.
@@ -298,15 +347,19 @@ Every time we run the pipeline:
   of the custom executor
   (through the tag mechanism)
 
-### GitLab CI configuration
+### Configuration of the test pipeline on GitLab CI
+
+**Note: This might be streamlined in the future.**
 
 The GitLab CI configuration included in this repository
 is made up of a number of stages
-which include unit test, a test deployment,
-a number of tests of the deployed executor
-(this includes a job with artifacts, 
-one in a container,
-a multi-node job 
+which include unit tests, a test deployment,
+a number of tests of the deployed executor.
+These try to test different features of the executor,
+e.g. the production of artifacts, usage of containers,
+multi-node mpi jobs and some combinations of these
+for the Singularity/Apptainer, Enroot and "SLURM-only" 
+flavours of the executor.
 
 At the beginning of the pipeline,
 the jobs are run using a shell executor,
@@ -354,13 +407,15 @@ In order for this to work:
   one with the `singularity, slurm` tags,
   one with the `enroot, slurm` tags,
   and another with the `slurm` tag.
-  In order to make sure that 
+- In order to make sure that 
   the tests for the slurm-only runner 
   are run only in on the third runner,
   the `slurm-only` tag has been added 
   to those tests.
-  As a result, one need to add 
-  the `slurm-only` tag to the last runner.
+  As a result, *one needs to add*
+  the `slurm-only` tag to the last runner
+  (otherwise some CI jobs 
+  will remain stuck in the queue).
   Runner tags can only be managed 
   either at the registration stage
   or later on the GitLab web interface,
@@ -385,7 +440,6 @@ Unfortunately, `bashcov` does not seem
 to interact perfectly
 with `bats`, and some tests hang while running,
 causing (possibly) erratic and nonsensical coverage information.
-
 
 ## Packaging
 
