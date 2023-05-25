@@ -2,7 +2,7 @@
 # THIS SEEMS TO WORK NOW
 echo Create the allocation and get the job ID
 echo This job runs on the host, no container
-JOBID=$(sbatch -p dev_cpuonly -n 1 -t 5 --wrap "sleep 300" --parsable)
+JOBID=$(sbatch -p dev_cpuonly -n 1 -t 5 --wrap "sleep 100" --parsable)
 
 echo "$JOBID" created
 

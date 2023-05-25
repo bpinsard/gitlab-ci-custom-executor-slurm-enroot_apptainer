@@ -16,7 +16,7 @@ multiple CI/CD jobs can use a single Slurm job allocation.
 The runner will create a new Slurm allocation for a CI/CD job 
 if it cannot determine whether a suitable existing allocation exists.
 If a Slurm job allocation is idling for some amount of time
-(300 seconds, but this can be reduced), 
+(100 seconds, but this can be changed) 
 it will terminate itself in order to avoid wasting resources.
 ## Usage
 

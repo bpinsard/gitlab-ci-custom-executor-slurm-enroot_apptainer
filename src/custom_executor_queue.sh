@@ -21,7 +21,7 @@ function start_custom_executor_queue () {
         set +o nounset
         if [ -z "$CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC" ]
         then
-        CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=300 # seconds
+        CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=100 # seconds
         fi
         set -o nounset
     fi
