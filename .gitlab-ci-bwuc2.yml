@@ -1,6 +1,7 @@
 
 stages:
   - test
+  - packaging
   - test-deploy
   - test-test-deploy
   - bootstrap-slurm-only
@@ -10,6 +11,7 @@ stages:
 
 include:
   - '/gitlab-ci/lint-and-unit.yml'
+  - '/gitlab-ci/package.yml'
   - '/gitlab-ci/update-ce-code.yml'
   - '/gitlab-ci/ce-queue-debug-test-enroot.yml'
   - '/gitlab-ci/ce-queue-debug-test-singularity.yml'
