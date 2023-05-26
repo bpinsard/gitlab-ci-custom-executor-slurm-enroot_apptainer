@@ -19,6 +19,8 @@ if [[ "$DEBUG" == "NO" ]]
 then
     # In case this is a sandbox, we need to use rm -r
     # but I cowardly refuse to have rm -r in a script
-    echo "Removing $CE_IMAGEFILE"
+    echo "[CLEANUP] Removing $CE_IMAGEFILE"
     rm "$CE_IMAGEFILE"
+else
+    echo "[CLEANUP] Not Removing $CE_IMAGEFILE because DEBUG==$DEBUG"
 fi
