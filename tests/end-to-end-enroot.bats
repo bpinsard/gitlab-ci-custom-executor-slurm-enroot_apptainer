@@ -49,7 +49,7 @@ function setup(){
     fi
 
     export CUSTOM_ENV_KILL_SLURM=1
-    }
+}
 
 function teardown() {
     if _on_horeka

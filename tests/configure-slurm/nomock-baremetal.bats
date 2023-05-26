@@ -37,7 +37,20 @@ EOF
     export CUSTOM_ENV_CI_WS
     mkdir -p "$CUSTOM_ENV_CI_WS" # This should not be needed
 
-    export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
+    if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
+    then
+      # If we are in a testing environment,
+      # it might be that CUSTOM_ENV_DEFAULT_PARTITION is not defined
+      # while DEFAULT_PARTITION is defined instead.
+      export CUSTOM_ENV_DEFAULT_PARTITION="$DEFAULT_PARTITION"
+    fi
+    if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
+    then
+      echo "Error:CUSTOM_ENV_DEFAULT_PARTITION not defined"
+      exit 1
+    fi
+
+
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env
 
 }
