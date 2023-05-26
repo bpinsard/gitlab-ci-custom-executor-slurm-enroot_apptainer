@@ -65,6 +65,8 @@ function teardown_file(){
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CE_DEBUG=
     "$SRC/cleanup-slurm.sh" singularity
 
     # shellcheck source=./src/containerlib-singularity.sh
@@ -90,7 +92,7 @@ function teardown_file(){
 }
 
 @test "singularity image should not be removed if CUSTOM_ENV_CE_DEBUG is set" {
-
+    (
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     # We need this preparation step for container stuff
@@ -111,5 +113,5 @@ function teardown_file(){
     source "$SRC"/containerlib-singularity.sh
 
     assert_exists "$CE_IMAGEFILE"
-
+    )
 }

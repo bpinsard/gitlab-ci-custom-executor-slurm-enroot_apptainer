@@ -65,6 +65,8 @@ function teardown_file(){
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CE_DEBUG=
     "$SRC/cleanup-slurm.sh" enroot
 
     # Out mock is not so clever, this does not work.

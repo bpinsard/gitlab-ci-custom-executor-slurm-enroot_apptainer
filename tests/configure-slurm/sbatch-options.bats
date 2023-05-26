@@ -70,6 +70,9 @@ function teardown() {
 
 @test "sbatch invoked with --{input,output,error}=/dev/null" {
 
+    (
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CE_DEBUG=
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
     echo "sbatch mock log:"
     echo "===================="
@@ -79,12 +82,14 @@ function teardown() {
     do
         assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-${STREAM}=/dev/null"
     done
+    )
 
 }
 
 @test "sbatch NOT invoked with --{output,error}=/dev/null when CUSTOM_ENV_CE_DEBUG is set." {
 
     (
+    # shellcheck disable=SC2031
     export CUSTOM_ENV_CE_DEBUG=1
     "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
