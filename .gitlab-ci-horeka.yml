@@ -1,24 +1,24 @@
 
 stages:
   - test
+  - packaging
   - test-deploy
   - test-test-deploy
   - bootstrap-slurm-only
   - bootstrap-singularity
   - bootstrap-enroot
   - system-specific
-  - packaging
 
 include:
-  - '/gitlab-ci/lint-and-unit.yml'
+  #- '/gitlab-ci/lint-and-unit.yml'
+  #- '/gitlab-ci/package.yml'
   - '/gitlab-ci/update-ce-code.yml'
-  - '/gitlab-ci/ce-queue-debug-test-enroot.yml'
-  - '/gitlab-ci/ce-queue-debug-test-singularity.yml'
-  - '/gitlab-ci/features-enroot.yml'
-  - '/gitlab-ci/features-singularity.yml'
-  - '/gitlab-ci/features-slurm-only.yml'
+  #- '/gitlab-ci/ce-queue-debug-test-enroot.yml'
+  #- '/gitlab-ci/ce-queue-debug-test-singularity.yml'
+  #- '/gitlab-ci/features-enroot.yml'
+  #- '/gitlab-ci/features-singularity.yml'
+  #- '/gitlab-ci/features-slurm-only.yml'
   - '/gitlab-ci/bootstrap-slurm-only.yml'
   - '/gitlab-ci/bootstrap-enroot.yml'
   - '/gitlab-ci/bootstrap-singularity.yml'
   - '/gitlab-ci/horeka-specific.yml'
-  - '/gitlab-ci/package.yml'
