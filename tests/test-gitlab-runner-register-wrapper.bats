@@ -22,7 +22,7 @@ function setup() {
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    URL_DEFAULT="https://scs-gitlab.scc.kit.edu/"
+    URL_DEFAULT="https://git.scc.kit.edu/"
 
     MOCK_INPUTS=(url
                  token

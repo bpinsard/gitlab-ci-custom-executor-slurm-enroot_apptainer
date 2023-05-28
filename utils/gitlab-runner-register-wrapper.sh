@@ -2,7 +2,7 @@
 
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}" )/.." > /dev/null 2>&1 && pwd)"
-URL_DEFAULT="https://scs-gitlab.scc.kit.edu/"
+URL_DEFAULT="https://git.scc.kit.edu/"
 BUILDS_DIR_DEFAULT="$HOME/gitlab-runner/builds"
 CACHE_DIR_DEFAULT="$HOME/gitlab-runner/cache"
 CI_WS_DEFAULT="$HOME/gitlab-runner"
