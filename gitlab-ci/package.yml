@@ -1,4 +1,4 @@
-rpm-package:
+tar-package:
   dependencies: []
   tags:
     - shell

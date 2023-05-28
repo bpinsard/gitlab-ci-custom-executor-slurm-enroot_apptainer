@@ -45,7 +45,7 @@ artifact-image-job-singularity:
   script: cp /etc/os-release test-artifact-image.txt
   artifacts:
     paths:
-      - test-artifact.txt
+      - test-artifact-image.txt
 
 
 env-job-singularity:

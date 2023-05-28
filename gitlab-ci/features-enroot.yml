@@ -46,7 +46,7 @@ artifact-image-job-enroot:
   script: cp /etc/os-release test-artifact-image.txt
   artifacts:
     paths:
-      - test-artifact.txt
+      - test-artifact-image.txt
 
 
 
