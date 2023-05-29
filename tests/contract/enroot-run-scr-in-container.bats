@@ -54,12 +54,12 @@ EOF
 # bats test_tags=coverage-problematic
 @test "enroot CANNOT mounts two files with a single --mount directive." {
 
-    # shellcheck disable=SC2030
+    # shellcheck disable=SC2030,SC2031
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/enroot/run"
     # we do not change ENROOT_CONFIG_PATH
-    # shellcheck disable=SC2030
+    # shellcheck disable=SC2030,SC2031
     export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/enroot/cache"
-    # shellcheck disable=SC2030
+    # shellcheck disable=SC2030,SC2031
     export ENROOT_DATA_PATH="$TEST_PLAYGROUND/enroot/data"
 
     rm -f alpine+latest.sqsh
@@ -87,12 +87,12 @@ EOF
 # bats test_tags=coverage-problematic
 @test "enroot accepts multiple --mount directives." {
 
-    # shellcheck disable=SC2030
+    # shellcheck disable=SC2030,SC2031
     export ENROOT_RUNTIME_PATH="$TEST_PLAYGROUND/enroot/run"
     # we do not change ENROOT_CONFIG_PATH
-    # shellcheck disable=SC2030
+    # shellcheck disable=SC2030,SC2031
     export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/enroot/cache"
-    # shellcheck disable=SC2030
+    # shellcheck disable=SC2030,SC2031
     export ENROOT_DATA_PATH="$TEST_PLAYGROUND/enroot/data"
 
     rm -f alpine+latest.sqsh
