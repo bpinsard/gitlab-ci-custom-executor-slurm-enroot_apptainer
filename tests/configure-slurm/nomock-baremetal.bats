@@ -163,6 +163,8 @@ EOF
     cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
     echo "end of logfile"
     assert_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out"
+    cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out"
+    find "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"
     assert_file_contains "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out" 'Hello'
 
 
