@@ -53,9 +53,9 @@ EOF
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
-    echo "[PREPARE] Wrap to be executed:" >&2
+    echo "[PREPARE] Wrap to be executed (credentials redacted):" >&2
     echo "==========================" >&2
-    cat "$WRAP" >&2
+    grep -vi "PASSWORD\|USERNAME" "$WRAP" >&2
     echo "==========================" >&2
     submit_to_custom_executor_queue_and_wait "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
 else
