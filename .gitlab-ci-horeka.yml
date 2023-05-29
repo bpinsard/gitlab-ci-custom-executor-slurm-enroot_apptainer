@@ -10,7 +10,7 @@ stages:
   - system-specific
 
 include:
-  # - '/gitlab-ci/lint-and-unit.yml' # TEMPORARY
+  - '/gitlab-ci/lint-and-unit.yml'
   - '/gitlab-ci/package.yml'
   - '/gitlab-ci/update-ce-code.yml'
   - '/gitlab-ci/ce-queue-debug-test-enroot.yml'
