@@ -6,11 +6,11 @@
 TOWRAP="$1"
 [[ "$TOWRAP" =~ ^/ ]] || { echo "Needs absolute path to script to wrap." >&2; exit 22; }
 
-MOUNT="$CUSTOM_ENV_CI_WS:$CUSTOM_ENV_CI_WS"
+MOUNT="--mount $CUSTOM_ENV_CI_WS:$CUSTOM_ENV_CI_WS"
 
 if [[ ! "$TOWRAP" =~ ^"${CUSTOM_ENV_CI_WS}"  ]]
 then
-    MOUNT="$TOWRAP":"$TOWRAP","$MOUNT"
+    MOUNT="--mount $TOWRAP:$TOWRAP $MOUNT"
 fi
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
@@ -23,7 +23,7 @@ source "$SRC"/containerlib-enroot.sh
 cat <<EOF
 COMMAND=(enroot start 
          --rw 
-         --mount "$MOUNT"
+         "$MOUNT"
          --
          "$CE_CONTAINER_NAME"
          "$TOWRAP")
