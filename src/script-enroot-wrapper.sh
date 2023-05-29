@@ -23,7 +23,7 @@ source "$SRC"/containerlib-enroot.sh
 cat <<EOF
 COMMAND=(enroot start 
          --rw 
-         "$MOUNT"
+         $MOUNT
          --
          "$CE_CONTAINER_NAME"
          "$TOWRAP")
