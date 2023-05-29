@@ -1,5 +1,8 @@
+
+
 update-ce-code:
-  dependencies: []
+  dependencies:
+    - tar-package
   stage: test-deploy
   tags:
     - shell
@@ -9,7 +12,6 @@ update-ce-code:
     - echo "Updating custom executor code in directory $CI_TEST_CODE"
     - test -n "$CI_TEST_CODE"
     - test -d "$CI_TEST_CODE"
-    - cd "$CI_TEST_CODE"
-    - git checkout "$CI_COMMIT_BRANCH"
-    - git pull $CI_REPOSITORY_URL
-
+    - tar xvf rpmbuild.tar
+    - rm -r "$CI_TEST_CODE"
+    - mv gitlab-custom-executor-slurm-singularity-enroot "$CI_TEST_CODE"
