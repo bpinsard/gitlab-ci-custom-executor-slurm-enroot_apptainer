@@ -34,7 +34,7 @@ function teardown() {
     [[ "$HOSTNAME" =~ hkn199[0-3]\.localdomain ]] || skip 
 
     # shellcheck disable=SC2030
-    export SINGULARITY_CACHEDIR="$TEST_PLAYGROUND/singularity"
+    export APPTAINER_CACHEDIR="$TEST_PLAYGROUND/singularity"
     run singularity pull docker://alpine:latest
     assert_failure
 
@@ -45,13 +45,13 @@ function teardown() {
 @test "singularity pull runs on the compute node, accept name for output image file and uses cache" {
 
     # shellcheck disable=SC2031
-    export SINGULARITY_CACHEDIR="$TEST_PLAYGROUND/singularity"
+    export APPTAINER_CACHEDIR="$TEST_PLAYGROUND/singularity"
 
     run srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
 
     assert_success
     assert_exists my-image.sif 
-    assert_dir_exists "$SINGULARITY_CACHEDIR"
+    assert_dir_exists "$APPTAINER_CACHEDIR"
 
 
 }

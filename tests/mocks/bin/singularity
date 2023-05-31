@@ -11,12 +11,12 @@ source "$BASEMOCK" "$SINGULARITY_LOG" "$@"
 
 
 set +o nounset
-if [[ -z "$SINGULARITY_CACHEDIR" ]]
+if [[ -z "$APPTAINER_CACHEDIR" ]]
 then
-    SINGULARITY_CACHEDIR="$HOME/.singularity"
+    APPTAINER_CACHEDIR="$HOME/.singularity"
 fi
 set -o nounset
-mkdir -p "$SINGULARITY_CACHEDIR/cache"
+mkdir -p "$APPTAINER_CACHEDIR/cache"
 
 # if the first argument is exec
 # execute last argument - notice the space

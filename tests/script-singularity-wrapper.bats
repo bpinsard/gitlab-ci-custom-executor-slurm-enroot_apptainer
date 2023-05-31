@@ -120,7 +120,7 @@ EOF
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    assert_file_contains "$MOCKLOGDIR/singularity.log" "SINGULARITY_CACHEDIR=$CUSTOM_ENV_CI_WS/.singularity"
+    assert_file_contains "$MOCKLOGDIR/singularity.log" "APPTAINER_CACHEDIR=$CUSTOM_ENV_CI_WS/.singularity"
 
 }
 

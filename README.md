@@ -227,8 +227,8 @@ Use one of the numerous alternatives.**
 
 #### Singularity
 
-Singularity can use the `SINGULARITY_DOCKER_USERNAME`
-and `SINGULARITY_DOCKER_PASSWORD` environment variables.
+Singularity can use the `APPTAINER_DOCKER_USERNAME`
+and `APPTAINER_DOCKER_PASSWORD` environment variables.
 These can be set on the GitLabCI interface.
 Additionally, Singularity can store credentials in its cache file.
 
