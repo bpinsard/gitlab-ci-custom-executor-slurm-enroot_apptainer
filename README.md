@@ -253,6 +253,24 @@ and by setting the environment variable `COMMAND_OPTIONS_SBATCH`
 to a string of `sbatch` command line parameters 
 (this is needed to set the number of tasks, for example).
 
+If subsequent jobs try use the same values for all the variables,
+then the executor will try to schedule them on the same slurm allocation,
+if there is enough time left in that allocation.
+This would save the need to submit another job allocation 
+and wait for it to start.
+**Note**: at the moment the executor is not clever enough
+to read the duration of the job from the `-t` or `--time` option
+in `COMMANDS_OPTIONS_SBATCH`. 
+To give this information to the configuration script,
+please set the `JOB_TIME_SEC` variable for the job
+to an appropriate value.
+If the variable is not set, it is assumed 
+that the job takes 600 seconds.
+
+
+
+
+
 ## Development and maintenance of the custom executor code
 
 ### Debug
