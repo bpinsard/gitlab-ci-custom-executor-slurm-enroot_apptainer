@@ -174,12 +174,10 @@ To achieve parity with
 what `gitlab-runner-register-wrapper` does,
 typically one has to invoke 
 the command `gitlab-runner register`
-multiple times
 and modify the configuration file
 in multiple places,
 in particular adding the paths to all the scripts 
 and setting environment variables.
-
 
 ### CI jobs in containers on HoreKa and bwUniCluster 2.0
 
@@ -395,37 +393,41 @@ In order for this to work:
   and for the update of the custom executor code
   that is necessary for the bootstrap
   (this is done int the test-deploy stage)
-- a custom gitlab runner needs to be registered 
+- 3 custom gitlab runners needs to be registered 
   and properly configured 
-  so that it uses the scripts in the test directory
+  so that they use the scripts in the test directory
   used in the test-deploy stage.
-  For this, one can use 
-  ``` bash
-  ./utils/gitlab-runner-register-wrapper.sh --tags=slurm --container-backends=all
-  ```
-  This will register 3 runners,
-  one with the `singularity, slurm` tags,
-  one with the `enroot, slurm` tags,
-  and another with the `slurm` tag.
-- In order to make sure that 
-  the tests for the slurm-only runner 
-  are run only in on the third runner,
-  the `slurm-only` tag has been added 
-  to those tests.
-  As a result, *one needs to add*
-  the `slurm-only` tag to the last runner
-  (otherwise some CI jobs 
-  will remain stuck in the queue).
-  Runner tags can only be managed 
-  either at the registration stage
-  or later on the GitLab web interface,
-  in Settings -> CI/CD -> Runner,
-  under "Assigned project runners". 
-  Each runner can be edited individually 
-  and the list of tags can be changed there.
+  Unfortunately, this requires some manual labor,
+  as one needs to obtain *3 different registration tokens*
+  from the GitLab server web interface.
+  To register one runner based on the custom executor
+  in a convenient way, one can use the command
+  `./utils/gitlab-runner-register-wrapper.sh`.
+  Suggestions:
+  - The `--container-backend` option 
+    can be used to specify `singularity`, `enroot` and `none`
+    each time, for each runner.
+  - The `--registration-token` option can be used 
+    to pass the registration tokens obtained 
+    from the GitLab server web interface.
+  - The `--name` option can be used to give a name 
+    to each one of the runners, *which is important 
+    to distinguish them from each other*
+    in the GitLab server web interface
+  After each runner has been registered,
+  tags can be assigned to it 
+  from the GitLab server web interface
+  (where each runner can be edited independently).
+
+  In order for the jobs in the pipeline
+  to be picked up by the right runner:
+  - the runner registered with the `singularity` backend
+    must have `singularity, slurm` tags,
+  - the runner registered with the `enroot` backend
+    must have `enroot, slurm` tags,
+  - the runner registered with the `none` backend
+    must have `slurm, slurm-only` tag.
   
-
-
 ### Test coverage
 
 In case one installs it on the machine 
@@ -452,6 +454,3 @@ make -f packaging/Makefile rpm
 ```
 The information necessary for building the package
 are in the `packaging` directory.
-
-
-

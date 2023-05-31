@@ -27,7 +27,6 @@ function setup() {
     MOCK_INPUTS=(url
                  token
                  name
-                 tags
                  cerepo # custom executor repository
                  enroot
                  builds_dir
@@ -98,22 +97,6 @@ function teardown() {
 
 }
 
-@test "accepts --tags and passes it to gitlab-runner register" {
-
-    for mock_datum in "${MOCK_INPUTS[@]}"
-    do
-        if [[ "$mock_datum" != "tags" ]]
-        then
-        echo "$mock_datum"
-        fi
-    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --tags 'tags-like-this'
-
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-tag-list=tags-like-this'
-
-}
-
-
 @test "accepts --ce-repo and passes it to gitlab-runner register" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
@@ -132,7 +115,7 @@ function teardown() {
 
 }
 
-@test "accepts --container-backends and passes it to gitlab-runner register" {
+@test "accepts --container-backend and passes it to gitlab-runner register" {
 
  for mock_datum in "${MOCK_INPUTS[@]}"
     do
@@ -141,7 +124,7 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backends 'enroot' \
+        --container-backend 'enroot' \
 
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*enroot'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*enroot'
@@ -149,7 +132,7 @@ function teardown() {
 
 }
 
-@test "accepts 'none' as --container-backends and passes it to gitlab-runner register" {
+@test "accepts 'none' as --container-backend and passes it to gitlab-runner register" {
 
  for mock_datum in "${MOCK_INPUTS[@]}"
     do
@@ -158,7 +141,7 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backends 'none' \
+        --container-backend 'none' \
 
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*none'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*none'
@@ -255,8 +238,6 @@ function teardown() {
         --registration-token \
         --name \
         --description \
-        --tags \
-        --tag-list \
         --ce-repo
     do
         run "$UTILS"/gitlab-runner-register-wrapper.sh "$option"
@@ -424,92 +405,5 @@ function teardown() {
     assert_output --partial "$PROJECT_ROOT"
     assert_output --partial "$HOME/gitlab-runner/builds"
     assert_output --partial "$HOME/gitlab-runner/cache"
-
-}
-
-@test "accepts multiple container backends" {
-
- for mock_datum in "${MOCK_INPUTS[@]}"
-    do
-        if [[ "$mock_datum" != "enroot" ]]
-        then
-        echo "$mock_datum"
-        fi
-    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backends all
-
-    cat "$MOCKLOGDIR"/gitlab-runner.log
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*enroot'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*enroot'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*enroot'
-
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*singularity'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*singularity'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*singularity'
-
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*none'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*none'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*none'
-
-}
-
-@test "when using all, registers 3 runners with tags: 'enroot', 'singularity', '' " {
-
- for mock_datum in "${MOCK_INPUTS[@]}"
-    do
-        if [[ "$mock_datum" != "enroot" ]]
-        then
-        echo "$mock_datum"
-        fi
-    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backends all
-
-    _check_number_calls(){
-     grep -c "ARGS:" "$MOCKLOGDIR"/gitlab-runner.log
-    }
-    run _check_number_calls
-    assert_output 3
-
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags,enroot'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags,singularity'
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\--tag-list=tags '
-
-}
-
-
-@test "during registration, the tags for the runner are printed out when using enroot backend" {
-
-  function _helper(){
-     # shellcheck disable=SC2317
-     for mock_datum in "${MOCK_INPUTS[@]}"
-     do
-         # shellcheck disable=SC2317
-         echo "$mock_datum"
-     done | "$UTILS"/gitlab-runner-register-wrapper.sh
-  }
-
-  run _helper
-
-  assert_line --regexp "Runner using enroot backend set with tags=\"tags\""
-
-}
-
-@test "during registration, the tags for the runner are printed out when using both backends" {
-
-  function _helper(){
-     for mock_datum in "${MOCK_INPUTS[@]}"
-     do
-        if [[ "$mock_datum" != "enroot" ]]
-        then
-        echo "$mock_datum"
-        fi
-     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --container-backends all
-  }
-
-  run _helper
-
-  assert_line --regexp "Runner using enroot backend set with tags=\"tags,enroot\""
-  assert_line --regexp "Runner using singularity backend set with tags=\"tags,singularity\""
 
 }

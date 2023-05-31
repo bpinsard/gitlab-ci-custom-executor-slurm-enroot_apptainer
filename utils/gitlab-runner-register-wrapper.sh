@@ -28,22 +28,12 @@ It accepts the following options:
 
     --name|--description  A description for the runner
 
-    --tags|--tag-list     A comma-separated list of tags
-                          associated to the runner being registered
-
     --ce-repo             The location of the custom executor code
                           default:
                           $REPO
 
-    --container-backends  The backend used for containerised jobs,
-                          i.e., "enroot", "singularity", "none" or "all".
-                          When using "all", 3 runners will be registered,
-                          one will have the "enroot" tag
-                          added to the supplied tag list,
-                          another will have the "singularity" tag
-                          added to the supplied tag list,
-                          and the third one will have nothing
-                          added to the supplied tag list.
+    --container-backend   The backend used for containerised jobs,
+                          i.e., "enroot", "singularity" or "none".
 
     --builds-dir          Directory where builds are stored
                           default:
@@ -84,10 +74,8 @@ OPTSTRING+="url:"
 OPTSTRING+=",registration-token:"
 OPTSTRING+=",name:"
 OPTSTRING+=",description:"
-OPTSTRING+=",tags:"
-OPTSTRING+=",tag-list:"
 OPTSTRING+=",ce-repo:"
-OPTSTRING+=",container-backends:"
+OPTSTRING+=",container-backend:"
 OPTSTRING+=",builds-dir:"
 OPTSTRING+=",cache-dir:"
 OPTSTRING+=",ci-ws:"
@@ -101,7 +89,6 @@ SANITIZED_OPTS=$(getopt --name gitlab-runner-register-wrapper --longoptions "$OP
 URL=""
 REGISTRATION_TOKEN=""
 NAME=""
-TAGS=""
 CE_REPO=""
 CONTAINER_BACKENDS=""
 BUILDS_DIR=""
@@ -127,16 +114,12 @@ case "$1" in
         NAME="$2"
         shift
         ;;
-    --tags|--tag-list)
-        TAGS="$2"
-        shift
-        ;;
     --ce-repo)
         CE_REPO="$2"
         shift
         ;;
-    --container-backends)
-        CONTAINER_BACKENDS="$2"
+    --container-backend)
+        CONTAINER_BACKEND="$2"
         shift
         ;;
     --builds-dir)
@@ -191,12 +174,7 @@ then
 	echo "Name or description:"
 	read -r NAME
 fi
-if [ -z "$TAGS" ] 
-then
-	echo "Tags for the runner:"
-	read -r TAGS
-fi
-if [ -z "$CE_REPO" ] 
+if [ -z "$CE_REPO" ]
 then
     CE_REPO_DEFAULT="$REPO"
 	echo "Location of the custom executor repository ($CE_REPO_DEFAULT):"
@@ -206,10 +184,10 @@ then
         CE_REPO="$CE_REPO_DEFAULT"
     fi
 fi
-while [[ ! "$CONTAINER_BACKENDS" =~ ^(enroot|singularity|none|all)$ ]]
+while [[ ! "$CONTAINER_BACKEND" =~ ^(enroot|singularity|none)$ ]]
 do
-   echo "Container backend ('singularity', 'enroot' or 'all' - type unquoted):"
-   read -er CONTAINER_BACKENDS
+   echo "Container backend ('singularity', 'enroot' or 'none' - type unquoted):"
+   read -er CONTAINER_BACKEND
 done
 
 if [ -z "$BUILDS_DIR" ]
@@ -250,55 +228,28 @@ then
 fi
 SRC="$CE_REPO"/src
 
-declare -A TAGS_ARR
+echo "Runner using ${CONTAINER_BACKEND} backend"
 
-if [[ "$CONTAINER_BACKENDS" == singularity ]]
-then
-    CONTAINER_BACKENDS_ARR=(singularity)
-    TAGS_ARR[singularity]="$TAGS"
-elif [[ "$CONTAINER_BACKENDS" == enroot ]]
-then
-    CONTAINER_BACKENDS_ARR=(enroot)
-    TAGS_ARR[enroot]="$TAGS"
-elif [[ "$CONTAINER_BACKENDS" == none ]]
-then
-    CONTAINER_BACKENDS_ARR=(none)
-    TAGS_ARR[none]="$TAGS"
-elif [[ "$CONTAINER_BACKENDS" == all ]]
-then
-    CONTAINER_BACKENDS_ARR=(enroot singularity none)
-    TAGS_ARR[singularity]="$TAGS",singularity
-    TAGS_ARR[enroot]="$TAGS",enroot
-    TAGS_ARR[none]="$TAGS"
-fi
-
-for CONTAINER_BACKEND in ${CONTAINER_BACKENDS_ARR[@]}
-do
-   echo "Runner using ${CONTAINER_BACKEND} backend set with tags=\"${TAGS_ARR[$CONTAINER_BACKEND]}\""
-
-   gitlab-runner register \
-       --non-interactive \
-       --name="$NAME ($CONTAINER_BACKEND)" \
-       --url="$URL" \
-       --registration-token="$REGISTRATION_TOKEN" \
-       --executor="custom" \
-       --tag-list="${TAGS_ARR[$CONTAINER_BACKEND]}" \
-       --builds-dir="$BUILDS_DIR" \
-       --cache-dir="$CACHE_DIR" \
-       --env CI_WS="$CI_WS" \
-       --env DEFAULT_PARTITION="$DEFAULT_PARTITION" \
-       --custom_build_dir-enabled \
-       --custom-config-exec="$SRC/configure-slurm.sh" \
-       --custom-config-exec-timeout=200 \
-       --custom-prepare-exec="$SRC/prepare.sh" \
-       --custom-prepare-exec-timeout=200 \
-       --custom-prepare-args="$CONTAINER_BACKEND" \
-       --custom-run-exec="$SRC/run.sh" \
-       --custom-run-args="$CONTAINER_BACKEND" \
-       --custom-cleanup-exec="$SRC/cleanup-slurm.sh" \
-       --custom-cleanup-exec-timeout=200 \
-       --custom-cleanup-args="$CONTAINER_BACKEND" \
-       --custom-graceful-kill-timeout=200 \
-       --custom-force-kill-timeout=200
-done
-
+gitlab-runner register \
+    --non-interactive \
+    --name="$NAME ($CONTAINER_BACKEND)" \
+    --url="$URL" \
+    --registration-token="$REGISTRATION_TOKEN" \
+    --executor="custom" \
+    --builds-dir="$BUILDS_DIR" \
+    --cache-dir="$CACHE_DIR" \
+    --env CI_WS="$CI_WS" \
+    --env DEFAULT_PARTITION="$DEFAULT_PARTITION" \
+    --custom_build_dir-enabled \
+    --custom-config-exec="$SRC/configure-slurm.sh" \
+    --custom-config-exec-timeout=200 \
+    --custom-prepare-exec="$SRC/prepare.sh" \
+    --custom-prepare-exec-timeout=200 \
+    --custom-prepare-args="$CONTAINER_BACKEND" \
+    --custom-run-exec="$SRC/run.sh" \
+    --custom-run-args="$CONTAINER_BACKEND" \
+    --custom-cleanup-exec="$SRC/cleanup-slurm.sh" \
+    --custom-cleanup-exec-timeout=200 \
+    --custom-cleanup-args="$CONTAINER_BACKEND" \
+    --custom-graceful-kill-timeout=200 \
+    --custom-force-kill-timeout=200
