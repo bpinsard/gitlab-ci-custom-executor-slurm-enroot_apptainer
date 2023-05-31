@@ -80,7 +80,7 @@ fi
 cat <<EOF
 {
   "driver": {
-    "name": "Slurm driver+enroot/singularity",
+    "name": "Slurm driver+enroot/apptainer",
     "version": "v0.0.1"
   },
 "job_env": {

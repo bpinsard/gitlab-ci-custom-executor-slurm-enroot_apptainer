@@ -77,10 +77,10 @@ then
             # shellcheck source=./src/cleanup-enroot.sh
             source "$SRC/cleanup-enroot.sh"
             ;;
-        singularity)
+        apptainer)
             echo "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
-            # shellcheck source=./src/cleanup-singularity.sh
-            source "$SRC/cleanup-singularity.sh"
+            # shellcheck source=./src/cleanup-apptainer.sh
+            source "$SRC/cleanup-apptainer.sh"
             ;;
         *)
             echo "[CLEANUP] ERROR: Not a valid backend: $CONTAINERISATION_BACKEND"

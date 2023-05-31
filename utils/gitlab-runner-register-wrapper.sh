@@ -33,7 +33,7 @@ It accepts the following options:
                           $REPO
 
     --container-backend   The backend used for containerised jobs,
-                          i.e., "enroot", "singularity" or "none".
+                          i.e., "enroot", "apptainer" or "none".
 
     --builds-dir          Directory where builds are stored
                           default:
@@ -184,9 +184,9 @@ then
         CE_REPO="$CE_REPO_DEFAULT"
     fi
 fi
-while [[ ! "$CONTAINER_BACKEND" =~ ^(enroot|singularity|none)$ ]]
+while [[ ! "$CONTAINER_BACKEND" =~ ^(enroot|apptainer|none)$ ]]
 do
-   echo "Container backend ('singularity', 'enroot' or 'none' - type unquoted):"
+   echo "Container backend ('apptainer', 'enroot' or 'none' - type unquoted):"
    read -er CONTAINER_BACKEND
 done
 

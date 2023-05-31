@@ -304,10 +304,10 @@ EOF
 
 }
 
-@test "run uses singularity for the steps \"in container\" if singularity is specified as first arg" {
+@test "run uses apptainer for the steps \"in container\" if apptainer is specified as first arg" {
 
    STEPNAME="${STEPS_IN_CONTAINER[0]}"
-   APPTAINERLOG="$MOCKLOGDIR"/singularity.log
+   APPTAINERLOG="$MOCKLOGDIR"/apptainer.log
    # cleanup
    rm -f "$APPTAINERLOG"
    cat << EOF > script-"$STEPNAME".sh
@@ -317,7 +317,7 @@ touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
 EOF
    chmod +x ./script-"$STEPNAME".sh
 
-   "$SRC/run.sh" singularity ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   "$SRC/run.sh" apptainer ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
    assert_exists "$APPTAINERLOG"
@@ -524,7 +524,7 @@ EOF
 }
 
 # bats test_tags=onlythis
-@test "run exits with error if the containerisation backend is not enroot, singularity or none" {
+@test "run exits with error if the containerisation backend is not enroot, apptainer or none" {
 
 
     cat <<EOF > script.sh

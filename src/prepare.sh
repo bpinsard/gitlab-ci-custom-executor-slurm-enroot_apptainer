@@ -19,12 +19,12 @@ then
         enroot)
             PREPARE_SCRIPT="$SRC/prepare-enroot.sh"
             ;;
-        singularity)
-            PREPARE_SCRIPT="$SRC/prepare-singularity.sh"
+        apptainer)
+            PREPARE_SCRIPT="$SRC/prepare-apptainer.sh"
             ;;
         *)
             echo "[PREPARE] Error: No valid container backend specified"
-            echo "[PREPARE]        (i.e., singularity or enroot)"
+            echo "[PREPARE]        (i.e., apptainer or enroot)"
             echo "[PREPARE]        but job requires a container image."
             exit 22
             ;;

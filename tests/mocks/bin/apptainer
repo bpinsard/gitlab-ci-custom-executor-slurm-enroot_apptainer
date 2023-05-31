@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 
-APPTAINER_LOG=$MOCKLOGDIR/singularity.log
+APPTAINER_LOG=$MOCKLOGDIR/apptainer.log
 
 BASEMOCK="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"/basemock
 # shellcheck source=./tests/mocks/bin/basemock
 source "$BASEMOCK" "$APPTAINER_LOG" "$@"
 
-# Save singularity variables in the log
+# Save apptainer variables in the log
 { env | grep -E '^APPTAINER' | grep -v APPTAINER_LOG >> "$APPTAINER_LOG"; } || true
 
 
 set +o nounset
 if [[ -z "$APPTAINER_CACHEDIR" ]]
 then
-    APPTAINER_CACHEDIR="$HOME/.singularity"
+    APPTAINER_CACHEDIR="$HOME/.apptainer"
 fi
 set -o nounset
 mkdir -p "$APPTAINER_CACHEDIR/cache"

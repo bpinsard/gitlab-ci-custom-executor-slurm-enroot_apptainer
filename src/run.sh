@@ -32,12 +32,12 @@ then
         enroot)
             WRAPPER_NAME=wrap_enroot
             ;;
-        singularity)
-            WRAPPER_NAME=wrap_singularity
+        apptainer)
+            WRAPPER_NAME=wrap_apptainer
             ;;
         *)
             echo "[RUN] Error: No valid container backend specified"
-            echo "[RUN]        (i.e., singularity or enroot)"
+            echo "[RUN]        (i.e., apptainer or enroot)"
             echo "[RUN]        but job requires a container image."
             exit 22
             ;;

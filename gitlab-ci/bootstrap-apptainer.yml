@@ -1,15 +1,15 @@
-unit-test-parallel-bootstrap-singularity:
+unit-test-parallel-bootstrap-apptainer:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-singularity
+  stage: bootstrap-apptainer
   script:
     - make test-report-parallel JOBS=8
   after_script:
     - make joker
   tags:
     - slurm
-    - singularity
+    - apptainer
   artifacts:
     when: always
     paths:
@@ -18,18 +18,18 @@ unit-test-parallel-bootstrap-singularity:
       junit: report-parallel.xml
 
 
-unit-test-serial-bootstrap-singularity:
+unit-test-serial-bootstrap-apptainer:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-singularity
+  stage: bootstrap-apptainer
   script:
     - make test-report-serial
   after_script:
     - make joker
   tags:
     - slurm
-    - singularity
+    - apptainer
   artifacts:
     when: always
     paths:
@@ -38,13 +38,13 @@ unit-test-serial-bootstrap-singularity:
       junit: report-serial.xml
 
 
-lint-bootstrap-singularity:
+lint-bootstrap-apptainer:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-singularity
+  stage: bootstrap-apptainer
   script:
     - make shellcheck
   tags:
     - slurm
-    - singularity
+    - apptainer

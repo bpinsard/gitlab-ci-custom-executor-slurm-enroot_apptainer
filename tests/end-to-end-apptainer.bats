@@ -17,7 +17,7 @@ function setup(){
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
 
-    TEST_PLAYGROUND="$PWD/end-to-end-test-singularity-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/end-to-end-test-apptainer-$BATS_TEST_NAME"
     assert_dir_not_exists "$TEST_PLAYGROUND"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
@@ -81,9 +81,9 @@ function teardown() {
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
 
-    "$SRC"/prepare.sh singularity
+    "$SRC"/prepare.sh apptainer
 
-    "$SRC"/cleanup-slurm.sh singularity
+    "$SRC"/cleanup-slurm.sh apptainer
 
     run _helper
     assert_failure
@@ -113,9 +113,9 @@ function teardown() {
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
     echo -n "# Preparing job... " >&3
-    "$SRC"/prepare.sh singularity
+    "$SRC"/prepare.sh apptainer
     echo "done." >&3
-    assert_dir_exists "$CUSTOM_ENV_CI_WS/.singularity"
+    assert_dir_exists "$CUSTOM_ENV_CI_WS/.apptainer"
 
     cat <<EOF > "$STARTDIR"/get_sources_script.sh
 #!/bin/bash
@@ -125,7 +125,7 @@ EOF
     chmod +x "$STARTDIR"/get_sources_script.sh
 
     echo -n "# Running get_sources... " >&3
-    run "$SRC"/run.sh singularity "$STARTDIR"/get_sources_script.sh get_sources
+    run "$SRC"/run.sh apptainer "$STARTDIR"/get_sources_script.sh get_sources
     echo "done." >&3
 
     assert_line "Cloning dummy repository..."
@@ -141,13 +141,13 @@ EOF
     chmod +x "$STARTDIR"/build_script.sh
 
     echo -n "# Running build_script... " >&3
-    run "$SRC"/run.sh singularity "$STARTDIR"/build_script.sh build_script
+    run "$SRC"/run.sh apptainer "$STARTDIR"/build_script.sh build_script
     echo "done." >&3
 
     assert_line "Doing a lot of work..."
     assert_file_exists "$CUSTOM_ENV_CI_WS"/job-output.txt
 
-    "$SRC"/cleanup-slurm.sh singularity
+    "$SRC"/cleanup-slurm.sh apptainer
 
     # Check that the slurm job is over
     run _helper

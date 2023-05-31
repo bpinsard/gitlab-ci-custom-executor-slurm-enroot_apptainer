@@ -1,5 +1,5 @@
 #!/usr/bin/env rpm
-Name:     gitlab-custom-executor-slurm-singularity-enroot
+Name:     gitlab-custom-executor-slurm-apptainer-enroot
 Version:  1.0
 Release:  1
 Source0:  rpmbuild.tar
@@ -10,7 +10,7 @@ Summary:  GitLab-Runner custom executor using Slurm with Enroot or Singularity
 Requires: git
 Requires: git-lfs
 Requires: gitlab-runner
-Prefix:   /usr/share/gitlab-runner/custom-executor-slurm-singularity-enroot
+Prefix:   /usr/share/gitlab-runner/custom-executor-slurm-apptainer-enroot
 
 %description
 GitLab Runner offers the Custom Executor mechanism

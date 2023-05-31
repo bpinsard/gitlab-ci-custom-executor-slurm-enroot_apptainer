@@ -166,9 +166,9 @@ It will source `containerlib.sh`.
 - [X] do not do anything if image is not defined
 
 #### Singularity
-Enroot and singularity work in quite a different way.
+Enroot and apptainer work in quite a different way.
 In the way that it is configured on HoreKa, 
-singularity will by default mount PWD and HOME.
+apptainer will by default mount PWD and HOME.
 This means that 
 - [ ] download image (using pull)
   - [X] Unit
@@ -182,7 +182,7 @@ This means that
 
 Every step runs in the allocation, 
 the point is whether or not it needs to be 
-wrapped into a `enroot`/`singularity` command.
+wrapped into a `enroot`/`apptainer` command.
 
 - `prepare_script`
    This might need to run in the allocation.
@@ -247,13 +247,13 @@ wrapped into a `enroot`/`singularity` command.
 - [X] use the container name defined in the prepare stage
   (define an environment variable for that in configure-produce job-env?)
 
-#### singularity command wrapper
+#### apptainer command wrapper
 on HoreKa by default PWD is bound on the container 
 with RW permissions,
 so there should be no need 
 for `--writable` (or similar) flag.
 
-- [ ] uses `singularity exec`
+- [ ] uses `apptainer exec`
 
 ### cleanup.sh
 - [ ] The slurm job needs to be terminated if `CUSTOM_ENV_KILL_SLURM` is set 
@@ -279,7 +279,7 @@ for `--writable` (or similar) flag.
         of the temporary directories IF THE NECESSARY SUBSET
         of `ENROOT_*_PATH` variables are set 
         to point inside the right directories.
-  - [X] singularity
+  - [X] apptainer
     - removing CE_IMAGEFILE
   - [X] unless `CUSTOM_ENV_CE_DEBUG` is set
 

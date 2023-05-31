@@ -1,9 +1,9 @@
-horeka-mpi-multinode-job-singularity:
+horeka-mpi-multinode-job-apptainer:
   dependencies: []
   stage: system-specific
   tags:
     - slurm
-    - singularity
+    - apptainer
     - horeka
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"

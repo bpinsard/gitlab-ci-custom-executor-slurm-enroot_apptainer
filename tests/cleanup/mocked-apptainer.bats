@@ -57,26 +57,26 @@ function teardown_file(){
 }
 
 
-@test "cleanup removes singularity image" {
+@test "cleanup removes apptainer image" {
 
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
-    # This test requires that singularity is invoked
-    "$SRC/prepare-singularity.sh"
+    # This test requires that apptainer is invoked
+    "$SRC/prepare-apptainer.sh"
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=
-    "$SRC/cleanup-slurm.sh" singularity
+    "$SRC/cleanup-slurm.sh" apptainer
 
-    # shellcheck source=./src/containerlib-singularity.sh
-    source "$SRC"/containerlib-singularity.sh
+    # shellcheck source=./src/containerlib-apptainer.sh
+    source "$SRC"/containerlib-apptainer.sh
 
     assert_not_exists "$CE_IMAGEFILE"
 
 }
 
-@test "cleanup does not call singularity at all when image not needed" {
+@test "cleanup does not call apptainer at all when image not needed" {
 
 
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
@@ -86,31 +86,31 @@ function teardown_file(){
         export CUSTOM_ENV_CI_JOB_IMAGE=""
         # shellcheck disable=SC1091
         source "$CE_QUEUE_WORKSPACE/.env"
-        "$SRC/cleanup-slurm.sh" singularity
-        assert_not_exists "$MOCKLOGDIR/singularity.log"
+        "$SRC/cleanup-slurm.sh" apptainer
+        assert_not_exists "$MOCKLOGDIR/apptainer.log"
     )
 }
 
-@test "singularity image should not be removed if CUSTOM_ENV_CE_DEBUG is set" {
+@test "apptainer image should not be removed if CUSTOM_ENV_CE_DEBUG is set" {
     (
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     # We need this preparation step for container stuff
-    "$SRC/prepare-singularity.sh"
+    "$SRC/prepare-apptainer.sh"
 
     # shellcheck disable=SC2031
     export CUSTOM_ENV_CE_DEBUG=1
     # shellcheck disable=SC2031
-    export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-singularity"
+    export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-apptainer"
 
 
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
-    "$SRC/cleanup-slurm.sh" singularity
+    "$SRC/cleanup-slurm.sh" apptainer
 
-    # shellcheck source=./src/containerlib-singularity.sh
-    source "$SRC"/containerlib-singularity.sh
+    # shellcheck source=./src/containerlib-apptainer.sh
+    source "$SRC"/containerlib-apptainer.sh
 
     assert_exists "$CE_IMAGEFILE"
     )

@@ -42,7 +42,7 @@ function validate_containerisation_backend(){
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     fi
     case "$CONTAINERISATION_BACKEND" in
-    enroot|singularity|none)
+    enroot|apptainer|none)
         echo "Containerisation backend: $CONTAINERISATION_BACKEND" >&2
         ;;
     *)

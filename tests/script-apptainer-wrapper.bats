@@ -14,7 +14,7 @@ setup(){
 
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND="$PWD/script-singularity-wrapper-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/script-apptainer-wrapper-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
@@ -24,7 +24,7 @@ setup(){
     export CUSTOM_ENV_CI_JOB_IMAGE=an-image:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
-    TMPSCR=$(mktemp /tmp/script-singularity-wrapper-test-script-XXXX.sh)
+    TMPSCR=$(mktemp /tmp/script-apptainer-wrapper-test-script-XXXX.sh)
 }
 
 
@@ -42,7 +42,7 @@ teardown() {
 echo "some thing to wrap"
 EOF
 
-     "$SRC"/script-singularity-wrapper.sh "$SCRIPT_TO_WRAP" > ./wrapped.sh
+     "$SRC"/script-apptainer-wrapper.sh "$SCRIPT_TO_WRAP" > ./wrapped.sh
 
       assert [ "$(wc -l < ./wrapped.sh)" -gt 0 ]
 
@@ -56,7 +56,7 @@ echo "something to wrap"
 EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
-    "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
     chmod +x ./wrapped.sh
 
     run ./wrapped.sh
@@ -65,7 +65,7 @@ EOF
 
 }
 
-@test "singularity exec is called in the wrap" {
+@test "apptainer exec is called in the wrap" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
     cat <<EOF > "$SCRIPT_TO_WRAP"
@@ -73,16 +73,16 @@ echo "some thing to wrap"
 EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
-    "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
 
-    assert_file_contains "$MOCKLOGDIR/singularity.log" "exec.*$SCRIPT_TO_WRAP"
+    assert_file_contains "$MOCKLOGDIR/apptainer.log" "exec.*$SCRIPT_TO_WRAP"
 
 }
 
-@test "singularity exec is called with the image name" {
+@test "apptainer exec is called with the image name" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
     cat <<EOF > "$SCRIPT_TO_WRAP"
@@ -90,15 +90,15 @@ echo "some thing to wrap"
 EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
-    "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
 
-    # shellcheck source=./src/containerlib-singularity.sh
-    source "$SRC/containerlib-singularity.sh"
+    # shellcheck source=./src/containerlib-apptainer.sh
+    source "$SRC/containerlib-apptainer.sh"
 
-    assert_file_contains "$MOCKLOGDIR/singularity.log" "exec.*$CE_IMAGEFILE"
+    assert_file_contains "$MOCKLOGDIR/apptainer.log" "exec.*$CE_IMAGEFILE"
 
 
 
@@ -115,16 +115,16 @@ echo "something"
 EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
-    "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
     cat ./wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    assert_file_contains "$MOCKLOGDIR/singularity.log" "APPTAINER_CACHEDIR=$CUSTOM_ENV_CI_WS/.singularity"
+    assert_file_contains "$MOCKLOGDIR/apptainer.log" "APPTAINER_CACHEDIR=$CUSTOM_ENV_CI_WS/.apptainer"
 
 }
 
-@test "singularity exec uses the right container/image name" {
+@test "apptainer exec uses the right container/image name" {
 
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
@@ -133,19 +133,19 @@ echo "something"
 EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
-    "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
     cat wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
 
-    # shellcheck source=./src/containerlib-singularity.sh
-    CE_IMAGEFILE=$( . "$SRC"/containerlib-singularity.sh; echo "$CE_IMAGEFILE")
-    assert_file_contains "$MOCKLOGDIR/singularity.log" "ARGS: exec.*$CE_IMAGEFILE"
+    # shellcheck source=./src/containerlib-apptainer.sh
+    CE_IMAGEFILE=$( . "$SRC"/containerlib-apptainer.sh; echo "$CE_IMAGEFILE")
+    assert_file_contains "$MOCKLOGDIR/apptainer.log" "ARGS: exec.*$CE_IMAGEFILE"
 
 }
 
-@test "singularity mounts the script file inside the container after CUSTOM_ENV_CI_WS" {
+@test "apptainer mounts the script file inside the container after CUSTOM_ENV_CI_WS" {
 
     SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
     cat <<EOF > "$SCRIPT_TO_WRAP"
@@ -153,12 +153,12 @@ echo "something"
 EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
-    "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
     cat wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
-    assert_file_contains "$MOCKLOGDIR/singularity.log" "\-\-bind.*$CUSTOM_ENV_CI_WS,$SCRIPT_TO_WRAP"
+    assert_file_contains "$MOCKLOGDIR/apptainer.log" "\-\-bind.*$CUSTOM_ENV_CI_WS,$SCRIPT_TO_WRAP"
 
 }
 
@@ -170,7 +170,7 @@ echo "something"
 EOF
     chmod +x "$SCRIPT_TO_WRAP"
 
-    run "$SRC/script-singularity-wrapper.sh" "$SCRIPT_TO_WRAP"
+    run "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP"
     assert_equal "$status" 22
     assert_output "Needs absolute path to script to wrap."
 }

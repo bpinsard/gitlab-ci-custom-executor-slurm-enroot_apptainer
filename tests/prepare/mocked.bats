@@ -57,18 +57,18 @@ function teardown() {
 
 }
 
-@test "prepare uses singularity when singularity is passed as first argument" {
+@test "prepare uses apptainer when apptainer is passed as first argument" {
 
-    prepare.sh singularity
+    prepare.sh apptainer
 
-    assert_exists "$MOCKLOGDIR"/singularity.log
+    assert_exists "$MOCKLOGDIR"/apptainer.log
 
 }
 
 @test "prepare uses the custom executor queue" {
 
 
-    prepare.sh singularity
+    prepare.sh apptainer
 
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
@@ -81,7 +81,7 @@ function teardown() {
 
 }
 
-@test "prepare exits with error when CUSTOM_ENV_CI_JOB_IMAGE is set but enroot or singularity are not passed as arguments" {
+@test "prepare exits with error when CUSTOM_ENV_CI_JOB_IMAGE is set but enroot or apptainer are not passed as arguments" {
 
     #shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
@@ -103,7 +103,7 @@ function teardown() {
     )
 }
 
-@test "prepare exits with error if the containerisation backend is not enroot, singularity or none" {
+@test "prepare exits with error if the containerisation backend is not enroot, apptainer or none" {
 
     #shellcheck disable=SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102

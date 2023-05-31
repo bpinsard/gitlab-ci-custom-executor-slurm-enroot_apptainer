@@ -1,59 +1,59 @@
-minimal-job-singularity:
+minimal-job-apptainer:
   dependencies: []
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
-    - singularity
+    - apptainer
   script:
     - echo "Test Test"
     - env | sort
 
-image-job-singularity:
+image-job-apptainer:
   dependencies: []
   stage: test-test-deploy
   image: docker://debian:latest
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
-    - singularity
+    - apptainer
   script:
     - echo "Test Test using an image"
     - grep PRETTY /etc/os-release
     - env | sort
 
-artifact-job-singularity:
+artifact-job-apptainer:
   dependencies: []
   stage: test-test-deploy
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
-    - singularity
+    - apptainer
   script: touch test-artifact.txt
   artifacts:
     paths:
       - test-artifact.txt
 
-artifact-image-job-singularity:
+artifact-image-job-apptainer:
   dependencies: []
   stage: test-test-deploy
   image: docker://debian:latest
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
-    - singularity
+    - apptainer
   script: cp /etc/os-release test-artifact-image.txt
   artifacts:
     paths:
       - test-artifact-image.txt
 
 
-env-job-singularity:
+env-job-apptainer:
   dependencies: []
   stage: test-test-deploy
   tags:
     - slurm
-    - singularity
+    - apptainer
   variables:
     ENV_VAR_1: 55
   script:

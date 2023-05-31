@@ -12,7 +12,7 @@ function setup(){
     export PATH="$SRC:$PATH"
     load_mocks
 
-    TEST_PLAYGROUND="$PWD/singularity-prepare-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/apptainer-prepare-test-$BATS_TEST_NAME"
 
     mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
@@ -34,24 +34,24 @@ teardown() {
 }
 
 
-@test "singularity called with pull" {
+@test "apptainer called with pull" {
 
-    prepare-singularity.sh
-    assert_file_contains "$MOCKLOGDIR"/singularity.log "ARGS:.*pull.*$CUSTOM_ENV_CI_JOB_IMAGE"
+    prepare-apptainer.sh
+    assert_file_contains "$MOCKLOGDIR"/apptainer.log "ARGS:.*pull.*$CUSTOM_ENV_CI_JOB_IMAGE"
 
 }
 
 @test "APPTAINER_CACHEDIR is created in CI_WS" {
 
-    prepare-singularity.sh
-    assert_dir_exists "$CUSTOM_ENV_CI_WS/.singularity"
+    prepare-apptainer.sh
+    assert_dir_exists "$CUSTOM_ENV_CI_WS/.apptainer"
 
 }
 
-@test "singularity pull call specifies image file CI_WS/image-CI_JOB_ID.sif" {
+@test "apptainer pull call specifies image file CI_WS/image-CI_JOB_ID.sif" {
 
-    prepare-singularity.sh
-    assert_file_contains "$MOCKLOGDIR"/singularity.log  "ARGS:.*pull $CUSTOM_ENV_CI_WS/image-$CUSTOM_ENV_CI_JOB_ID.sif"
+    prepare-apptainer.sh
+    assert_file_contains "$MOCKLOGDIR"/apptainer.log  "ARGS:.*pull $CUSTOM_ENV_CI_WS/image-$CUSTOM_ENV_CI_JOB_ID.sif"
 
 
 

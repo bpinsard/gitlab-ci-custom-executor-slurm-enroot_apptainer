@@ -1,8 +1,8 @@
 # This test,
-# run with the slurm+singularity custom executor
+# run with the slurm+apptainer custom executor
 # should create a $HOME/ce-debug directory
 # because of CE_DEBUG=1
-ce-queue-debug-test-singularity:
+ce-queue-debug-test-apptainer:
   dependencies: []
   stage: test-test-deploy
   # Making sure this test runs
@@ -16,20 +16,20 @@ ce-queue-debug-test-singularity:
     CE_DEBUG: 1
   tags:
     - slurm
-    - singularity
+    - apptainer
   script:
     - echo "Making sure that $HOME/ce-debug/ does not exist before test cleanup..."
     - rm -rf "$HOME/ce-debug/"
 
-# This test is a test for the singularity executor
+# This test is a test for the apptainer executor
 # checking that CUSTOM_ENV_CE_DEBUG=1
-# set in the `ce-queue-debug-test-singularity` test
+# set in the `ce-queue-debug-test-apptainer` test
 # caused the cleanup script to save the CE workspace
 # in $HOME
-ce-queue-debug-post-test-singularity:
+ce-queue-debug-post-test-apptainer:
   stage: test-test-deploy
   needs:
-    - "ce-queue-debug-test-singularity"
+    - "ce-queue-debug-test-apptainer"
   tags:
     - shell
   script:

@@ -7,9 +7,9 @@ function setup() {
     load '../test-utils'
 
     _on_horeka || skip
-    type -p singularity || { echo "# singularity executable not found, skipping" >&3 ; skip ;}
+    type -p apptainer || { echo "# apptainer executable not found, skipping" >&3 ; skip ;}
 
-    TEST_PLAYGROUND="$PWD/singularity-contract-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/apptainer-contract-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     cd "$TEST_PLAYGROUND" || exit
@@ -26,7 +26,7 @@ function teardown() {
 }
 
 # bats test_tags=pullfail,serial
-@test "singularity pull does not work on horeka login node" {
+@test "apptainer pull does not work on horeka login node" {
     # Unfortunately this is the case at the moment (20230129) 
 
     HOSTNAME=$(hostname) # $HOSTNAME might not work
@@ -34,20 +34,20 @@ function teardown() {
     [[ "$HOSTNAME" =~ hkn199[0-3]\.localdomain ]] || skip 
 
     # shellcheck disable=SC2030
-    export APPTAINER_CACHEDIR="$TEST_PLAYGROUND/singularity"
-    run singularity pull docker://alpine:latest
+    export APPTAINER_CACHEDIR="$TEST_PLAYGROUND/apptainer"
+    run apptainer pull docker://alpine:latest
     assert_failure
 
 }
 
 
 # bats test_tags=pull,serial
-@test "singularity pull runs on the compute node, accept name for output image file and uses cache" {
+@test "apptainer pull runs on the compute node, accept name for output image file and uses cache" {
 
     # shellcheck disable=SC2031
-    export APPTAINER_CACHEDIR="$TEST_PLAYGROUND/singularity"
+    export APPTAINER_CACHEDIR="$TEST_PLAYGROUND/apptainer"
 
-    run srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    run srun -n 1 -p cpuonly  apptainer pull my-image.sif docker://alpine:latest
 
     assert_success
     assert_exists my-image.sif 
@@ -57,9 +57,9 @@ function teardown() {
 }
 
 # bats test_tags=run,serial
-@test "singularity executes file in PWD with --bind (exec no salloc)" {
+@test "apptainer executes file in PWD with --bind (exec no salloc)" {
     # we need an allocation for this, unfortunately.
-    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    srun -n 1 -p cpuonly  apptainer pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
     touch "$TEST_PLAYGROUND/afile"
 
@@ -77,7 +77,7 @@ EOF
     # Singularity only mounts /home by default
     # so if by any chance you are using paths in /hkfs/home/
     # they will not be seen inside the container.
-    run singularity exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
+    run apptainer exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
     assert_success
 
     assert_line "This is a test message"
@@ -86,21 +86,21 @@ EOF
 }
 
 # bats test_tags=run,serial
-@test "singularity sees PWD" {
+@test "apptainer sees PWD" {
     # we need an allocation for this, unfortunately.
-    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    srun -n 1 -p cpuonly  apptainer pull my-image.sif docker://alpine:latest
 
     # may run without a need for an allocation on horeka...
     # but might need a bind just for safety.
-    run singularity exec --bind "$TEST_PLAYGROUND" my-image.sif ls "$PWD"
+    run apptainer exec --bind "$TEST_PLAYGROUND" my-image.sif ls "$PWD"
     assert_success
 
 }
 
 # bats test_tags=run,serial
-@test "singularity scripts able to write on the host without --writable" {
+@test "apptainer scripts able to write on the host without --writable" {
     # we need an allocation for this, unfortunately.
-    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    srun -n 1 -p cpuonly  apptainer pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
 
     cat<<EOF > "$SCR"
@@ -109,7 +109,7 @@ touch "$TEST_PLAYGROUND/afile"
 EOF
     chmod +x "$SCR"
 
-    #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR" 
+    #run srun -n 1 -p cpuonly apptainer exec my-image.sif "$SCR" 
 
     # using --bind may not be necessary on HoreKa, but:
     # we need a bind just for safety,
@@ -120,7 +120,7 @@ EOF
     # The use of --writable is involved and it is anyway possible
     # to write in the directories on the host.
         
-    run singularity exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
+    run apptainer exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
 
     assert_success
     assert_exists "$TEST_PLAYGROUND/afile"
@@ -128,10 +128,10 @@ EOF
 }
 
 # bats test_tags=coverage-problematic
-@test "singularity mounts single file in container and executes it without problems" {
+@test "apptainer mounts single file in container and executes it without problems" {
 
     # we need an allocation for this, unfortunately.
-    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    srun -n 1 -p cpuonly  apptainer pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
 
     cat<<EOF > "$SCR"
@@ -140,9 +140,9 @@ touch "$TEST_PLAYGROUND/afile"
 EOF
     chmod +x "$SCR"
 
-    #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR"
+    #run srun -n 1 -p cpuonly apptainer exec my-image.sif "$SCR"
     # may run without a need for an allocation on horeka...
-    run singularity exec --bind "$SCR" my-image.sif "$SCR"
+    run apptainer exec --bind "$SCR" my-image.sif "$SCR"
 
     assert_success
 
@@ -151,10 +151,10 @@ EOF
 }
 
 # bats test_tags=coverage-problematic
-@test "singularity mounts directory and single file in directory in container and executes it without problems" {
+@test "apptainer mounts directory and single file in directory in container and executes it without problems" {
 
     # we need an allocation for this, unfortunately.
-    srun -n 1 -p cpuonly  singularity pull my-image.sif docker://alpine:latest
+    srun -n 1 -p cpuonly  apptainer pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
 
     cat<<EOF > "$SCR"
@@ -163,9 +163,9 @@ touch "$TEST_PLAYGROUND/afile"
 EOF
     chmod +x "$SCR"
 
-    #run srun -n 1 -p cpuonly singularity exec my-image.sif "$SCR"
+    #run srun -n 1 -p cpuonly apptainer exec my-image.sif "$SCR"
     # may run without a need for an allocation on horeka...
-    run singularity exec --bind "$TEST_PLAYGROUND,$SCR" my-image.sif "$SCR"
+    run apptainer exec --bind "$TEST_PLAYGROUND,$SCR" my-image.sif "$SCR"
 
     assert_success
 

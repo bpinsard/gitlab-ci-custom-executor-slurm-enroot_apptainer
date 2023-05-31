@@ -1,9 +1,9 @@
-bwuc2-mpi-multinode-job-singularity:
+bwuc2-mpi-multinode-job-apptainer:
   dependencies: []
   stage: system-specific
   tags:
     - slurm
-    - singularity
+    - apptainer
     - bwuc2
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition dev_multiple -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"

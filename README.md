@@ -196,7 +196,7 @@ The format for the image specification for Enroot is described
 (the `enroot import` command is used under the hood),
 while the one for Apptainer is described
 [here](https://apptainer.org/docs/user/main/cli/apptainer_pull.html)
-(the `singularity pull` command is used under the hood).
+(the `apptainer pull` command is used under the hood).
 
 **Note:** it is not possible to execute root commands 
 in Singularity containers on HoreKa or bwUnicluster 2.0.
@@ -232,7 +232,7 @@ and `APPTAINER_DOCKER_PASSWORD` environment variables.
 These can be set on the GitLabCI interface.
 Additionally, Singularity can store credentials in its cache file.
 
-More information can be found [here](https://singularity-userdoc.readthedocs.io/en/latest/singularity_and_docker.html#authentication-in-the-environment).
+More information can be found [here](https://apptainer-userdoc.readthedocs.io/en/latest/apptainer_and_docker.html#authentication-in-the-environment).
 
 ##### Apptainer (newer version of Singularity)
 
@@ -302,7 +302,7 @@ make test JOBS=64
 Notice that *this will not necessarily run all the tests*.
 Some tests which are more complex 
 are meaningful only when run on the HoreKa cluster,
-where Slurm, singularity and enroot are available.
+where Slurm, apptainer and enroot are available.
 
 #### Unit Tests
 
@@ -405,7 +405,7 @@ In order for this to work:
   `./utils/gitlab-runner-register-wrapper.sh`.
   Suggestions:
   - The `--container-backend` option 
-    can be used to specify `singularity`, `enroot` and `none`
+    can be used to specify `apptainer`, `enroot` and `none`
     each time, for each runner.
   - The `--registration-token` option can be used 
     to pass the registration tokens obtained 
@@ -421,8 +421,8 @@ In order for this to work:
 
   In order for the jobs in the pipeline
   to be picked up by the right runner:
-  - the runner registered with the `singularity` backend
-    must have `singularity, slurm` tags,
+  - the runner registered with the `apptainer` backend
+    must have `apptainer, slurm` tags,
   - the runner registered with the `enroot` backend
     must have `enroot, slurm` tags,
   - the runner registered with the `none` backend

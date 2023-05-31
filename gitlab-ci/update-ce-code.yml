@@ -14,4 +14,4 @@ update-ce-code:
     - test -d "$CI_TEST_CODE"
     - tar xvf rpmbuild.tar
     - rm -r "$CI_TEST_CODE"
-    - mv gitlab-custom-executor-slurm-singularity-enroot "$CI_TEST_CODE"
+    - mv gitlab-custom-executor-slurm-apptainer-enroot "$CI_TEST_CODE"
