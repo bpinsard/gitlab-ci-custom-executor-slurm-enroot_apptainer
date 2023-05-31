@@ -45,8 +45,8 @@ function wait_until_file_contains() {
 
 }
 
-function _on_horeka () {
-    hostname | grep -q -E "hkn[0-9]{4}.localdomain"
+function _at_scc () {
+    [[ $(hostname) =~ (uc2n|hkn)[[:digit:]]{3,4}\.localdomain ]]
 }
 
 

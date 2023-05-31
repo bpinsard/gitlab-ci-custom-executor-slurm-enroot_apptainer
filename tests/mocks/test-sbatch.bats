@@ -77,15 +77,15 @@ teardown(){
 
 }
 
-function _on_horeka () {
-    hostname | grep -q -E "hkn[0-9]{4}.localdomain"
+function _at_scc () {
+    [[ $(hostname) =~ (uc2n|hkn)[[:digit:]]{3,4}\.localdomain ]]
 }
 
 
 
 @test "sbatch input environment variables read from docs are the expected ones" {
 
-   _on_horeka || skip
+   _at_scc || skip
    local MOCK="$PROJECT_ROOT"/tests/mocks
    local SRC="$PROJECT_ROOT"/src
 

@@ -6,7 +6,7 @@ function setup() {
     load '../test_helper/bats-file/load'
     load '../test-utils'
 
-    _on_horeka || skip
+    _at_scc || skip
     type -p apptainer || { echo "# apptainer executable not found, skipping" >&3 ; skip ;}
 
     TEST_PLAYGROUND="$PWD/apptainer-contract-test-$BATS_TEST_NAME"

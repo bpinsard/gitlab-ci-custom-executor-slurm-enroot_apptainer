@@ -31,7 +31,7 @@ function teardown() {
 # bats test_tags=serial
 @test "srun --container-image runs in a container (with the right mount options)" {
     # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/
-    _on_horeka || skip
+    _at_scc || skip
     GET_DISTRONAME=(grep PRETTY /etc/os-release)
     
     # Running on the host (on a compute node)

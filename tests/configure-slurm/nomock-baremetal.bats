@@ -5,7 +5,7 @@ function setup(){
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
     load '../test_helper/bats-file/load'
     load '../test-utils'
-    _on_horeka || skip
+    _at_scc || skip
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
@@ -56,7 +56,7 @@ EOF
 }
 
 function teardown() {
-    if _on_horeka
+    if _at_scc
     then
       echo scancel "$JOB_ID"
       scancel "$JOB_ID"
