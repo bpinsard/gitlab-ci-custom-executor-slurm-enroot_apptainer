@@ -9,7 +9,7 @@ source "$SRC"/containerlib-singularity.sh
 
 # This line will print the environment variables
 # shellcheck disable=SC2086
-{ env | grep -qE '^SINGULARITY'; } && declare -p ${!SINGULARITY*}
+{ env | grep -qE '^APPTAINER'; } && declare -p ${!APPTAINER*}
 
 cat <<EOF
 COMMAND=(singularity exec

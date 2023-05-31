@@ -307,9 +307,9 @@ EOF
 @test "run uses singularity for the steps \"in container\" if singularity is specified as first arg" {
 
    STEPNAME="${STEPS_IN_CONTAINER[0]}"
-   SINGULARITYLOG="$MOCKLOGDIR"/singularity.log
+   APPTAINERLOG="$MOCKLOGDIR"/singularity.log
    # cleanup
-   rm -f "$SINGULARITYLOG"
+   rm -f "$APPTAINERLOG"
    cat << EOF > script-"$STEPNAME".sh
 
 touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
@@ -320,7 +320,7 @@ EOF
    "$SRC/run.sh" singularity ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
-   assert_exists "$SINGULARITYLOG"
+   assert_exists "$APPTAINERLOG"
 
 }
 
