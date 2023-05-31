@@ -145,11 +145,17 @@ function check_string_has_no_forbidden_options(){
 
 function wait_for_job_to_be_ready(){
     local JOB_ID="$1"
-    while ! scontrol wait_job "$JOB_ID"
+    while ! scontrol wait_job "$JOB_ID" &> /dev/null
     do
         sleep 3
+        if [ $((SECONDS % 20)) -lt 3 ]
+        then
+            STARTTIME="$(squeue --start --job "$JOB_ID" --format %S | tail -n 1)"
+            echo "$(date) Expected start: $STARTTIME"
+        fi
     done
 }
+
 
 function save_slurm_environment(){
 
