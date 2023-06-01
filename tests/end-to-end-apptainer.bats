@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
+function has_slurm_and_apptainer(){
+    which sbatch &> /dev/null && which apptainer &> /dev/null
+}
+
 function setup(){
     load './test_helper/bats-support/load' # for run
     load './test_helper/bats-assert/load' # for assert_output and refute_output
     load './test_helper/bats-file/load' # for assert_output and refute_output
     load './test-utils'
-    _at_scc || skip
+    has_slurm_and_apptainer || skip
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/.." > /dev/null 2>&1 && pwd)"
 
     # To make scripts in /src available for sourcing
@@ -52,7 +56,7 @@ function setup(){
     }
 
 function teardown() {
-    if _at_scc
+    if has_slurm_and_apptainer
     then
       echo rm -rf "$TEST_PLAYGROUND"
       rm -rf "$TEST_PLAYGROUND"

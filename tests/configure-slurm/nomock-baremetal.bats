@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 
+function has_slurm(){
+    which sbatch &> /dev/null
+
+}
+
 function setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
     load '../test_helper/bats-file/load'
     load '../test-utils'
-    _at_scc || skip
+    has_slurm || skip
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
 
-    # To make scripts in /src available for sourcing
-    # and loading, and also make the sbatch mock available.
     export SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
@@ -56,7 +59,7 @@ EOF
 }
 
 function teardown() {
-    if _at_scc
+    if has_slurm
     then
       echo scancel "$JOB_ID"
       scancel "$JOB_ID"

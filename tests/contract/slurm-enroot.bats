@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+function has_slurm_and_enroot() {
+    type -p srun &> /dev/null && type -p enroot &> /dev/null
+}
+
+
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
@@ -24,14 +29,12 @@ function setup() {
 
 function teardown() {
     rm -rf "$TEST_PLAYGROUND"
-
-
 }
 
 # bats test_tags=serial
 @test "srun --container-image runs in a container (with the right mount options)" {
     # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/
-    _at_scc || skip
+    has_slurm_and_enroot || skip
     GET_DISTRONAME=(grep PRETTY /etc/os-release)
     
     # Running on the host (on a compute node)

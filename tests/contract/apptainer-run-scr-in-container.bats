@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 
+function has_slurm_and_apptainer() {
+    type -p srun &> /dev/null && type -p apptainer &> /dev/null
+
+}
+
+
 function setup() {
     load '../test_helper/bats-support/load' 
     load '../test_helper/bats-assert/load' 
     load '../test_helper/bats-file/load'
     load '../test-utils'
 
-    _at_scc || skip
-    type -p apptainer || { echo "# apptainer executable not found, skipping" >&3 ; skip ;}
+    has_slurm_and_apptainer || { echo "# slurm or apptainer executables not found, skipping" >&3 ; skip ;}
 
     TEST_PLAYGROUND="$PWD/apptainer-contract-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3

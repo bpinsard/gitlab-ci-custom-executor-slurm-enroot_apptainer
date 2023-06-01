@@ -45,11 +45,6 @@ function wait_until_file_contains() {
 
 }
 
-function _at_scc () {
-    [[ $(hostname) =~ (uc2n|hkn)[[:digit:]]{3,4}\.localdomain ]]
-}
-
-
 function scontrol_pre_wait_job_with_deadline() {
     # scontrol tends to fail
     local JOB_ID

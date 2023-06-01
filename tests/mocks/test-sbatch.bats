@@ -77,15 +77,15 @@ teardown(){
 
 }
 
-function _at_scc () {
-    [[ $(hostname) =~ (uc2n|hkn)[[:digit:]]{3,4}\.localdomain ]]
+function has_slurm () {
+    man sbatch &> /dev/null
 }
 
 
 
 @test "sbatch input environment variables read from docs are the expected ones" {
 
-   _at_scc || skip
+   has_slurm || skip
    local MOCK="$PROJECT_ROOT"/tests/mocks
    local SRC="$PROJECT_ROOT"/src
 
@@ -97,7 +97,6 @@ function _at_scc () {
    N=$( wc -l < diff-real-mock)
 
    assert_equal "$N" 0
-
 
 }
 

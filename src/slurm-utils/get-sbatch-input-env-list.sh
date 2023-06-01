@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-function _at_scc () {
-    [[ $(hostname) =~ (uc2n|hkn)[[:digit:]]{3,4}\.localdomain ]]
+function sbatch_man_available () {
+    man sbatch &> /dev/null
 }
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
-if _at_scc
+if sbatch_man_available
 then
     "$DIR"/_get-sbatch-input-env-list.sh
 else
