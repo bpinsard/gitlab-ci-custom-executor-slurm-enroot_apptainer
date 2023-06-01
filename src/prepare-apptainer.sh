@@ -7,12 +7,23 @@ source "$SRC"/containerlib-apptainer.sh
 
 echo "[PREPARE] Singularity: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
 
-COMMAND=(apptainer
-         pull
-         "$CE_IMAGEFILE"
-         "$CUSTOM_ENV_CI_JOB_IMAGE")
+set +o nounset
+if [ -z "$CUSTOM_ENV_IMAGEFILE" ]
+then
+    CUSTOM_ENV_IMAGEFILE=''
+fi
+set -o nounset
 
-"${COMMAND[@]}" || {
-    echo "ERROR: command failed: ${COMMAND[*]}";
-    echo "       Image pull failed";
-    }
+
+if [ -z "$CUSTOM_ENV_IMAGEFILE" ]
+then
+    COMMAND=(apptainer
+             pull
+             "$CE_IMAGEFILE"
+             "$CUSTOM_ENV_CI_JOB_IMAGE")
+
+    "${COMMAND[@]}" || {
+        echo "ERROR: command failed: ${COMMAND[*]}";
+        echo "       Image pull failed";
+        }
+fi

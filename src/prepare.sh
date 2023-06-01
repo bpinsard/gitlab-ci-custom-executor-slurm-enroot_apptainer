@@ -8,10 +8,16 @@ echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
 
 CONTAINERISATION_BACKEND="${1}"
 
+if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] && [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
+then
+    echo -n "ERROR: image: option ($CUSTOM_ENV_CI_JOB_IMAGE) "
+    echo "and IMAGEFILE variable ($CUSTOM_ENV_IMAGEFILE) set at the same time"
+    exit "$SYSTEM_FAILURE_EXIT_CODE"
+fi
 
 echo -n "[PREPARE] "; validate_containerisation_backend "$CONTAINERISATION_BACKEND" "$CUSTOM_ENV_CI_JOB_IMAGE"
 
-if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
+if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] || [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
 then
     echo  "[PREPARE] Using image $CUSTOM_ENV_CI_JOB_IMAGE" >&2
 
@@ -43,6 +49,7 @@ then
 export APPTAINER_DOCKER_USERNAME="$CUSTOM_ENV_APPTAINER_DOCKER_USERNAME" # TODO: add test
 export APPTAINER_DOCKER_PASSWORD="$CUSTOM_ENV_APPTAINER_DOCKER_PASSWORD" # TODO: add test
 export CUSTOM_ENV_CI_JOB_IMAGE="$CUSTOM_ENV_CI_JOB_IMAGE"
+export CUSTOM_ENV_IMAGEFILE="$CUSTOM_ENV_IMAGEFILE"
 export CUSTOM_ENV_CI_JOB_ID="$CUSTOM_ENV_CI_JOB_ID"
 source "$PREPARE_SCRIPT"
 EOF

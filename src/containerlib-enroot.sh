@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set +o nounset
-if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
+if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] || [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
 then
     if [ -z "$ENROOT_RUNTIME_PATH" ]
     then

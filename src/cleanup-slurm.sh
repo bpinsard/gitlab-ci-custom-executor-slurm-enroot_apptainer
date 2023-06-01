@@ -38,6 +38,10 @@ if [[ -z "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then
     export CUSTOM_ENV_CI_JOB_IMAGE=""
 fi
+if [ -z "$CUSTOM_ENV_IMAGEFILE" ]
+then
+    CUSTOM_ENV_IMAGEFILE=''
+fi
 set -o nounset
 
 
@@ -64,7 +68,10 @@ shopt -u nullglob
 
 
 
-echo -n "[CLEANUP] "; validate_containerisation_backend "$CONTAINERISATION_BACKEND" "$CUSTOM_ENV_CI_JOB_IMAGE"
+echo -n "[CLEANUP] "; validate_containerisation_backend \
+                            "$CONTAINERISATION_BACKEND" \
+                            "$CUSTOM_ENV_CI_JOB_IMAGE"  \
+                            "$CUSTOM_ENV_IMAGEFILE"
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
 then

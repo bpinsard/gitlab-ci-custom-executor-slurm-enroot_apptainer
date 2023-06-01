@@ -10,23 +10,37 @@ CE_IMAGEDIR="$(mktemp -d "$CUSTOM_ENV_CI_WS/imagedirXXXXX")"
 trap "rm -rf $CE_IMAGEDIR" exit
 
 
+set +o nounset
+if [ -z "$CUSTOM_ENV_IMAGEFILE" ]
+then
+    CUSTOM_ENV_IMAGEFILE=""
+fi
+set -o nounset
+
 set -o errexit
 
-CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
+if [ -z "$CUSTOM_ENV_IMAGEFILE" ]
+then
+    CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
 
-echo "[PREPARE] Enroot: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
+    echo "[PREPARE] Enroot: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
 
-COMMAND=(enroot
-         import
-         --output
-         "$CE_IMAGEFILE"
-         "$CUSTOM_ENV_CI_JOB_IMAGE")
+    COMMAND=(enroot
+             import
+             --output
+             "$CE_IMAGEFILE"
+             "$CUSTOM_ENV_CI_JOB_IMAGE")
 
-"${COMMAND[@]}" || {
-    echo "ERROR: command failed: ${COMMAND[*]}";
-    echo "       Image pull failed";
-    }
-if { enroot list | grep "$CE_CONTAINER_NAME" &> /dev/null; }
-then enroot remove "$CE_CONTAINER_NAME" < <(echo yes)
+    "${COMMAND[@]}" || {
+        echo "ERROR: command failed: ${COMMAND[*]}";
+        echo "       Image pull failed";
+        }
+    if { enroot list | grep "$CE_CONTAINER_NAME" &> /dev/null; }
+    then enroot remove "$CE_CONTAINER_NAME" < <(echo yes)
+    fi
+
+else
+
+    CE_IMAGEFILE="$CUSTOM_ENV_IMAGEFILE"
 fi
 enroot create --name "$CE_CONTAINER_NAME" "$CE_IMAGEFILE"

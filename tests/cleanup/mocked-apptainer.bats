@@ -115,3 +115,31 @@ function teardown_file(){
     assert_exists "$CE_IMAGEFILE"
     )
 }
+
+@test "when CUSTOM_ENV_IMAGEFILE is defined, that file is not deleted" {
+
+    (
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
+    #shellcheck disable=SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-apptainer.sh"
+
+    echo "Prepared..."
+    # shellcheck disable=SC1091
+    source "$CE_QUEUE_WORKSPACE/.env"
+
+    touch "$CUSTOM_ENV_IMAGEFILE"
+
+    "$SRC/cleanup-slurm.sh" apptainer
+
+    echo "Cleaned."
+    (
+    # shellcheck source=./src/containerlib-apptainer.sh
+    source "$SRC"/containerlib-apptainer.sh
+    assert_exists "$CE_IMAGEFILE"
+    )
+    )
+}

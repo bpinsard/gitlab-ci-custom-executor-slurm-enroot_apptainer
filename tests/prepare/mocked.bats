@@ -105,11 +105,51 @@ function teardown() {
 
 @test "prepare exits with error if the containerisation backend is not enroot, apptainer or none" {
 
-    #shellcheck disable=SC2031
+    #shellcheck disable=SC2031,SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
     run prepare.sh some-random-string
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "Invalid containerisation backend: some-random-string"
 
+}
+
+@test "prepare exits with error if both CUSTOM_ENV_{CI_JOB_IMAGE,IMAGEFILE} are specified" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
+    #shellcheck disable=SC2030
+    export CUSTOM_ENV_IMAGEFILE="a-file"
+    #shellcheck disable=SC2031
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    run prepare.sh apptainer
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_output --partial "ERROR: image: option (an-image) and IMAGEFILE variable (a-file) set at the same time"
+
+}
+
+@test "when CUSTOM_ENV_IMAGEFILE is defined, apptainer is not called at all" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="a-file"
+    run prepare.sh apptainer
+    assert_success
+    assert_not_exist "$MOCKLOGDIR"/apptainer.log
+}
+
+@test "when CUSTOM_ENV_IMAGEFILE is defined, enroot called only to create the container" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="a-file"
+    bash prepare.sh enroot
+    run prepare.sh enroot
+    assert_exist "$MOCKLOGDIR"/enroot.log
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "create --name .* $CUSTOM_ENV_IMAGEFILE"
+    run cat "$MOCKLOGDIR"/enroot.log
+    refute_output --partial "import"
 }

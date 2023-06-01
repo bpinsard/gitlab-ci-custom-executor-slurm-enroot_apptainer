@@ -12,8 +12,7 @@ function setup(){
     has_slurm_and_apptainer || skip
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/.." > /dev/null 2>&1 && pwd)"
 
-    # To make scripts in /src available for sourcing
-    # and loading, and also make the sbatch mock available.
+    # To make scripts in /src available for sourcing and loading
     export SRC="$PROJECT_ROOT"/src
 
     JOB_ENV_READER="$PROJECT_ROOT"/tests/mocks/bin/read-job-env.py
@@ -91,10 +90,6 @@ function teardown() {
 
     run _helper
     assert_failure
-
-
-
-
 }
 
 # bats test_tags=configure,prepare,cleanup,run

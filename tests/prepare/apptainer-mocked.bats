@@ -53,6 +53,5 @@ teardown() {
     prepare-apptainer.sh
     assert_file_contains "$MOCKLOGDIR"/apptainer.log  "ARGS:.*pull $CUSTOM_ENV_CI_WS/image-$CUSTOM_ENV_CI_JOB_ID.sif"
 
-
-
 }
+

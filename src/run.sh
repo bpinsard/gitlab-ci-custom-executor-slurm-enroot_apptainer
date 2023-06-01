@@ -23,7 +23,10 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # shellcheck source=./src/run-include.sh
 source "$SRC"/run-include.sh
 
-echo -n "[RUN] "; validate_containerisation_backend "$CONTAINERISATION_BACKEND" "$CUSTOM_ENV_CI_JOB_IMAGE"
+echo -n "[RUN] "; validate_containerisation_backend \
+                     "$CONTAINERISATION_BACKEND" \
+                     "$CUSTOM_ENV_CI_JOB_IMAGE" \
+                     "$CUSTOM_ENV_IMAGEFILE"
 
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]

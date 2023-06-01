@@ -78,6 +78,7 @@ STEPS_OUT_CONTAINER=(get_sources
                      upload_artifacts_on_success
                      upload_artifacts_on_failure)
 
+
 @test "step name lists are consistent" {
 
     for STEPNAME in "${ALL_STEP_NAMES[@]}"
@@ -523,7 +524,6 @@ EOF
 
 }
 
-# bats test_tags=onlythis
 @test "run exits with error if the containerisation backend is not enroot, apptainer or none" {
 
 
@@ -544,7 +544,7 @@ EOF
 
 
 
-@test "run complains if 'none' is passed as an argument and image is used" {
+@test "run complains if 'none' is passed as an argument and CUSTOM_ENV_CI_JOB_IMAGE is used" {
 
     cat <<EOF > script.sh
 echo "hello"
@@ -559,4 +559,43 @@ EOF
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
+}
+
+@test "run complains if 'none' is passed as an argument and CUSTOM_ENV_IMAGEFILE is used" {
+
+    cat <<EOF > script.sh
+echo "hello"
+EOF
+    chmod +x ./script.sh
+    #shellcheck disable=SC2030,SC2031
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    #shellcheck disable=SC2031
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    #shellcheck disable=SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    #shellcheck disable=SC2030
+    export CUSTOM_ENV_IMAGEFILE="a-file.sif"
+    run "$SRC/run.sh" none ./script.sh prepare_script
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
+}
+
+@test "if CUSTOM_ENV_IMAGEFILE is defined, use that (apptainer)." {
+
+    #shellcheck disable=SC2031
+    export CUSTOM_ENV_IMAGEFILE="a-file"
+    cat <<EOF > script.sh
+echo "hello"
+EOF
+    chmod +x ./script.sh
+    #shellcheck disable=SC2031
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    export CUSTOM_ENV_IMAGEFILE="a-file.sif"
+    run "$SRC/run.sh" apptainer ./script.sh prepare_script
+    assert_file_contains "$MOCKLOGDIR"/apptainer.log "exec.*a-file.sif"
+
+
 }
