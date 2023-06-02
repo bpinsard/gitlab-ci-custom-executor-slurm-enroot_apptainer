@@ -624,3 +624,22 @@ EOF
     assert_file_contains "$MOCKLOGDIR"/enroot.log "start"
 
 }
+
+
+# bats test_tags=onlythis
+@test "APPTAINER_EXEC_OPTIONS is passed to apptainer" {
+
+    cat <<EOF > script.sh
+echo "hello"
+EOF
+    chmod +x ./script.sh
+    #shellcheck disable=SC2031
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    export CUSTOM_ENV_APPTAINER_EXEC_OPTIONS="--some-options for-apptainer"
+    run "$SRC/run.sh" apptainer ./script.sh prepare_script
+    assert_success
+    assert_exists "$MOCKLOGDIR"/apptainer.log
+    assert_file_contains "$MOCKLOGDIR"/apptainer.log "exec.*$CUSTOM_ENV_APPTAINER_EXEC_OPTIONS"
+
+}
