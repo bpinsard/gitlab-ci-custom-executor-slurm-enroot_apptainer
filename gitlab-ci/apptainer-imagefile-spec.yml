@@ -4,7 +4,7 @@ apptainer-imagefile-pull:
   tags:
     - shell
   variables:
-    IMAGEFILE: "$HOME/playground/debian-latest.sif"
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sif"
   script:
     - pwd # DEBUG
     - env | grep /hkfs/home/project/hk-project-scs/hs2454/builds
