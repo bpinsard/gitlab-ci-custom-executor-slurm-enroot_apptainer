@@ -204,6 +204,17 @@ With Enroot it is theoretically possible to use the `--root` option
 for the command `enroot start`, 
 but it is not implemented at the moment.
 
+### Further customization of Apptainer behaviour
+
+It is possible, by specifying a value for 
+`APPTAINER_EXEC_OPTIONS`, to pass additional options 
+to the `apptainer exec` command used to launch the container.
+This can be used to mount additional directories from the host 
+with the `--bind` option 
+(e.g., `$TMPDIR` or the location 
+of the chosen mpi installation), 
+or to require support for gpus 
+with the `--nv` or `--rocm` options.
 
 ### Authentication to DockerHub
 
@@ -225,17 +236,11 @@ they can be used in any place where a password is needed.
 in a software repository, e.g. in the .gitlab-ci.yml file.
 Use one of the numerous alternatives.**
 
-#### Singularity
+#### Apptainer
 
-Singularity can use the `APPTAINER_DOCKER_USERNAME`
+Apptainer can use the `APPTAINER_DOCKER_USERNAME`
 and `APPTAINER_DOCKER_PASSWORD` environment variables.
 These can be set on the GitLabCI interface.
-Additionally, Singularity can store credentials in its cache file.
-
-More information can be found [here](https://apptainer-userdoc.readthedocs.io/en/latest/apptainer_and_docker.html#authentication-in-the-environment).
-
-##### Apptainer (newer version of Singularity)
-
 Relevant information can be found [here](https://apptainer.org/docs/user/latest/endpoint.html#managing-oci-registries).
 
 ##### Enroot
@@ -266,8 +271,6 @@ please set the `JOB_TIME_SEC` variable for the job
 to an appropriate value.
 If the variable is not set, it is assumed 
 that the job takes 600 seconds.
-
-
 
 
 
