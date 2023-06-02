@@ -132,15 +132,17 @@ function teardown() {
     # shellcheck disable=SC1091
     source "$SRC"/custom_executor_queue.sh
 
-    cat << EOF > job.sh
+    # Choosing a complicated name here for better
+    JOBNAME=job-config-launches-ce-queue-slurm-job.sh
+    cat << EOF > "$JOBNAME"
 #!/usr/bin/env bash
 echo "Hello"
 
 EOF
-    chmod +x job.sh
+    chmod +x "$JOBNAME"
 
 
-    TODONAME="$(submit_to_custom_executor_queue job.sh JOB-"$CUSTOM_ENV_CI_JOB_ID")"
+    TODONAME="$(submit_to_custom_executor_queue "$JOBNAME" JOB-"$CUSTOM_ENV_CI_JOB_ID")"
     BNAME="$(basename "$TODONAME")"
 
     # DEBUG: This check is flaky.
@@ -166,8 +168,14 @@ EOF
     cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" # For debugging
     echo "end of logfile"
     assert_file_exists "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out"
+    echo "Output of job:"
+    echo "====================="
     cat "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out"
+    echo "====================="
+    echo "Content of workspace:"
+    echo "====================="
     find "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"
+    echo "====================="
     assert_file_contains "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}/OUTPUT/$BNAME.out" 'Hello'
 
 
