@@ -1,0 +1,39 @@
+enroot-imagefile-pull:
+  dependencies: []
+  stage: bootstrap-enroot
+  tags:
+    - shell
+  variables:
+    IMAGEFILE: "$HOME/playground/debian-latest.sqsh"
+  script:
+    - 'mkdir -p "$(dirname "$IMAGEFILE")"'
+    - 'cd "$(dirname "$IMAGEFILE")"'
+    - 'enroot import --output "$(basename "$IMAGEFILE")" docker://debian:latest'
+
+enroot-imagefile-job:
+  dependencies: []
+  needs:
+    - enroot-imagefile-pull
+  stage: bootstrap-enroot
+  tags:
+    - slurm
+    - enroot
+  variables:
+    IMAGEFILE: "$HOME/playground/debian-latest.sqsh"
+  script:
+    - grep PRETTY /etc/os-release | grep -i debian
+
+
+enroot-imagefile-clean:
+  dependencies: []
+  needs:
+    - enroot-imagefile-job
+  stage: bootstrap-enroot
+  tags:
+    - shell
+  when: always
+  variables:
+    IMAGEFILE: "$HOME/playground/debian-latest.sqsh"
+  script:
+    - 'cd "$(dirname "$IMAGEFILE")"'
+    - 'rm -rf "$(basename "$IMAGEFILE")"'

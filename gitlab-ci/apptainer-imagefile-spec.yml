@@ -1,0 +1,39 @@
+apptainer-imagefile-pull:
+  dependencies: []
+  stage: bootstrap-apptainer
+  tags:
+    - shell
+  variables:
+    IMAGEFILE: "$HOME/playground/debian-latest.sif"
+  script:
+    - 'mkdir -p "$(dirname "$IMAGEFILE")"'
+    - 'cd "$(dirname "$IMAGEFILE")"'
+    - 'apptainer pull "$(basename "$IMAGEFILE")" docker://debian:latest'
+
+apptainer-imagefile-job:
+  dependencies: []
+  needs:
+    - apptainer-imagefile-pull
+  stage: bootstrap-apptainer
+  tags:
+    - slurm
+    - apptainer
+  variables:
+    IMAGEFILE: "$HOME/playground/debian-latest.sif"
+  script:
+    - grep PRETTY /etc/os-release | grep -i debian
+
+
+apptainer-imagefile-clean:
+  dependencies: []
+  needs:
+    - apptainer-imagefile-job
+  stage: bootstrap-apptainer
+  tags:
+    - shell
+  when: always
+  variables:
+    IMAGEFILE: "$HOME/playground/debian-latest.sif"
+  script:
+    - 'cd "$(dirname "$IMAGEFILE")"'
+    - 'rm -rf "$(basename "$IMAGEFILE")"'
