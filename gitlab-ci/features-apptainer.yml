@@ -61,7 +61,7 @@ env-job-apptainer:
     - test $ENV_VAR_1 -eq 55
 
 apptainer-exec-options-test:
-   dependencies: []
+  dependencies: []
   stage: test-test-deploy
   tags:
     - slurm
