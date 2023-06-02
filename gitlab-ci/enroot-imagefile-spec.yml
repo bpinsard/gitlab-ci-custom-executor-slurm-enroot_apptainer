@@ -4,7 +4,7 @@ enroot-imagefile-pull:
   tags:
     - shell
   variables:
-    IMAGEFILE: "$HOME/playground/debian-latest.sqsh"
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sqsh"
   script:
     - 'mkdir -p "$(dirname "$IMAGEFILE")"'
     - 'cd "$(dirname "$IMAGEFILE")"'
@@ -19,7 +19,7 @@ enroot-imagefile-job:
     - slurm
     - enroot
   variables:
-    IMAGEFILE: "$HOME/playground/debian-latest.sqsh"
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sqsh"
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
@@ -33,7 +33,7 @@ enroot-imagefile-clean:
     - shell
   when: always
   variables:
-    IMAGEFILE: "$HOME/playground/debian-latest.sqsh"
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sqsh"
   script:
     - 'cd "$(dirname "$IMAGEFILE")"'
     - 'rm -rf "$(basename "$IMAGEFILE")"'

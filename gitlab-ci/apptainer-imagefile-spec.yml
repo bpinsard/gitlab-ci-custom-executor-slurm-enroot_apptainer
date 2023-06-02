@@ -6,8 +6,6 @@ apptainer-imagefile-pull:
   variables:
     IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sif"
   script:
-    - pwd # DEBUG
-    - env | grep /hkfs/home/project/hk-project-scs/hs2454/builds
     - 'mkdir -p "$(dirname "$IMAGEFILE")"'
     - 'cd "$(dirname "$IMAGEFILE")"'
     - 'apptainer pull "$(basename "$IMAGEFILE")" docker://debian:latest'
@@ -21,7 +19,7 @@ apptainer-imagefile-job:
     - slurm
     - apptainer
   variables:
-    IMAGEFILE: "$HOME/playground/debian-latest.sif"
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sif"
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
@@ -35,7 +33,7 @@ apptainer-imagefile-clean:
     - shell
   when: always
   variables:
-    IMAGEFILE: "$HOME/playground/debian-latest.sif"
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sif"
   script:
     - 'cd "$(dirname "$IMAGEFILE")"'
     - 'rm -rf "$(basename "$IMAGEFILE")"'
