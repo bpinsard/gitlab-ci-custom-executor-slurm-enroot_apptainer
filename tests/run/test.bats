@@ -572,7 +572,7 @@ EOF
     #shellcheck disable=SC2031
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
-    #shellcheck disable=SC2031
+    #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE=""
     #shellcheck disable=SC2030
     export CUSTOM_ENV_IMAGEFILE="a-file.sif"
@@ -582,10 +582,12 @@ EOF
     assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
 }
 
-@test "if CUSTOM_ENV_IMAGEFILE is defined, use that (apptainer)." {
+# bats test_tags=onlythis
+@test "if IMAGEFILE is defined (and CI_JOB_IMAGE is not), use that (apptainer)." {
 
-    #shellcheck disable=SC2031
-    export CUSTOM_ENV_IMAGEFILE="a-file"
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+
     cat <<EOF > script.sh
 echo "hello"
 EOF
@@ -593,9 +595,34 @@ EOF
     #shellcheck disable=SC2031
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
+    # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="a-file.sif"
     run "$SRC/run.sh" apptainer ./script.sh prepare_script
+    assert_success
     assert_file_contains "$MOCKLOGDIR"/apptainer.log "exec.*a-file.sif"
 
+
+}
+
+# bats test_tags=onlythis
+@test "if IMAGEFILE is defined (and CI_JOB_IMAGE is not), nothing changes for Enroot." {
+
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+
+    cat <<EOF > script.sh
+echo "hello"
+EOF
+    chmod +x ./script.sh
+    #shellcheck disable=SC2031
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_IMAGEFILE="a-file.sqsh"
+    run "$SRC/run.sh" enroot ./script.sh prepare_script
+    assert_success
+    ENROOTLOG="$MOCKLOGDIR"/enroot.log
+    assert_exists "$ENROOTLOG"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "start"
 
 }

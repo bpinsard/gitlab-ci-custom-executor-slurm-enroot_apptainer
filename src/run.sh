@@ -29,7 +29,7 @@ echo -n "[RUN] "; validate_containerisation_backend \
                      "$CUSTOM_ENV_IMAGEFILE"
 
 
-if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
+if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] || [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
 then
     case "$CONTAINERISATION_BACKEND" in
         enroot)
