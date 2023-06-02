@@ -582,7 +582,6 @@ EOF
     assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
 }
 
-# bats test_tags=onlythis
 @test "if IMAGEFILE is defined (and CI_JOB_IMAGE is not), use that (apptainer)." {
 
     # shellcheck disable=SC2030,SC2031
@@ -604,7 +603,6 @@ EOF
 
 }
 
-# bats test_tags=onlythis
 @test "if IMAGEFILE is defined (and CI_JOB_IMAGE is not), nothing changes for Enroot." {
 
     # shellcheck disable=SC2031

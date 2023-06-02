@@ -8,7 +8,7 @@ enroot-imagefile-pull:
   script:
     - 'mkdir -p "$(dirname "$IMAGEFILE")"'
     - 'cd "$(dirname "$IMAGEFILE")"'
-    - 'enroot import --output "$(basename "$IMAGEFILE")" docker://debian:latest'
+    - 'test -e "$(basename "$IMAGEFILE")" || enroot import --output "$(basename "$IMAGEFILE")" docker://debian:latest'
 
 enroot-imagefile-job:
   dependencies: []
