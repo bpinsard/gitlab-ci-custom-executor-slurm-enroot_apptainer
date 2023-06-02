@@ -6,6 +6,7 @@ apptainer-imagefile-pull:
   variables:
     IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sif"
   script:
+    - 'echo $IMAGEFILE'
     - 'mkdir -p "$(dirname "$IMAGEFILE")"'
     - 'cd "$(dirname "$IMAGEFILE")"'
     - 'test -e "$(basename "$IMAGEFILE")" || apptainer pull "$(basename "$IMAGEFILE")" docker://debian:latest'
