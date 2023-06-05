@@ -81,7 +81,7 @@ function teardown() {
 
 @test "check_for_orbidden_options succeeds when conflicts are NOT present" {
 
-    run check_for_forbidden_option "--partition=dev_cpuonly" "--propagate"
+    run check_for_forbidden_option "--partition=" "--propagate"
 
     assert_success
 

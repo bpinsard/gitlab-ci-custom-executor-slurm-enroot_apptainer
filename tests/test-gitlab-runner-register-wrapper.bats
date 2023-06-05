@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 
+function get_slurm_default_partition() {
+   set -o pipefail
+   { scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2; } || echo dev_cpuonly
+   set +o pipefail
+}
+
 function setup() {
     load './test_helper/bats-support/load' # for run
     load './test_helper/bats-assert/load' # for assert_output and refute_output
@@ -34,7 +40,8 @@ function setup() {
                  ci_ws
                  default-partition
                 )
-    }
+
+}
 
 function teardown() {
     try_to_remove_dir "$TEST_PLAYGROUND"
@@ -339,7 +346,10 @@ function teardown() {
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-env DEFAULT_PARTITION=dev_cpuonly"
+
+    SLURM_PARTITION_DEFAULT="$(get_slurm_default_partition)"
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+                         "\-\-env DEFAULT_PARTITION=$SLURM_PARTITION_DEFAULT"
 
 }
 @test "systemctl --user restart gitlab-runner.service is NOT called" {

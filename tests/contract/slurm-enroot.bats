@@ -4,6 +4,9 @@ function has_slurm_and_enroot() {
     type -p srun &> /dev/null && type -p enroot &> /dev/null
 }
 
+function get_slurm_default_partition() {
+    scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2
+}
 
 function setup() {
     load '../test_helper/bats-support/load' # for run
@@ -25,6 +28,9 @@ function setup() {
     export ENROOT_CACHE_PATH="$TEST_PLAYGROUND/cache/enroot"
     export ENROOT_DATA_PATH="$TEST_PLAYGROUND/data/enroot"
     export ENROOT_TEMP_PATH="$TEST_PLAYGROUND/tmp/enroot"
+
+    SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
+    export SLURM_DEFAULT_PARTITION
 }
 
 function teardown() {
@@ -34,18 +40,18 @@ function teardown() {
 # bats test_tags=serial
 @test "srun --container-image runs in a container (with the right mount options)" {
     # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/
-    has_slurm_and_enroot || skip
+    on_horeka || skip
     GET_DISTRONAME=(grep PRETTY /etc/os-release)
     
     # Running on the host (on a compute node)
-    run srun -p dev_cpuonly \
+    run srun -p "$SLURM_DEFAULT_PARTITION" \
         -n 1 -t 1 \
         "${GET_DISTRONAME[@]}"
 
     refute_output --partial "Alpine Linux"
 
     # Running inside a container (on a compute node)
-    run srun -p dev_cpuonly \
+    run srun -p "$SLURM_DEFAULT_PARTITION" \
         --container-image=alpine:latest \
         --container-mounts=/scratch:/scratch,/etc/slurm/task_prolog.hk:/etc/slurm/task_prolog.hk \
         -n 1 -t 1 \

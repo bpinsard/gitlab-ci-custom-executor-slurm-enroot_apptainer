@@ -5,6 +5,11 @@ function has_slurm(){
 
 }
 
+function get_slurm_default_partition() {
+    scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2
+}
+
+
 function setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
@@ -53,6 +58,8 @@ EOF
       exit 1
     fi
 
+    SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
+    export SLURM_DEFAULT_PARTITION
 
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env
 
@@ -82,7 +89,7 @@ function teardown() {
     ############################################
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 1 -n 1"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 1 -n 1"
     WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
@@ -109,7 +116,7 @@ function teardown() {
     ###############################################
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 3 -n 1"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 3 -n 1"
     WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
@@ -190,7 +197,7 @@ EOF
     ###############################################
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 2 -n 1"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 2 -n 1"
     WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
@@ -207,7 +214,7 @@ EOF
     # shellcheck disable=SC1090
     source "$CEQ_ENV"
 
-    run sbatch -p dev_cpuonly -n 1 -t 1 \
+    run sbatch -p "$SLURM_DEFAULT_PARTITION" -n 1 -t 1 \
         --dependency=afterany:"$JOB_ID" \
        	--wait \
 	--wrap "grep -q 'Stopping custom executor queue...' $CUSTOM_EXECUTOR_QUEUE_LOGFILE"

@@ -6,10 +6,13 @@ URL_DEFAULT="https://git.scc.kit.edu/"
 BUILDS_DIR_DEFAULT="$HOME/gitlab-runner/builds"
 CACHE_DIR_DEFAULT="$HOME/gitlab-runner/cache"
 CI_WS_DEFAULT="$HOME/gitlab-runner"
-# We might be clever here and choose a different default
-# based on the name of the node we are on.
-DEFAULT_PARTITION_DEFAULT="dev_cpuonly"
 
+function get_slurm_default_partition() {
+   set -o pipefail
+   { scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2; } || echo dev_cpuonly
+   set +o pipefail
+}
+DEFAULT_PARTITION_DEFAULT="$(get_slurm_default_partition)"
 
 function show_help() {
 

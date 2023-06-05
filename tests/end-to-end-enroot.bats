@@ -4,6 +4,9 @@ function has_slurm_and_enroot(){
     which sbatch &> /dev/null && which enroot &> /dev/null
 }
 
+function get_slurm_default_partition() {
+    scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2
+}
 
 function setup(){
     load './test_helper/bats-support/load' # for run
@@ -33,8 +36,10 @@ function setup(){
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
+    SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
+    export SLURM_DEFAULT_PARTITION
 
-    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=dev_cpuonly -t 5 -n 1"
+    export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 5 -n 1"
     export CUSTOM_ENV_CI_JOB_IMAGE="docker://ubuntu:kinetic-20221101"
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export SYSTEM_FALURE_EXIT_CODE=102

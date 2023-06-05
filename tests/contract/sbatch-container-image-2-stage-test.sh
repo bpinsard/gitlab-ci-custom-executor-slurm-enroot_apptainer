@@ -2,7 +2,14 @@
 # THIS SEEMS TO WORK NOW
 echo Create the allocation and get the job ID
 echo This job runs on the host, no container
-JOBID=$(sbatch -p dev_cpuonly -n 1 -t 5 --wrap "sleep 100" --parsable)
+
+function get_slurm_default_partition() {
+    scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2
+}
+SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
+export SLURM_DEFAULT_PARTITION
+
+JOBID=$(sbatch -p "$SLURM_DEFAULT_PARTITION" -n 1 -t 5 --wrap "sleep 100" --parsable)
 
 echo "$JOBID" created
 
