@@ -292,6 +292,8 @@ function _custom_executor_queue () {
                  # cd "$(cat "$LOCATIONFNAME")" # DEBUG: This might cause problems.
                  # shellcheck disable=SC1090
                  source <(purge_variables < "$ENVFNAME")
+                 _log "Original job file: $(ls -l "$JOB")"
+                 _log "Job file copied to Working: $(ls -l "$WNAME")"
                  "$WNAME" &> "$OUTPUTNAME" &
                  RUNNINGPID=$!
                  trap 'kill '"$RUNNINGPID"'; \
