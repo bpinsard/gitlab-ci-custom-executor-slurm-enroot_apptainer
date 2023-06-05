@@ -1,7 +1,7 @@
 # GitLab custom executor using Slurm + Enroot/Singularity
 
 
-![Pipeline Status](https://git.scc.kit.edu/hs2454/gitlab-ci-custom-executor-slurm-enroot_apptainer/main/pipeline.svg)
+![Pipeline Status](https://git.scc.kit.edu/hs2454/gitlab-ci-custom-executor-slurm-enroot_apptainer/badges/main/pipeline.svg)
 
 This is a [custom executor for GitLab](https://docs.gitlab.com/runner/executors/custom.html)
 written taking inspiration from https://github.com/ginkgo-project/gitlab-hpc-ci-cb 
