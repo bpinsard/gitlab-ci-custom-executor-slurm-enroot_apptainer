@@ -1,5 +1,8 @@
 # GitLab custom executor using Slurm + Enroot/Singularity
 
+
+![Pipeline Status](https://git.scc.kit.edu/hs2454/gitlab-ci-custom-executor-slurm-enroot_apptainer/main/pipeline.svg)
+
 This is a [custom executor for GitLab](https://docs.gitlab.com/runner/executors/custom.html)
 written taking inspiration from https://github.com/ginkgo-project/gitlab-hpc-ci-cb 
 and from Holger Obermaier's Slurm and Enroot custom executor.
@@ -204,6 +207,13 @@ With Enroot it is theoretically possible to use the `--root` option
 for the command `enroot start`, 
 but it is not implemented at the moment.
 
+Alternatively, if an image file or a sandbox directory
+is already available on the system where the runners are launched,
+it is possible to set the `IMAGEFILE` variable to that path,
+and the custom executor will use it. 
+Do not use the `IMAGEFILE` variable
+with the `image:` option.
+
 ### Further customization of Apptainer behaviour
 
 It is possible, by specifying a value for 
@@ -339,7 +349,7 @@ These contract tests probe the different interactions
 that we assume our software will have with the external system
 (e.g., HoreKa). These needs to be run on HoreKa.
 
-#### End to end tests on HoreKa
+#### End to end tests on HoreKa or BWUniCluster
 
 In order to fully test the custom executor, 
 we need to do the following steps.
@@ -397,10 +407,10 @@ In order for this to work:
   slightly different tests, that differ only 
   in the choice of the partition
   for a multi-node mpi job.
-- a "normal" executor needs to be registered,
+- a "non-custom" executor needs to be registered,
   tagged `shell`
   (a shell executor would work just fine),
-  adding the flags:
+  **adding the flags**:
   - `--env CI_TEST_CODE=/where/the/ce/code/lives` 
     (the `CI_TEST_CODE` variable
     determines where the custom executor code
@@ -409,18 +419,34 @@ In order for this to work:
     (the `DEFAULT_PARTITION` variable
     determines what Slurm partition 
     will be used by default);
+  - `--builds-dir $HOME/gitlab-runner/builds`,
+    to make sure that this executor
+    uses the same build directory 
+    as the other executors under test
+    (This is needed for a group of tests
+    that require some files to stay
+    in `$CI_BUILDS_DIR` between multiple tests,
+    see `apptainer-imagefile-spec.yml` and `enroot-imagefile-spec.yml`;
+  - `--cache-dir $HOME/gitlab-runner/cache`,
+    for consistency (not strictly necessary at the moment).
+    
   This runner will be used for 
   the first run of the test suite and the linting,
-  and for the update of the custom executor code
+  for the update of the custom executor code
   that is necessary for the bootstrap
-  (this is done int the test-deploy stage)
+  (this is done int the test-deploy stage),
+  and for downloading container images to test the `IMAGEFILE` feature.
+  
 - 3 custom gitlab runners needs to be registered 
   and properly configured 
   so that they use the scripts in the test directory
   used in the test-deploy stage.
-  Unfortunately, this requires some manual labor,
+  Unfortunately, with the latest version of GitLab (>= 16.0)
+  this requires some manual labor,
   as one needs to obtain *3 different registration tokens*
-  from the GitLab server web interface.
+  from the GitLab server web interface
+  (A single registration token for all the runners
+  can be used with GitLab < 16.0).
   To register one runner based on the custom executor
   in a convenient way, one can use the command
   `./utils/gitlab-runner-register-wrapper.sh`.
@@ -440,19 +466,72 @@ In order for this to work:
   from the GitLab server web interface
   (where each runner can be edited independently).
 
-  In order for the jobs in the pipeline
-  to be picked up by the right runner:
-  - the runner registered with the `apptainer` backend
-    must have `apptainer, slurm` tags,
-  - the runner registered with the `enroot` backend
-    must have `enroot, slurm` tags,
-  - the runner registered with the `none` backend
-    must have `slurm, slurm-only` tag.
+  If the pipeline is going to be run on HoreKa, 
+  one needs to change the pipeline definition file
+  from `.gitlab-ci.yml` to `.gitlab-ci-horeka.yml`
+  in Settings -> CI/CD -> General pipelines
+  (on GitLab 15.10).
+  If the pipeline is goint to be run on BWUniCluster 2.0,
+  the pipeline is defined `.gitlab-ci-bwuc2.yml`.
   
+  These two files differ only for the inclusion 
+  of either an `horeka-specific.yml` 
+  or an `bwuc2-specific.yml` file,
+  which differ only in the definition 
+  of the slurm partition to use to run the jobs.
+  
+  In order for the jobs in the pipeline
+  (as it is now)
+  to be picked up by the right runner,
+  on HoreKa:
+  - the runner registered with the `apptainer` backend
+    must have `apptainer, slurm, horeka` tags,
+  - the runner registered with the `enroot` backend
+    must have `enroot, slurm, horeka` tags,
+  - the runner registered with the `none` backend
+    must have `slurm, slurm-only, horeka` tag.
+  
+  If the pipeline is run on BWUniCluster 2.0,
+  the `horeka` tag should be changed to `bwuc2`
+  (see the differences between `horeka-specific.yml`
+  and `bwuc2-specific.yml`).
+  
+### Troubleshooting
+
+- The CI job called `unit-test-parallel` hangs 
+  and does not produce any output  
+  Try to run the test suite manually on your machine,
+  and then on HoreKa or BWUniCluster
+  It has been successfully run with `make JOBS=64`
+  on a 8-core machine.
+  In the CI jobs 
+  by default no option on stdout is produced,
+  and instead the test results are written in a junit xml file.
+  You can try to disable the production of the xml report
+  and reactivate the stdout output.
+- The test suite says "<N> tests not run" without any additional information  
+  This is still an error, 
+  a sign that something does not work as it should.
+  The best course of action 
+  is to try and point out the (hopefully small number of)
+  tests that fail, and check them step by step,
+  possibly inserting additional debugging statements
+  in the test code.
+- General: The pipeline fails on HoreKa or on BWUniCluster  
+  Apart from the obvious reasons, like a bug that broke the code,
+  it could be that the executors have not been set up 
+  according to the instructions above
+  (the `shell` executor is the most complex to set up,
+  since there is no wrapper helping with sensible defaults).
+  This is most likely if the test suite runs without errors
+  on your laptop or on a login node.
+  Make sure that the paths in the `environment` section
+  of the `config.toml` file are in agreement for all the runners 
+  (this is crucial for those groups of tests that require consistency,
+  e.g., the tests related to the `IMAGEFILE` feature).
+
 ### Test coverage
 
-In case one installs it on the machine 
-on which the tests are run,
 [`bashcov`](https://github.com/infertux/bashcov) 
 can be used to collect coverage information.
 
