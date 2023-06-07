@@ -206,14 +206,17 @@ EOF
     # scontrol is slow, so it might query the job information
     # before it is actually available
     # and the test may fail
+    echo "Waiting on job"
     scontrol_pre_wait_job_with_deadline "$JOB_ID" 600
 
+    echo "Waiting on env file being produced"
     wait_until_file_exists "$CEQ_ENV" 30
 
 
     # shellcheck disable=SC1090
     source "$CEQ_ENV"
 
+    echo "Checking that job $JOB_ID has ended with the right message"
     run sbatch -p "$SLURM_DEFAULT_PARTITION" -n 1 -t 1 \
         --dependency=afterany:"$JOB_ID" \
        	--wait \
