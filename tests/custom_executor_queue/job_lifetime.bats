@@ -7,8 +7,9 @@ setup(){
 
     TEST_PLAYGROUND="$PWD/ce-queue-job-sub-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
-    mkdir "$TEST_PLAYGROUND"
 
+    rm -rf "$TEST_PLAYGROUND"
+    mkdir "$TEST_PLAYGROUND"
 
     WORKDIR="${TEST_PLAYGROUND}"/cews
     STARTDIR="${TEST_PLAYGROUND}"/start
@@ -27,7 +28,6 @@ teardown(){
     _common_teardown
 }
 
-
 @test "submitted jobs to custom executor queue get executed" {
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -40,11 +40,13 @@ EOF
     submit_to_custom_executor_queue job.sh JOB-5432
     rm job.sh
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1 1
+
     local RESULT
+
     RESULT="$TEST_PLAYGROUND"/test-job-results.txt
     wait_until_file_exists "$RESULT" 20
-    assert_file_exists "$RESULT"
 
+    assert_file_exists "$RESULT"
 }
 
 @test "submitted jobs to custom executor queue get executed ONCE" {
@@ -270,6 +272,10 @@ EOF
     # There are 20 processes
     # Note: using pipes would break the test
     # for some strange reason.
+    echo "All jobs:"
+    echo "==================="
+    jobs -p
+    echo "==================="
     list_all_child_pids > pids
     N=$(wc -l < pids)
     assert_equal "$N" 20

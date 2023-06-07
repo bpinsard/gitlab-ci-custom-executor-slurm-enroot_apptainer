@@ -1,10 +1,12 @@
+# Note: the success of this depends on the settings of
+# CI_BUILDS_DIR for the 2 runners involved.
 enroot-imagefile-pull:
   dependencies: []
   stage: bootstrap-enroot
   tags:
     - shell
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sqsh"
+    IMAGEFILE: "$CI_BUILDS_DIR/enroot/playground/debian-latest.sqsh"
   script:
     - 'mkdir -p "$(dirname "$IMAGEFILE")"'
     - 'cd "$(dirname "$IMAGEFILE")"'
@@ -33,7 +35,7 @@ enroot-imagefile-clean:
     - shell
   when: always
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sqsh"
+    IMAGEFILE: "$CI_BUILDS_DIR/enroot/playground/debian-latest.sqsh"
   script:
     - 'cd "$(dirname "$IMAGEFILE")"'
     - 'rm -rf "$(basename "$IMAGEFILE")"'

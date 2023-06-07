@@ -32,6 +32,10 @@ teardown(){
     # We test in the current shell,
     start_custom_executor_queue "${WORKDIR}" 3> /dev/null
     sleep 5
+    echo "Jobs:"
+    echo "===================="
+    jobs -r
+    echo "===================="
     job_is_alive=$(jobs -r | wc -l)
     assert_equal "$job_is_alive" 1
 

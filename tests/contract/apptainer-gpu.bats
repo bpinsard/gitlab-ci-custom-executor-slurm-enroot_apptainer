@@ -6,9 +6,9 @@ function setup(){
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
     load '../test_helper/bats-file/load' # for file(system) related asserts 
     load '../test-utils'
+    { type -p apptainer && type -p srun; } || { echo "# necessary executables not found, skipping" >&3 ; skip ;}
 
     TAG=12.1.1-devel-ubi8
-    { type -p apptainer && type -p srun; } || { echo "# necessary executables not found, skipping" >&3 ; skip ;}
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     IMAGEFILE="$PROJECT_ROOT/cuda_$TAG.sif"
 
@@ -21,6 +21,12 @@ function setup(){
 }
 
 function setup_file() {
+    load '../test_helper/bats-support/load' # for run
+    load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load' # for file(system) related asserts
+    load '../test-utils'
+    { { type -p apptainer && type -p srun; } && {
+
     TAG=12.1.1-devel-ubi8
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     IMAGEFILE="$PROJECT_ROOT/cuda_$TAG.sif"
@@ -44,6 +50,7 @@ function setup_file() {
 	sleep 5
     done
 
+    } }|| { echo "# necessary executables not found, skipping" >&3; }
 }
 
 function teardown() {
@@ -52,6 +59,12 @@ function teardown() {
 
 
 function teardown_file() {
+
+    load '../test_helper/bats-support/load' # for run
+    load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load' # for file(system) related asserts
+    load '../test-utils'
+    { { type -p apptainer && type -p srun; } && {
     TAG=12.1.1-devel-ubi8
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     IMAGEFILE="$PROJECT_ROOT/cuda_$TAG.sif"
@@ -62,6 +75,7 @@ function teardown_file() {
     scancel "$TEST_JOB_ID"
     rm "$HOME/.apptainer-gpu-test-jobid"
     rm "$HOME/.apptainer-gpu-test-job.out"
+    } } || { echo "# necessary executables not found, skipping" >&3; }
 }
 
 

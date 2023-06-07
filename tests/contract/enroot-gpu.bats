@@ -23,6 +23,11 @@ function setup(){
 }
 
 function setup_file() {
+    load '../test_helper/bats-support/load' # for run
+    load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load' # for file(system) related asserts
+    load '../test-utils'
+    { { type -p enroot && type -p srun; } && {
     TAG=12.1.1-devel-ubi8
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     IMAGEFILE="$PROJECT_ROOT/cuda_$TAG.sqsh"
@@ -52,6 +57,7 @@ function setup_file() {
         echo "Waiting for job to start..."
 	sleep 5
     done
+    } } || { echo "# necessary executables not found, skipping" >&3 ; }
 
 }
 
@@ -61,6 +67,11 @@ function teardown() {
 
 
 function teardown_file() {
+    load '../test_helper/bats-support/load' # for run
+    load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load' # for file(system) related asserts
+    load '../test-utils'
+    { { type -p enroot && type -p srun; } && {
     TAG=12.1.1-devel-ubi8
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
     IMAGEFILE="$PROJECT_ROOT/cuda_$TAG.sqsh"
@@ -73,6 +84,7 @@ function teardown_file() {
     rm "$HOME/.enroot-gpu-test-jobid"
     rm "$HOME/.enroot-gpu-test-job.out"
     yes | enroot remove enroot-gpu-test-container
+    } } || { echo "# necessary executables not found, skipping" >&3 ; }
 }
 
 

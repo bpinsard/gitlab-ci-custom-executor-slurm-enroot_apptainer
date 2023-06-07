@@ -40,16 +40,16 @@ It accepts the following options:
 
     --builds-dir          Directory where builds are stored
                           default:
-                          $BUILDS_DIR_DEFAULT
+                          $BUILDS_DIR_DEFAULT/<container-backend>
 
     --cache-dir           Directory where build cache is stored
                           default:
-                          $CACHE_DIR_DEFAULT
+                          $CACHE_DIR_DEFAULT/<container-backend>
 
     --ci-ws               Workspace for the internals
                           of the custom executor.
                           default:
-                          $CI_WS_DEFAULT
+                          $CI_WS_DEFAULT/<container-backend>
 
     --default-partition   The default Slurm partition to use
                           (can be overridden using the right
@@ -239,9 +239,9 @@ gitlab-runner register \
     --url="$URL" \
     --registration-token="$REGISTRATION_TOKEN" \
     --executor="custom" \
-    --builds-dir="$BUILDS_DIR" \
-    --cache-dir="$CACHE_DIR" \
-    --env CI_WS="$CI_WS" \
+    --builds-dir="$BUILDS_DIR/$CONTAINER_BACKEND" \
+    --cache-dir="$CACHE_DIR/$CONTAINER_BACKEND" \
+    --env CI_WS="$CI_WS/$CONTAINER_BACKEND" \
     --env DEFAULT_PARTITION="$DEFAULT_PARTITION" \
     --custom_build_dir-enabled \
     --custom-config-exec="$SRC/configure-slurm.sh" \

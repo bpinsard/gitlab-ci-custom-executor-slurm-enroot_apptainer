@@ -465,6 +465,14 @@ In order for this to work:
   tags can be assigned to it 
   from the GitLab server web interface
   (where each runner can be edited independently).
+  
+  The directories that each of the runners use
+  should be different, to make sure that 
+  there are no intereferences. 
+  The wrapper postpones the value 
+  of the `--container-backend` option to the paths used 
+  (for `--builds-dir`, `--cache-dir` 
+  and the environment variable `CI_WS`).
 
   If the pipeline is going to be run on HoreKa, 
   one needs to change the pipeline definition file

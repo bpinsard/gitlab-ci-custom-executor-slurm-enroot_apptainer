@@ -407,13 +407,62 @@ function teardown() {
 
 }
 
-@test "help contains default values" {
+@test "help contains default values (with <container-backend>)" {
 
     run "$UTILS"/gitlab-runner-register-wrapper.sh --help
 
     assert_output --partial "$URL_DEFAULT"
     assert_output --partial "$PROJECT_ROOT"
-    assert_output --partial "$HOME/gitlab-runner/builds"
-    assert_output --partial "$HOME/gitlab-runner/cache"
+    assert_output --partial "$HOME/gitlab-runner/builds/<container-backend>"
+    assert_output --partial "$HOME/gitlab-runner/cache/<container-backend>"
+    assert_output --partial "$HOME/gitlab-runner/<container-backend>"
 
+}
+
+@test "builds-dir passed to gitlab-runner register has <container-backend> at the end" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "builds_dir" ]]
+        then
+        echo "$mock_datum"
+        fi
+
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --builds-dir '/this/other/builds/dir' \
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+                         '\-\-builds-dir=/this/other/builds/dir/enroot'
+
+}
+
+@test "cache-dir passed to gitlab-runner register has <container-backend> at the end" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "cache_dir" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --cache-dir '/this/other/cache/dir' \
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+                         '\-\-cache-dir=/this/other/cache/dir/enroot'
+}
+
+
+@test "ci-ws passed to gitlab-runner register has <container-backend> at the end" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "ci_ws" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --ci-ws '/this/other/directory' \
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+                         '\-\-env CI_WS=/this/other/directory/enroot'
 }
