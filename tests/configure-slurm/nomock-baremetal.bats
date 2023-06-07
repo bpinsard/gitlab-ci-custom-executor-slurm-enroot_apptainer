@@ -45,6 +45,11 @@ EOF
     export CUSTOM_ENV_CI_WS
     mkdir -p "$CUSTOM_ENV_CI_WS" # This should not be needed
 
+    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND/builds"
+    export CUSTOM_ENV_CI_CACHE_DIR="$TEST_PLAYGROUND/cache"
+
+    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR"
+    mkdir -p "$CUSTOM_ENV_CI_CACHE_DIR"
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
       # If we are in a testing environment,
