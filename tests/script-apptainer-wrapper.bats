@@ -21,6 +21,8 @@ setup(){
     cd "$TEST_PLAYGROUND" || exit
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND/builds"
+    export CUSTOM_ENV_CI_CACHE_DIR="$TEST_PLAYGROUND/cache"
     export CUSTOM_ENV_CI_JOB_IMAGE=an-image:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
@@ -159,6 +161,40 @@ EOF
 
     ./wrapped.sh
     assert_file_contains "$MOCKLOGDIR/apptainer.log" "\-\-bind.*$CUSTOM_ENV_CI_WS,$SCRIPT_TO_WRAP"
+
+}
+
+@test "apptainer mounts CUSTOM_ENV_CI_BUILDS_DIR" {
+
+    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    cat wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    assert_file_contains "$MOCKLOGDIR/apptainer.log" "\-\-bind.*$CUSTOM_ENV_CI_BUILDS_DIR"
+
+}
+
+@test "apptainer mounts CUSTOM_ENV_CI_CACHE_DIR" {
+
+    SCRIPT_TO_WRAP="$PWD/scrtowrap.sh"
+    cat <<EOF > "$SCRIPT_TO_WRAP"
+echo "something"
+EOF
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-apptainer-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    cat wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    assert_file_contains "$MOCKLOGDIR/apptainer.log" "\-\-bind.*$CUSTOM_ENV_CI_CACHE_DIR"
 
 }
 

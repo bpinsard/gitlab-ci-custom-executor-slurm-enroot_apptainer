@@ -20,7 +20,7 @@ set -o nounset
 
 cat <<EOF
 COMMAND=(apptainer exec
-         --bind "$CUSTOM_ENV_CI_WS,$TOWRAP"
+         --bind "$CUSTOM_ENV_CI_WS,$TOWRAP,$CUSTOM_ENV_CI_CACHE_DIR,$CUSTOM_ENV_CI_BUILDS_DIR"
          $CUSTOM_ENV_APPTAINER_EXEC_OPTIONS
          "$CE_IMAGEFILE"
          "$TOWRAP")

@@ -217,5 +217,90 @@ EOF
     run "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP"
     assert_equal "$status" 22
     assert_output "Needs absolute path to script to wrap."
-    }
+}
 
+@test "enroot DOES NOT mount the CI_BUILDS_DIR inside the container if it is in CI_WS" {
+
+    # Not actually created!
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CI_BUILDS_DIR="$CUSTOM_ENV_CI_WS/builds"
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CI_CACHE_DIR="/a/path"
+
+    SCRIPT_TO_WRAP="$TMPSCR"
+    touch "$SCRIPT_TO_WRAP"
+    chmod +x "$SCRIPT_TO_WRAP"
+
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    run cat "$MOCKLOGDIR/enroot.log"
+    refute_output --regexp "--mount.*$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
+
+}
+
+@test "enroot DOES mount the CI_BUILDS_DIR inside the container if it is outside of CI_WS" {
+
+    # Not actually created!
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_BUILDS_DIR="$HOME/builds"
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_CACHE_DIR="/a/path"
+
+    SCRIPT_TO_WRAP="$TMPSCR"
+    touch "$SCRIPT_TO_WRAP"
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    assert_file_contains "$MOCKLOGDIR/enroot.log" \
+                         "\-\-mount.*$CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR"
+
+}
+
+@test "enroot DOES NOT mount the CI_CACHE_DIR inside the container if it is in CI_WS" {
+
+    # Not actually created!
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_BUILDS_DIR="/a/path"
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_CACHE_DIR="$CUSTOM_ENV_CI_WS/cache"
+
+    SCRIPT_TO_WRAP="$TMPSCR"
+    touch "$SCRIPT_TO_WRAP"
+    chmod +x "$SCRIPT_TO_WRAP"
+
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    run cat "$MOCKLOGDIR/enroot.log"
+    refute_output --regexp "--mount.*$CUSTOM_ENV_CI_CACHE_DIR:$CUSTOM_ENV_CI_CACHE_DIR"
+
+}
+
+@test "enroot DOES mount the CI_CACHE_DIR inside the container if it is outside of CI_WS" {
+
+    # Not actually created!
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CI_BUILDS_DIR="/a/path"
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CI_CACHE_DIR="$HOME/cache"
+
+    SCRIPT_TO_WRAP="$TMPSCR"
+    touch "$SCRIPT_TO_WRAP"
+    chmod +x "$SCRIPT_TO_WRAP"
+
+    "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    chmod +x ./wrapped.sh
+
+    ./wrapped.sh
+    assert_file_contains "$MOCKLOGDIR/enroot.log" \
+                         "\-\-mount.*$CUSTOM_ENV_CI_CACHE_DIR:$CUSTOM_ENV_CI_CACHE_DIR"
+
+}
