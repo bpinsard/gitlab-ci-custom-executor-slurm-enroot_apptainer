@@ -1,6 +1,6 @@
 minimal-job-apptainer:
   dependencies: []
-  stage: test-test-deploy
+  stage: test-deploy
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
@@ -11,7 +11,7 @@ minimal-job-apptainer:
 
 image-job-apptainer:
   dependencies: []
-  stage: test-test-deploy
+  stage: test-deploy
   image: docker://debian:latest
   tags:
     # This needs to match the tag of the test custom executor
@@ -24,7 +24,7 @@ image-job-apptainer:
 
 artifact-job-apptainer:
   dependencies: []
-  stage: test-test-deploy
+  stage: test-deploy
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
@@ -36,7 +36,7 @@ artifact-job-apptainer:
 
 artifact-image-job-apptainer:
   dependencies: []
-  stage: test-test-deploy
+  stage: test-deploy
   image: docker://debian:latest
   tags:
     # This needs to match the tag of the test custom executor
@@ -50,7 +50,7 @@ artifact-image-job-apptainer:
 
 env-job-apptainer:
   dependencies: []
-  stage: test-test-deploy
+  stage: test-deploy
   tags:
     - slurm
     - apptainer
@@ -62,7 +62,7 @@ env-job-apptainer:
 
 apptainer-exec-options-test:
   dependencies: []
-  stage: test-test-deploy
+  stage: test-deploy
   image: docker://debian:latest
   tags:
     - slurm

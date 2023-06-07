@@ -1,6 +1,6 @@
 horeka-mpi-multinode-job-apptainer:
   dependencies: []
-  stage: system-specific
+  stage: test-deploy
   tags:
     - slurm
     - apptainer
@@ -14,7 +14,7 @@ horeka-mpi-multinode-job-apptainer:
 
 horeka-mpi-multinode-job-enroot:
   dependencies: []
-  stage: system-specific
+  stage: test-deploy
   tags:
     - slurm
     - enroot
@@ -28,7 +28,7 @@ horeka-mpi-multinode-job-enroot:
 
 horeka-mpi-multinode-job-slurm-only:
   dependencies: []
-  stage: system-specific
+  stage: test-deploy
   tags:
     - slurm
     - slurm-only

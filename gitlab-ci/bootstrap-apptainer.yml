@@ -1,8 +1,8 @@
-unit-test-parallel-bootstrap-apptainer:
+unit-test-parallel-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-apptainer
+  stage: test-deploy
   script:
     - make test-report-parallel JOBS=8
   after_script:
@@ -18,11 +18,11 @@ unit-test-parallel-bootstrap-apptainer:
       junit: report-parallel.xml
 
 
-unit-test-serial-bootstrap-apptainer:
+unit-test-serial-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-apptainer
+  stage: test-deploy
   script:
     - make test-report-serial
   after_script:
@@ -38,11 +38,11 @@ unit-test-serial-bootstrap-apptainer:
       junit: report-serial.xml
 
 
-lint-bootstrap-apptainer:
+lint-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-apptainer
+  stage: test-deploy
   script:
     - make shellcheck
   tags:

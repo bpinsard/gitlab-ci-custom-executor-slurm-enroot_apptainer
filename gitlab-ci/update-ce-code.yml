@@ -3,7 +3,7 @@
 update-ce-code:
   dependencies:
     - tar-package
-  stage: test-deploy
+  stage: deploy
   tags:
     - shell
   script:

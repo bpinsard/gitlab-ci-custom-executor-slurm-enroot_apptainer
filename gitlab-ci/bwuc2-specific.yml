@@ -1,6 +1,6 @@
 bwuc2-mpi-multinode-job-apptainer:
   dependencies: []
-  stage: system-specific
+  stage: test-deploy
   tags:
     - slurm
     - apptainer
@@ -14,7 +14,7 @@ bwuc2-mpi-multinode-job-apptainer:
 
 bwuc2-mpi-multinode-job-enroot:
   dependencies: []
-  stage: system-specific
+  stage: test-deploy
   tags:
     - slurm
     - enroot
@@ -28,7 +28,7 @@ bwuc2-mpi-multinode-job-enroot:
 
 bwuc2-mpi-multinode-job-slurm-only:
   dependencies: []
-  stage: system-specific
+  stage: test-deploy
   tags:
     - slurm
     - slurm-only

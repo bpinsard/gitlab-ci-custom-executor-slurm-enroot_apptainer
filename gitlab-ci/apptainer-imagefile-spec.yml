@@ -2,7 +2,7 @@
 # CI_BUILDS_DIR for the 2 runners involved.
 apptainer-imagefile-pull:
   dependencies: []
-  stage: bootstrap-apptainer
+  stage: test-deploy
   tags:
     - shell
   variables:
@@ -17,7 +17,7 @@ apptainer-imagefile-job:
   dependencies: []
   needs:
     - apptainer-imagefile-pull
-  stage: bootstrap-apptainer
+  stage: test-deploy
   tags:
     - slurm
     - apptainer
@@ -31,7 +31,7 @@ apptainer-imagefile-clean:
   dependencies: []
   needs:
     - apptainer-imagefile-job
-  stage: bootstrap-apptainer
+  stage: test-deploy
   tags:
     - shell
   when: always

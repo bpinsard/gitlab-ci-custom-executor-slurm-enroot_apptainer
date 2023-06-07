@@ -2,12 +2,8 @@
 stages:
   - test
   - packaging
+  - deploy
   - test-deploy
-  - test-test-deploy
-  - bootstrap-slurm-only
-  - bootstrap-apptainer
-  - bootstrap-enroot
-  - system-specific
 
 include:
   - '/gitlab-ci/lint-and-unit.yml'

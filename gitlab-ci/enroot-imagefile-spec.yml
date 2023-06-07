@@ -2,7 +2,7 @@
 # CI_BUILDS_DIR for the 2 runners involved.
 enroot-imagefile-pull:
   dependencies: []
-  stage: bootstrap-enroot
+  stage: test-deploy
   tags:
     - shell
   variables:
@@ -16,7 +16,7 @@ enroot-imagefile-job:
   dependencies: []
   needs:
     - enroot-imagefile-pull
-  stage: bootstrap-enroot
+  stage: test-deploy
   tags:
     - slurm
     - enroot
@@ -30,7 +30,7 @@ enroot-imagefile-clean:
   dependencies: []
   needs:
     - enroot-imagefile-job
-  stage: bootstrap-enroot
+  stage: test-deploy
   tags:
     - shell
   when: always

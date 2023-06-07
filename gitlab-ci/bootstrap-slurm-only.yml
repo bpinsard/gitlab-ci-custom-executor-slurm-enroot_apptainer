@@ -1,8 +1,8 @@
-unit-test-parallel-bootstrap-slurm-only:
+unit-test-parallel-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-slurm-only
+  stage: test-deploy
   script:
     - make test-report-parallel JOBS=8
   after_script:
@@ -18,11 +18,11 @@ unit-test-parallel-bootstrap-slurm-only:
       junit: report-parallel.xml
 
 
-unit-test-serial-bootstrap-slurm-only:
+unit-test-serial-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-slurm-only
+  stage: test-deploy
   script:
     - make test-report-serial
   after_script:
@@ -38,11 +38,11 @@ unit-test-serial-bootstrap-slurm-only:
       junit: report-serial.xml
 
 
-lint-bootstrap-slurm-only:
+lint-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: bootstrap-slurm-only
+  stage: test-deploy
   script:
     - make shellcheck
   tags:
