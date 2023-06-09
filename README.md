@@ -315,7 +315,7 @@ that the job takes 600 seconds.
 ## Development 
 
 To modify the code in this repository,
-please have a look at [`CONTRIBUTUING.md`](./CONTRIBUTUING.md)
+please have a look at [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 for a general introduction, 
 set up of the development environment
 and contribution guidelines.
