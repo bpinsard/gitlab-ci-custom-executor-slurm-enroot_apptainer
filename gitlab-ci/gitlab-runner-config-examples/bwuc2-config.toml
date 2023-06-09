@@ -1,0 +1,104 @@
+concurrent = 1
+check_interval = 0
+shutdown_timeout = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "Custom Executor slurm+enroot (enroot)"
+  url = "https://git.scc.kit.edu/"
+  id = 4227
+  token = "<redacted>"
+  token_obtained_at = 2023-06-05T08:11:12Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "custom"
+  builds_dir = "/home/kit/scc/hs2454/gitlab-runner/builds"
+  cache_dir = "/home/kit/scc/hs2454/gitlab-runner/cache"
+  environment = ["CI_WS=/home/kit/scc/hs2454/gitlab-runner", "DEFAULT_PARTITION=dev_single"]
+  [runners.custom_build_dir]
+    enabled = true
+  [runners.custom]
+    config_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/configure-slurm.sh"
+    config_exec_timeout = 200
+    prepare_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/prepare.sh"
+    prepare_args = ["enroot"]
+    prepare_exec_timeout = 200
+    run_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/run.sh"
+    run_args = ["enroot"]
+    cleanup_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/cleanup-slurm.sh"
+    cleanup_args = ["enroot"]
+    cleanup_exec_timeout = 200
+    graceful_kill_timeout = 200
+    force_kill_timeout = 200
+
+[[runners]]
+  name = "Custom Executor slurm+apptainer (apptainer)"
+  url = "https://git.scc.kit.edu/"
+  id = 4228
+  token = "<redacted>"
+  token_obtained_at = 2023-06-05T08:13:47Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "custom"
+  builds_dir = "/home/kit/scc/hs2454/gitlab-runner/builds"
+  cache_dir = "/home/kit/scc/hs2454/gitlab-runner/cache"
+  environment = ["CI_WS=/home/kit/scc/hs2454/gitlab-runner", "DEFAULT_PARTITION=dev_single"]
+  [runners.custom_build_dir]
+    enabled = true
+  [runners.custom]
+    config_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/configure-slurm.sh"
+    config_exec_timeout = 200
+    prepare_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/prepare.sh"
+    prepare_args = ["apptainer"]
+    prepare_exec_timeout = 200
+    run_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/run.sh"
+    run_args = ["apptainer"]
+    cleanup_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/cleanup-slurm.sh"
+    cleanup_args = ["apptainer"]
+    cleanup_exec_timeout = 200
+    graceful_kill_timeout = 200
+    force_kill_timeout = 200
+
+[[runners]]
+  name = "Custom Executor slurm+apptainer (none)"
+  url = "https://git.scc.kit.edu/"
+  id = 4229
+  token = "<redacted>"
+  token_obtained_at = 2023-06-05T08:13:59Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "custom"
+  builds_dir = "/home/kit/scc/hs2454/gitlab-runner/builds"
+  cache_dir = "/home/kit/scc/hs2454/gitlab-runner/cache"
+  environment = ["CI_WS=/home/kit/scc/hs2454/gitlab-runner", "DEFAULT_PARTITION=dev_single"]
+  [runners.custom_build_dir]
+    enabled = true
+  [runners.custom]
+    config_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/configure-slurm.sh"
+    config_exec_timeout = 200
+    prepare_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/prepare.sh"
+    prepare_args = ["none"]
+    prepare_exec_timeout = 200
+    run_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/run.sh"
+    run_args = ["none"]
+    cleanup_exec = "/home/kit/scc/hs2454/gitlab-custom-executor-slurm-apptainer-enroot/src/cleanup-slurm.sh"
+    cleanup_args = ["none"]
+    cleanup_exec_timeout = 200
+    graceful_kill_timeout = 200
+    force_kill_timeout = 200
+
+[[runners]]
+  name = "A bwUC2-based shell executor"
+  url = "https://git.scc.kit.edu"
+  id = 4230
+  token = "<redacted>"
+  token_obtained_at = 2023-06-05T08:15:37Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "shell"
+  builds_dir = "/home/kit/scc/hs2454/gitlab-unner/builds"
+  cache_dir = "/home/kit/scc/hs2454/gitlab-runner/cache"
+  environment = ["CI_TEST_CODE=/home/kit/scc/hs2454/custom-executor-slurm-container-test-deploy", "DEFAULT_PARTITION=dev_cpuonly"]
+  [runners.custom_build_dir]
+    enabled = true
+
+  [runners.cache]
+    MaxUploadedArchiveSize = 0

@@ -36,30 +36,39 @@ More info can be obtained [here](https://docs.gitlab.com/runner/)
   manages the communication with the GitLab instance,
   and provides some standard mechanisms of execution
   and customization hooks.
-- the runner: a resource that can run CI jobs.
+- the runner: an abstract resource that can run CI jobs.
   A runner can be created/registered for a GitLab repository,
-  for a GitLab instance or a GitLab group. 
-- the executor: the underlying mechanism 
-  that will concretely execute the CI jobs
+  for a GitLab group or a GitLab instance.
+- the executor: the underlying concrete  mechanism 
+  that will execute the CI jobs
   More info can be obtained [here](https://docs.gitlab.com/runner/executors/)
 - the custom executor: a custom version of the executor,
   composed of a number of scripts
   representing the customization hooks of the runner.
   More info can be obtained [here](https://docs.gitlab.com/runner/executors/custom.html)
 
-### GitLab CI setup: installing the custom executor code
+### GitLab CI setup: obtaining the custom executor code
 
-To set up this executor on a HPC system,
-either:
-- clone this repository on the system,
-- make sure this code is available on the system,
+The of the custom executor needs to be copied to the hpc system. 
+There are a few ways to do this.
+Either:
+- This code might be available on the system,
   in the system directories
-- create a  tarball with all the necessary code
-  (which can be produced using the `Makefile` 
-  in the `packaging` directory),
-  and extract it on the system.
+  (see system documentation).
+  This is by far the simplest option
+- Clone this repository on the system.
+  This is the best option if you think 
+  you will have to modify the code;
 
-### GitLab CI setup: runner registration
+Alternatively, a  tarball with all the necessary code
+can be produced using the `Makefile` 
+in the `packaging` directory extract it on the system.
+It is also produced as an artifact
+by one of the jobs in the CI pipeline
+of this project.
+
+
+### GitLab CI setup: Register the runner
 To register a new runner
 make use of the script named
 `gitlab-runner-register-wrapper.sh`,
@@ -85,14 +94,14 @@ The most important inputs and options are:
 - the project registration token,
   needed by the runner to query 
   the gitlab server for CI jobs
-  (retrieve this from the CI runner setting web page);
+  (retrieve this from the CI runner setting web page
+  or from the registration procedure);
 - a description, or name, for the runner
-- the tags we want to give to the runner (optional)
 - the containerisation backend 
-  that we might be interested in using
-  (This is used only 
-   if we have an `image:` section 
-   in the definition of the CI job)
+  that we might be interested in using,
+  i.e., enroot, apptainer or none
+  (this makes no difference
+  for a job that does not use any containers)
 - the default Slurm partition that we want to use 
   for our jobs.
 Other options are available, 
@@ -113,7 +122,7 @@ the plain `gitlab-runner register` command
 and/or to modify the GitLab runner configuration file
 that by default lives in `$HOME/.gitlab-runner/config.toml`.
 
-#### Runner tags and job tags
+#### Important: Runner tags and job tags
 
 Tags are a mechanism which allows 
 to choose which runner can process a given job
@@ -132,7 +141,8 @@ at the runner registration stage
 (and can be later changed on the GitLab web interface),
 while the tags for the jobs are set
 in the `tags:` section of the job definition
-in the CI/CD configuration file (i.e., typically, `.gitlab-ci.yml`).
+in the CI/CD configuration file 
+(i.e., typically, `.gitlab-ci.yml`).
 
 #### Workspace for the custom executor
 
@@ -145,7 +155,7 @@ The recommended way is to define it
 in the private configuration of the custom executor,
 on the machine where the runner is registered.
 The `gitlab-runner-register-wrapper.sh` script
-sets it to a reasonable default (`$HOME/gitlab-runner/`).
+sets it to a reasonable default (`$HOME/gitlab-runner/<container-backend>`).
 
 Alternatively, it can be done in [various ways](https://docs.gitlab.com/ee/ci/variables/),
 e.g. [in the `.gitlab-ci.yml` file](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-gitlab-ciyml-file)
@@ -167,9 +177,9 @@ the invocation and launch of the GitLab runner
 depends on the configuration
 of the system the runner sits on).
 
-After that, one generally needs to manually modify the configuration file
+After that, one may need to manually modify the configuration file
 (by default, `$HOME/.gitlab-runner/config.toml`),
-unless all the necessary command line options
+/unless all the necessary command line options/
 have been passed to the invocation 
 of `gitlab-runner register`.
 
@@ -180,7 +190,10 @@ the command `gitlab-runner register`
 and modify the configuration file
 in multiple places,
 in particular adding the paths to all the scripts 
-and setting environment variables.
+and setting environment variables
+(these settings are generally overlooked
+in the standard invocation 
+of `gitlab-runner register`).
 
 ### CI jobs in containers on HoreKa and bwUniCluster 2.0
 
@@ -189,15 +202,20 @@ or [Enroot](https://github.com/NVIDIA/enroot) to run jobs in containers
 (this relies on Singularity/Apptainer or Enroot to be installed
 on the HPC system in use).
 
-In order to use those, make sure you set the `image:` tag 
-of the CI job in the same format as Singularity/Apptainer or Enroot expect it.
-Both Apptainer and Enroot do support image specification in a format like
-`docker://debian:latest`.
+In order to use those, make sure that:
+- either the `image:` tag of the CI job 
+  is set in the same format as Singularity/Apptainer or Enroot expect it.
+  Both Apptainer and Enroot do support image specification in a format like
+  `docker://debian:latest`.
+- or an `IMAGEFILE` variable is set 
+  that points to an existing Apptainer container 
+  or to an existing `.sqsh` image file for Enroot.
 
 The format for the image specification for Enroot is described 
 [here](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md#usage)
 (the `enroot import` command is used under the hood),
 while the one for Apptainer is described
+
 [here](https://apptainer.org/docs/user/main/cli/apptainer_pull.html)
 (the `apptainer pull` command is used under the hood).
 
@@ -231,9 +249,9 @@ with the `--nv` or `--rocm` options.
 When using images with uri starting with `docker://`,
 the image will be pulled from DockerHub (if it is not cached).
 
-DockerHub has a pull rate limiting in place of 200 pulls every 6 hours.
-For non authenticated users it applies to *the IP address*,
-while for authenticated users it applies to a single user account.
+DockerHub has a pull rate limiting.
+For non authenticated users it is 100 pulls *per IP address* every 6 hours,
+while for authenticated users it is 200 pulls *per account* every 6 hours.
 If you are hitting a pull rate limit, consider authenticating.
 
 Singularity and Enroot have different authentication mechanisms. 
@@ -248,13 +266,24 @@ Use one of the numerous alternatives.**
 
 #### Apptainer
 
-Apptainer can use the `APPTAINER_DOCKER_USERNAME`
+Apptainer [can use](https://apptainer.org/docs/user/latest/docker_and_oci.html#environment-variables)
+the `APPTAINER_DOCKER_USERNAME`
 and `APPTAINER_DOCKER_PASSWORD` environment variables.
-These can be set on the GitLabCI interface.
-Relevant information can be found [here](https://apptainer.org/docs/user/latest/endpoint.html#managing-oci-registries).
+These can be set on the GitLabCI interface
+and will be then used by the custom executor.
+
+Alternatively, it is possible to use 
+[the `apptainer remote login` command](https://apptainer.org/docs/user/latest/docker_and_oci.html#apptainer-cli-remote-command)
+on the machine hosting the runner.
+This will cause the credentials 
+to be stored in the home directory.
+
+Additional relevant information can be found [here](https://apptainer.org/docs/user/latest/endpoint.html#managing-oci-registries).
 
 ##### Enroot
 
+Enroot uses `curl` under the hood, 
+which uses a `netrc` file.
 Relevant information about enroot's authentication method,
 is available at the [documentation of the enroot import command](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md).
 
@@ -368,7 +397,8 @@ Once:
 Every time we run the pipeline:
 
 - make sure the gitlab runner is running 
-  (log into the horeka-ci login node)
+  (this might require to log into the horeka-ci login node,
+  or have lingering enabled for the systemd service)
 - deploy the code to horeka, 
   in the locations where the gitlab runner needs them
   (this is part of the pipeline)
@@ -383,7 +413,7 @@ Every time we run the pipeline:
 The GitLab CI configuration included in this repository
 is made up of a number of stages
 which include unit tests, a test deployment,
-a number of tests of the deployed executor.
+a number of tests of the deployed executors.
 These try to test different features of the executor,
 e.g. the production of artifacts, usage of containers,
 multi-node mpi jobs and some combinations of these
@@ -394,19 +424,33 @@ At the beginning of the pipeline,
 the jobs are run using a shell executor,
 but at some point the code is deployed 
 to a directory of your choice
-(in the "test-deploy" stage)
+(in the `deploy` stage)
 and the later stages are run using the deployed
 custom executor code.
 
 In order for this to work:
-- depending on the machine where the tests are supposed to run,
-  set `.gitlab-ci-bwuc2.yml` or `.gitlab-ci-horeka.yml`
-  as the CI/CD configuration file on the GitLab CI web interface
-  (Settings -> CI/CD -> General Pipelines).
-  The difference between these files is only that they include
-  slightly different tests, that differ only 
-  in the choice of the partition
-  for a multi-node mpi job.
+depending on the machine where the tests are supposed to run,
+set `.gitlab-ci-bwuc2.yml` or `.gitlab-ci-horeka.yml`
+as the CI/CD configuration file on the GitLab CI web interface
+(Settings -> CI/CD -> General Pipelines).
+The difference between these files is only that they include
+slightly different tests, that differ only 
+in the choice of the partition
+for a multi-node mpi job.
+
+### Setting up the runners for the pipeline
+
+A number of runners must be set up on the host
+where the pipeline is going to run.
+Examples of the gitlab runner configuration file
+(usually `$HOME/.gitlab-runner/config.toml`)
+for which the pipeline can successfully run
+are shown in the directory `gitlab-ci/gitlab-runner-config-examples`.
+(tags are not visible in the configurations,
+they need to be set from the GitLab server web interface)
+
+Detailed setup steps:
+
 - a "non-custom" executor needs to be registered,
   tagged `shell`
   (a shell executor would work just fine),
@@ -503,6 +547,22 @@ In order for this to work:
   the `horeka` tag should be changed to `bwuc2`
   (see the differences between `horeka-specific.yml`
   and `bwuc2-specific.yml`).
+  
+- Optionally, one would like to set up authentication for DockerHub
+  both for Apptainer and for Enroot.
+  This might be needed if one wants to 
+  run the pipeline multiple times a day
+  without hitting the pull rate limit.
+  For this, one can set the `APPTAINER_DOCKER_USERNAME`
+  and the `APPTAINER_DOCKER_PASSWORD` environment variables
+  that will be used by default by Apptainer,
+  and then use the following line 
+  ```
+  machine auth.docker.io login <username> password $CUSTOM_ENV_APPTAINER_DOCKER_PASSWORD
+  ```
+  in the `.config/enroot/.credentials` netrc file
+  (see [the documentation](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md#usage)
+  for Enroot's import command).
   
 ### Troubleshooting
 
