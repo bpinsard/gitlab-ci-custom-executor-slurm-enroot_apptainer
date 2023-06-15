@@ -25,7 +25,6 @@ function setup() {
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND/builds"
-    export CUSTOM_ENV_CI_CACHE_DIR="$TEST_PLAYGROUND/cache"
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     echo "Test setup phase completed."

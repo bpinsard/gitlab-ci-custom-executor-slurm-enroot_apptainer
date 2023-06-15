@@ -43,12 +43,10 @@ function setup(){
     export CUSTOM_ENV_CI_JOB_IMAGE="docker://ubuntu:kinetic-20221101"
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND/builds"
-    export CUSTOM_ENV_CI_CACHE_DIR="$TEST_PLAYGROUND/cache"
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
 
     mkdir "$CUSTOM_ENV_CI_BUILDS_DIR"
-    mkdir "$CUSTOM_ENV_CI_CACHE_DIR"
 
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then

@@ -18,11 +18,6 @@ then
     MOUNTS="--mount $CUSTOM_ENV_CI_BUILDS_DIR:$CUSTOM_ENV_CI_BUILDS_DIR $MOUNTS"
 fi
 
-if [[ ! "$CUSTOM_ENV_CI_CACHE_DIR" =~ ^"${CUSTOM_ENV_CI_WS}"  ]]
-then
-    MOUNTS="--mount $CUSTOM_ENV_CI_CACHE_DIR:$CUSTOM_ENV_CI_CACHE_DIR $MOUNTS"
-fi
-
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # shellcheck source=./src/containerlib-enroot.sh
 source "$SRC"/containerlib-enroot.sh
