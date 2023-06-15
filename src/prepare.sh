@@ -8,14 +8,29 @@ echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
 
 CONTAINERISATION_BACKEND="${1}"
 
+# Both defined
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] && [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
 then
-    echo -n "ERROR: image: option ($CUSTOM_ENV_CI_JOB_IMAGE) "
-    echo "and IMAGEFILE variable ($CUSTOM_ENV_IMAGEFILE) set at the same time"
-    exit "$SYSTEM_FAILURE_EXIT_CODE"
+    echo -n "image: $CUSTOM_ENV_CI_JOB_IMAGE"
+    echo -n " and variable IMAGEFILE=$CUSTOM_ENV_IMAGEFILE"
+    echo " are set at the same time."
+    if [[ -a "$CUSTOM_ENV_IMAGEFILE" ]]
+    then
+        echo "$CUSTOM_ENV_IMAGEFILE does exist, not dowloading image: $CUSTOM_ENV_CI_JOB_IMAGE"
+    fi
 fi
 
+# image: undefined but IMAGEFILE defined
+if [[ -z "$CUSTOM_ENV_CI_JOB_IMAGE" ]] && [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
+then
+    if [[ ! -a "$CUSTOM_ENV_IMAGEFILE" ]]
+    then
+        echo "IMAGEFILE=$CUSTOM_ENV_IMAGEFILE does not exist and image: not specified."
+        exit "$SYSTEM_FAILURE_EXIT_CODE"
+    fi
+fi
 echo -n "[PREPARE] "; validate_containerisation_backend "$CONTAINERISATION_BACKEND" "$CUSTOM_ENV_CI_JOB_IMAGE"
+
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] || [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
 then

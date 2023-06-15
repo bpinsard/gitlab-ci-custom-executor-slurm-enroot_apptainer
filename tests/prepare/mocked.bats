@@ -114,42 +114,91 @@ function teardown() {
 
 }
 
-@test "prepare exits with error if both CUSTOM_ENV_{CI_JOB_IMAGE,IMAGEFILE} are specified" {
+@test "prepare informs when both CUSTOM_ENV_{CI_JOB_IMAGE,IMAGEFILE} are specified" {
 
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
     #shellcheck disable=SC2030
-    export CUSTOM_ENV_IMAGEFILE="a-file"
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
+    run prepare.sh apptainer
+    assert_success
+    assert_output --regexp "image: an-image and variable IMAGEFILE=$CUSTOM_ENV_IMAGEFILE are set at the same time."
+
+}
+
+@test "prepare exit with error when image not speficied but IMAGEFILE is and file does not exist" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
     #shellcheck disable=SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     run prepare.sh apptainer
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --partial "ERROR: image: option (an-image) and IMAGEFILE variable (a-file) set at the same time"
+    assert_output --regexp "IMAGEFILE=$CUSTOM_ENV_IMAGEFILE does not exist and image: not specified."
 
 }
 
-@test "when CUSTOM_ENV_IMAGEFILE is defined, apptainer is not called at all" {
+@test "when CUSTOM_ENV_IMAGEFILE is defined and exists, apptainer is not called at all" {
 
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE=""
     #shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_IMAGEFILE="a-file"
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
+    touch "$CUSTOM_ENV_IMAGEFILE"
     run prepare.sh apptainer
     assert_success
+    if [ -f  "$MOCKLOGDIR"/apptainer.log ]
+    then
+       cat  "$MOCKLOGDIR"/apptainer.log
+    fi
     assert_not_exist "$MOCKLOGDIR"/apptainer.log
 }
 
-@test "when CUSTOM_ENV_IMAGEFILE is defined, enroot called only to create the container" {
+@test "when CUSTOM_ENV_IMAGEFILE is defined but does not exist, apptainer is called to download the image" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
+    run prepare.sh apptainer
+    assert_success
+    assert_exist "$MOCKLOGDIR"/apptainer.log
+    cat "$MOCKLOGDIR"/apptainer.log
+    assert_file_contains "$MOCKLOGDIR"/apptainer.log "pull.*$CUSTOM_ENV_CI_JOB_IMAGE"
+}
+
+
+@test "when CUSTOM_ENV_IMAGEFILE is defined and exists, enroot called only to create the container" {
 
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE=""
     #shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_IMAGEFILE="a-file"
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
+    touch "$CUSTOM_ENV_IMAGEFILE"
     bash prepare.sh enroot
     run prepare.sh enroot
     assert_exist "$MOCKLOGDIR"/enroot.log
     assert_file_contains "$MOCKLOGDIR"/enroot.log "create --name .* $CUSTOM_ENV_IMAGEFILE"
+    run cat "$MOCKLOGDIR"/enroot.log
+    refute_output --partial "import"
+}
+
+# bats test_tags=onlythis
+@test "when CUSTOM_ENV_IMAGEFILE is defined but does not exist, enroot called only to create the container" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
+    bash prepare.sh enroot
+    run prepare.sh enroot
+    assert_exist "$MOCKLOGDIR"/enroot.log
+    cat  "$MOCKLOGDIR"/enroot.log
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "import --output.*$CUSTOM_ENV_CI_JOB_IMAGE"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "create --name $CUSTOM_ENV_IMAGEFILE"
     run cat "$MOCKLOGDIR"/enroot.log
     refute_output --partial "import"
 }

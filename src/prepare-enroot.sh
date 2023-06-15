@@ -19,7 +19,7 @@ set -o nounset
 
 set -o errexit
 
-if [ -z "$CUSTOM_ENV_IMAGEFILE" ]
+if [[ -z "$CUSTOM_ENV_IMAGEFILE" ]] || [[ ! -a "$CUSTOM_ENV_IMAGEFILE" ]]
 then
     CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
 
@@ -40,7 +40,6 @@ then
     fi
 
 else
-
     CE_IMAGEFILE="$CUSTOM_ENV_IMAGEFILE"
 fi
 enroot create --name "$CE_CONTAINER_NAME" "$CE_IMAGEFILE"
