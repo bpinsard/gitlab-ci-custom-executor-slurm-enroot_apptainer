@@ -158,7 +158,7 @@ function teardown() {
 }
 
 
-@test "accepts --builds-dir and passes it to gitlab-runner register" {
+@test "accepts --builds-dir-base and passes it to gitlab-runner register" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
@@ -167,13 +167,13 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --builds-dir '/this/other/builds/dir' \
+        --builds-dir-base "$TEST_PLAYGROUND/this/other/builds/dir" \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-builds-dir=/this/other/builds/dir'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-builds-dir=$TEST_PLAYGROUND/this/other/builds/dir"
 
 }
 
-@test "accepts --cache-dir and passes it to gitlab-runner register" {
+@test "accepts --cache-dir-base and passes it to gitlab-runner register" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
@@ -182,14 +182,13 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --cache-dir '/this/other/cache/dir' \
+        --cache-dir-base "$TEST_PLAYGROUND/this/other/cache/dir" \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-cache-dir=/this/other/cache/dir'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-cache-dir=$TEST_PLAYGROUND/this/other/cache/dir"
 
 }
 
-
-@test "accepts --ci-ws and passes it to gitlab-runner register" {
+@test "accepts --ci-ws-base and passes it to gitlab-runner register" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
@@ -198,9 +197,9 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --ci-ws '/this/other/directory' \
+        --ci-ws-base "$TEST_PLAYGROUND/this/other/directory" \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-env CI_WS=/this/other/directory'
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-env CI_WS=$TEST_PLAYGROUND/this/other/directory"
 
 }
 
@@ -298,6 +297,7 @@ function teardown() {
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
+    cat "$MOCKLOGDIR"/gitlab-runner.log
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-builds-dir=$HOME/gitlab-runner/builds"
 
 }
@@ -419,7 +419,7 @@ function teardown() {
 
 }
 
-@test "builds-dir passed to gitlab-runner register has <container-backend> at the end" {
+@test "builds-dir-base passed to gitlab-runner register has <container-backend> at the end" {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
@@ -429,10 +429,29 @@ function teardown() {
         fi
 
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --builds-dir '/this/other/builds/dir' \
+        --builds-dir-base "$TEST_PLAYGROUND/this/other/builds/dir" \
 
+    # the proper gitlab-runner option is still --builds-dir
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
-                         '\-\-builds-dir=/this/other/builds/dir/enroot'
+                         "\-\-builds-dir=$TEST_PLAYGROUND/this/other/builds/dir/enroot"
+
+}
+
+@test "builds-dir-base is created if it does not exist" {
+
+    BUILDS_DIR="$TEST_PLAYGROUND/builds_dir"
+    assert_dir_not_exists "$BUILDS_DIR"
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "builds_dir" ]]
+        then
+        echo "$mock_datum"
+        fi
+
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --builds-dir-base "$BUILDS_DIR" \
+
+    assert_dir_exists "$BUILDS_DIR"
 
 }
 
@@ -445,12 +464,30 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --cache-dir '/this/other/cache/dir' \
+        --cache-dir-base "$TEST_PLAYGROUND/this/other/cache/dir" \
 
+    # the proper gitlab-runner option is still --cache-dir
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
-                         '\-\-cache-dir=/this/other/cache/dir/enroot'
+                         "\-\-cache-dir=$TEST_PLAYGROUND/this/other/cache/dir/enroot"
 }
 
+@test "cache-dir is created if it does not exist" {
+
+    CACHE_DIR="$TEST_PLAYGROUND/cache_dir"
+    assert_dir_not_exists "$CACHE_DIR"
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "cache_dir" ]]
+        then
+        echo "$mock_datum"
+        fi
+
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --cache-dir-base "$CACHE_DIR" \
+
+    assert_dir_exists "$CACHE_DIR"
+
+}
 
 @test "ci-ws passed to gitlab-runner register has <container-backend> at the end" {
 
@@ -461,8 +498,26 @@ function teardown() {
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --ci-ws '/this/other/directory' \
+        --ci-ws-base "$TEST_PLAYGROUND/this/other/directory" \
 
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
-                         '\-\-env CI_WS=/this/other/directory/enroot'
+                         "\-\-env CI_WS=$TEST_PLAYGROUND/this/other/directory/enroot"
+}
+
+@test "ci-ws is created if it does not exist" {
+
+    CI_WS="$TEST_PLAYGROUND/ci_ws"
+    assert_dir_not_exists "$CI_WS"
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "ci_ws" ]]
+        then
+        echo "$mock_datum"
+        fi
+
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --ci-ws-base "$CI_WS" \
+
+    assert_dir_exists "$CI_WS"
+
 }

@@ -164,7 +164,7 @@ or in the `environment` section of the configuration file
 of the runner (typically, `$HOME/.gitlab-runner/config.toml`).
 
 This variable needs to be an absolute path
-pointing to an existing directory 
+pointing to directory 
 you have write privileges on.
 
 #### The plain `gitlab-runner register` command
