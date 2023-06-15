@@ -12,7 +12,7 @@ enroot-imagefile-pull:
     - 'cd "$(dirname "$IMAGEFILE")"'
     - 'test -e "$(basename "$IMAGEFILE")" || enroot import --output "$(basename "$IMAGEFILE")" docker://debian:latest'
 
-enroot-imagefile-job:
+enroot-imagefile-job-no-image:
   dependencies: []
   needs:
     - enroot-imagefile-pull
@@ -25,17 +25,47 @@ enroot-imagefile-job:
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
+enroot-imagefile-job-with-image:
+  dependencies: []
+  stage: test-deploy
+  image: docker://debian:latest
+  tags:
+    - slurm
+    - enroot
+  variables:
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-another-image.sqsh"
+  script:
+    - grep PRETTY /etc/os-release | grep -i debian
+
+enroot-imagefile-job-no-image-second-round:
+  dependencies: []
+  needs:
+    - enroot-imagefile-job-with-image
+  stage: test-deploy
+  tags:
+    - slurm
+    - enroot
+  variables:
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-another-image.sqsh"
+  script:
+    - grep PRETTY /etc/os-release | grep -i debian
+
 
 enroot-imagefile-clean:
   dependencies: []
   needs:
-    - enroot-imagefile-job
+    - enroot-imagefile-job-no-image
+    - enroot-imagefile-job-with-image
+    - enroot-imagefile-job-no-image-second-round
   stage: test-deploy
   tags:
     - shell
   when: always
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/enroot/playground/debian-latest.sqsh"
+    IMAGEFILE1: "$CI_BUILDS_DIR/enroot/playground/debian-latest.sqsh"
+    IMAGEFILE2: "$CI_BUILDS_DIR/enroot/playground/debian-another-image.sqsh"
   script:
-    - 'cd "$(dirname "$IMAGEFILE")"'
-    - 'rm -rf "$(basename "$IMAGEFILE")"'
+    - 'cd "$(dirname "$IMAGEFILE1")"'
+    - 'rm -rf "$(basename "$IMAGEFILE1")"'
+    - 'cd "$(dirname "$IMAGEFILE2")"'
+    - 'rm -rf "$(basename "$IMAGEFILE2")"'

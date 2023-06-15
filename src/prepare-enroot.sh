@@ -21,7 +21,12 @@ set -o errexit
 
 if [[ -z "$CUSTOM_ENV_IMAGEFILE" ]] || [[ ! -a "$CUSTOM_ENV_IMAGEFILE" ]]
 then
-    CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
+    if [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
+    then
+        CE_IMAGEFILE="$CUSTOM_ENV_IMAGEFILE"
+    else
+        CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
+    fi
 
     echo "[PREPARE] Enroot: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
 
@@ -38,7 +43,6 @@ then
     if { enroot list | grep "$CE_CONTAINER_NAME" &> /dev/null; }
     then enroot remove "$CE_CONTAINER_NAME" < <(echo yes)
     fi
-
 else
     CE_IMAGEFILE="$CUSTOM_ENV_IMAGEFILE"
 fi

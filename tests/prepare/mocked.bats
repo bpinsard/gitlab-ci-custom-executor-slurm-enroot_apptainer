@@ -157,7 +157,7 @@ function teardown() {
     assert_not_exist "$MOCKLOGDIR"/apptainer.log
 }
 
-@test "when CUSTOM_ENV_IMAGEFILE is defined but does not exist, apptainer is called to download the image" {
+@test "when CUSTOM_ENV_IMAGEFILE defined but not exist, call apptainer save image in IMAGEFILE" {
 
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
@@ -167,7 +167,7 @@ function teardown() {
     assert_success
     assert_exist "$MOCKLOGDIR"/apptainer.log
     cat "$MOCKLOGDIR"/apptainer.log
-    assert_file_contains "$MOCKLOGDIR"/apptainer.log "pull.*$CUSTOM_ENV_CI_JOB_IMAGE"
+    assert_file_contains "$MOCKLOGDIR"/apptainer.log "pull.*$CUSTOM_ENV_IMAGEFILE.*$CUSTOM_ENV_CI_JOB_IMAGE"
 }
 
 
@@ -178,7 +178,6 @@ function teardown() {
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
     touch "$CUSTOM_ENV_IMAGEFILE"
-    bash prepare.sh enroot
     run prepare.sh enroot
     assert_exist "$MOCKLOGDIR"/enroot.log
     assert_file_contains "$MOCKLOGDIR"/enroot.log "create --name .* $CUSTOM_ENV_IMAGEFILE"
@@ -186,19 +185,15 @@ function teardown() {
     refute_output --partial "import"
 }
 
-# bats test_tags=onlythis
-@test "when CUSTOM_ENV_IMAGEFILE is defined but does not exist, enroot called only to create the container" {
+@test "when CUSTOM_ENV_IMAGEFILE defined but not exist, enroot import to IMAGEFILE" {
 
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
-    bash prepare.sh enroot
     run prepare.sh enroot
     assert_exist "$MOCKLOGDIR"/enroot.log
     cat  "$MOCKLOGDIR"/enroot.log
-    assert_file_contains "$MOCKLOGDIR"/enroot.log "import --output.*$CUSTOM_ENV_CI_JOB_IMAGE"
-    assert_file_contains "$MOCKLOGDIR"/enroot.log "create --name $CUSTOM_ENV_IMAGEFILE"
-    run cat "$MOCKLOGDIR"/enroot.log
-    refute_output --partial "import"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "import --output $CUSTOM_ENV_IMAGEFILE $CUSTOM_ENV_CI_JOB_IMAGE"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "create --name GLCE_$CUSTOM_ENV_CI_JOB_ID $CUSTOM_ENV_IMAGEFILE"
 }

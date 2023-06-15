@@ -13,7 +13,7 @@ apptainer-imagefile-pull:
     - 'cd "$(dirname "$IMAGEFILE")"'
     - 'test -e "$(basename "$IMAGEFILE")" || apptainer pull "$(basename "$IMAGEFILE")" docker://debian:latest'
 
-apptainer-imagefile-job:
+apptainer-imagefile-job-no-image:
   dependencies: []
   needs:
     - apptainer-imagefile-pull
@@ -26,17 +26,49 @@ apptainer-imagefile-job:
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
+apptainer-imagefile-job-with-image:
+  dependencies: []
+  stage: test-deploy
+  image: docker://debian:latest
+  tags:
+    - slurm
+    - apptainer
+  variables:
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-another-image.sif"
+  script:
+    - grep PRETTY /etc/os-release | grep -i debian
+
+apptainer-imagefile-job-no-image-second-round:
+  dependencies: []
+  needs:
+    - apptainer-imagefile-job-with-image
+  stage: test-deploy
+  tags:
+    - slurm
+    - apptainer
+  variables:
+    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-another-image.sif"
+  script:
+    - grep PRETTY /etc/os-release | grep -i debian
+
+
+
 
 apptainer-imagefile-clean:
   dependencies: []
   needs:
-    - apptainer-imagefile-job
+    - apptainer-imagefile-job-no-image
+    - apptainer-imagefile-job-with-image
+    - apptainer-imagefile-job-no-image-second-round
   stage: test-deploy
   tags:
     - shell
   when: always
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/apptainer/playground/debian-latest.sif"
+    IMAGEFILE1: "$CI_BUILDS_DIR/apptainer/playground/debian-latest.sif"
+    IMAGEFILE2: "$CI_BUILDS_DIR/apptainer/playground/debian-another-image.sif"
   script:
-    - 'cd "$(dirname "$IMAGEFILE")"'
-    - 'rm -rf "$(basename "$IMAGEFILE")"'
+    - 'cd "$(dirname "$IMAGEFILE1")"'
+    - 'rm -rf "$(basename "$IMAGEFILE1")"'
+    - 'cd "$(dirname "$IMAGEFILE2")"'
+    - 'rm -rf "$(basename "$IMAGEFILE2")"'
