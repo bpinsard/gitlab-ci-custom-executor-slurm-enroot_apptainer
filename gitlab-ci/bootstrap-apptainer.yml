@@ -1,4 +1,4 @@
-unit-test-parallel-test-deploy:
+apptainer-unit-test-parallel-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -18,7 +18,7 @@ unit-test-parallel-test-deploy:
       junit: report-parallel.xml
 
 
-unit-test-serial-test-deploy:
+apptainer-unit-test-serial-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -38,7 +38,7 @@ unit-test-serial-test-deploy:
       junit: report-serial.xml
 
 
-lint-test-deploy:
+apptainer-lint-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
