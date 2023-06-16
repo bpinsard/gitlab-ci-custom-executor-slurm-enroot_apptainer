@@ -177,11 +177,14 @@ function submit_to_custom_executor_queue_and_wait() {
     DONENAME="$(_donename "$TODONAME")"
     OUTPUTNAME="$(_outputname "$TODONAME")"
     EXITVALUEFNAME="$(_exitvaluefname "$TODONAME")"
+    touch "$OUTPUTNAME"
+    tail -f "$OUTPUTNAME" &
+    local TAILPID=$!
     while [ ! -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     do
         sleep 1
     done
-    cat "$OUTPUTNAME"
+    kill "$TAILPID"
     if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     then
     echo "Abnormal termination of script, exiting."
