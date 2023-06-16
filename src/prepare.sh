@@ -12,6 +12,14 @@ echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
 
 CONTAINERISATION_BACKEND="${1}"
 
+
+set +o nounset
+[[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] || export CUSTOM_ENV_CI_JOB_IMAGE=""
+[[ -n "$CUSTOM_ENV_IMAGEFILE" ]] || export CUSTOM_ENV_IMAGEFILE=""
+[[ -n "$CUSTOM_ENV_APPTAINER_DOCKER_USERNAME" ]] || export CUSTOM_ENV_APPTAINER_DOCKER_USERNAME=""
+[[ -n "$CUSTOM_ENV_APPTAINER_DOCKER_PASSWORD" ]] || export CUSTOM_ENV_APPTAINER_DOCKER_PASSWORD=""
+set -o nounset
+
 # Both defined
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] && [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
 then
@@ -33,7 +41,11 @@ then
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     fi
 fi
-echo -n "[PREPARE] "; validate_containerisation_backend "$CONTAINERISATION_BACKEND" "$CUSTOM_ENV_CI_JOB_IMAGE"
+echo -n "[PREPARE] "; validate_containerisation_backend \
+                             "$CONTAINERISATION_BACKEND" \
+                             "$CUSTOM_ENV_CI_JOB_IMAGE" \
+                             "$CUSTOM_ENV_IMAGEFILE"
+
 
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] || [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
