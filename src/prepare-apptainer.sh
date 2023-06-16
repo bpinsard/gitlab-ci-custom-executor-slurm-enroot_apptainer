@@ -31,4 +31,6 @@ then
         echo "ERROR: command failed: ${COMMAND[*]}";
         echo "       Image pull failed";
         }
+    echo "Verify existence of file:" >&2
+    ls "$CE_IMAGEFILE" >&2
 fi
