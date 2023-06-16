@@ -181,6 +181,7 @@ function submit_to_custom_executor_queue_and_wait() {
     do
         sleep 1
     done
+    cat "$OUTPUTNAME"
     if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     then
     echo "Abnormal termination of script, exiting."
@@ -189,7 +190,6 @@ function submit_to_custom_executor_queue_and_wait() {
 
     TIME="$(date +"%s")"
     mv "$DONENAME" "$DONENAME"-"$TIME"
-    cat "$OUTPUTNAME"
     read -r EXITVALUE < "$EXITVALUEFNAME"
     return "$EXITVALUE"
 

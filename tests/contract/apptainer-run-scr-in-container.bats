@@ -33,6 +33,8 @@ function teardown() {
 # bats test_tags=pullfail,serial
 @test "apptainer pull does not work on horeka login node" {
     # Unfortunately this is the case at the moment (20230129) 
+    # Things seem to have been solved (20230616)
+    skip
 
     HOSTNAME=$(hostname) # $HOSTNAME might not work
     # Make sure this runs on the login node
