@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
 
+set -o errexit
+set -o pipefail
+set -o nounset
 TOWRAP="$1"
 [[ "$TOWRAP" =~ ^/ ]] || { echo "Needs absolute path to script to wrap." >&2; exit 22; }
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # shellcheck source=./src/containerlib-apptainer.sh
 source "$SRC"/containerlib-apptainer.sh
+
+cat <<EOF
+set -o errexit
+set -o pipefail
+set -o nounset
+EOF
 
 # This line will print the environment variables
 # shellcheck disable=SC2086
