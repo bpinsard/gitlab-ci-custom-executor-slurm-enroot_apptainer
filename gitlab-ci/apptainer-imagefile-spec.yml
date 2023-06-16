@@ -68,7 +68,9 @@ apptainer-imagefile-clean:
     IMAGEFILE1: "$CI_BUILDS_DIR/apptainer/playground/debian-latest.sif"
     IMAGEFILE2: "$CI_BUILDS_DIR/apptainer/playground/debian-another-image.sif"
   script:
+    - ls "$IMAGEFILE1"
     - 'cd "$(dirname "$IMAGEFILE1")"'
     - 'rm -rf "$(basename "$IMAGEFILE1")"'
+    - ls "$IMAGEFILE2"
     - 'cd "$(dirname "$IMAGEFILE2")"'
     - 'rm -rf "$(basename "$IMAGEFILE2")"'
