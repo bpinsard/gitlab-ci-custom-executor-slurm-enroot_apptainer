@@ -453,6 +453,44 @@ EOF
 
 }
 
+# bats test_tags=termination
+@test "when slurm job has terminated, output is displayed anyway." {
+    # shellcheck disable=SC2030,SC2031
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    # shellcheck disable=SC1091,SC2031
+    source "$CE_QUEUE_WORKSPACE/.env"
+    # shellcheck source=./src/custom_executor_queue.sh
+    source "$SRC/custom_executor_queue.sh"
+
+    # shellcheck disable=SC2030
+    STEP="${STEPS_OUT_CONTAINER[0]}"
+cat << EOF > script-"$STEP".sh
+echo "This output should be visible"
+sleep 100
+
+EOF
+    chmod +x ./script-"$STEP".sh
+
+    echo "Testing $STEP"
+
+    (
+    sleep 5
+    # Terminating the
+    stop_custom_executor_queue
+    touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
+    ) &
+
+    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_line "Abnormal termination of script, exiting."
+    assert_line "This output should be visible"
+
+
+}
+
+
 @test "run exits with error if slurm custom executor queue is not running at submission time" {
 
 
