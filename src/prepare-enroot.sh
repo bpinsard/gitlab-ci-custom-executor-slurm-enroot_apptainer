@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # shellcheck source=./src/containerlib-enroot.sh
