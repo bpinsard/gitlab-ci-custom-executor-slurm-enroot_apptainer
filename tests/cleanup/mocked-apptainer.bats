@@ -118,9 +118,9 @@ function teardown_file(){
 
 @test "when CUSTOM_ENV_IMAGEFILE is defined, that file is not deleted" {
 
-    (
+    #shellcheck disable=SC2030
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
-    #shellcheck disable=SC2031
+    #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CI_JOB_IMAGE=""
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
@@ -133,13 +133,34 @@ function teardown_file(){
 
     touch "$CUSTOM_ENV_IMAGEFILE"
 
-    "$SRC/cleanup-slurm.sh" apptainer
+    run "$SRC/cleanup-slurm.sh" apptainer
 
     echo "Cleaned."
-    (
-    # shellcheck source=./src/containerlib-apptainer.sh
-    source "$SRC"/containerlib-apptainer.sh
-    assert_exists "$CE_IMAGEFILE"
-    )
-    )
+    assert_exists "$CUSTOM_ENV_IMAGEFILE"
+
+}
+
+@test "when IMAGEFILE and CI_JOB_IMAGE are defined, IMAGEFILE is not deleted" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
+    #shellcheck disable=SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE="docker://debian:latest"
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-apptainer.sh"
+
+    echo "Prepared..."
+    # shellcheck disable=SC1091
+    source "$CE_QUEUE_WORKSPACE/.env"
+
+    touch "$CUSTOM_ENV_IMAGEFILE"
+
+    run "$SRC/cleanup-slurm.sh" apptainer
+
+    echo "Cleaned."
+    assert_exists "$CUSTOM_ENV_IMAGEFILE"
+    assert_output --partial "Not Removing"
+
 }
