@@ -9,6 +9,7 @@ include:
   - '/gitlab-ci/lint-and-unit.yml'
   - '/gitlab-ci/package.yml'
   - '/gitlab-ci/update-ce-code.yml'
+  - '/gitlab-ci/interactive-test.yml'
   - '/gitlab-ci/ce-queue-debug-test-enroot.yml'
   - '/gitlab-ci/ce-queue-debug-test-apptainer.yml'
   - '/gitlab-ci/features-enroot.yml'

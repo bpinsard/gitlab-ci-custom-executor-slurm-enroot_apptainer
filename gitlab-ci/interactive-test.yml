@@ -1,0 +1,18 @@
+
+# This is actually a manual test,
+# It is just a job that can be watched executing
+# while the pipeline is running,
+# checking that the output is printed bit by bit
+# and not as a single chunk at the end.
+interactive-test:
+  dependencies: []
+  stage: test-deploy
+  tags:
+    - slurm
+    - slurm-only
+  script: |
+    for i in $(seq 1 1 10)
+    do
+       echo "Iteration $i"
+       sleep 5
+    done
