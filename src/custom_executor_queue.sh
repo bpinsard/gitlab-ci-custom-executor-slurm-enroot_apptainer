@@ -184,6 +184,7 @@ function submit_to_custom_executor_queue_and_wait() {
     do
         sleep 1
     done
+    disown "$TAILPID"
     kill "$TAILPID"
     if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     then
