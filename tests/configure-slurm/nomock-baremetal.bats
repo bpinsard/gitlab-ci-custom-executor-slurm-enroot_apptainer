@@ -23,12 +23,13 @@ function setup(){
     TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
     
     echo "# Creating test playground in $TEST_PLAYGROUND" >&3
+    rm -rf "$TEST_PLAYGROUND"
     mkdir "$TEST_PLAYGROUND"
     export TEST_PLAYGROUND
-    export STARTDIR="${TEST_PLAYGROUND}"/start
+    export STARTDIR="$TEST_PLAYGROUND"/start
     # export CUSTOM_ENV_CE_DEBUG=1
     mkdir -p "$STARTDIR"
-    cd "$STARTDIR" || exit
+    cd "$STARTDIR" || false
 
     cat << EOF > get_workspace.py
 import sys, json
@@ -36,8 +37,7 @@ dump = json.load(sys.stdin)
 print(dump["job_env"]["CE_QUEUE_WORKSPACE"])
 EOF
 
-
-    echo "Test setup phase completed."
+    echo "# Test setup phase completed." >&3
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
@@ -57,8 +57,8 @@ EOF
     fi
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
-      echo "Error:CUSTOM_ENV_DEFAULT_PARTITION not defined"
-      exit 1
+      echo "# Error:CUSTOM_ENV_DEFAULT_PARTITION not defined" >&3
+      false
     fi
 
     SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
@@ -69,7 +69,7 @@ EOF
 }
 
 function teardown() {
-    if has_slurm
+    if has_slurm && [[ -n "$JOB_ID" ]]
     then
       echo scancel "$JOB_ID"
       scancel "$JOB_ID"
@@ -87,13 +87,14 @@ function teardown() {
 
 @test "configure launches custom executor queue in slurm job - no container" {
 
-    ############################################
+    ###############################################
     # STARTING CUSTOM EXECUTOR QUEUE IN SLURM JOB #
-    ############################################
+    ###############################################
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 1 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
     JOB_ID="$(get_slurm_jobid "$WORKSPACE")"
@@ -120,7 +121,8 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 3 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
     JOB_ID="$(get_slurm_jobid "$WORKSPACE")"
@@ -201,7 +203,8 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 2 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
     JOB_ID="$(get_slurm_jobid "$WORKSPACE")"

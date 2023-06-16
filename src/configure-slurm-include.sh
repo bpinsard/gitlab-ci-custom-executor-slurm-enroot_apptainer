@@ -46,7 +46,7 @@ function wait_until_file_exists() {
     done
     if [[ !  -f "$FILE" ]]
     then
-        echo "Error: Waited too long ($MAXDELAY) for $FILE to be created".
+        echo "Error: Waited too long ($MAXDELAY) for $FILE to be created". >&2
         return 124
     fi
 
@@ -56,8 +56,8 @@ function check_custom_env_ci_ws_set(){
     set +o nounset
     if [[ -z "$CUSTOM_ENV_CI_WS" ]]
     then
-        echo "ERROR: CUSTOM_ENV_CI_WS variable not defined." 1>&2
-        echo "       Please define the CI_WS variable in your gitlab CI/CD setup (See README)." 1>&2
+        echo "ERROR: CUSTOM_ENV_CI_WS variable not defined." >&2
+        echo "       Please define the CI_WS variable in your gitlab CI/CD setup (See README)." >&2
 
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     fi
@@ -151,13 +151,13 @@ function wait_for_job_to_be_ready(){
         if [ $((SECONDS % 20)) -lt 3 ]
         then
             STARTTIME="$(squeue --start --job "$JOB_ID" --format %S | tail -n 1)"
-            echo "$(date) Expected start: $STARTTIME"
+            echo "$(date) Expected start: $STARTTIME" >&2
         fi
     done
 }
 
 
-function save_slurm_environment(){
+function print_slurm_environment(){
 
     set +o nounset
     for VAR in $("$SRC"/slurm-utils/get-sbatch-input-env-list.sh)
@@ -175,7 +175,7 @@ function find_available_workspace_name(){
     ROOTDIR="$(dirname "$ROOT")"
     if [[ ! -d "$ROOTDIR" ]]
     then
-        echo "Not an existing directory: $ROOTDIR"
+        echo "Not an existing directory: $ROOTDIR" >&2
         return 22
     fi
 

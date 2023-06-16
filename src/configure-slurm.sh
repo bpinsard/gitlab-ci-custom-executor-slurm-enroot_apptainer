@@ -26,7 +26,7 @@ export_all_custom_env_var_into_var_if_defined
 
 
 SLURMENV_CANDIDATE="$CUSTOM_ENV_CI_WS/slurmenv_candidate_$CUSTOM_ENV_CI_JOB_ID"
-save_slurm_environment > "$SLURMENV_CANDIDATE"
+print_slurm_environment > "$SLURMENV_CANDIDATE"
 
 
 WORKSPACE=""
