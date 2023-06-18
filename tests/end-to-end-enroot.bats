@@ -41,12 +41,13 @@ function setup(){
 
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 5 -n 1"
     export CUSTOM_ENV_CI_JOB_IMAGE="docker://ubuntu:kinetic-20221101"
-    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND/builds"
+
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
 
-    mkdir "$CUSTOM_ENV_CI_BUILDS_DIR"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
+    export CUSTOM_ENV_CI_PROJECT_PATH='user/proj-name'
 
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then

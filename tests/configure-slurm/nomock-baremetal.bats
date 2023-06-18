@@ -40,12 +40,11 @@ EOF
     echo "# Test setup phase completed." >&3
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_ID=54321
-    export CUSTOM_ENV_CI_WS
-    mkdir -p "$CUSTOM_ENV_CI_WS" # This should not be needed
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND/builds"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
+    export CUSTOM_ENV_CI_PROJECT_PATH='user/proj-name'
 
     mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR"
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
