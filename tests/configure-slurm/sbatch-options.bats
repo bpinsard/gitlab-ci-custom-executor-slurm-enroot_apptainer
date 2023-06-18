@@ -21,7 +21,10 @@ function setup() {
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
+    export CUSTOM_ENV_CI_PROJECT_PATH='user/proj-name'
+
     export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_DEFAULT_PARTITION=default-partition

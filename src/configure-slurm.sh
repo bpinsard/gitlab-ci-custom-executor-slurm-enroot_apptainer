@@ -77,8 +77,12 @@ then
     echo "[CONFIGURE] Configured workspace in $WORKSPACE" >&2
 fi
 
+CI_BUILDS_DIR="$CUSTOM_ENV_CI_WS/$CUSTOM_ENV_CI_CONCURRENT_ID/$CUSTOM_ENV_CI_PROJECT_PATH"
+mkdir -p "$CI_BUILDS_DIR"
+
 cat <<EOF
 {
+  "builds_dir": "$CI_BUILDS_DIR",
   "driver": {
     "name": "Slurm driver+enroot/apptainer",
     "version": "v0.0.1"

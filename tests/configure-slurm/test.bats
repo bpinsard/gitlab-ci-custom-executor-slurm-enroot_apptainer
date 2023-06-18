@@ -27,7 +27,10 @@ function setup() {
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
+    export CUSTOM_ENV_CI_PROJECT_PATH='user/proj-name'
+
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
@@ -201,6 +204,20 @@ function teardown() {
 
 }
 
+@test "script output has builds_dir and it is in CI_WS,contains CI_CONCURRENT_ID and project path" {
+
+    function _helper() {
+
+    "$SRC"/configure-slurm.sh 3> /dev/null | python3 -c 'import json,sys;print(json.load(sys.stdin)["builds_dir"])'
+    }
+
+    run _helper
+    assert_success
+    assert_output --regexp "$CUSTOM_ENV_CI_WS"
+    assert_output --regexp "$CUSTOM_ENV_CI_CONCURRENT_ID"
+    assert_output --regexp "$CUSTOM_ENV_CI_PROJECT_PATH"
+
+}
 
 @test "script output has driver.version" {
 
@@ -324,5 +341,17 @@ EOF
     NEWJOBSLURM="$CUSTOM_ENV_CI_WS/cews_3/job.slurm"
     assert_exist "$NEWJOBSLURM"
     assert_file_contains "$MOCKLOGDIR"/sbatch.log "$NEWJOBSLURM"
+
+}
+
+@test "configure-slurm creates the builds_dir directory" {
+
+
+    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+    (
+        # shellcheck disable=SC1091
+        . env1
+        assert_dir_exists "$CUSTOM_ENV_CI_BUILDS_DIR"
+    )
 
 }
