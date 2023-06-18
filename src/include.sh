@@ -40,6 +40,8 @@ function validate_containerisation_backend(){
     if [ -n "$CI_JOB_IMAGE" ] || [ -n "$IMAGEFILE" ] && [ "$CONTAINERISATION_BACKEND" == "none" ]
     then
         echo "Error: Job requires a container image but 'none' selected as backend. "
+        echo "       image: $CI_JOB_IMAGE"
+        echo "       imagefile: $IMAGEFILE"
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     fi
     case "$CONTAINERISATION_BACKEND" in
