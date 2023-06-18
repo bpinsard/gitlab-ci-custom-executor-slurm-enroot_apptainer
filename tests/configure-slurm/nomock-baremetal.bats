@@ -46,7 +46,6 @@ EOF
     export CUSTOM_ENV_CI_CONCURRENT_ID=42
     export CUSTOM_ENV_CI_PROJECT_PATH='user/proj-name'
 
-    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR"
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
       # If we are in a testing environment,
