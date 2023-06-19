@@ -47,7 +47,6 @@ function setup(){
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
     export CUSTOM_ENV_CI_CONCURRENT_ID=42
-    export CUSTOM_ENV_CI_PROJECT_PATH='user/proj-name'
 
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then

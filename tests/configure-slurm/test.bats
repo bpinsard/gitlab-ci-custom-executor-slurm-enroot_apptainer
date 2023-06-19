@@ -29,7 +29,6 @@ function setup() {
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
     export CUSTOM_ENV_CI_CONCURRENT_ID=42
-    export CUSTOM_ENV_CI_PROJECT_PATH='user/proj-name'
 
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
@@ -215,7 +214,6 @@ function teardown() {
     assert_success
     assert_output --regexp "$CUSTOM_ENV_CI_WS"
     assert_output --regexp "$CUSTOM_ENV_CI_CONCURRENT_ID"
-    assert_output --regexp "$CUSTOM_ENV_CI_PROJECT_PATH"
 
 }
 
