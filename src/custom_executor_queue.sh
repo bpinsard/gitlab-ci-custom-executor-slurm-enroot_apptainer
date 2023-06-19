@@ -134,10 +134,16 @@ function submit_to_custom_executor_queue() {
     local ORIG_JOBSCRIPT="$1"
     local JOBTAG="$2"
     _log "Received request to execute $ORIG_JOBSCRIPT under $JOBTAG"
+    if [ ! -f "$ORIG_JOBSCRIPT" ]
+    then
+       _log "Error: $ORIG_JOBSCRIPT does not exist."
+       echo "job submission failed: $ORIG_JOBSCRIPT does not exist"
+       exit 22
+    fi
 
     local SCRID
     SCRID=$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")
-    while ! (set -o noclobber; echo > "$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")")
+    while  [ "$(cp -vn "$ORIG_JOBSCRIPT" "$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")" | wc -l)" -ne 1 ]
     do
         echo "increasing scrid: $SCRID" >&2
         SCRID=$((SCRID+1))
@@ -146,9 +152,9 @@ function submit_to_custom_executor_queue() {
     echo $((SCRID+1)) > "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE"
     local TODONAME
     TODONAME="$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")"
-    echo "$TODONAME"
-    cp "$ORIG_JOBSCRIPT" "$TODONAME"
-    chmod +x "$TODONAME"
+    echo "$TODONAME" # This is the output!
+    #cp "$ORIG_JOBSCRIPT" "$TODONAME"
+    #chmod +x "$TODONAME"
 
     local JOBSCRIPT
     JOBSCRIPT="$TODONAME"
@@ -173,7 +179,7 @@ function submit_to_custom_executor_queue() {
 
 
 function submit_to_custom_executor_queue_and_wait() {
-    TODONAME="$(submit_to_custom_executor_queue "$@")" || exit "$SYSTEM_FAILURE_EXIT_CODE"
+    TODONAME="$(submit_to_custom_executor_queue "$@" || exit "$SYSTEM_FAILURE_EXIT_CODE" )"
 
     DONENAME="$(_donename "$TODONAME")"
     OUTPUTNAME="$(_outputname "$TODONAME")"
