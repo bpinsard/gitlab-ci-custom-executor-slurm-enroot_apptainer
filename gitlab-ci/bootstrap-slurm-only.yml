@@ -5,8 +5,6 @@ unit-test-parallel-test-deploy:
   stage: test-deploy
   script:
     - make test-report-parallel JOBS=8
-  after_script:
-    - make joker
   tags:
     - slurm
     - slurm-only
@@ -25,8 +23,6 @@ unit-test-serial-test-deploy:
   stage: test-deploy
   script:
     - make test-report-serial
-  after_script:
-    - make joker
   tags:
     - slurm
     - slurm-only

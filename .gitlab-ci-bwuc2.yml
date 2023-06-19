@@ -21,3 +21,4 @@ include:
   - '/gitlab-ci/bootstrap-enroot.yml'
   - '/gitlab-ci/bootstrap-apptainer.yml'
   - '/gitlab-ci/bwuc2-specific.yml'
+  - '/gitlab-ci/joker.yml'
