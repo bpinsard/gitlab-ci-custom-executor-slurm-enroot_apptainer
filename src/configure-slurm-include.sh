@@ -180,15 +180,11 @@ function find_available_workspace_name(){
     fi
 
     N=0;
-    while true
+    CANDIDATE="$ROOT$N"
+    while ! mkdir "$CANDIDATE" &> /dev/null
     do
+       N=$((N+1))
        CANDIDATE="$ROOT$N"
-       if [[ -d "$CANDIDATE" ]] || [[ -f "$CANDIDATE" ]]
-       then
-           N=$((N+1))
-       else
-           break
-       fi
     done
     echo "$CANDIDATE"
 
@@ -255,8 +251,6 @@ function create_job_slurm(){
     local TEMPLATE="$1"
     local DEFAULT_PARTITION="$2"
     local OUTDIR="$3"
-
-    mkdir -p "$OUTDIR"
 
     sed 's/%CUSTOM_ENV_DEFAULT_PARTITION%/'"$DEFAULT_PARTITION"'/' "$TEMPLATE"  \
         > "$OUTDIR/job.slurm"
