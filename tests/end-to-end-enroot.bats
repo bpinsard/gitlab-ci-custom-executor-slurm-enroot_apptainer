@@ -143,6 +143,17 @@ EOF
     echo "============================="
     cat  "$CE_QUEUE_WORKSPACE/log.txt"
     echo "============================="
+
+    echo "Output from job, as seen by run:"
+    echo "============================="
+    echo "$output"
+    echo "============================="
+
+    echo "Content of the queue workspace "
+    echo "============================="
+    ( cd "$CE_QUEUE_WORKSPACE" && find . )
+    echo "============================="
+
     assert_success
     assert_line "Cloning dummy repository..."
 

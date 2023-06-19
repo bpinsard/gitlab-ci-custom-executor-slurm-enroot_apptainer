@@ -110,6 +110,7 @@ EOF
 
     ./wrapped.sh
 
+    cat "$MOCKLOGDIR/enroot.log"
     for VARNAME in ENROOT_RUNTIME_PATH ENROOT_CACHE_PATH ENROOT_DATA_PATH
     do
         assert_file_contains "$MOCKLOGDIR/enroot.log" "${VARNAME}.*${CUSTOM_ENV_CI_WS}"
