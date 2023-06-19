@@ -12,8 +12,8 @@ function start_custom_executor_queue () {
     fi
     declare -i CUSTOM_EXECUTOR_QUEUE_CYCLETIME
     # In seconds
-    export CUSTOM_EXECUTOR_QUEUE_CYCLETIME=3 # DEBUG
-    export CUSTOM_EXECUTOR_QUEUE_WORKSPACE="$1"
+    CUSTOM_EXECUTOR_QUEUE_CYCLETIME=3 # DEBUG
+    CUSTOM_EXECUTOR_QUEUE_WORKSPACE="$1"
     if [ "$#" -eq 2 ]
     then
         CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC="$2"
@@ -27,22 +27,21 @@ function start_custom_executor_queue () {
     fi
 
     _create_directories
-    export CUSTOM_EXECUTOR_QUEUE_LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
+    CUSTOM_EXECUTOR_QUEUE_LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
     touch "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
-    export CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/last_activity
-    export CUSTOM_EXECUTOR_QUEUE_SCRID_FILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/scridcount
+    CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/last_activity
+    CUSTOM_EXECUTOR_QUEUE_SCRID_FILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/scridcount
     echo 1 > "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE"
 
     _custom_executor_queue > /dev/null &
-    export CUSTOM_EXECUTOR_QUEUE_PID=$!
+    CUSTOM_EXECUTOR_QUEUE_PID=$!
     CUSTOM_EXECUTOR_QUEUE_HOSTNAME=$(hostname)
-    export CUSTOM_EXECUTOR_QUEUE_HOSTNAME
 
     set +o nounset
     if [ -n "$SLURM_JOB_ID" ]
     then
         # shellcheck disable=SC2034
-        export CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID="$SLURM_JOB_ID"
+        CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID="$SLURM_JOB_ID"
     fi
     set -o nounset
     # shellcheck disable=SC2086
