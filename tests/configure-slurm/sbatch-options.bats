@@ -47,7 +47,7 @@ function teardown() {
 
 @test "sbatch invoked with '--propagate=NONE'" {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
     assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-propagate=NONE"
 
 
@@ -55,7 +55,7 @@ function teardown() {
 
 @test "sbatch invoked with '--parsable'" {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
     assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-parsable"
 
 
@@ -63,7 +63,7 @@ function teardown() {
 
 @test "sbatch invoked with '--signal=B:USR1@15'" {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
     assert_file_contains "$MOCKLOGDIR"/sbatch.log "\-\-signal=B:USR1@15"
 
 
@@ -75,7 +75,7 @@ function teardown() {
     (
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
     echo "sbatch mock log:"
     echo "===================="
     cat "$MOCKLOGDIR/sbatch.log"
@@ -93,7 +93,7 @@ function teardown() {
     (
     # shellcheck disable=SC2031
     export CUSTOM_ENV_CE_DEBUG=1
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     for STREAM in output error
     do

@@ -76,7 +76,7 @@ function teardown() {
 # bats test_tags=configure,prepare,cleanup
 @test "configure, prepare, and cleanup" {
 
-    "$SRC"/configure-slurm.sh  | "$JOB_ENV_READER" > ./job-env
+    "$SRC"/configure-slurm.sh enroot  | "$JOB_ENV_READER" > ./job-env
 
     assert_exists ./job-env
     assert_file_contains ./job-env "CE_QUEUE_WORKSPACE"
@@ -106,7 +106,7 @@ function teardown() {
 # bats test_tags=configure,prepare,cleanup,run
 @test "configure, prepare, run and cleanup run a simple script" {
 
-    "$SRC"/configure-slurm.sh | "$JOB_ENV_READER" > ./job-env
+    "$SRC"/configure-slurm.sh enroot | "$JOB_ENV_READER" > ./job-env
 
     assert_exists ./job-env
     assert_file_contains ./job-env "CE_QUEUE_WORKSPACE"

@@ -44,7 +44,7 @@ function teardown() {
         export CUSTOM_ENV_CI_WS=""
         # shellcheck disable=SC2030
         export SYSTEM_FAILURE_EXIT_CODE=102
-        run "$SRC"/configure-slurm.sh 3> /dev/null
+        run "$SRC"/configure-slurm.sh none 3> /dev/null
         assert_failure
         assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
         assert_output --partial "CUSTOM_ENV_CI_WS variable not defined."
@@ -68,7 +68,7 @@ function teardown() {
             then
                 FORBIDDEN_OPTION="${BASH_REMATCH[0]}"
                 export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="$FORBIDDEN_OPTION"
-                run "$SRC"/configure-slurm.sh 3> /dev/null
+                run "$SRC"/configure-slurm.sh none 3> /dev/null
                 assert_failure
                 assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
                 assert_output --partial "Error: please do not use $FORBIDDEN_OPTION"

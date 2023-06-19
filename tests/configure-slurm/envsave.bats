@@ -49,7 +49,7 @@ function teardown() {
 
 @test "configure saves all slurm variables in WORKSPACE/slurmenv" {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
 
     assert_exists "$CUSTOM_ENV_CI_WS/cews_0/slurmenv"
 
@@ -57,7 +57,7 @@ function teardown() {
 
 @test "WORKSPACE/slurmenv contains SBATCH input variables and COMMAND_OPTIONS_SBATCH" {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
     SLURMENV="$CUSTOM_ENV_CI_WS/cews_0/slurmenv"
     for VAR in $("$SRC"/slurm-utils/get-sbatch-input-env-list.sh)
     do
@@ -75,7 +75,7 @@ function teardown() {
     export CUSTOM_ENV_SBATCH_REQUEUE="something-like-this"
 
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
     SLURMENV="$CUSTOM_ENV_CI_WS/cews_0/slurmenv"
     cat "$SLURMENV"
     assert_file_contains "$SLURMENV" "COMMAND_OPTIONS_SBATCH=--ntasks=5 --gres=gpu:2"

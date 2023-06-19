@@ -32,7 +32,7 @@ function setup() {
 
 
     # shellcheck disable=SC1090
-    source <( "$SRC/configure-slurm.sh" 3> /dev/null | read-job-env.py )
+    source <( "$SRC/configure-slurm.sh" none 3> /dev/null | read-job-env.py )
 
     (
         # shellcheck source=./src/containerlib-enroot.sh

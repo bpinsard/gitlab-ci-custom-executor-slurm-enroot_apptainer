@@ -64,7 +64,7 @@ function teardown() {
 
 @test "sbatch NOT called with --container-* (NOT using pyxis)" {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
 
     run cat "$MOCKLOGDIR"/sbatch.log
     refute_line --partial '--container'
@@ -73,7 +73,7 @@ function teardown() {
 
 @test "Relevant diagnostics is given when testing workspaces" {
 
-    run "$SRC"/configure-slurm.sh 3> /dev/null
+    run "$SRC"/configure-slurm.sh none 3> /dev/null
     assert_output --regexp "cews_0 has no env"
     assert_output --regexp "cews_1 has no slurmenv"
     assert_output --regexp "slurmenv is different for .*cews_2"
@@ -84,7 +84,7 @@ function teardown() {
 @test "custom executor queue is started in (mocked) slurm allocation" {
 
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
 
     wait_until_file_exists "$CEQ_ENV" 10
     # shellcheck disable=SC1090
@@ -96,7 +96,7 @@ function teardown() {
 
 @test "custom executor queue uses CUSTOM_ENV_CI_WS/cews_N as a workspace" {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
 
     wait_until_file_exists "$CEQ_ENV" 10
     # shellcheck disable=SC1090
@@ -112,7 +112,7 @@ function teardown() {
 
     export CUSTOM_ENV_SBATCH_ACCOUNT='averyimportantone'
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
 
 
     assert_file_contains "$MOCKLOGDIR"/sbatch.log "SBATCH_ACCOUNT=averyimportantone"
@@ -124,7 +124,7 @@ function teardown() {
 
     export CUSTOM_ENV_SBATCH_ACCOUNT_WRONG='averyimportantone'
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
 
 
     run cat "$MOCKLOGDIR"/sbatch.log
@@ -138,7 +138,7 @@ function teardown() {
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
 
     assert_file_contains "$MOCKLOGDIR"/sbatch.log "ARGS: $CUSTOM_ENV_COMMAND_OPTIONS_SBATCH"
 
@@ -152,7 +152,7 @@ function teardown() {
 
     local STDOUT="$TEST_PLAYGROUND/.stdout.test"
     local STDERR="$TEST_PLAYGROUND/.stderr.test"
-    "$SRC"/configure-slurm.sh 1> "$STDOUT" \
+    "$SRC"/configure-slurm.sh none 1> "$STDOUT" \
         2> "$STDERR" \
         3> /dev/null
 
@@ -173,7 +173,7 @@ function teardown() {
     local CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--very-important=long --option"
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | json_validate
+    "$SRC"/configure-slurm.sh none 3> /dev/null | json_validate
 
     wait_until_file_exists "$CEQ_ENV" 10
     # shellcheck disable=SC1090
@@ -195,7 +195,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
+    "$SRC"/configure-slurm.sh none 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
     }
 
     run _helper
@@ -203,16 +203,17 @@ function teardown() {
 
 }
 
-@test "script output has builds_dir and it is in CI_WS,contains CI_CONCURRENT_ID and project path" {
+@test "script output has builds_dir and it is in CI_WS,contains CI_CONCURRENT_ID and backend" {
 
     function _helper() {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | python3 -c 'import json,sys;print(json.load(sys.stdin)["builds_dir"])'
+    "$SRC"/configure-slurm.sh a-backend 3> /dev/null | python3 -c 'import json,sys;print(json.load(sys.stdin)["builds_dir"])'
     }
 
     run _helper
     assert_success
     assert_output --regexp "$CUSTOM_ENV_CI_WS"
+    assert_output --regexp "a-backend"
     assert_output --regexp "$CUSTOM_ENV_CI_CONCURRENT_ID"
 
 }
@@ -221,7 +222,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
+    "$SRC"/configure-slurm.sh none 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
     }
 
     run _helper
@@ -239,7 +240,7 @@ import sys
 dump = json.load(sys.stdin)
 print(dump["job_env"]["CE_QUEUE_WORKSPACE"])
 EOF
-    "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null | python3 scr.py
+    "$SRC"/configure-slurm.sh none 2> /dev/null 3> /dev/null | python3 scr.py
     }
 
     run _helper
@@ -255,7 +256,7 @@ EOF
 @test "configure calls scontrol wait_job" {
 
 
-    "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null
+    "$SRC"/configure-slurm.sh none 2> /dev/null 3> /dev/null
 
     assert_file_contains "$MOCKLOGDIR"/scontrol.log "wait_job"
 
@@ -263,7 +264,7 @@ EOF
 
 @test "when job script exits, a file named 'terminated' is produced" {
 
-    "$SRC"/configure-slurm.sh 2> /dev/null 3> /dev/null
+    "$SRC"/configure-slurm.sh none 2> /dev/null 3> /dev/null
 
     local SBATCHPID
     SBATCHPID=$(awk '{print $1}' "$MOCKLOGDIR"/pids.txt| head -n 1)
@@ -283,11 +284,11 @@ EOF
 
     # shellcheck disable=SC2030
     export SLURM_JOB_ID=34343434 # the squeue mock gives us 10 min more
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+    "$SRC"/configure-slurm.sh none 3> /dev/null | read-job-env.py > env1
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_JOB_TIME_SEC=500
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
+    "$SRC"/configure-slurm.sh none 3> /dev/null | read-job-env.py > env2
 
     assert_equal "$(diff env1 env2 | wc -l )" 0
     assert_file_contains env1 "cews_3"
@@ -296,11 +297,11 @@ EOF
 
     # shellcheck disable=SC2031
     export SLURM_JOB_ID=34343434 # the squeue mock gives us 10 min more
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+    "$SRC"/configure-slurm.sh none 3> /dev/null | read-job-env.py > env1
 
     # shellcheck disable=SC2031
     export CUSTOM_ENV_JOB_TIME_SEC=1200
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
+    "$SRC"/configure-slurm.sh none 3> /dev/null | read-job-env.py > env2
 
     assert_file_contains env1 "cews_3"
     assert_file_contains env2 "cews_4"
@@ -310,7 +311,7 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=4
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+    "$SRC"/configure-slurm.sh none 3> /dev/null | read-job-env.py > env1
 
     # shellcheck disable=SC1091
     source ./env1
@@ -321,11 +322,11 @@ EOF
 
     # shellcheck disable=SC2031
     export CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC=20
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+    "$SRC"/configure-slurm.sh none 3> /dev/null | read-job-env.py > env1
 
     sleep 10
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env2
+    "$SRC"/configure-slurm.sh none 3> /dev/null | read-job-env.py > env2
 
     assert_file_contains env1 "cews_3"
     assert_file_contains env2 "cews_4"
@@ -334,7 +335,7 @@ EOF
 
 @test "configure-slurm creates job.slurm from template in a workspace and submits it with sbatch" {
 
-    "$SRC"/configure-slurm.sh 3> /dev/null
+    "$SRC"/configure-slurm.sh none 3> /dev/null
 
     NEWJOBSLURM="$CUSTOM_ENV_CI_WS/cews_3/job.slurm"
     assert_exist "$NEWJOBSLURM"
@@ -345,7 +346,7 @@ EOF
 @test "configure-slurm creates the builds_dir directory" {
 
 
-    "$SRC"/configure-slurm.sh 3> /dev/null | read-job-env.py > env1
+    "$SRC"/configure-slurm.sh none 3> /dev/null | read-job-env.py > env1
     (
         # shellcheck disable=SC1091
         . env1

@@ -90,7 +90,7 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 1 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
     cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
@@ -118,7 +118,7 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 3 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
     cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
@@ -200,7 +200,7 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 2 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
     cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"

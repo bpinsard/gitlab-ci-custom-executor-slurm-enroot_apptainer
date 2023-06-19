@@ -13,6 +13,8 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
+BACKEND="$1"
+
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # shellcheck source=src/configure-slurm-include.sh
@@ -77,7 +79,7 @@ then
     echo "[CONFIGURE] Configured workspace in $WORKSPACE" >&2
 fi
 
-CI_BUILDS_DIR="$CUSTOM_ENV_CI_WS/$CUSTOM_ENV_CI_CONCURRENT_ID"
+CI_BUILDS_DIR="$CUSTOM_ENV_CI_WS/$BACKEND/$CUSTOM_ENV_CI_CONCURRENT_ID"
 mkdir -p "$CI_BUILDS_DIR"
 
 cat <<EOF
