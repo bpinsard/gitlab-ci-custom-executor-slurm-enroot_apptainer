@@ -1,12 +1,13 @@
 # Note: the success of this depends on the settings of
 # CI_WS for the 2 runners involved.
+# (i.e., for the "shell" executor and the "slurm, apptainer" one)
 enroot-imagefile-pull:
   dependencies: []
   stage: test-deploy
   tags:
     - shell
   variables:
-    IMAGEFILE: "$CI_WS/enroot/playground/debian-latest.sqsh"
+    IMAGEFILE: "$CI_WS/playground/debian-latest.sqsh"
   script:
     - 'mkdir -p "$(dirname "$IMAGEFILE")"'
     - 'cd "$(dirname "$IMAGEFILE")"'
@@ -62,8 +63,8 @@ enroot-imagefile-clean:
     - shell
   when: always
   variables:
-    IMAGEFILE1: "$CI_WS/enroot/playground/debian-latest.sqsh"
-    IMAGEFILE2: "$CI_WS/enroot/playground/debian-another-image.sqsh"
+    IMAGEFILE1: "$CI_WS/playground/debian-latest.sqsh"
+    IMAGEFILE2: "$CI_WS/playground/debian-another-image.sqsh"
   script:
     - 'cd "$(dirname "$IMAGEFILE1")"'
     - 'rm -rf "$(basename "$IMAGEFILE1")"'

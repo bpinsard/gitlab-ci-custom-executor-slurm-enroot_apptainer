@@ -51,10 +51,10 @@ EOF
 EOF
     chmod +x job-abc.sh
 
-    run submit_to_custom_executor_queue job.sh JOB-54321
+    submit_to_custom_executor_queue job-abc.sh JOB-54321
 
     assert_exists "$WORKDIR/JOB-54321"
-    assert_file_contains "$WORKDIR/JOB-54321" "job.sh"
+    assert_file_contains "$WORKDIR/JOB-54321" "job-abc.sh"
 
 
 }
@@ -145,8 +145,7 @@ EOF
     then
         skip # We are very unlucky
     fi
-    run submit_to_custom_executor_queue job1.sh JOB-5432
-    assert_success
+    submit_to_custom_executor_queue job1.sh JOB-5432
 
 
 }
@@ -161,9 +160,7 @@ sleep 5
 touch $WORKDIR/output
 EOF
     chmod +x job1.sh
-    run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
-    assert_success
-
+    submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
     assert_exists "$WORKDIR/output"
 
 }
@@ -194,6 +191,7 @@ exit 104
 EOF
     chmod +x job1.sh
     run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
+    assert_failure
     assert_equal "$status" 104
 
 
@@ -274,5 +272,17 @@ EOF
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
 
     assert_not_exist "$TEST_PLAYGROUND/this-should-not-exist"
+
+}
+
+@test "submit to custom executor queue exits if job script does not exist " {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    run submit_to_custom_executor_queue unexisting-job.sh job-tag
+
+    assert_failure
+    assert_output --regexp "job submission failed: unexisting-job.sh does not exist"
+
 
 }

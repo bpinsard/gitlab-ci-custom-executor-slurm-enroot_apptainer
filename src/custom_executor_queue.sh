@@ -133,10 +133,16 @@ function submit_to_custom_executor_queue() {
     local ORIG_JOBSCRIPT="$1"
     local JOBTAG="$2"
     _log "Received request to execute $ORIG_JOBSCRIPT under $JOBTAG"
+    if [ ! -f "$ORIG_JOBSCRIPT" ]
+    then
+       _log "Error: $ORIG_JOBSCRIPT does not exist."
+       echo "job submission failed: $ORIG_JOBSCRIPT does not exist"
+       exit 22
+    fi
 
     local SCRID
     SCRID=$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")
-    while ! (set -o noclobber; echo > "$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")")
+    while  [ "$(cp -vn "$ORIG_JOBSCRIPT" "$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")" | wc -l)" -ne 1 ]
     do
         echo "increasing scrid: $SCRID" >&2
         SCRID=$((SCRID+1))
@@ -145,9 +151,9 @@ function submit_to_custom_executor_queue() {
     echo $((SCRID+1)) > "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE"
     local TODONAME
     TODONAME="$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")"
-    echo "$TODONAME"
-    cp "$ORIG_JOBSCRIPT" "$TODONAME"
-    chmod +x "$TODONAME"
+    echo "$TODONAME" # This is the output!
+    #cp "$ORIG_JOBSCRIPT" "$TODONAME"
+    #chmod +x "$TODONAME"
 
     local JOBSCRIPT
     JOBSCRIPT="$TODONAME"
@@ -172,7 +178,7 @@ function submit_to_custom_executor_queue() {
 
 
 function submit_to_custom_executor_queue_and_wait() {
-    TODONAME="$(submit_to_custom_executor_queue "$@")" || exit "$SYSTEM_FAILURE_EXIT_CODE"
+    TODONAME="$(submit_to_custom_executor_queue "$@" || exit "$SYSTEM_FAILURE_EXIT_CODE" )"
 
     DONENAME="$(_donename "$TODONAME")"
     OUTPUTNAME="$(_outputname "$TODONAME")"
@@ -262,6 +268,7 @@ function _custom_executor_queue () {
     # shellcheck disable=SC2064
     trap "touch $CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated;" EXIT
     date +%s > "$CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY"
+    export CE_QUEUE_PID="$BASHPID" # Debug
 
     _log "Starting custom executor queue."
     local SUBMITTEDPID
@@ -282,7 +289,7 @@ function _custom_executor_queue () {
             ENVFNAME="$(_envfname "$JOB")"
             if [ ! -f "$WNAME" ]
             then
-                _log "Processing $JOB ..."
+                _log "[CEQ PID:$CE_QUEUE_PID] Processing $JOB ..."
                 mv "$JOB" "$WNAME"
                 OUTPUTNAME="$(_outputname "$JOB")"
                 EXITVALUEFNAME="$(_exitvaluefname "$JOB")"
@@ -296,12 +303,12 @@ function _custom_executor_queue () {
                  # cd "$(cat "$LOCATIONFNAME")" # DEBUG: This might cause problems.
                  # shellcheck disable=SC1090
                  source <(purge_variables < "$ENVFNAME")
-                 _log "Original job file: $(ls -l "$JOB")"
-                 _log "Job file copied to Working: $(ls -l "$WNAME")"
+                 _log "[CEQ PID:$CE_QUEUE_PID] Original job file: $(ls -l "$JOB")"
+                 _log "[CEQ PID:$CE_QUEUE_PID] Job file copied to Working: $(ls -l "$WNAME")"
                  "$WNAME" &> "$OUTPUTNAME" &
                  RUNNINGPID=$!
                  trap 'kill '"$RUNNINGPID"'; \
-                       _log "'"$BNAME"' was terminated."; \
+                       _log "[CEQ PID:'"$CE_QUEUE_PID"']'"$BNAME"' was terminated."; \
                        rm '"$PIDFILE"'; \
                        exit 0' SIGTERM SIGUSR1
                  wait "$RUNNINGPID"
@@ -315,14 +322,14 @@ function _custom_executor_queue () {
                  _log "$BNAME has ended."
                 ) &
                 SUBMITTEDPID=$!
-                _log "$BNAME (PID=$SUBMITTEDPID) launched."
+                _log "[CEQ PID:$CE_QUEUE_PID] $BNAME (PID=$SUBMITTEDPID) launched."
             else
-                _log "Waiting on $JOB, $BNAME still in progess..."
+                _log "[CEQ PID:$CE_QUEUE_PID] Waiting on $JOB, $BNAME still in progess..."
             fi
         done
         for CANC_REQ in "$CANC_REQS"/*
         do
-            _log "Requested cancellation of $CANC_REQ"
+            _log "[CEQ PID:$CE_QUEUE_PID] Requested cancellation of $CANC_REQ"
             cancel_job_group "$(basename "$CANC_REQ")"
             rm "$CANC_REQ"
         done
@@ -363,7 +370,7 @@ function _current_time(){
 }
 
 function _log() {
-	echo "$(date)" "$(hostname)" "$@" >> "${CUSTOM_EXECUTOR_QUEUE_LOGFILE}"
+	echo "$(date)" "$(hostname)" - "$@" >> "${CUSTOM_EXECUTOR_QUEUE_LOGFILE}"
 }
 
 function purge_variables() {

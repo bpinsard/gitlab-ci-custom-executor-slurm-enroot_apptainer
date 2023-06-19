@@ -217,6 +217,10 @@ EOF
     # 2 seconds more for safety
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
 
+    echo "Content of logfile so far:"
+    echo "=================================="
+    cat  "$CE_QUEUE_WORKSPACE/log.txt"
+    echo "=================================="
     assert_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$JOBSUBNAME1"
     assert_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$JOBSUBNAME2"
 

@@ -122,9 +122,7 @@ function teardown() {
 
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
-
-
-    echo -n "Preparing job... "
+    echo "Preparing job... "
     "$SRC"/prepare.sh enroot
     echo "done."
     assert_dir_exists "$CUSTOM_ENV_CI_WS/.enroot"
@@ -136,7 +134,7 @@ git clone https://github.com/mmesiti/test-repo-clone-me.git
 EOF
     chmod +x "$STARTDIR"/get_sources_script.sh
 
-    echo -n " Running get_sources... "
+    echo "Running get_sources... "
     run "$SRC"/run.sh enroot "$STARTDIR"/get_sources_script.sh get_sources
     echo "done."
 
@@ -144,6 +142,18 @@ EOF
     echo "============================="
     cat  "$CE_QUEUE_WORKSPACE/log.txt"
     echo "============================="
+
+    echo "Output from job, as seen by run:"
+    echo "============================="
+    echo "$output"
+    echo "============================="
+
+    echo "Content of the queue workspace "
+    echo "============================="
+    ( cd "$CE_QUEUE_WORKSPACE" && find . )
+    echo "============================="
+
+    assert_success
     assert_line "Cloning dummy repository..."
 
     cat <<EOF > "$STARTDIR"/build_script.sh
@@ -156,7 +166,7 @@ echo "Done."
 EOF
     chmod +x "$STARTDIR"/build_script.sh
 
-    echo -n " Running build_script... "
+    echo "Running build_script... "
     run "$SRC"/run.sh enroot "$STARTDIR"/build_script.sh build_script
     echo "done."
 
@@ -164,6 +174,7 @@ EOF
     echo "============================="
     cat  "$CE_QUEUE_WORKSPACE/log.txt"
     echo "============================="
+    assert_success
     assert_line "Doing a lot of work..."
     assert_file_exists "$CUSTOM_ENV_CI_WS"/job-output.txt
 

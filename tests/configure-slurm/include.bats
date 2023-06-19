@@ -102,9 +102,23 @@ function teardown() {
     mkdir "$TEST_PLAYGROUND/cews_1"
     touch "$TEST_PLAYGROUND/cews_2"
     run find_available_workspace_name "$TEST_PLAYGROUND/cews_"
+    assert_success
     assert_output "$TEST_PLAYGROUND/cews_3"
 
 }
+
+@test "find_available_workspace_name creates new dir" {
+
+    mkdir "$TEST_PLAYGROUND/cews_0"
+    mkdir "$TEST_PLAYGROUND/cews_1"
+    touch "$TEST_PLAYGROUND/cews_2"
+    run find_available_workspace_name "$TEST_PLAYGROUND/cews_"
+    assert_output "$TEST_PLAYGROUND/cews_3"
+    assert_success
+    assert_dir_exists "$TEST_PLAYGROUND/cews_3"
+
+}
+
 
 @test "find_available_workspace_name errors if stem does not exist" {
 
@@ -194,6 +208,7 @@ function teardown() {
 @test "create_job_slurm creates job.slurm in CUSTOM_ENV_CI_WS and returns the location" {
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ciws"
+    mkdir "$CUSTOM_ENV_CI_WS"
 
     CUSTOM_ENV_SLURM_DEFAULT_PARTITION=default_partition_name
 
