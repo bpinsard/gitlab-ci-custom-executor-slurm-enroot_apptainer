@@ -453,7 +453,7 @@ EOF
 
 }
 
-# bats test_tags=termination
+# bats test_tags=serial
 @test "when slurm job has terminated, output is displayed anyway." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
@@ -474,8 +474,8 @@ EOF
     echo "Testing $STEP"
 
     (
-    sleep 5
-    # Terminating the
+    sleep 20 # Very large for safety
+    # Terminating the whole queue
     stop_custom_executor_queue
     touch "$CUSTOM_ENV_CI_WS/cews_0"/terminated
     ) &

@@ -363,3 +363,22 @@ EOF
     assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 1
 
 }
+
+
+@test "if script is not executable, it is just skipped" {
+
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/TODO/job.txt"
+    This is not an executable file
+EOF
+
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+
+    LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/log.txt"
+    assert_file_contains "$LOGFILE" "Skipping .*job.txt, not executable"
+
+}

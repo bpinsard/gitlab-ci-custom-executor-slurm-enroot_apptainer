@@ -279,50 +279,56 @@ function _custom_executor_queue () {
         shopt -s nullglob
         for JOB in "$TODO"/*
         do
-            local BNAME
-            BNAME="$(basename "$JOB")"
-            local WNAME
-            WNAME="$(_wname "$JOB")"
-            local LOCATIONFNAME
-            LOCATIONFNAME="$(_locationfname "$JOB")"
-            local ENVFNAME
-            ENVFNAME="$(_envfname "$JOB")"
-            if [ ! -f "$WNAME" ]
+            if [[ -x "$JOB" ]]
             then
-                _log "[CEQ PID:$CE_QUEUE_PID] Processing $JOB ..."
-                mv "$JOB" "$WNAME"
-                OUTPUTNAME="$(_outputname "$JOB")"
-                EXITVALUEFNAME="$(_exitvaluefname "$JOB")"
-                (
-                 PIDFILE=$(_pidfname "$JOB")
-                 echo "$BASHPID" > "$PIDFILE"
-                 # shellcheck disable=SC2064
-                 set +o pipefail
-                 set +o errexit
-                 set +o nounset
-                 # cd "$(cat "$LOCATIONFNAME")" # DEBUG: This might cause problems.
-                 # shellcheck disable=SC1090
-                 source <(purge_variables < "$ENVFNAME")
-                 "$WNAME" &> "$OUTPUTNAME" &
-                 RUNNINGPID=$!
-                 trap 'kill '"$RUNNINGPID"'; \
-                       _log "[CEQ PID:'"$CE_QUEUE_PID"']'"$BNAME"' was terminated."; \
-                       rm '"$PIDFILE"'; \
-                       exit 0' SIGTERM SIGUSR1
-                 wait "$RUNNINGPID"
-                 echo $? > "$EXITVALUEFNAME"
-                 rm "$PIDFILE"
-                 set -o nounset
-                 set -o errexit
-                 set -o pipefail
-                 DONENAME="$(_donename "$JOB")"
-                 mv "$WNAME" "$DONENAME"
-                 _log "$BNAME has ended."
-                ) &
-                SUBMITTEDPID=$!
-                _log "[CEQ PID:$CE_QUEUE_PID] $BNAME (PID=$SUBMITTEDPID) launched."
+                local BNAME
+                BNAME="$(basename "$JOB")"
+                local WNAME
+                WNAME="$(_wname "$JOB")"
+                local LOCATIONFNAME
+                LOCATIONFNAME="$(_locationfname "$JOB")"
+                local ENVFNAME
+                ENVFNAME="$(_envfname "$JOB")"
+                if [ ! -f "$WNAME" ]
+                then
+                    _log "[CEQ PID:$CE_QUEUE_PID] Processing $JOB ..."
+                    mv "$JOB" "$WNAME"
+                    OUTPUTNAME="$(_outputname "$JOB")"
+                    EXITVALUEFNAME="$(_exitvaluefname "$JOB")"
+                    (
+                     PIDFILE=$(_pidfname "$JOB")
+                     echo "$BASHPID" > "$PIDFILE"
+                     # shellcheck disable=SC2064
+                     set +o pipefail
+                     set +o errexit
+                     set +o nounset
+                     # cd "$(cat "$LOCATIONFNAME")" # DEBUG: This might cause problems.
+                     # shellcheck disable=SC1090
+                     source <(purge_variables < "$ENVFNAME")
+                     "$WNAME" &> "$OUTPUTNAME" &
+                     RUNNINGPID=$!
+                     trap 'kill '"$RUNNINGPID"'; \
+                           _log "[CEQ PID:'"$CE_QUEUE_PID"']'"$BNAME"' was terminated."; \
+                           rm '"$PIDFILE"'; \
+                           exit 0' SIGTERM SIGUSR1
+                     wait "$RUNNINGPID"
+                     echo $? > "$EXITVALUEFNAME"
+                     rm "$PIDFILE"
+                     set -o nounset
+                     set -o errexit
+                     set -o pipefail
+                     DONENAME="$(_donename "$JOB")"
+                     mv "$WNAME" "$DONENAME"
+                     _log "$BNAME has ended."
+                    ) &
+                    SUBMITTEDPID=$!
+                    _log "[CEQ PID:$CE_QUEUE_PID] $BNAME (PID=$SUBMITTEDPID) launched."
+                else
+                    _log "[CEQ PID:$CE_QUEUE_PID] Waiting on $JOB, $BNAME still in progess..."
+                fi
             else
-                _log "[CEQ PID:$CE_QUEUE_PID] Waiting on $JOB, $BNAME still in progess..."
+                _log "Skipping $JOB, not executable"
+                continue
             fi
         done
         for CANC_REQ in "$CANC_REQS"/*
