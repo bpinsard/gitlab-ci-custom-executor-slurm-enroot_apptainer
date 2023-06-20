@@ -7,6 +7,7 @@ stages:
   - test-deploy-serial-none
   - test-deploy-serial-enroot
   - test-deploy-serial-apptainer
+  - bats-cleanup
 
 include:
   - '/gitlab-ci/lint-and-unit.yml'

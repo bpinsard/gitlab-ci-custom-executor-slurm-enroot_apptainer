@@ -10,6 +10,6 @@ joker:
     - enroot-unit-test-serial-test-deploy
     - unit-test-parallel-test-deploy
     - unit-test-serial-test-deploy
-  stage: test-deploy
+  stage: bats-cleanup
   script:
     - make joker
