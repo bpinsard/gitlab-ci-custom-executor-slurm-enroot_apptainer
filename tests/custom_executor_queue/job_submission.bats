@@ -70,7 +70,7 @@ EOF
     chmod +x job-abc.sh
 
     run submit_to_custom_executor_queue job-abc.sh JOB-54321
-    assert_output --regexp "job-abc.sh-1"
+    assert_output --regexp 'job-abc.sh-'"$(hostname)"'-[0-9]+-1'
 
 }
 
@@ -122,7 +122,7 @@ EOF
 
 }
 # bats test_tags=samename,serial
-@test "attempting to submit 2 jobs with the same name too fast DOES NOT causes error" {
+@test "attempting to submit many jobs with the same name too fast DOES NOT causes error" {
 # Using serial here because this test might fail
 # if there is too much congestion:
 # the first script might be snatched
@@ -135,16 +135,12 @@ EOF
 echo "A line of output"
 EOF
     chmod +x job1.sh
-    SUBJOBNAME="job1.sh-1"
-    while [ ! -f "$WORKDIR"/TODO/"$SUBJOBNAME" ]
+    SUBJOBNAME="job1.sh"
+    while [ "$( bash -c 'ls '"$WORKDIR"'/TODO/'"${SUBJOBNAME}"'*' | wc -l )" -lt 10 ]
     do
         TODONAME="$(submit_to_custom_executor_queue job1.sh JOB-5432)"
     done
 
-    if [ ! -f "$TODONAME" ]
-    then
-        skip # We are very unlucky
-    fi
     submit_to_custom_executor_queue job1.sh JOB-5432
 
 
@@ -213,26 +209,6 @@ EOF
     assert_failure
 
     assert_output --partial "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
-
-}
-
-@test "when submitting a script, the content of the SCRID file is increased by one" {
-
-    # shellcheck disable=SC1091
-    source "$WORKDIR"/.env
-    cat <<EOF > job.sh
-echo "This should not run at all!"
-exit 1
-EOF
-    chmod +x job.sh
-
-    ORIGINAL="$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")"
-
-    submit_to_custom_executor_queue job.sh JOB-5432
-
-    NEW="$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")"
-
-    assert_equal "$NEW" "$((ORIGINAL+1))"
 
 }
 

@@ -108,9 +108,16 @@ EOF
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
     chmod +x ./wrapped.sh
 
+    echo "Wrap produced:"
+    echo "====================="
+    cat ./wrapped.sh
+    echo "====================="
     ./wrapped.sh
 
+    echo "Log: "
+    echo "====================="
     cat "$MOCKLOGDIR/enroot.log"
+    echo "====================="
     for VARNAME in ENROOT_RUNTIME_PATH ENROOT_CACHE_PATH ENROOT_DATA_PATH
     do
         assert_file_contains "$MOCKLOGDIR/enroot.log" "${VARNAME}.*${CUSTOM_ENV_CI_WS}"

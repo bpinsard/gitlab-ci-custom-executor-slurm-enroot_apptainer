@@ -4,6 +4,7 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
+
 function start_custom_executor_queue () {
     if [[ $# -gt 2 ]]
     then
@@ -30,8 +31,6 @@ function start_custom_executor_queue () {
     CUSTOM_EXECUTOR_QUEUE_LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
     touch "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
     CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/last_activity
-    CUSTOM_EXECUTOR_QUEUE_SCRID_FILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/scridcount
-    echo 1 > "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE"
 
     _custom_executor_queue > /dev/null &
     CUSTOM_EXECUTOR_QUEUE_PID=$!
@@ -48,14 +47,20 @@ function start_custom_executor_queue () {
     declare -p ${!CUSTOM_EXECUTOR_QUEUE*} > "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
 }
 
+set +o nounset
+if [ -z "$SCRID" ]
+then
+    SCRID=1
+fi
+set -o nounset
 function _todoname(){
-    local JOB SCRID
+    local JOB
     JOB=$1
-    SCRID=$2
     local TODO="${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/TODO
     local BNAME
     BNAME="$(basename "$JOB")"
-    echo "${TODO}/${BNAME}-${SCRID}"
+    echo "${TODO}/${BNAME}-$(hostname)-$BASHPID-${SCRID}"
+    SCRID=$((SCRID+1))
 }
 
 
@@ -140,20 +145,10 @@ function submit_to_custom_executor_queue() {
        exit 22
     fi
 
-    local SCRID
-    SCRID=$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")
-    while  [ "$(cp -vn "$ORIG_JOBSCRIPT" "$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")" | wc -l)" -ne 1 ]
-    do
-        echo "increasing scrid: $SCRID" >&2
-        SCRID=$((SCRID+1))
-    done
-    # NOTE: This is not race-free at all.
-    echo $((SCRID+1)) > "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE"
-    local TODONAME
-    TODONAME="$(_todoname "$ORIG_JOBSCRIPT" "$SCRID")"
+    TODONAME="$(_todoname "$ORIG_JOBSCRIPT")"
     echo "$TODONAME" # This is the output!
-    #cp "$ORIG_JOBSCRIPT" "$TODONAME"
-    #chmod +x "$TODONAME"
+    cp "$ORIG_JOBSCRIPT" "$TODONAME"
+    chmod +x "$TODONAME"
 
     local JOBSCRIPT
     JOBSCRIPT="$TODONAME"
