@@ -94,3 +94,15 @@ cat <<EOF
   }
 }
 EOF
+cat <<EOF 1>&2
+{
+  "builds_dir": "$CI_BUILDS_DIR",
+  "driver": {
+    "name": "Slurm driver+enroot/apptainer",
+    "version": "v0.0.1"
+  },
+"job_env": {
+    "CE_QUEUE_WORKSPACE" : "$WORKSPACE"
+  }
+}
+EOF

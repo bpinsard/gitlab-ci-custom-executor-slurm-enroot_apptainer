@@ -20,7 +20,7 @@ apptainer-unit-test-serial-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: test-deploy
+  stage: test-deploy-serial-apptainer
   script:
     - make test-report-serial
   tags:

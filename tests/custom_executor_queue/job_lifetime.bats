@@ -296,7 +296,7 @@ EOF
 }
 
 # bats test_tags=serial
-@test "custom executor queue saves the pid of the each job in a separate file" {
+@test "custom executor queue saves the pid of the job in a separate file" {
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -313,6 +313,12 @@ EOF
     submit_to_custom_executor_queue job2.sh JOB-5432
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
+
+
+    echo "Logfile:"
+    echo "===================="
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+    echo "===================="
 
     assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 2
 
@@ -349,13 +355,19 @@ EOF
     ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS
     echo "pids count:"
     find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l
+    echo "Content of workspace:"
+    ( cd "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE" ; find . )
+    echo "Content of log file:"
+    echo "======================================="
+    cat "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
+    echo "======================================="
 
     assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 2
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
 
-    echo "PIds after a while:"
+    echo "PIDs after a while:"
     ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS
     echo "pids count:"
     find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l

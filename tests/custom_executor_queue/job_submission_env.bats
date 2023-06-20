@@ -32,6 +32,11 @@ teardown(){
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
+    echo "Environment:"
+    echo "================================="
+    cat "$WORKDIR"/.env
+    echo "================================="
+
     cat << EOF > job.sh
     echo \$MY_VARIABLE
 
@@ -55,9 +60,14 @@ EOF
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
+    echo "Environment:"
+    echo "================================="
+    cat "$WORKDIR"/.env
+    echo "================================="
+
     cat << EOF > job.sh
     echo \$MY_VARIABLE
-
+    echo Something else
 EOF
     chmod +x job.sh
 
@@ -65,7 +75,7 @@ EOF
     # shellcheck disable=SC2031
     export MY_VARIABLE="some-thing"
     run submit_to_custom_executor_queue_and_wait job.sh JOB-54321 --with-env
-    assert_output "some-thing"
+    assert_output --partial "some-thing"
     )
 
 
@@ -77,6 +87,11 @@ EOF
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
+    echo "Environment:"
+    echo "================================="
+    cat "$WORKDIR"/.env
+    echo "================================="
+
     cat << EOF > job.sh
     echo \$SLURM_SOMETHING
 

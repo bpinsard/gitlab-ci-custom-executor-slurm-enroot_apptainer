@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+function get_gpu_test_jobid_file() {
+    set +o nounset
+    if [ -z "$CI_BUILDS_DIR" ]
+    then
+        echo "$HOME/.apptainer-gpu-test-jobid"
+    else
+        echo "$CI_BUILDS_DIR/.apptainer-gpu-test-jobid"
+    fi
+    set -o nounset
+}
 
 function setup(){
     load '../test_helper/bats-support/load' # for run
@@ -17,7 +27,7 @@ function setup(){
     cp ./tests/contract/test.cu "$TEST_PLAYGROUND"
     cd "$TEST_PLAYGROUND" || exit
 
-    read -r TEST_JOB_ID < "$HOME/.apptainer-gpu-test-jobid"
+    read -r TEST_JOB_ID < "$(get_gpu_test_jobid_file)"
 }
 
 function setup_file() {
@@ -43,7 +53,7 @@ function setup_file() {
                          -o "$HOME/.apptainer-gpu-test-job.out" \
                          --wrap "sleep 150")
     echo "Submitted Job: $TEST_JOB_ID" >&3
-    echo "$TEST_JOB_ID" > "$HOME/.apptainer-gpu-test-jobid"
+    echo "$TEST_JOB_ID" > "$(get_gpu_test_jobid_file)"
     while ! scontrol wait_job "$TEST_JOB_ID" &> /dev/null
     do
         echo "Waiting for job to start..."
@@ -70,14 +80,13 @@ function teardown_file() {
     IMAGEFILE="$PROJECT_ROOT/cuda_$TAG.sif"
     echo rm -rf "$IMAGEFILE" >&3
     rm -rf "$IMAGEFILE"
-    read -r TEST_JOB_ID < "$HOME/.apptainer-gpu-test-jobid"
+    read -r TEST_JOB_ID < "$(get_gpu_test_jobid_file)"
     echo scancel "$TEST_JOB_ID"
     scancel "$TEST_JOB_ID"
-    rm "$HOME/.apptainer-gpu-test-jobid"
+    rm "$(get_gpu_test_jobid_file)"
     rm "$HOME/.apptainer-gpu-test-job.out"
     } } || { echo "# necessary executables not found, skipping" >&3; }
 }
-
 
 @test "apptainer gpu job fails without --nv" {
     COMMAND=(apptainer exec --bind '/scratch' "$IMAGEFILE" bash -c "nvcc -o tt ./test.cu && ./tt && echo ok")

@@ -20,7 +20,7 @@ unit-test-serial-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: test-deploy
+  stage: test-deploy-serial-none
   script:
     - make test-report-serial
   tags:

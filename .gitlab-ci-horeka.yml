@@ -4,6 +4,9 @@ stages:
   - packaging
   - deploy
   - test-deploy
+  - test-deploy-serial-none
+  - test-deploy-serial-enroot
+  - test-deploy-serial-apptainer
 
 include:
   - '/gitlab-ci/lint-and-unit.yml'
