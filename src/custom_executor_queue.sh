@@ -194,7 +194,7 @@ function submit_to_custom_executor_queue_and_wait() {
     kill "$TAILPID"
     if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     then
-    echo "Abnormal termination of script, exiting."
+    echo "Abnormal termination of Custom Executor Queue, exiting."
     exit "$SYSTEM_FAILURE_EXIT_CODE"
     fi
 
@@ -303,8 +303,6 @@ function _custom_executor_queue () {
                  # cd "$(cat "$LOCATIONFNAME")" # DEBUG: This might cause problems.
                  # shellcheck disable=SC1090
                  source <(purge_variables < "$ENVFNAME")
-                 _log "[CEQ PID:$CE_QUEUE_PID] Original job file: $(ls -l "$JOB")"
-                 _log "[CEQ PID:$CE_QUEUE_PID] Job file copied to Working: $(ls -l "$WNAME")"
                  "$WNAME" &> "$OUTPUTNAME" &
                  RUNNINGPID=$!
                  trap 'kill '"$RUNNINGPID"'; \

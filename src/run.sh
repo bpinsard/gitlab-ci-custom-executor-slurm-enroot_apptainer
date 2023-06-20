@@ -100,4 +100,9 @@ else
     grep -vi "PASSWORD\|USERNAME" "$WRAPPED" >&2
 fi
 
+echo "[RUN] Output:" >&2
 submit_to_custom_executor_queue_and_wait "$WRAPPED" "JOB_$CUSTOM_ENV_CI_JOB_ID"
+EXIT_CODE=$?
+echo "[RUN] Exit code: $EXIT_CODE" >&2
+echo "[RUN] End of Output:" >&2
+exit "$EXIT_CODE"

@@ -412,7 +412,7 @@ EOF
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_line "Abnormal termination of script, exiting."
+    assert_line "Abnormal termination of Custom Executor Queue, exiting."
 
 
 }
@@ -448,7 +448,7 @@ EOF
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_line "Abnormal termination of script, exiting."
+    assert_line "Abnormal termination of Custom Executor Queue, exiting."
 
 
 }
@@ -477,14 +477,18 @@ EOF
     sleep 5
     # Terminating the
     stop_custom_executor_queue
-    touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
+    touch "$CUSTOM_ENV_CI_WS/cews_0"/terminated
     ) &
 
     run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
 
+    echo "Logfile:"
+    echo "=============================="
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+    echo "=============================="
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_line "Abnormal termination of script, exiting."
+    assert_line "Abnormal termination of Custom Executor Queue, exiting."
     assert_line "This output should be visible"
 
 

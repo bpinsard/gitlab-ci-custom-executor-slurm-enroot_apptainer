@@ -318,6 +318,7 @@ EOF
 
 }
 
+# bats test_tags=serial
 @test "when a script ends, his pid is removed from the PIDS directory" {
 
     # shellcheck disable=SC1091
@@ -344,7 +345,7 @@ EOF
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
 
-    echo "PIds after submission:"
+    echo "PIDs after submission:"
     ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS
     echo "pids count:"
     find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l
