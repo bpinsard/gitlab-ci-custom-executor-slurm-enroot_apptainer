@@ -43,8 +43,8 @@ function start_custom_executor_queue () {
         CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID="$SLURM_JOB_ID"
     fi
     set -o nounset
-    # shellcheck disable=SC2086
     set -o noclobber
+    # shellcheck disable=SC2086
     declare -p ${!CUSTOM_EXECUTOR_QUEUE*} > "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
     set +o noclobber
 }
