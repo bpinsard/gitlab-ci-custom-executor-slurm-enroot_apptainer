@@ -19,9 +19,6 @@ function setup() {
     mkdir "$TEST_PLAYGROUND"
     cd "$TEST_PLAYGROUND" || exit
 
-    # DEBUG
-    env > "$HOME/$BATS_TEST_NAME.env"
-
 }
 
 function teardown() {

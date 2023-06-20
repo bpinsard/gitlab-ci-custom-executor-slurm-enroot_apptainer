@@ -121,7 +121,7 @@ EOF
 
 
 }
-# bats test_tags=samename,serial
+# bats test_tags=serial
 @test "attempting to submit many jobs with the same name too fast DOES NOT causes error" {
 # Using serial here because this test might fail
 # if there is too much congestion:
