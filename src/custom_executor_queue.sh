@@ -44,7 +44,9 @@ function start_custom_executor_queue () {
     fi
     set -o nounset
     # shellcheck disable=SC2086
+    set -o noclobber
     declare -p ${!CUSTOM_EXECUTOR_QUEUE*} > "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
+    set +o noclobber
 }
 
 set +o nounset
