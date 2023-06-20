@@ -66,7 +66,7 @@ function teardown() {
     if has_slurm_and_apptainer
     then
       echo rm -rf "$TEST_PLAYGROUND"
-      rm -rf "$TEST_PLAYGROUND"
+      # rm -rf "$TEST_PLAYGROUND" # DEBUG
     fi
 }
 
