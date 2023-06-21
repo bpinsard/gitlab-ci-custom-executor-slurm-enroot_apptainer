@@ -382,7 +382,7 @@ EOF
 }
 
 # bats test_tags=termination
-@test "run exit with error when slurm job has terminated, but script (in container) has not." {
+@test "run exits with error when slurm job has terminated, but script (in container) has not." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     # shellcheck disable=SC1091,SC2031
@@ -418,7 +418,7 @@ EOF
 }
 
 # bats test_tags=termination
-@test "run exit with error when slurm job has terminated, but script (not in container) has not." {
+@test "run exits with error when slurm job has terminated, but script (not in container) has not." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     # shellcheck disable=SC1091,SC2031

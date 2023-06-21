@@ -12,4 +12,4 @@ joker:
     - unit-test-serial-test-deploy
   stage: bats-cleanup
   script:
-    - make joker
+    - make joker || true
