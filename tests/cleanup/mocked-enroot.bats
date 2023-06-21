@@ -78,6 +78,7 @@ function teardown_file(){
     # shellcheck source=./src/containerlib-enroot.sh
     source "$SRC"/containerlib-enroot.sh
     assert_file_contains "$MOCKLOGDIR/enroot.log" "\bremove\b.*$CE_CONTAINER_NAME"
+    assert_file_contains "$MOCKLOGDIR/enroot.log" '^y$'
 
 }
 

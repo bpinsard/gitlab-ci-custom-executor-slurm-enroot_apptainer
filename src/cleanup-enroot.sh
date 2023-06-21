@@ -19,5 +19,5 @@ set -o nounset
 if [[ "$DEBUG" == "NO" ]]
 then
     echo "[CLEANUP] enroot remove $CE_CONTAINER_NAME"
-    enroot remove "$CE_CONTAINER_NAME" < <(echo yes)
+    enroot remove "$CE_CONTAINER_NAME" < <(echo y)
 fi
