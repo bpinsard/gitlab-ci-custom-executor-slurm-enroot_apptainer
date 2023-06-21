@@ -173,6 +173,22 @@ function submit_to_custom_executor_queue() {
     _log "Submitted $TODONAME to custom executor queue"
 }
 
+function wait_until_file_contains() {
+    local FILE="$1"
+    local WHAT="$2"
+    local MAXDELAY="$3"
+    if [ "$#" -ne 3 ]; then echo "wrong number of arguments to ${FUNCNAME[0]}"; fi
+    local T0="$SECONDS"
+    while ! grep -qE "$WHAT" "$FILE" &&  [[ "$SECONDS" -lt $((T0+MAXDELAY)) ]]
+    do
+        sleep 1
+    done
+    if ! grep -qE "$WHAT" "$FILE"
+    then
+        echo "Error: Waited too long ($MAXDELAY) for $FILE to contain \"$WHAT\"."
+        return 124
+    fi
+}
 
 function submit_to_custom_executor_queue_and_wait() {
     TODONAME="$(submit_to_custom_executor_queue "$@" || exit "$SYSTEM_FAILURE_EXIT_CODE" )"
@@ -181,14 +197,20 @@ function submit_to_custom_executor_queue_and_wait() {
     OUTPUTNAME="$(_outputname "$TODONAME")"
     EXITVALUEFNAME="$(_exitvaluefname "$TODONAME")"
     touch "$OUTPUTNAME"
-    tail -f "$OUTPUTNAME" &
-    local TAILPID=$!
+    local JOB_END_SIGNAL="$DONENAME has ended, $OUTPUTNAME completed."
+    ( tail -f "$OUTPUTNAME" | grep -v "$JOB_END_SIGNAL"; ) &
+    local SUBPID=$!
     while [ ! -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     do
         sleep 1
     done
-    disown "$TAILPID"
-    kill "$TAILPID"
+    if [ -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
+    then
+        wait_until_file_contains "$OUTPUTNAME" "$JOB_END_SIGNAL" 10
+    fi
+    disown "$SUBPID"
+    kill "$SUBPID" || true
+    pkill -f -U "$USER" 'tail -f '"$OUTPUTNAME"
     if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     then
     echo "Abnormal termination of Custom Executor Queue, exiting."
@@ -317,6 +339,8 @@ function _custom_executor_queue () {
                      DONENAME="$(_donename "$JOB")"
                      mv "$WNAME" "$DONENAME"
                      _log "$BNAME has ended."
+                     echo "$DONENAME has ended, $OUTPUTNAME completed." >> "$OUTPUTNAME"
+
                     ) &
                     SUBMITTEDPID=$!
                     _log "[CEQ PID:$CE_QUEUE_PID] $BNAME (PID=$SUBMITTEDPID) launched."

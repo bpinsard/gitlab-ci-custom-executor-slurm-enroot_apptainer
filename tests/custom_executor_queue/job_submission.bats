@@ -13,7 +13,7 @@ setup(){
     STARTDIR="${TEST_PLAYGROUND}"/start
 
     mkdir -p "${STARTDIR}"
-    cd "${STARTDIR}"
+    cd "${STARTDIR}" || exit
 
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
@@ -146,7 +146,6 @@ EOF
 
 }
 
-# bats test_tags=blocking
 @test "submit_to_custom_executor_queue_and_wait blocks until job has executed" {
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -156,13 +155,36 @@ sleep 5
 touch $WORKDIR/output
 EOF
     chmod +x job1.sh
-    submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
+    run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
+    assert_success
     assert_exists "$WORKDIR/output"
 
 }
 
+@test "submit_to_custom_executor_queue_and_wait blocks until file contains end signal" {
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
 
-# bats test_tags=output
+    cat <<EOF > job1.sh
+sleep 5
+touch $WORKDIR/output
+EOF
+    chmod +x job1.sh
+    submit_to_custom_executor_queue_and_wait job1.sh JOB-5432 &
+
+    SLEEP=10
+    while ! ls "$WORKDIR/TODO/"* &> /dev/null && [[ "$SLEEP" -gt 0 ]]
+    do
+        sleep 1
+        SLEEP=$((SLEEP-1))
+    done
+    # Creating DONENAME to trick "submit_to_custom_executor_queue_and_wait"
+    touch "$(_donename "$WORKDIR/TODO/job1.sh"*)"
+    wait
+
+    assert_exists "$WORKDIR/output"
+
+}
 @test "submit_to_custom_executor_queue_and_wait has the same output as the command" {
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -171,7 +193,8 @@ EOF
 echo this is the output
 EOF
     chmod +x job1.sh
-    run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
+
+    run submit_to_custom_executor_queue_and_wait job1.sh JOB-54321
     assert_output "this is the output"
 
 }
@@ -189,7 +212,6 @@ EOF
     run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
     assert_failure
     assert_equal "$status" 104
-
 
 }
 

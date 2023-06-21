@@ -127,7 +127,7 @@ EOF
     wait_until_file_exists "$OUT" 10
     assert_file_exists "$OUT"
 
-    run cat "$OUT"
+    run grep -v "has ended," "$OUT"
     assert_output - <<EOF
 A new line
 A stderr line
