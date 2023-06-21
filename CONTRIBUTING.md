@@ -302,6 +302,30 @@ Detailed setup steps:
   in the `.config/enroot/.credentials` netrc file
   (see [the documentation](https://github.com/NVIDIA/enroot/blob/master/doc/cmd/import.md#usage)
   for Enroot's import command).
+
+#### Quick remarks on concurrency
+The custom executor code as it is 
+should be able to work concurrently
+and process more than one job at the time
+without race conditions or conflicts.
+This means that it should be possible
+to register runners with these executors,
+and set `concurrent` to a value higher than 1
+in the global section of the runner configuration file.
+
+The test suite of the custom executor 
+has, though, limitations regarding concurrency.
+The dependencies between the jobs are set correctly,
+but the fact that the pipeline 
+includes the deployment of the code
+and other global filesystem or host-wide operations
+on the machine that is used
+makes it unsafe to run multiple pipeline at the same time,
+i.e., if there are multiple pipelines in flight for this project 
+(caused, e.g. by multiple pushes close in time)
+they might interfere with each other.
+
+
   
 ### Troubleshooting
 
