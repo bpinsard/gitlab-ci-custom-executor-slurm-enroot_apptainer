@@ -204,6 +204,12 @@ Detailed setup steps:
     see `apptainer-imagefile-spec.yml` and `enroot-imagefile-spec.yml`;
   - `--cache-dir $HOME/gitlab-runner/cache`,
     for consistency (not strictly necessary at the moment).
+  - `--limit 1` to make sure that the runner
+    does not try to lunch multiple jobs at the same time
+    on the shell executor
+    (it is possible to do this safely,
+    but this is not possible at the moment
+    with the current pipeline).
     
   This runner will be used for 
   the first run of the test suite and the linting,
