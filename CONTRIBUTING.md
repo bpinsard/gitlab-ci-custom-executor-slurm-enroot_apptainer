@@ -50,6 +50,14 @@ This debuggability feature might need to be expanded.
 If you find any issues with the runner,
 please let us know.
 
+To debug some test cases, 
+it might make sense to temporarily comment out
+the removal of the test directory 
+in the teardown step,
+in order to be able to inspect 
+the temporary files and directories
+that were created.
+
 ### Linting
 
 `shellcheck` is used for linting.
@@ -155,7 +163,9 @@ as the CI/CD configuration file on the GitLab CI web interface
 The difference between these files is only that they include
 slightly different tests, that differ only 
 in the choice of the partition
-for a multi-node mpi job.
+for a multi-node mpi job
+(This might be done better in another way
+but it is debatable).
 
 ### Setting up the runners for the pipeline
 
@@ -182,6 +192,8 @@ Detailed setup steps:
     (the `DEFAULT_PARTITION` variable
     determines what Slurm partition 
     will be used by default);
+  - `--env CI_WS=...` that should point 
+    at the same directory that is used for the other runners;
   - `--builds-dir $HOME/gitlab-runner/builds`,
     to make sure that this executor
     uses the same build directory 
@@ -229,13 +241,15 @@ Detailed setup steps:
   from the GitLab server web interface
   (where each runner can be edited independently).
   
-  The directories that each of the runners use
+  The build directories that each of the runners use
   should be different, to make sure that 
   there are no intereferences. 
-  The wrapper postpones the value 
-  of the `--container-backend` option to the paths used 
-  (for `--builds-dir`, `--cache-dir` 
-  and the environment variable `CI_WS`).
+  This is taken care of at the `configure_exec` stage,
+  where the build directory inside `CI_WS`
+  is determined based on the name of the containerisation backend
+  and the value of `CI_CONCURRENT_ID`
+  (so that multiple jobs can be run at the same time
+  by each runner independently)
 
   If the pipeline is going to be run on HoreKa, 
   one needs to change the pipeline definition file
@@ -304,6 +318,11 @@ Detailed setup steps:
   tests that fail, and check them step by step,
   possibly inserting additional debugging statements
   in the test code.
+- In order to inspect the state 
+  of the custom executor queue after each test,
+  one can temporarily comment out 
+  the removal of the test directory 
+  in the teardown function.
 - General: The pipeline fails on HoreKa or on BWUniCluster  
   Apart from the obvious reasons, like a bug that broke the code,
   it could be that the executors have not been set up 
