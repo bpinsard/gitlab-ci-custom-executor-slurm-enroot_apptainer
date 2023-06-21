@@ -210,7 +210,7 @@ function submit_to_custom_executor_queue_and_wait() {
     fi
     disown "$SUBPID"
     kill "$SUBPID" || true
-    pkill -f -U "$USER" 'tail -f '"$OUTPUTNAME"
+    pkill -f -U "$USER" 'tail -f '"$OUTPUTNAME" || true
     if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     then
     echo "Abnormal termination of Custom Executor Queue, exiting."
