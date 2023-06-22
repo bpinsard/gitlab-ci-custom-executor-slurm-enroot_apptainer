@@ -68,7 +68,7 @@ function teardown() {
     if has_slurm_and_enroot
     then
       echo rm -rf "$TEST_PLAYGROUND"
-      #rm -rf "$TEST_PLAYGROUND" # DEBUG
+      rm -rf "$TEST_PLAYGROUND"
     fi
 }
 

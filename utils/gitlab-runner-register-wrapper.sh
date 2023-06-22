@@ -6,9 +6,8 @@ set -o pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}" )/.." > /dev/null 2>&1 && pwd)"
 URL_DEFAULT="https://git.scc.kit.edu/"
-BUILDS_DIR_BASE_DEFAULT="$HOME/gitlab-runner/builds"
 CACHE_DIR_BASE_DEFAULT="$HOME/gitlab-runner/cache"
-CI_WS_BASE_DEFAULT="$HOME/gitlab-runner"
+CI_WS_DEFAULT="$HOME/gitlab-runner"
 
 function get_slurm_default_partition() {
    set -o pipefail
@@ -41,22 +40,17 @@ It accepts the following options:
     --container-backend   The backend used for containerised jobs,
                           i.e., "enroot", "apptainer" or "none".
 
-    --builds-dir-base     Directory where builds are stored.
-                          It will be created if it does not exist.
-                          Default:
-                          $BUILDS_DIR_BASE_DEFAULT/<container-backend>
-
     --cache-dir-base      Directory where build cache is stored
                           It will be created if it does not exist.
                           Default:
                           $CACHE_DIR_BASE_DEFAULT/<container-backend>
 
 
-    --ci-ws-base          Workspace for the internals
+    --ci-ws               Workspace for the internals
                           of the custom executor.
                           It will be created if it does not exist.
                           Default:
-                          $CI_WS_BASE_DEFAULT/<container-backend>
+                          $CI_WS_DEFAULT
 
 
     --default-partition   The default Slurm partition to use
@@ -83,9 +77,8 @@ OPTSTRING+=",name:"
 OPTSTRING+=",description:"
 OPTSTRING+=",ce-repo:"
 OPTSTRING+=",container-backend:"
-OPTSTRING+=",builds-dir-base:"
 OPTSTRING+=",cache-dir-base:"
-OPTSTRING+=",ci-ws-base:"
+OPTSTRING+=",ci-ws:"
 OPTSTRING+=",default-partition:"
 OPTSTRING+=",help"
 
@@ -97,9 +90,8 @@ REGISTRATION_TOKEN=""
 NAME=""
 CE_REPO=""
 CONTAINER_BACKEND=""
-BUILDS_DIR_BASE=""
 CACHE_DIR_BASE=""
-CI_WS_BASE=""
+CI_WS=""
 DEFAULT_PARTITION=""
 
 SANITIZED_OPTIONS=$(getopt --name gitlab-runner-register-wrapper --longoptions "$OPTSTRING" -- "$0" "$@")
@@ -129,16 +121,12 @@ case "$1" in
         CONTAINER_BACKEND="$2"
         shift
         ;;
-    --builds-dir-base)
-        BUILDS_DIR_BASE="$2"
-        shift
-        ;;
     --cache-dir-base)
         CACHE_DIR_BASE="$2"
         shift
         ;;
-    --ci-ws-base)
-        CI_WS_BASE="$2"
+    --ci-ws)
+        CI_WS="$2"
         shift
         ;;
     --default-partition)
@@ -197,16 +185,6 @@ do
    read -er CONTAINER_BACKEND
 done
 
-if [ -z "$BUILDS_DIR_BASE" ]
-then
-	echo -n "Location of the builds directory"
-    echo "- will be created if it does not exist ($BUILDS_DIR_BASE_DEFAULT):"
-	read -er BUILDS_DIR_BASE
-    if [ -z "$BUILDS_DIR_BASE" ]
-    then
-        BUILDS_DIR_BASE="$BUILDS_DIR_BASE_DEFAULT"
-    fi
-fi
 if [ -z "$CACHE_DIR_BASE" ]
 then
 	echo -n "Location of the cache directory"
@@ -217,13 +195,13 @@ then
         CACHE_DIR_BASE="$CACHE_DIR_BASE_DEFAULT"
     fi
 fi
-if [ -z "$CI_WS_BASE" ]
+if [ -z "$CI_WS" ]
 then
-	echo "Location of the Custom Executor Workspace ($CI_WS_BASE_DEFAULT):"
-	read -er CI_WS_BASE
-    if [ -z "$CI_WS_BASE" ]
+	echo "Location of the Custom Executor Workspace ($CI_WS_DEFAULT):"
+	read -er CI_WS
+    if [ -z "$CI_WS" ]
     then
-        CI_WS_BASE="$CI_WS_BASE_DEFAULT"
+        CI_WS="$CI_WS_DEFAULT"
     fi
 fi
 if [ -z "$DEFAULT_PARTITION" ]
@@ -238,12 +216,10 @@ fi
 SRC="$CE_REPO"/src
 
 echo "Creating directories:"
-echo "- Builds dir: $BUILDS_DIR_BASE/$CONTAINER_BACKEND"
-mkdir -p "$BUILDS_DIR_BASE/$CONTAINER_BACKEND"
 echo "- Cache dir: $CACHE_DIR_BASE/$CONTAINER_BACKEND"
 mkdir -p "$CACHE_DIR_BASE/$CONTAINER_BACKEND"
-echo "- CI Workspace: $CI_WS_BASE/$CONTAINER_BACKEND"
-mkdir -p "$CI_WS_BASE/$CONTAINER_BACKEND"
+echo "- CI Workspace: $CI_WS"
+mkdir -p "$CI_WS"
 
 echo "Registering runner using ${CONTAINER_BACKEND} backend"
 
@@ -253,13 +229,13 @@ gitlab-runner register \
     --url="$URL" \
     --registration-token="$REGISTRATION_TOKEN" \
     --executor="custom" \
-    --builds-dir="$BUILDS_DIR_BASE/$CONTAINER_BACKEND" \
     --cache-dir="$CACHE_DIR_BASE/$CONTAINER_BACKEND" \
-    --env CI_WS="$CI_WS_BASE/$CONTAINER_BACKEND" \
+    --env CI_WS="$CI_WS" \
     --env DEFAULT_PARTITION="$DEFAULT_PARTITION" \
     --custom_build_dir-enabled \
     --custom-config-exec="$SRC/configure-slurm.sh" \
-    --custom-config-exec-timeout=200 \
+    --custom-config-exec-timeout=2000 \
+    --custom-config-args="$CONTAINER_BACKEND" \
     --custom-prepare-exec="$SRC/prepare.sh" \
     --custom-prepare-exec-timeout=200 \
     --custom-prepare-args="$CONTAINER_BACKEND" \
