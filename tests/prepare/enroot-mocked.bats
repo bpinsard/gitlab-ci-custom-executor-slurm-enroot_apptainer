@@ -64,9 +64,10 @@ teardown() {
 @test "enroot environment variables set correctly" {
 
     prepare-enroot.sh
-    assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_RUNTIME_PATH=$CUSTOM_ENV_CI_WS/.enroot/run"
+
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_RUNTIME_PATH=$CUSTOM_ENV_CI_WS/$CUSTOM_ENV_CI_CONCURRENT_ID/.enroot/run"
     assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_CACHE_PATH=$CUSTOM_ENV_CI_WS/.enroot/cache"
-    assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_DATA_PATH=$CUSTOM_ENV_CI_WS/.enroot/data"
+    assert_file_contains "$MOCKLOGDIR"/enroot.log "ENROOT_DATA_PATH=$CUSTOM_ENV_CI_WS/$CUSTOM_ENV_CI_CONCURRENT_ID/.enroot/data"
 
 }
 

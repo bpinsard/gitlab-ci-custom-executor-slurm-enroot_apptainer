@@ -52,14 +52,18 @@ function teardown() {
     sleep 2
     CEQ_ENV="$TEST_PLAYGROUND/cews_0"/.env
     echo "Content of TEST_PLAYGROUND ($TEST_PLAYGROUND):"
-    find "$TEST_PLAYGROUND"
+    ( cd  "$TEST_PLAYGROUND"; find . )
     assert_exists "$CEQ_ENV"
     # shellcheck disable=SC1090
     source "$CEQ_ENV"
+    echo "Contents of $CEQ_ENV:"
+    cat "$CEQ_ENV"
     # shellcheck source=./src/custom_executor_queue.sh disable=SC2031
     source "$SRC/custom_executor_queue.sh"
 
     sleep 2
+    echo "Content of logfile so far:"
+    cat "$TEST_PLAYGROUND/cews_0"/log.txt
     assert custom_executor_queue_is_alive
     stop_custom_executor_queue
     while custom_executor_queue_is_alive

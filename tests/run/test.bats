@@ -382,7 +382,7 @@ EOF
 }
 
 # bats test_tags=termination
-@test "run exit with error when slurm job has terminated, but script (in container) has not." {
+@test "run exits with error when slurm job has terminated, but script (in container) has not." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     # shellcheck disable=SC1091,SC2031
@@ -412,13 +412,13 @@ EOF
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_line "Abnormal termination of script, exiting."
+    assert_line "Abnormal termination of Custom Executor Queue, exiting."
 
 
 }
 
 # bats test_tags=termination
-@test "run exit with error when slurm job has terminated, but script (not in container) has not." {
+@test "run exits with error when slurm job has terminated, but script (not in container) has not." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
     # shellcheck disable=SC1091,SC2031
@@ -448,12 +448,12 @@ EOF
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_line "Abnormal termination of script, exiting."
+    assert_line "Abnormal termination of Custom Executor Queue, exiting."
 
 
 }
 
-# bats test_tags=termination
+# bats test_tags=serial
 @test "when slurm job has terminated, output is displayed anyway." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
@@ -474,17 +474,21 @@ EOF
     echo "Testing $STEP"
 
     (
-    sleep 5
-    # Terminating the
+    sleep 20 # Very large for safety
+    # Terminating the whole queue
     stop_custom_executor_queue
-    touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
+    touch "$CUSTOM_ENV_CI_WS/cews_0"/terminated
     ) &
 
     run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
 
+    echo "Logfile:"
+    echo "=============================="
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+    echo "=============================="
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_line "Abnormal termination of script, exiting."
+    assert_line "Abnormal termination of Custom Executor Queue, exiting."
     assert_line "This output should be visible"
 
 

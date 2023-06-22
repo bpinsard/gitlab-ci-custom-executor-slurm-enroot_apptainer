@@ -13,6 +13,8 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
+BACKEND="$1"
+
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # shellcheck source=src/configure-slurm-include.sh
@@ -77,8 +79,24 @@ then
     echo "[CONFIGURE] Configured workspace in $WORKSPACE" >&2
 fi
 
+CI_BUILDS_DIR="$CUSTOM_ENV_CI_WS/$BACKEND/$CUSTOM_ENV_CI_CONCURRENT_ID"
+mkdir -p "$CI_BUILDS_DIR"
+
 cat <<EOF
 {
+  "builds_dir": "$CI_BUILDS_DIR",
+  "driver": {
+    "name": "Slurm driver+enroot/apptainer",
+    "version": "v0.0.1"
+  },
+"job_env": {
+    "CE_QUEUE_WORKSPACE" : "$WORKSPACE"
+  }
+}
+EOF
+cat <<EOF 1>&2
+{
+  "builds_dir": "$CI_BUILDS_DIR",
   "driver": {
     "name": "Slurm driver+enroot/apptainer",
     "version": "v0.0.1"

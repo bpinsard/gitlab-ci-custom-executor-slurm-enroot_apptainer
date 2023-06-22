@@ -5,8 +5,6 @@ unit-test-parallel-test-deploy:
   stage: test-deploy
   script:
     - make test-report-parallel JOBS=8
-  after_script:
-    - make joker
   tags:
     - slurm
     - slurm-only
@@ -22,11 +20,9 @@ unit-test-serial-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  stage: test-deploy
+  stage: test-deploy-serial-none
   script:
     - make test-report-serial
-  after_script:
-    - make joker
   tags:
     - slurm
     - slurm-only

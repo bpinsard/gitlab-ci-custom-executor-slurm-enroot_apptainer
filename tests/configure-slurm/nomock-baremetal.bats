@@ -40,14 +40,11 @@ EOF
     echo "# Test setup phase completed." >&3
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
     export CUSTOM_ENV_CI_JOB_ID=54321
-    export CUSTOM_ENV_CI_WS
-    mkdir -p "$CUSTOM_ENV_CI_WS" # This should not be needed
 
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND/builds"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
 
-    mkdir -p "$CUSTOM_ENV_CI_BUILDS_DIR"
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
       # If we are in a testing environment,
@@ -93,7 +90,7 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 1 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
     cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
@@ -121,7 +118,7 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 3 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
     cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"
@@ -203,7 +200,7 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 2 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
     cat config-output
     # shellcheck source=./src/include.sh
     source "$SRC/include.sh"

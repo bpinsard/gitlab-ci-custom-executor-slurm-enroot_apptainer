@@ -1,12 +1,13 @@
 # Note: the success of this depends on the settings of
-# CI_BUILDS_DIR for the 2 runners involved.
+# CI_WS for the 2 runners involved.
+# (i.e., for the "shell" executor and the "slurm, apptainer" one)
 enroot-imagefile-pull:
   dependencies: []
   stage: test-deploy
   tags:
     - shell
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/enroot/playground/debian-latest.sqsh"
+    IMAGEFILE: "$CI_WS/playground/debian-latest.sqsh"
   script:
     - 'mkdir -p "$(dirname "$IMAGEFILE")"'
     - 'cd "$(dirname "$IMAGEFILE")"'
@@ -21,7 +22,7 @@ enroot-imagefile-job-no-image:
     - slurm
     - enroot
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sqsh"
+    IMAGEFILE: "$CI_WS/playground/debian-latest.sqsh"
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
@@ -33,7 +34,7 @@ enroot-imagefile-job-with-image:
     - slurm
     - enroot
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-another-image.sqsh"
+    IMAGEFILE: "$CI_WS/playground/debian-another-image.sqsh"
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
@@ -46,7 +47,7 @@ enroot-imagefile-job-no-image-second-round:
     - slurm
     - enroot
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-another-image.sqsh"
+    IMAGEFILE: "$CI_WS/playground/debian-another-image.sqsh"
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
@@ -62,8 +63,8 @@ enroot-imagefile-clean:
     - shell
   when: always
   variables:
-    IMAGEFILE1: "$CI_BUILDS_DIR/enroot/playground/debian-latest.sqsh"
-    IMAGEFILE2: "$CI_BUILDS_DIR/enroot/playground/debian-another-image.sqsh"
+    IMAGEFILE1: "$CI_WS/playground/debian-latest.sqsh"
+    IMAGEFILE2: "$CI_WS/playground/debian-another-image.sqsh"
   script:
     - 'cd "$(dirname "$IMAGEFILE1")"'
     - 'rm -rf "$(basename "$IMAGEFILE1")"'

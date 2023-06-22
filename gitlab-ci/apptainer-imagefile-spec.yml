@@ -1,12 +1,13 @@
 # Note: the success of this depends on the settings of
-# CI_BUILDS_DIR for the 2 runners involved.
+# CI_WS for the 2 runners involved
+# (i.e., for the "shell" executor and the "slurm, apptainer" one)
 apptainer-imagefile-pull:
   dependencies: []
   stage: test-deploy
   tags:
     - shell
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/apptainer/playground/debian-latest.sif"
+    IMAGEFILE: "$CI_WS/playground/debian-latest.sif"
   script:
     - 'echo $IMAGEFILE'
     - 'mkdir -p "$(dirname "$IMAGEFILE")"'
@@ -22,7 +23,7 @@ apptainer-imagefile-job-no-image:
     - slurm
     - apptainer
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-latest.sif"
+    IMAGEFILE: "$CI_WS/playground/debian-latest.sif"
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
@@ -34,7 +35,7 @@ apptainer-imagefile-job-with-image:
     - slurm
     - apptainer
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-another-image.sif"
+    IMAGEFILE: "$CI_WS/playground/debian-another-image.sif"
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
@@ -47,7 +48,7 @@ apptainer-imagefile-job-no-image-second-round:
     - slurm
     - apptainer
   variables:
-    IMAGEFILE: "$CI_BUILDS_DIR/playground/debian-another-image.sif"
+    IMAGEFILE: "$CI_WS/playground/debian-another-image.sif"
   script:
     - grep PRETTY /etc/os-release | grep -i debian
 
@@ -65,8 +66,8 @@ apptainer-imagefile-clean:
     - shell
   when: always
   variables:
-    IMAGEFILE1: "$CI_BUILDS_DIR/apptainer/playground/debian-latest.sif"
-    IMAGEFILE2: "$CI_BUILDS_DIR/apptainer/playground/debian-another-image.sif"
+    IMAGEFILE1: "$CI_WS/playground/debian-latest.sif"
+    IMAGEFILE2: "$CI_WS/playground/debian-another-image.sif"
   script:
     - ls "$IMAGEFILE1"
     - 'cd "$(dirname "$IMAGEFILE1")"'

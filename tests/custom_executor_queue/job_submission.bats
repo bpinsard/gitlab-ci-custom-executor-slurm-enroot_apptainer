@@ -13,7 +13,7 @@ setup(){
     STARTDIR="${TEST_PLAYGROUND}"/start
 
     mkdir -p "${STARTDIR}"
-    cd "${STARTDIR}"
+    cd "${STARTDIR}" || exit
 
     (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
 
@@ -51,10 +51,10 @@ EOF
 EOF
     chmod +x job-abc.sh
 
-    run submit_to_custom_executor_queue job.sh JOB-54321
+    submit_to_custom_executor_queue job-abc.sh JOB-54321
 
     assert_exists "$WORKDIR/JOB-54321"
-    assert_file_contains "$WORKDIR/JOB-54321" "job.sh"
+    assert_file_contains "$WORKDIR/JOB-54321" "job-abc.sh"
 
 
 }
@@ -70,7 +70,7 @@ EOF
     chmod +x job-abc.sh
 
     run submit_to_custom_executor_queue job-abc.sh JOB-54321
-    assert_output --regexp "job-abc.sh-1"
+    assert_output --regexp 'job-abc.sh-'"$(hostname)"'-[0-9]+-1'
 
 }
 
@@ -121,8 +121,8 @@ EOF
 
 
 }
-# bats test_tags=samename,serial
-@test "attempting to submit 2 jobs with the same name too fast DOES NOT causes error" {
+# bats test_tags=serial
+@test "attempting to submit many jobs with the same name too fast DOES NOT causes error" {
 # Using serial here because this test might fail
 # if there is too much congestion:
 # the first script might be snatched
@@ -135,23 +135,17 @@ EOF
 echo "A line of output"
 EOF
     chmod +x job1.sh
-    SUBJOBNAME="job1.sh-1"
-    while [ ! -f "$WORKDIR"/TODO/"$SUBJOBNAME" ]
+    SUBJOBNAME="job1.sh"
+    while [ "$( bash -c 'ls '"$WORKDIR"'/TODO/'"${SUBJOBNAME}"'*' | wc -l )" -lt 10 ]
     do
         TODONAME="$(submit_to_custom_executor_queue job1.sh JOB-5432)"
     done
 
-    if [ ! -f "$TODONAME" ]
-    then
-        skip # We are very unlucky
-    fi
-    run submit_to_custom_executor_queue job1.sh JOB-5432
-    assert_success
+    submit_to_custom_executor_queue job1.sh JOB-5432
 
 
 }
 
-# bats test_tags=blocking
 @test "submit_to_custom_executor_queue_and_wait blocks until job has executed" {
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -163,13 +157,34 @@ EOF
     chmod +x job1.sh
     run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
     assert_success
-
     assert_exists "$WORKDIR/output"
 
 }
 
+@test "submit_to_custom_executor_queue_and_wait blocks until file contains end signal" {
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
 
-# bats test_tags=output
+    cat <<EOF > job1.sh
+sleep 5
+touch $WORKDIR/output
+EOF
+    chmod +x job1.sh
+    submit_to_custom_executor_queue_and_wait job1.sh JOB-5432 &
+
+    SLEEP=10
+    while ! ls "$WORKDIR/TODO/"* &> /dev/null && [[ "$SLEEP" -gt 0 ]]
+    do
+        sleep 1
+        SLEEP=$((SLEEP-1))
+    done
+    # Creating DONENAME to trick "submit_to_custom_executor_queue_and_wait"
+    touch "$(_donename "$WORKDIR/TODO/job1.sh"*)"
+    wait
+
+    assert_exists "$WORKDIR/output"
+
+}
 @test "submit_to_custom_executor_queue_and_wait has the same output as the command" {
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -178,7 +193,8 @@ EOF
 echo this is the output
 EOF
     chmod +x job1.sh
-    run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
+
+    run submit_to_custom_executor_queue_and_wait job1.sh JOB-54321
     assert_output "this is the output"
 
 }
@@ -194,8 +210,8 @@ exit 104
 EOF
     chmod +x job1.sh
     run submit_to_custom_executor_queue_and_wait job1.sh JOB-5432
+    assert_failure
     assert_equal "$status" 104
-
 
 }
 
@@ -215,26 +231,6 @@ EOF
     assert_failure
 
     assert_output --partial "ERROR: Custom executor queue process $CUSTOM_EXECUTOR_QUEUE_PID not running!"
-
-}
-
-@test "when submitting a script, the content of the SCRID file is increased by one" {
-
-    # shellcheck disable=SC1091
-    source "$WORKDIR"/.env
-    cat <<EOF > job.sh
-echo "This should not run at all!"
-exit 1
-EOF
-    chmod +x job.sh
-
-    ORIGINAL="$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")"
-
-    submit_to_custom_executor_queue job.sh JOB-5432
-
-    NEW="$(cat "$CUSTOM_EXECUTOR_QUEUE_SCRID_FILE")"
-
-    assert_equal "$NEW" "$((ORIGINAL+1))"
 
 }
 
@@ -274,5 +270,17 @@ EOF
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
 
     assert_not_exist "$TEST_PLAYGROUND/this-should-not-exist"
+
+}
+
+@test "submit to custom executor queue exits if job script does not exist " {
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+    run submit_to_custom_executor_queue unexisting-job.sh job-tag
+
+    assert_failure
+    assert_output --regexp "job submission failed: unexisting-job.sh does not exist"
+
 
 }

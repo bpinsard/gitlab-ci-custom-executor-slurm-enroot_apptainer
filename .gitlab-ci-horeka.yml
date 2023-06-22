@@ -4,6 +4,10 @@ stages:
   - packaging
   - deploy
   - test-deploy
+  - test-deploy-serial-none
+  - test-deploy-serial-enroot
+  - test-deploy-serial-apptainer
+  - bats-cleanup
 
 include:
   - '/gitlab-ci/lint-and-unit.yml'
@@ -21,3 +25,4 @@ include:
   - '/gitlab-ci/bootstrap-enroot.yml'
   - '/gitlab-ci/bootstrap-apptainer.yml'
   - '/gitlab-ci/horeka-specific.yml'
+  - '/gitlab-ci/joker.yml'

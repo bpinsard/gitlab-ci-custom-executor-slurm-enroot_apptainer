@@ -27,8 +27,8 @@ teardown(){
 }
 
 
-# bats test_flags=serial
-@test "running jobs that belong to a certain tags are cancelled when requested" {
+# bats test_tags=serial
+@test "running jobs that belong to a certain tag are cancelled when requested" {
 
     (start_custom_executor_queue "$WORKDIR"  3> /dev/null)
 
@@ -55,8 +55,10 @@ EOF
     # 2 seconds more for safety
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
 
-    #echo "Logfile:"
-    #cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+    echo "Logfile:"
+    echo "=============================="
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+    echo "=============================="
 
     assert_not_exist "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$JOBSUBNAME1"
     assert_not_exist "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$JOBSUBNAME2"

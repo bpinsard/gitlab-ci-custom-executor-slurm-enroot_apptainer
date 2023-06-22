@@ -41,12 +41,12 @@ function setup(){
 
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 5 -n 1"
     export CUSTOM_ENV_CI_JOB_IMAGE="docker://ubuntu:kinetic-20221101"
-    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
-    export CUSTOM_ENV_CI_BUILDS_DIR="$TEST_PLAYGROUND/builds"
+
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
 
-    mkdir "$CUSTOM_ENV_CI_BUILDS_DIR"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
 
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
@@ -76,7 +76,7 @@ function teardown() {
 # bats test_tags=configure,prepare,cleanup
 @test "configure, prepare, and cleanup" {
 
-    "$SRC"/configure-slurm.sh  | "$JOB_ENV_READER" > ./job-env
+    "$SRC"/configure-slurm.sh enroot  | "$JOB_ENV_READER" > ./job-env
 
     assert_exists ./job-env
     assert_file_contains ./job-env "CE_QUEUE_WORKSPACE"
@@ -106,7 +106,7 @@ function teardown() {
 # bats test_tags=configure,prepare,cleanup,run
 @test "configure, prepare, run and cleanup run a simple script" {
 
-    "$SRC"/configure-slurm.sh | "$JOB_ENV_READER" > ./job-env
+    "$SRC"/configure-slurm.sh enroot | "$JOB_ENV_READER" > ./job-env
 
     assert_exists ./job-env
     assert_file_contains ./job-env "CE_QUEUE_WORKSPACE"
@@ -122,9 +122,9 @@ function teardown() {
 
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
-    echo -n "# Preparing job... " >&3
+    echo "Preparing job... "
     "$SRC"/prepare.sh enroot
-    echo "done." >&3
+    echo "done."
     assert_dir_exists "$CUSTOM_ENV_CI_WS/.enroot"
 
     cat <<EOF > "$STARTDIR"/get_sources_script.sh
@@ -134,10 +134,26 @@ git clone https://github.com/mmesiti/test-repo-clone-me.git
 EOF
     chmod +x "$STARTDIR"/get_sources_script.sh
 
-    echo -n "# Running get_sources... " >&3
+    echo "Running get_sources... "
     run "$SRC"/run.sh enroot "$STARTDIR"/get_sources_script.sh get_sources
-    echo "done." >&3
+    echo "done."
 
+    echo "Job log - after get-sources:"
+    echo "============================="
+    cat  "$CE_QUEUE_WORKSPACE/log.txt"
+    echo "============================="
+
+    echo "Output from job, as seen by run:"
+    echo "============================="
+    echo "$output"
+    echo "============================="
+
+    echo "Content of the queue workspace "
+    echo "============================="
+    ( cd "$CE_QUEUE_WORKSPACE" && find . )
+    echo "============================="
+
+    assert_success
     assert_line "Cloning dummy repository..."
 
     cat <<EOF > "$STARTDIR"/build_script.sh
@@ -150,10 +166,15 @@ echo "Done."
 EOF
     chmod +x "$STARTDIR"/build_script.sh
 
-    echo -n "# Running build_script... " >&3
+    echo "Running build_script... "
     run "$SRC"/run.sh enroot "$STARTDIR"/build_script.sh build_script
-    echo "done." >&3
+    echo "done."
 
+    echo "Job log - after build-script:"
+    echo "============================="
+    cat  "$CE_QUEUE_WORKSPACE/log.txt"
+    echo "============================="
+    assert_success
     assert_line "Doing a lot of work..."
     assert_file_exists "$CUSTOM_ENV_CI_WS"/job-output.txt
 

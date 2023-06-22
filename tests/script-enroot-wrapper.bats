@@ -42,9 +42,11 @@ teardown() {
 echo "some thing to wrap"
 EOF
 
-     "$SRC"/script-enroot-wrapper.sh "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    sync "$SCRIPT_TO_WRAP"
+    "$SRC"/script-enroot-wrapper.sh "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    sync ./wrapped.sh
 
-      assert [ "$(wc -l < ./wrapped.sh)" -gt 0 ]
+    assert [ "$(wc -l < ./wrapped.sh)" -gt 0 ]
 
 }
 
@@ -54,9 +56,11 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something to wrap"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    sync ./wrapped.sh
     chmod +x ./wrapped.sh
 
     run ./wrapped.sh
@@ -71,9 +75,11 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    sync ./wrapped.sh
 
     assert [ "$(wc -l < ./wrapped.sh)" -lt 50 ]
 }
@@ -84,9 +90,11 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "some thing to wrap"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    sync ./wrapped.sh
     chmod +x ./wrapped.sh
 
     ./wrapped.sh
@@ -103,13 +111,23 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+    sync ./wrapped.sh
     chmod +x ./wrapped.sh
 
+    echo "Wrap produced:"
+    echo "====================="
+    cat ./wrapped.sh
+    echo "====================="
     ./wrapped.sh
 
+    echo "Log: "
+    echo "====================="
+    cat "$MOCKLOGDIR/enroot.log"
+    echo "====================="
     for VARNAME in ENROOT_RUNTIME_PATH ENROOT_CACHE_PATH ENROOT_DATA_PATH
     do
         assert_file_contains "$MOCKLOGDIR/enroot.log" "${VARNAME}.*${CUSTOM_ENV_CI_WS}"
@@ -125,6 +143,7 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "echoing something from the script to wrap"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
@@ -145,6 +164,7 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
@@ -162,6 +182,7 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
@@ -179,6 +200,7 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
@@ -196,6 +218,7 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
@@ -213,6 +236,7 @@ EOF
     cat <<EOF > "$SCRIPT_TO_WRAP"
 echo "something"
 EOF
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     run "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP"
@@ -228,6 +252,7 @@ EOF
 
     SCRIPT_TO_WRAP="$TMPSCR"
     touch "$SCRIPT_TO_WRAP"
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
 
@@ -248,6 +273,7 @@ EOF
 
     SCRIPT_TO_WRAP="$TMPSCR"
     touch "$SCRIPT_TO_WRAP"
+    sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh

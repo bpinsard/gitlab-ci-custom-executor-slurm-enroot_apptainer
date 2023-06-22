@@ -33,6 +33,7 @@ function teardown(){
 
     cat <<EOF > json-output
 {
+  "builds_dir": "/a/direc/tory",
   "driver": {
     "name": "ENROOT+Slurm driver",
     "version": "v0.0.1"
@@ -47,5 +48,6 @@ EOF
     run read-job-env.py < json-output
 
     assert_line 'export CE_QUEUE_WORKSPACE=/some/path'
+    assert_line 'export CUSTOM_ENV_CI_BUILDS_DIR=/a/direc/tory'
 
 }

@@ -53,9 +53,9 @@ teardown(){
     set +o nounset
     if [ -n "$SLURM_JOB_ID" ]
     then
-        NVAR=9
-    else
         NVAR=8
+    else
+        NVAR=7
     fi
     set -o nounset
     assert_equal "$(wc -l < "$WORKDIR"/.env)" "$NVAR"

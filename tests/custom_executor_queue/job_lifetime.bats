@@ -127,7 +127,7 @@ EOF
     wait_until_file_exists "$OUT" 10
     assert_file_exists "$OUT"
 
-    run cat "$OUT"
+    run grep -v "has ended," "$OUT"
     assert_output - <<EOF
 A new line
 A stderr line
@@ -296,7 +296,7 @@ EOF
 }
 
 # bats test_tags=serial
-@test "custom executor queue saves the pid of the each job in a separate file" {
+@test "custom executor queue saves the pid of the job in a separate file" {
 
     # shellcheck disable=SC1091
     source "$WORKDIR"/.env
@@ -314,10 +314,17 @@ EOF
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
 
+
+    echo "Logfile:"
+    echo "===================="
+    cat "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+    echo "===================="
+
     assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 2
 
 }
 
+# bats test_tags=serial
 @test "when a script ends, his pid is removed from the PIDS directory" {
 
     # shellcheck disable=SC1091
@@ -344,21 +351,46 @@ EOF
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 1
 
-    echo "PIds after submission:"
+    echo "PIDs after submission:"
     ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS
     echo "pids count:"
     find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l
+    echo "Content of workspace:"
+    ( cd "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE" ; find . )
+    echo "Content of log file:"
+    echo "======================================="
+    cat "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/log.txt
+    echo "======================================="
 
     assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 2
 
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
 
-    echo "PIds after a while:"
+    echo "PIDs after a while:"
     ls "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS
     echo "pids count:"
     find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l
 
     assert_equal "$(find "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/PIDS -type f | wc -l )" 1
+
+}
+
+
+@test "if script is not executable, it is just skipped" {
+
+
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    cat <<EOF > "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/TODO/job.txt"
+    This is not an executable file
+EOF
+
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+    sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME"
+
+    LOGFILE="$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/log.txt"
+    assert_file_contains "$LOGFILE" "Skipping .*job.txt, not executable"
 
 }

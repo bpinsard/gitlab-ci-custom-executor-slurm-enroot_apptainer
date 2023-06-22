@@ -22,7 +22,9 @@ function setup() {
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
+
     export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
@@ -30,7 +32,7 @@ function setup() {
 
 
     # shellcheck disable=SC1090
-    source <( "$SRC/configure-slurm.sh" 3> /dev/null | read-job-env.py )
+    source <( "$SRC/configure-slurm.sh" none 3> /dev/null | read-job-env.py )
 
     (
         # shellcheck source=./src/containerlib-enroot.sh
@@ -215,6 +217,10 @@ EOF
     # 2 seconds more for safety
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
 
+    echo "Content of logfile so far:"
+    echo "=================================="
+    cat  "$CE_QUEUE_WORKSPACE/log.txt"
+    echo "=================================="
     assert_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$JOBSUBNAME1"
     assert_not_exists "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/PIDS/$JOBSUBNAME2"
 

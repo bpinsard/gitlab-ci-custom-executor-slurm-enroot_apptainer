@@ -23,6 +23,7 @@ function setup() {
 
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
     export CE_QUEUE_WORKSPACE="$CUSTOM_ENV_CI_WS/cews_0"
     (
     # shellcheck source=./src/custom_executor_queue.sh

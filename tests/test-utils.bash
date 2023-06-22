@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function load_mocks(){
-    PATH="$PROJECT_ROOT/tests/mocks/bin:$PATH"
+    export PATH="$PROJECT_ROOT/tests/mocks/bin:$PATH"
 }
 
 
