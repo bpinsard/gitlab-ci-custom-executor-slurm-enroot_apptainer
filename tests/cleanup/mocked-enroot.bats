@@ -82,12 +82,40 @@ function teardown_file(){
 
 }
 
+@test "cleanup removes enroot container even when CI_JOB_IMAGE is not present but IMAGEFILE is" {
+
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+    export CUSTOM_ENV_IMAGEFILE="a-file.sqsh"
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+    # This test requires that enroot is invoked
+    "$SRC/prepare-enroot.sh"
+    # shellcheck disable=SC1091
+    source "$CE_QUEUE_WORKSPACE/.env"
+
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CE_DEBUG=
+    "$SRC/cleanup-slurm.sh" enroot
+
+    # Out mock is not so clever, this does not work.
+    # _helper(){ enroot list | wc -l; }
+
+
+    # shellcheck source=./src/containerlib-enroot.sh
+    source "$SRC"/containerlib-enroot.sh
+    assert_file_contains "$MOCKLOGDIR/enroot.log" "\bremove\b.*$CE_CONTAINER_NAME"
+    assert_file_contains "$MOCKLOGDIR/enroot.log" '^y$'
+
+}
+
+
 @test "cleanup does not call enroot at all when image not needed" {
 
 
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     (
+        # shellcheck disable=SC2031
         export CUSTOM_ENV_CI_JOB_IMAGE=""
         # shellcheck disable=SC1091
         source "$CE_QUEUE_WORKSPACE/.env"
