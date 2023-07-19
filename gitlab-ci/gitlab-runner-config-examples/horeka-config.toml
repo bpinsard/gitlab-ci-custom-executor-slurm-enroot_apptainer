@@ -1,4 +1,4 @@
-concurrent = 1
+concurrent = 3
 check_interval = 0
 shutdown_timeout = 0
 
@@ -6,6 +6,7 @@ shutdown_timeout = 0
   session_timeout = 1800
 
 [[runners]]
+  limit = 3
   name = "Slurm-Based custom executor (enroot)"
   url = "https://git.scc.kit.edu/"
   id = 4231
@@ -15,12 +16,13 @@ shutdown_timeout = 0
   executor = "custom"
   builds_dir = "/home/hk-project-scs/hs2454/gitlab-runner/builds/enroot"
   cache_dir = "/home/hk-project-scs/hs2454/gitlab-runner/cache/enroot"
-  environment = ["CI_WS=/home/hk-project-scs/hs2454/gitlab-runner/enroot", "DEFAULT_PARTITION=dev_cpuonly"]
+  environment = ["CI_WS=/home/hk-project-scs/hs2454/gitlab-runner", "DEFAULT_PARTITION=dev_cpuonly"]
   [runners.custom_build_dir]
     enabled = true
   [runners.custom]
     config_exec = "/home/hk-project-scs/hs2454/custom-executor-slurm-container-test-deploy/src/configure-slurm.sh"
-    config_exec_timeout = 200
+    config_exec_timeout = 2000 
+    config_args = ["enroot"]
     prepare_exec = "/home/hk-project-scs/hs2454/custom-executor-slurm-container-test-deploy/src/prepare.sh"
     prepare_args = ["enroot"]
     prepare_exec_timeout = 200
@@ -33,6 +35,7 @@ shutdown_timeout = 0
     force_kill_timeout = 200
 
 [[runners]]
+  limit = 3
   name = "Slurm-Based custom executor (apptainer)"
   url = "https://git.scc.kit.edu/"
   id = 4232
@@ -42,12 +45,13 @@ shutdown_timeout = 0
   executor = "custom"
   builds_dir = "/home/hk-project-scs/hs2454/gitlab-runner/builds/apptainer"
   cache_dir = "/home/hk-project-scs/hs2454/gitlab-runner/cache/apptainer"
-  environment = ["CI_WS=/home/hk-project-scs/hs2454/gitlab-runner/apptainer", "DEFAULT_PARTITION=dev_cpuonly"]
+  environment = ["CI_WS=/home/hk-project-scs/hs2454/gitlab-runner", "DEFAULT_PARTITION=dev_cpuonly"]
   [runners.custom_build_dir]
     enabled = true
   [runners.custom]
     config_exec = "/home/hk-project-scs/hs2454/custom-executor-slurm-container-test-deploy/src/configure-slurm.sh"
-    config_exec_timeout = 200
+    config_exec_timeout = 2000
+    config_args = ["apptainer"]
     prepare_exec = "/home/hk-project-scs/hs2454/custom-executor-slurm-container-test-deploy/src/prepare.sh"
     prepare_args = ["apptainer"]
     prepare_exec_timeout = 200
@@ -60,6 +64,7 @@ shutdown_timeout = 0
     force_kill_timeout = 200
 
 [[runners]]
+  limit = 3
   name = "Slurm-Based custom executor (none)"
   url = "https://git.scc.kit.edu/"
   id = 4233
@@ -69,12 +74,13 @@ shutdown_timeout = 0
   executor = "custom"
   builds_dir = "/home/hk-project-scs/hs2454/gitlab-runner/builds/none"
   cache_dir = "/home/hk-project-scs/hs2454/gitlab-runner/cache/none"
-  environment = ["CI_WS=/home/hk-project-scs/hs2454/gitlab-runner/none", "DEFAULT_PARTITION=dev_cpuonly"]
+  environment = ["CI_WS=/home/hk-project-scs/hs2454/gitlab-runner", "DEFAULT_PARTITION=dev_cpuonly"]
   [runners.custom_build_dir]
     enabled = true
   [runners.custom]
     config_exec = "/home/hk-project-scs/hs2454/custom-executor-slurm-container-test-deploy/src/configure-slurm.sh"
-    config_exec_timeout = 200
+    config_exec_timeout = 2000
+    config_args = ["none"]
     prepare_exec = "/home/hk-project-scs/hs2454/custom-executor-slurm-container-test-deploy/src/prepare.sh"
     prepare_args = ["none"]
     prepare_exec_timeout = 200
@@ -87,6 +93,7 @@ shutdown_timeout = 0
     force_kill_timeout = 200
 
 [[runners]]
+  limit = 1
   name = "A HoreKa-based shell executor"
   url = "https://git.scc.kit.edu/"
   id = 4234
@@ -96,7 +103,7 @@ shutdown_timeout = 0
   executor = "shell"
   builds_dir = "/home/hk-project-scs/hs2454/gitlab-runner/builds"
   cache_dir = "/home/hk-project-scs/hs2454/gitlab-runner/cache"
-  environment = ["CI_TEST_CODE=/home/hk-project-scs/hs2454/custom-executor-slurm-container-test-deploy", "DEFAULT_PARTITION=dev_cpuonly"]
+  environment = ["CI_TEST_CODE=/home/hk-project-scs/hs2454/custom-executor-slurm-container-test-deploy", "DEFAULT_PARTITION=dev_cpuonly","CI_WS=/home/hk-project-scs/hs2454/gitlab-runner"]
   [runners.custom_build_dir]
     enabled = true
 
