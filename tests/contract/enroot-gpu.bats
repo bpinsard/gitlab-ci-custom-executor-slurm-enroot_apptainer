@@ -19,6 +19,7 @@ function setup(){
     cp ./tests/contract/test.cu "$TEST_PLAYGROUND"
     cd "$TEST_PLAYGROUND" || exit
 
+    wait_until_file_exists "$HOME/.enroot-gpu-test-jobid" 10
     read -r ENROOT_TEST_JOB_ID < "$HOME/.enroot-gpu-test-jobid"
 }
 
@@ -89,7 +90,9 @@ function teardown_file() {
 
 
 @test "enroot gpu job works without monting /scratch" { 
-    COMMAND=(enroot start --mount "$PWD:$PWD" enroot-gpu-test-container bash -c "cd $PWD && nvcc -o tt ./test.cu && ./tt && echo ok")
+    COMMAND=(enroot start --mount "$PWD:$PWD"
+             enroot-gpu-test-container
+             bash -c "cd $PWD && nvcc -o tt ./test.cu && ./tt && echo ok")
     echo "${COMMAND[@]}" >&3
     srun --jobid "$ENROOT_TEST_JOB_ID" "${COMMAND[@]}"
 }
