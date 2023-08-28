@@ -204,7 +204,7 @@ function submit_to_custom_executor_queue_and_wait() {
     do
         sleep 1
     done
-    if [ -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
+    if [ -f "$DONENAME" ]
     then
         wait_until_file_contains "$OUTPUTNAME" "$JOB_END_SIGNAL" 10
     fi
