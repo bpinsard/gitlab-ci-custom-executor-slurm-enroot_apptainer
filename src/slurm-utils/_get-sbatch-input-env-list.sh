@@ -18,7 +18,7 @@ function get_relevant_lines_from_sbatch_manual() {
     START=$(get_line_from_content "INPUT ENVIRONMENT VARIABLES")
     END=$(get_line_from_content "OUTPUT ENVIRONMENT VARIABLES")
 
-    man sbatch | head -n $((END-1)) | tail -n +$((START+1)) | grep -E '^\s+(SBATCH|SLURM)'
+    MANWIDTH=160 man sbatch | head -n $((END-1)) | tail -n +$((START+1)) | grep -E '^\s+(SBATCH|SLURM)'
 
 }
 
