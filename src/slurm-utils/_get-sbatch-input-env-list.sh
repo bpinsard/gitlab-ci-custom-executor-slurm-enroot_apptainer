@@ -8,7 +8,7 @@
 
 function get_line_from_content() {
     CONTENT=$1
-    man sbatch | grep -n "$CONTENT" | cut -d: -f1
+    MANWIDTH=160 man sbatch | grep -n "$CONTENT" | cut -d: -f1
 }
 
 function get_relevant_lines_from_sbatch_manual() {
