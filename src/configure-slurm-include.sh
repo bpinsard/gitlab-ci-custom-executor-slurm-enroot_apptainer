@@ -151,13 +151,14 @@ function wait_for_job_to_be_ready(){
         if [ $((SECONDS % 20)) -lt 3 ]
         then
             STARTTIME="$(squeue --start --job "$JOB_ID" --format %S | tail -n 1)"
-            echo "$(date) Expected start: $STARTTIME" >&2
             if [ "$STARTTIME" == "START_TIME" ]
             then
-                echo "Error in finding the job start time:"
-                echo sacct -j "$JOB_ID"
-                sacct -j "$JOB_ID"
-                exit "$SYSTEM_FAILURE_EXIT_CODE"
+                echo "Error in finding the job start time:" >&2
+                echo sacct -j "$JOB_ID" >&2
+                sacct -j "$JOB_ID" >&2
+                echo "This feature might be unreliable..." >&2
+            else
+                echo "$(date) Expected start: $STARTTIME" >&2
             fi
         fi
     done
