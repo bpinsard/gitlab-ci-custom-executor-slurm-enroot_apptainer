@@ -66,9 +66,9 @@ function teardown() {
 @test "apptainer executes file in PWD with --bind (exec no salloc)" {
     # we need an allocation for this, unfortunately.
     srun --time 5 \
-        --ntasks 1 \
-        --partition cpuonly \
-        apptainer pull my-image.sif docker://alpine:latest
+         --ntasks 1 \
+         --partition cpuonly \
+         apptainer pull my-image.sif docker://alpine:latest
     SCR="$TEST_PLAYGROUND/script.sh"
     touch "$TEST_PLAYGROUND/afile"
 
@@ -86,7 +86,9 @@ EOF
     # Singularity only mounts /home by default
     # so if by any chance you are using paths in /hkfs/home/
     # they will not be seen inside the container.
-    apptainer exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
+    run apptainer exec --bind "$TEST_PLAYGROUND" my-image.sif "$SCR"
+
+    assert_success
 
     assert_line "This is a test message"
     assert_line "$TEST_PLAYGROUND/afile"
