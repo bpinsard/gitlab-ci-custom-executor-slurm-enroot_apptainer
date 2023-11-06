@@ -8,7 +8,7 @@
 
 function get_line_from_content() {
     CONTENT=$1
-    MANWIDTH=160 man sbatch | grep -n "$CONTENT" | cut -d: -f1
+    MANWIDTH=160 man sbatch 2>/dev/null | grep -n "$CONTENT" | cut -d: -f1 
 }
 
 function get_relevant_lines_from_sbatch_manual() {
@@ -18,7 +18,7 @@ function get_relevant_lines_from_sbatch_manual() {
     START=$(get_line_from_content "INPUT ENVIRONMENT VARIABLES")
     END=$(get_line_from_content "OUTPUT ENVIRONMENT VARIABLES")
 
-    MANWIDTH=160 man sbatch | head -n $((END-1)) | tail -n +$((START+1)) | grep -E '^\s+(SBATCH|SLURM)'
+    MANWIDTH=160 man sbatch 2>/dev/null | head -n $((END-1)) | tail -n +$((START+1)) | grep -E '^\s+(SBATCH|SLURM)'
 
 }
 
