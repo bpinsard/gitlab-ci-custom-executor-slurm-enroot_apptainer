@@ -6,14 +6,14 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-TOWRAP="$1"
-[[ "$TOWRAP" =~ ^/ ]] || { echo "Needs absolute path to script to wrap." >&2; exit 22; }
+SCRIPTFILETOWRAP="$1"
+[[ "$SCRIPTFILETOWRAP" =~ ^/ ]] || { echo "Needs absolute path to script to wrap." >&2; exit 22; }
 
 MOUNTS="--mount $CUSTOM_ENV_CI_WS:$CUSTOM_ENV_CI_WS"
 
-if [[ ! "$TOWRAP" =~ ^"${CUSTOM_ENV_CI_WS}"  ]]
+if [[ ! "$SCRIPTFILETOWRAP" =~ ^"${CUSTOM_ENV_CI_WS}"  ]]
 then
-    MOUNTS="--mount $TOWRAP:$TOWRAP $MOUNTS"
+    MOUNTS="--mount $SCRIPTFILETOWRAP:$SCRIPTFILETOWRAP $MOUNTS"
 fi
 
 if [[ ! "$CUSTOM_ENV_CI_BUILDS_DIR" =~ ^"${CUSTOM_ENV_CI_WS}"  ]]
@@ -42,7 +42,7 @@ COMMAND=(enroot start
          $MOUNTS
          --
          "$CE_CONTAINER_NAME"
-         "$TOWRAP")
+         "$SCRIPTFILETOWRAP")
 "\${COMMAND[@]}"
 status=\$?
 if [[ "\$status" -ne 0 ]]

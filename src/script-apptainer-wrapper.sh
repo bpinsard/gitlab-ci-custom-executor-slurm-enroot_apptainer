@@ -3,8 +3,8 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-TOWRAP="$1"
-[[ "$TOWRAP" =~ ^/ ]] || { echo "Needs absolute path to script to wrap." >&2; exit 22; }
+SCRIPTFILETOWRAP="$1"
+[[ "$SCRIPTFILETOWRAP" =~ ^/ ]] || { echo "Needs absolute path to script to wrap." >&2; exit 22; }
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # shellcheck source=./src/containerlib-apptainer.sh
@@ -29,10 +29,10 @@ set -o nounset
 
 cat <<EOF
 COMMAND=(apptainer exec
-         --bind "$CUSTOM_ENV_CI_WS,$TOWRAP,$CUSTOM_ENV_CI_BUILDS_DIR"
+         --bind "$CUSTOM_ENV_CI_WS,$SCRIPTFILETOWRAP,$CUSTOM_ENV_CI_BUILDS_DIR"
          $CUSTOM_ENV_APPTAINER_EXEC_OPTIONS
          "$CE_IMAGEFILE"
-         "$TOWRAP")
+         "$SCRIPTFILETOWRAP")
 "\${COMMAND[@]}"
 status=\$?
 if [[ "\$status" -ne 0 ]]
