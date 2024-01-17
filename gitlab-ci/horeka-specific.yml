@@ -31,7 +31,7 @@ horeka-mpi-multinode-job-slurm-only:
   stage: test-deploy
   tags:
     - slurm
-    - slurm-only
+    - nocontainer
     - horeka
   variables:
     COMMAND_OPTIONS_SBATCH: "--partition cpuonly -t 20 --ntasks 2 --nodes 2 --ntasks-per-node=1"

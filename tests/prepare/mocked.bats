@@ -52,7 +52,7 @@ function teardown() {
 
 
 @test "prepare uses enroot when enroot is passed as first argument" {
-    prepare.sh enroot
+    prepare.sh enroot useslurm
 
     assert_exists "$MOCKLOGDIR"/enroot.log
 
@@ -60,7 +60,7 @@ function teardown() {
 
 @test "prepare uses apptainer when apptainer is passed as first argument" {
 
-    prepare.sh apptainer
+    prepare.sh apptainer useslurm
 
     assert_exists "$MOCKLOGDIR"/apptainer.log
 
@@ -69,7 +69,7 @@ function teardown() {
 @test "prepare uses the custom executor queue" {
 
 
-    prepare.sh apptainer
+    prepare.sh apptainer useslurm
 
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
@@ -86,7 +86,7 @@ function teardown() {
 
     #shellcheck disable=SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
-    run prepare.sh none
+    run prepare.sh none useslurm
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
@@ -99,7 +99,7 @@ function teardown() {
     CUSTOM_ENV_CI_JOB_IMAGE=""
     #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
-    run prepare.sh none
+    run prepare.sh none useslurm
     assert_output --regexp "Containerisation backend: none"
     )
 }
@@ -108,7 +108,7 @@ function teardown() {
 
     #shellcheck disable=SC2031,SC2030
     export SYSTEM_FAILURE_EXIT_CODE=102
-    run prepare.sh some-random-string
+    run prepare.sh some-random-string useslurm
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "Invalid containerisation backend: some-random-string"
@@ -121,7 +121,7 @@ function teardown() {
     export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
     #shellcheck disable=SC2030
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
-    run prepare.sh apptainer
+    run prepare.sh apptainer useslurm
     assert_success
     assert_output --regexp "image: an-image and variable IMAGEFILE=$CUSTOM_ENV_IMAGEFILE are set at the same time."
 
@@ -135,7 +135,7 @@ function teardown() {
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
     #shellcheck disable=SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
-    run prepare.sh apptainer
+    run prepare.sh apptainer useslurm
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "IMAGEFILE=$CUSTOM_ENV_IMAGEFILE does not exist and image: not specified."
@@ -149,7 +149,7 @@ function teardown() {
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
     touch "$CUSTOM_ENV_IMAGEFILE"
-    run prepare.sh apptainer
+    run prepare.sh apptainer useslurm
     assert_success
     if [ -f  "$MOCKLOGDIR"/apptainer.log ]
     then
@@ -164,7 +164,7 @@ function teardown() {
     export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
-    run prepare.sh apptainer
+    run prepare.sh apptainer useslurm
     assert_success
     assert_exist "$MOCKLOGDIR"/apptainer.log
     cat "$MOCKLOGDIR"/apptainer.log
@@ -179,7 +179,7 @@ function teardown() {
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
     touch "$CUSTOM_ENV_IMAGEFILE"
-    run prepare.sh enroot
+    run prepare.sh enroot useslurm
     assert_exist "$MOCKLOGDIR"/enroot.log
     assert_file_contains "$MOCKLOGDIR"/enroot.log "create --name .* $CUSTOM_ENV_IMAGEFILE"
     run cat "$MOCKLOGDIR"/enroot.log
@@ -192,7 +192,7 @@ function teardown() {
     export CUSTOM_ENV_CI_JOB_IMAGE="an-image"
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/a-file"
-    run prepare.sh enroot
+    run prepare.sh enroot useslurm
     assert_exist "$MOCKLOGDIR"/enroot.log
     cat  "$MOCKLOGDIR"/enroot.log
     assert_file_contains "$MOCKLOGDIR"/enroot.log "import --output $CUSTOM_ENV_IMAGEFILE $CUSTOM_ENV_CI_JOB_IMAGE"

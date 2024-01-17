@@ -17,4 +17,4 @@ export MOCKLOGDIR=$PWD/playground
 
 
 
-"$SRC"/configure-slurm.sh none
+"$SRC"/configure-slurm.sh none useslurm

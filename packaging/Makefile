@@ -1,21 +1,25 @@
-SCRIPTS_SRC_RWX  := src/configure-slurm.sh                                   \
+SCRIPTS_SRC_RWX  := src/configure.sh                                         \
                     src/prepare.sh                                           \
                     src/run.sh                                               \
-                    src/cleanup-slurm.sh
-SCRIPTS_SRC_RW   := src/configure-slurm-include.sh                           \
+                    src/cleanup.sh
+SCRIPTS_SRC_RW   := src/configure-include.sh                                 \
+                    src/configure-slurm-include.sh                           \
+                    src/configure-noslurm-include.sh                         \
+                    src/cleanup-include.sh                                   \
                     src/cleanup-slurm-include.sh                             \
-                    src/cleanup-apptainer.sh                               \
+                    src/cleanup-apptainer.sh                                 \
                     src/cleanup-enroot.sh                                    \
                     src/custom_executor_queue.sh                             \
                     src/containerlib-enroot.sh                               \
-                    src/containerlib-apptainer.sh                          \
+                    src/containerlib-apptainer.sh                            \
                     src/include.sh                                           \
+                    src/slurm-include.sh                                     \
                     src/job.slurm.template                                   \
                     src/prepare-enroot.sh                                    \
-                    src/prepare-apptainer.sh                               \
+                    src/prepare-apptainer.sh                                 \
                     src/run-include.sh                                       \
                     src/script-enroot-wrapper.sh                             \
-                    src/script-apptainer-wrapper.sh                        \
+                    src/script-apptainer-wrapper.sh                          \
                     src/slurm-utils/get-sbatch-input-env-list.sh             \
                     src/slurm-utils/_get-sbatch-input-env-list.sh
 SCRIPTS_UTILS_RWX := utils/gitlab-runner-register-wrapper.sh

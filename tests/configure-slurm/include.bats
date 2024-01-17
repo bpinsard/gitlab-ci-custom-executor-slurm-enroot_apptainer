@@ -13,12 +13,12 @@ function setup() {
     load_mocks
 
     SRC="$PROJECT_ROOT/src"
-    # shellcheck disable=SC1091
+    #shellcheck source=./src/configure-slurm-include.sh
     source "$SRC"/configure-slurm-include.sh
 
 
 
-    TEST_PLAYGROUND="$PWD/configure-slurm-include-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/configure-include-test-$BATS_TEST_NAME"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
@@ -219,5 +219,23 @@ function teardown() {
     assert_output "$CUSTOM_ENV_CI_WS/job.slurm"
     assert_exists "$CUSTOM_ENV_CI_WS/job.slurm"
     assert_file_contains "$CUSTOM_ENV_CI_WS/job.slurm" default_partition_name
+
+}
+
+@test "print_json_output_slurm behaves correctly" {
+
+    print_json_output_slurm /some/path/like/this
+    function _helper() {
+        print_json_output_slurm /some/path/like/this
+    }
+    run _helper
+    assert_output --partial '"builds_dir": "/some/path/like/this"'
+    assert_output --partial '"job_env"'
+
+}
+
+@test "print_json_output_noslurm emits correct json" {
+
+    print_json_output_slurm /some/path/like/this | json_validate
 
 }

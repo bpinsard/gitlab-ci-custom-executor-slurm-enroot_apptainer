@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-# shellcheck source=./src/include.sh
-source "$SRC/include.sh"
+
 
 function get_abs_path(){
     echo "$(export CDPATH=""; cd "$(dirname "$1")" || exit; pwd)"/"$(basename "$1")"

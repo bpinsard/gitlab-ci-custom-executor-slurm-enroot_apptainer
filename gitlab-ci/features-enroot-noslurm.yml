@@ -1,0 +1,63 @@
+
+minimal-job-enroot-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - enroot
+  script:
+    - echo "Test Test"
+    - env | sort
+
+image-job-enroot-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  image: docker://debian:latest
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - enroot
+  script:
+    - echo "Test Test using an image"
+    - grep PRETTY /etc/os-release
+    - env | sort
+
+artifact-job-enroot-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - enroot
+  script: touch test-artifact.txt
+  artifacts:
+    paths:
+      - test-artifact.txt
+
+artifact-image-job-enroot-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  image: docker://debian:latest
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - enroot
+  script: cp /etc/os-release test-artifact-image.txt
+  artifacts:
+    paths:
+      - test-artifact-image.txt
+
+
+
+env-job-enroot-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    - noslurm
+    - enroot
+  variables:
+    ENV_VAR_1: 55
+  script:
+    - env | grep ENV_VAR_1
+    - test $ENV_VAR_1 -eq 55

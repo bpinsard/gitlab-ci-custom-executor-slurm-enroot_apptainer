@@ -2,9 +2,9 @@
 
 
 function get_slurm_default_partition() {
-   set -o pipefail
-   { scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2; } || echo dev_cpuonly
-   set +o pipefail
+    set -o pipefail
+    { scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2; } || echo dev_cpuonly
+    set +o pipefail
 }
 
 function setup() {
@@ -28,7 +28,7 @@ function setup() {
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
-    URL_DEFAULT="https://git.scc.kit.edu/"
+    URL_DEFAULT="https://gitlab.kit.edu/"
 
     MOCK_INPUTS=(url
                  token
@@ -38,6 +38,7 @@ function setup() {
                  cache_dir
                  ci_ws
                  default-partition
+                 yes # use slurm
                 )
 
 }
@@ -99,7 +100,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --name 'a_fake_name' \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-name=a_fake_name'
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-name=a_fake_name'
 
 }
 
@@ -114,7 +115,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --ce-repo '/this/path' \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'config-exec.*/this/path'
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'config-exec.*/this/path'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'prepare-exec.*/this/path'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'run-exec.*/this/path'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log 'cleanup-exec.*/this/path'
@@ -123,7 +124,7 @@ function teardown() {
 
 @test "accepts --container-backend and passes it to gitlab-runner register" {
 
- for mock_datum in "${MOCK_INPUTS[@]}"
+    for mock_datum in "${MOCK_INPUTS[@]}"
     do
         if [[ "$mock_datum" != "enroot" ]]
         then
@@ -132,7 +133,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --container-backend 'enroot' \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-config-args.*enroot'
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-config-args.*enroot'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*enroot'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*enroot'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*enroot'
@@ -141,7 +142,7 @@ function teardown() {
 
 @test "accepts 'none' as --container-backend and passes it to gitlab-runner register" {
 
- for mock_datum in "${MOCK_INPUTS[@]}"
+    for mock_datum in "${MOCK_INPUTS[@]}"
     do
         if [[ "$mock_datum" != "enroot" ]]
         then
@@ -150,13 +151,50 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --container-backend 'none' \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-config-args.*none'
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-config-args.*none'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*none'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*none'
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*none'
 
 
 }
+
+@test "acccepts --use-slurm as an argument" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --use-slurm yes
+
+}
+
+@test "useslurm used as argument for config when useslurm=yes" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-config-args.*useslurm'
+
+}
+
+@test "noslurm used as argument for config when useslurm=no" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "yes" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --use-slurm no
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-config-args.*noslurm'
+
+}
+
+
+
 
 
 @test "accepts --cache-dir-base and passes it to gitlab-runner register" {
@@ -170,7 +208,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --cache-dir-base "$TEST_PLAYGROUND/this/other/cache/dir" \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-cache-dir=$TEST_PLAYGROUND/this/other/cache/dir"
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-cache-dir=$TEST_PLAYGROUND/this/other/cache/dir"
 
 }
 
@@ -185,7 +223,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --ci-ws "$TEST_PLAYGROUND/this/other/directory" \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-env CI_WS=$TEST_PLAYGROUND/this/other/directory"
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-env CI_WS=$TEST_PLAYGROUND/this/other/directory"
 
 }
 
@@ -200,8 +238,8 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --default-partition 'a-default-partition' \
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
-                         '\-\-env DEFAULT_PARTITION=a-default-partition'
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+            '\-\-env DEFAULT_PARTITION=a-default-partition'
 
 }
 
@@ -215,6 +253,96 @@ function teardown() {
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-exec=.*/prepare.sh'
 
 }
+
+@test "useslurm used as argument for prepare" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "enroot" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --container-backend 'none' \
+
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*useslurm'
+
+}
+
+@test "noslurm used as argument for prepare when useslurm=no" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "yes" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --use-slurm no
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-prepare-args.*noslurm'
+
+}
+
+@test "useslurm used as argument for run" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "enroot" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --container-backend 'none' \
+
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*useslurm'
+
+}
+
+@test "noslurm used as argument for run when useslurm=no" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "yes" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --use-slurm no
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-run-args.*noslurm'
+
+}
+
+
+@test "useslurm used as argument for cleanup" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "enroot" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --container-backend 'none' \
+
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*useslurm'
+
+}
+
+@test "noslurm used as argument for cleanup when useslurm=no" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "yes" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --use-slurm no
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log '\-\-custom-cleanup-args.*noslurm'
+
+}
+
+
 
 @test "complains if bad option is passed" {
 
@@ -245,7 +373,7 @@ function teardown() {
     do
         if [[ "$mock_datum" != "url" ]]
         then
-            echo "$mock_datum"
+        echo "$mock_datum"
         else
             echo
         fi
@@ -261,13 +389,13 @@ function teardown() {
     do
         if [[ "$mock_datum" != "cerepo" ]]
         then
-            echo "$mock_datum"
+        echo "$mock_datum"
         else
             echo
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-custom-config-exec=$PROJECT_ROOT/src/configure-slurm.sh"
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log "\-\-custom-config-exec=$PROJECT_ROOT/src/configure.sh"
 
 }
 
@@ -277,7 +405,7 @@ function teardown() {
     do
         if [[ "$mock_datum" != "cache_dir" ]]
         then
-            echo "$mock_datum"
+        echo "$mock_datum"
         else
             echo
         fi
@@ -293,7 +421,7 @@ function teardown() {
     do
         if [[ "$mock_datum" != "ci_ws" ]]
         then
-            echo "$mock_datum"
+        echo "$mock_datum"
         else
             echo
         fi
@@ -309,7 +437,7 @@ function teardown() {
     do
         if [[ "$mock_datum" != "default-partition" ]]
         then
-            echo "$mock_datum"
+        echo "$mock_datum"
         else
             echo
         fi
@@ -318,7 +446,7 @@ function teardown() {
 
     SLURM_PARTITION_DEFAULT="$(get_slurm_default_partition)"
     assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
-                         "\-\-env DEFAULT_PARTITION=$SLURM_PARTITION_DEFAULT"
+        "\-\-env DEFAULT_PARTITION=$SLURM_PARTITION_DEFAULT"
 
 }
 @test "systemctl --user restart gitlab-runner.service is NOT called" {
@@ -398,9 +526,9 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --cache-dir-base "$TEST_PLAYGROUND/this/other/cache/dir" \
 
-    # the proper gitlab-runner option is still --cache-dir
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
-                         "\-\-cache-dir=$TEST_PLAYGROUND/this/other/cache/dir/enroot"
+        # the proper gitlab-runner option is still --cache-dir
+        assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+            "\-\-cache-dir=$TEST_PLAYGROUND/this/other/cache/dir/enroot"
 }
 
 @test "cache-dir is created if it does not exist" {
@@ -417,7 +545,7 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --cache-dir-base "$CACHE_DIR" \
 
-    assert_dir_exists "$CACHE_DIR"
+        assert_dir_exists "$CACHE_DIR"
 
 }
 
@@ -435,6 +563,34 @@ function teardown() {
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --ci-ws "$CI_WS" \
 
-    assert_dir_exists "$CI_WS"
+        assert_dir_exists "$CI_WS"
+
+}
+@test "--use-slurm mentioned in the help" {
+
+    run "$UTILS"/gitlab-runner-register-wrapper.sh --help
+
+    assert_output --partial "--use-slurm"
+
+
+}
+
+@test "if --use-slurm no is used, do not add the default partition ENV" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "yes" ]]
+        then
+        echo "$mock_datum"
+        fi
+
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --use-slurm no \
+
+
+    assert_file_not_contains "$MOCKLOGDIR"/gitlab-runner.log \
+            "\-\-env DEFAULT_PARTITION"
+
+
 
 }

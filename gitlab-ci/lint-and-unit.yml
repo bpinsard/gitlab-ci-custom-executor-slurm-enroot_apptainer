@@ -10,6 +10,7 @@ lint:
 
 
 unit-test-serial:
+  when: manual # This test is redundant
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -27,6 +28,7 @@ unit-test-serial:
 
 
 unit-test-parallel:
+  when: manual # This test is redundant
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive

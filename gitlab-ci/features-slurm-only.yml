@@ -4,7 +4,7 @@ minimal-job-slurm-only:
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
-    - slurm-only
+    - nocontainer
   script:
     - echo "Test Test"
     - env | sort
@@ -15,7 +15,7 @@ artifact-job-slurm-only:
   tags:
     # This needs to match the tag of the test custom executor
     - slurm
-    - slurm-only
+    - nocontainer
   script: touch test-artifact.txt
   artifacts:
     paths:
@@ -26,7 +26,7 @@ env-job-slurm-only:
   stage: test-deploy
   tags:
     - slurm
-    - slurm-only
+    - nocontainer
   variables:
     ENV_VAR_1: 55
   script:

@@ -1,0 +1,74 @@
+minimal-job-apptainer-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - apptainer
+  script:
+    - echo "Test Test"
+    - env | sort
+
+image-job-apptainer-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  image: docker://debian:latest
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - apptainer
+  script:
+    - echo "Test Test using an image"
+    - grep PRETTY /etc/os-release
+    - env | sort
+
+artifact-job-apptainer-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - apptainer
+  script: touch test-artifact.txt
+  artifacts:
+    paths:
+      - test-artifact.txt
+
+artifact-image-job-apptainer-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  image: docker://debian:latest
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - apptainer
+  script: cp /etc/os-release test-artifact-image.txt
+  artifacts:
+    paths:
+      - test-artifact-image.txt
+
+
+env-job-apptainer-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    - noslurm
+    - apptainer
+  variables:
+    ENV_VAR_1: 55
+  script:
+    - env | grep ENV_VAR_1
+    - test $ENV_VAR_1 -eq 55
+
+apptainer-exec-options-test-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  image: docker://debian:latest
+  tags:
+    - noslurm
+    - apptainer
+  variables:
+    APPTAINER_EXEC_OPTIONS: "--env THEANSWER=42"
+  script:
+    - echo $THEANSWER
+    - test $THEANSWER -eq 42

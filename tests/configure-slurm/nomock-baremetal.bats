@@ -45,6 +45,9 @@ EOF
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
     export CUSTOM_ENV_CI_CONCURRENT_ID=42
 
+    SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
+    export SLURM_DEFAULT_PARTITION
+
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
       # If we are in a testing environment,
@@ -54,12 +57,14 @@ EOF
     fi
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
+      export CUSTOM_ENV_DEFAULT_PARTITION="$SLURM_DEFAULT_PARTITION"
+    fi
+    if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
+    then
       echo "# Error:CUSTOM_ENV_DEFAULT_PARTITION not defined" >&3
       false
     fi
 
-    SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
-    export SLURM_DEFAULT_PARTITION
 
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env
 
@@ -90,10 +95,12 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 1 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
+    # shellcheck disable=SC2031
+    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | python3 get_workspace.py)
     cat config-output
-    # shellcheck source=./src/include.sh
-    source "$SRC/include.sh"
+    # shellcheck disable=SC2031
+    # shellcheck source=./src/slurm-include.sh
+    source "$SRC/slurm-include.sh"
     JOB_ID="$(get_slurm_jobid "$WORKSPACE")"
 
 
@@ -118,10 +125,12 @@ function teardown() {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 3 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
+    # shellcheck disable=SC2031
+    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | python3 get_workspace.py)
     cat config-output
-    # shellcheck source=./src/include.sh
-    source "$SRC/include.sh"
+    # shellcheck disable=SC2031
+    # shellcheck source=./src/slurm-include.sh
+    source "$SRC/slurm-include.sh"
     JOB_ID="$(get_slurm_jobid "$WORKSPACE")"
 
 
@@ -200,10 +209,12 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 2 -n 1"
-    WORKSPACE=$("$SRC"/configure-slurm.sh none | tee config-output | python3 get_workspace.py)
+    # shellcheck disable=SC2031
+    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | python3 get_workspace.py)
     cat config-output
-    # shellcheck source=./src/include.sh
-    source "$SRC/include.sh"
+    # shellcheck disable=SC2031
+    # shellcheck source=./src/slurm-include.sh
+    source "$SRC/slurm-include.sh"
     JOB_ID="$(get_slurm_jobid "$WORKSPACE")"
 
     # scontrol is slow, so it might query the job information

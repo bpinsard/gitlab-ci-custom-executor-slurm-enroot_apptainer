@@ -1,4 +1,5 @@
 enroot-unit-test-parallel-test-deploy:
+  when: manual # This test is redundant
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive

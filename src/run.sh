@@ -1,27 +1,39 @@
 #!/usr/bin/env bash
 
-if [[ "$#" -ne 3 ]]
+if [[ "$#" -ne 4 ]]
 then
-    echo "Usage: run.sh <containerisation_backend> <script> <stepname>" >&2
+    echo "Usage: run.sh <containerisation_backend> <{use,no}slurm> <script> <stepname>" >&2
     exit "$SYSTEM_FAILURE_EXIT_CODE"
 fi
 
 CONTAINERISATION_BACKEND="${1}"
-ORIGINAL_SCRIPT="${2}"
-STEPNAME="${3}"
-echo "[RUN] Running script:$2 step:$3 on backend:$1"
+USESLURM="${2}"
+ORIGINAL_SCRIPT="${3}"
+STEPNAME="${4}"
 
-if [[ -z "$CE_QUEUE_WORKSPACE" ]]
-then
-    echo "[RUN] CE_QUEUE_WORKSPACE not defined." >&2
-    exit "$SYSTEM_FAILURE_EXIT_CODE"
-fi
+echo "[RUN] Running script:$ORIGINAL_SCRIPT step:$STEPNAME on backend:$1 ($2)"
 
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # shellcheck source=./src/run-include.sh
 source "$SRC"/run-include.sh
+
+if [[ "$USESLURM" == "useslurm" ]]
+then
+    if [[ -z "$CE_QUEUE_WORKSPACE" ]]
+    then
+        echo "[RUN] CE_QUEUE_WORKSPACE not defined." >&2
+        exit "$SYSTEM_FAILURE_EXIT_CODE"
+    fi
+    # shellcheck source=./src/slurm-include.sh
+    source "$SRC/slurm-include.sh"
+elif [[ "$USESLURM" == "noslurm" ]]
+then
+
+    # shellcheck source=./src/include.sh
+    source "$SRC/include.sh"
+fi
 
 echo -n "[RUN] "; validate_containerisation_backend \
                      "$CONTAINERISATION_BACKEND" \
@@ -54,8 +66,17 @@ then
 
         F="$WRAPPER_NAME"
 
+
+        if [[ "$USESLURM" == "useslurm" ]]
+        then
+           PATH_TO_USE=$CE_QUEUE_WORKSPACE
+        elif [[ "$USESLURM" == "noslurm" ]]
+        then
+           PATH_TO_USE=$CUSTOM_ENV_CI_WS
+        fi
+
         _BNAME="$(basename "$ORIGINAL_SCRIPT")"
-        SCRIPT=$(mktemp "$CE_QUEUE_WORKSPACE/cp-XXXXXX${_BNAME}")
+        SCRIPT=$(mktemp "$PATH_TO_USE/cp-XXXXXX${_BNAME}")
         cat "$ORIGINAL_SCRIPT" > "$SCRIPT"
         chmod +x "$SCRIPT"
 
@@ -84,14 +105,8 @@ else
     SCRIPT="$ORIGINAL_SCRIPT"
 fi
 
-# shellcheck source=./src/custom_executor_queue.sh
-source "$SRC/custom_executor_queue.sh"
-# shellcheck disable=SC1091
-source "$CE_QUEUE_WORKSPACE/.env"
-
 WRAPPED="$("$F" "$SCRIPT")"
 
-echo "[RUN] Submitting wrapped script ($WRAPPED) to custom executor queue..."
 echo "[RUN] Wrap to be executed (credentials redacted):" >&2
 if [[ "$WRAPPED" == "$ORIGINAL_SCRIPT" ]]
 then
@@ -101,7 +116,19 @@ else
 fi
 
 echo "[RUN] Output:" >&2
-submit_to_custom_executor_queue_and_wait "$WRAPPED" "JOB_$CUSTOM_ENV_CI_JOB_ID"
+if [[ "$USESLURM" ==  "useslurm" ]]
+then
+    echo "[RUN] Submitting wrapped script ($WRAPPED) to custom executor queue..."
+    # shellcheck source=./src/custom_executor_queue.sh
+    source "$SRC/custom_executor_queue.sh"
+    # shellcheck disable=SC1091
+    source "$CE_QUEUE_WORKSPACE/.env"
+    submit_to_custom_executor_queue_and_wait "$WRAPPED" "JOB_$CUSTOM_ENV_CI_JOB_ID"
+elif [[ "$USESLURM" == "noslurm" ]]
+then
+    "$WRAPPED" "JOB_$CUSTOM_ENV_CI_JOB_ID"
+fi
+
 EXIT_CODE=$?
 echo "[RUN] Exit code: $EXIT_CODE" >&2
 echo "[RUN] End of Output:" >&2

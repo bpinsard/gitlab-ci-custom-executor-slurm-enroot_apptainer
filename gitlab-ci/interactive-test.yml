@@ -9,7 +9,7 @@ interactive-test:
   stage: test-deploy
   tags:
     - slurm
-    - slurm-only
+    - nocontainer
   script: |
     for i in $(seq 1 1 10)
     do
