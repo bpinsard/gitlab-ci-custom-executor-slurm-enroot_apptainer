@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+
+function setup() {
+    load '../test_helper/bats-support/load' # for run
+    load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test_helper/bats-file/load' # for file-based operations
+    load '../test-utils'
+    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME" )/../.." > /dev/null 2>&1 && pwd)"
+
+    # To make scripts in /src available for sourcing
+    # and loading, and also make the sbatch mock available.
+    load_mocks
+    SRC="$PROJECT_ROOT"/src
+
+    TEST_PLAYGROUND="$PWD/cleanup-test-sing-mocked-$BATS_TEST_NAME"
+    echo "# Creating test playground at $TEST_PLAYGROUND" >&3
+    mkdir "$TEST_PLAYGROUND"
+
+    export MOCKLOGDIR=$TEST_PLAYGROUND
+
+    STARTDIR="${TEST_PLAYGROUND}"/start
+    mkdir -p "$STARTDIR"
+    cd "$STARTDIR" || exit
+
+    export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
+    export CUSTOM_ENV_CI_CONCURRENT_ID=42
+    export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
+    export CUSTOM_ENV_CI_JOB_ID=54321
+    export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
+    echo "Test setup phase completed."
+
+
+    # shellcheck disable=SC1090
+    source <( "$SRC/configure.sh" apptainer noslurm 3> /dev/null | read-job-env.py )
+
+
+}
+
+function teardown() {
+    rm -rf "$TEST_PLAYGROUND"
+}
+
+
+@test "cleanup removes apptainer image (noslurm)" {
+
+    # This test requires that apptainer is invoked
+    "$SRC/prepare-apptainer.sh"
+
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CE_DEBUG=
+    "$SRC/cleanup.sh" apptainer noslurm
+
+    # shellcheck source=./src/containerlib-apptainer.sh
+    source "$SRC"/containerlib-apptainer.sh
+
+    assert_not_exists "$CE_IMAGEFILE"
+
+}
+
+@test "cleanup does not call apptainer at all when image not needed (noslurm)" {
+
+    (
+        # shellcheck disable=SC2030
+        export CUSTOM_ENV_CI_JOB_IMAGE=""
+        "$SRC/cleanup.sh" apptainer noslurm
+        assert_not_exists "$MOCKLOGDIR/apptainer.log"
+    )
+}
+
+@test "apptainer image should not be removed if CUSTOM_ENV_CE_DEBUG is set (noslurm)" {
+    (
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-apptainer.sh"
+
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG=1
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-apptainer"
+
+
+    "$SRC/cleanup.sh" apptainer noslurm
+
+    # shellcheck source=./src/containerlib-apptainer.sh
+    source "$SRC"/containerlib-apptainer.sh
+
+    assert_exists "$CE_IMAGEFILE"
+    )
+}
+
+@test "when CUSTOM_ENV_IMAGEFILE is defined, that file is not deleted (noslurm)" {
+
+    #shellcheck disable=SC2030
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE=""
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-apptainer.sh"
+
+    echo "Prepared..."
+
+    touch "$CUSTOM_ENV_IMAGEFILE"
+
+    run "$SRC/cleanup.sh" apptainer noslurm
+
+    echo "Cleaned."
+    assert_exists "$CUSTOM_ENV_IMAGEFILE"
+
+}
+
+@test "when IMAGEFILE and CI_JOB_IMAGE are defined, IMAGEFILE is not deleted (noslurm)" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
+    #shellcheck disable=SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE="docker://debian:latest"
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-apptainer.sh"
+
+    echo "Prepared..."
+
+    touch "$CUSTOM_ENV_IMAGEFILE"
+
+    run "$SRC/cleanup.sh" apptainer noslurm
+
+    echo "Cleaned."
+    assert_exists "$CUSTOM_ENV_IMAGEFILE"
+    assert_output --partial "Not Removing"
+
+}

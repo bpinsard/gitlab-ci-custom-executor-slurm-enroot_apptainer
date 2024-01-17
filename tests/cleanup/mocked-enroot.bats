@@ -32,7 +32,7 @@ function setup() {
 
 
     # shellcheck disable=SC1090
-    source <( "$SRC/configure-slurm.sh" enroot 3> /dev/null | read-job-env.py )
+    source <( "$SRC/configure.sh" enroot useslurm 3> /dev/null | read-job-env.py )
 
 
 }
@@ -69,7 +69,7 @@ function teardown_file(){
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=
-    "$SRC/cleanup-slurm.sh" enroot
+    "$SRC/cleanup.sh" enroot useslurm
 
     # Out mock is not so clever, this does not work.
     # _helper(){ enroot list | wc -l; }
@@ -95,7 +95,7 @@ function teardown_file(){
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CE_DEBUG=
-    "$SRC/cleanup-slurm.sh" enroot
+    "$SRC/cleanup.sh" enroot useslurm
 
     # Out mock is not so clever, this does not work.
     # _helper(){ enroot list | wc -l; }
@@ -119,7 +119,7 @@ function teardown_file(){
         export CUSTOM_ENV_CI_JOB_IMAGE=""
         # shellcheck disable=SC1091
         source "$CE_QUEUE_WORKSPACE/.env"
-        "$SRC/cleanup-slurm.sh" enroot
+        "$SRC/cleanup.sh" enroot useslurm
         assert_not_exists "$MOCKLOGDIR/enroot.log"
     )
 }
@@ -138,7 +138,7 @@ function teardown_file(){
 
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
-    "$SRC/cleanup-slurm.sh" enroot
+    "$SRC/cleanup.sh" enroot useslurm
 
     run cat "$MOCKLOGDIR/enroot.log"
     refute_line --regexp "\sremove\s"

@@ -144,7 +144,7 @@ a number of tests of the deployed executors.
 These try to test different features of the executor,
 e.g. the production of artifacts, usage of containers,
 multi-node mpi jobs and some combinations of these
-for the Singularity/Apptainer, Enroot and "SLURM-only" 
+for the Singularity/Apptainer, Enroot and "nocontainer" 
 flavours of the executor.
 
 At the beginning of the pipeline,
@@ -280,7 +280,7 @@ Detailed setup steps:
   - the runner registered with the `enroot` backend
     must have `enroot, slurm, horeka` tags,
   - the runner registered with the `none` backend
-    must have `slurm, slurm-only, horeka` tag.
+    must have `slurm, nocontainer, horeka` tag.
   
   If the pipeline is run on BWUniCluster 2.0,
   the `horeka` tag should be changed to `bwuc2`

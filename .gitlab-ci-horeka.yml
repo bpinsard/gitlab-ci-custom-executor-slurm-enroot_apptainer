@@ -3,8 +3,10 @@ stages:
   - test
   - packaging
   - deploy
+  - test-deploy-noslurm
   - test-deploy
   - test-deploy-serial-none
+  - test-deploy-serial-noslurm-none
   - test-deploy-serial-enroot
   - test-deploy-serial-apptainer
   - bats-cleanup
@@ -24,5 +26,9 @@ include:
   - '/gitlab-ci/bootstrap-slurm-only.yml'
   - '/gitlab-ci/bootstrap-enroot.yml'
   - '/gitlab-ci/bootstrap-apptainer.yml'
+  - '/gitlab-ci/features-enroot-noslurm.yml'
+  - '/gitlab-ci/features-apptainer-noslurm.yml'
+  - '/gitlab-ci/features-noslurm-nocontainer.yml'
+  - '/gitlab-ci/bootstrap-noslurm-nocontainer.yml'
   - '/gitlab-ci/horeka-specific.yml'
   - '/gitlab-ci/joker.yml'

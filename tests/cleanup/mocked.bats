@@ -32,7 +32,7 @@ function setup() {
 
 
     # shellcheck disable=SC1090
-    source <( "$SRC/configure-slurm.sh" none 3> /dev/null | read-job-env.py )
+    source <( "$SRC/configure.sh" none useslurm 3> /dev/null | read-job-env.py )
 
     (
         # shellcheck source=./src/containerlib-enroot.sh
@@ -83,7 +83,7 @@ function teardown_file(){
 
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
-    "$SRC/cleanup-slurm.sh" enroot
+    "$SRC/cleanup.sh" enroot useslurm
 
     assert_dir_not_exists "$CUSTOM_ENV_CI_WS/cews_10"
     assert_dir_exists "$CUSTOM_ENV_CI_WS/cews_11"
@@ -111,7 +111,7 @@ function teardown_file(){
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=1
-    "$SRC/cleanup-slurm.sh" enroot
+    "$SRC/cleanup.sh" enroot useslurm
 
     assert_dir_exists "$HOME/ce-debug/cews_10"
     assert_dir_not_exists "$HOME/ce-debug/cews_11"
@@ -126,7 +126,7 @@ function teardown_file(){
     export SYSTEM_FAILURE_EXIT_CODE=102
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
-    run "$SRC/cleanup-slurm.sh" nonexisting-backend
+    run "$SRC/cleanup.sh" nonexisting-backend useslurm
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "Invalid containerisation backend: nonexisting-backend"
@@ -139,7 +139,7 @@ function teardown_file(){
     export SYSTEM_FAILURE_EXIT_CODE=102
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
-    run "$SRC/cleanup-slurm.sh" none
+    run "$SRC/cleanup.sh" none useslurm
     assert_success
 }
 
@@ -149,7 +149,7 @@ function teardown_file(){
     export SYSTEM_FAILURE_EXIT_CODE=102
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
-    run "$SRC/cleanup-slurm.sh" none
+    run "$SRC/cleanup.sh" none useslurm
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
@@ -162,7 +162,7 @@ function teardown_file(){
     echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=987654321" >> "$CE_QUEUE_WORKSPACE/.env"
 
     export CUSTOM_ENV_KILL_SLURM=1
-    "$SRC/cleanup-slurm.sh" enroot
+    "$SRC/cleanup.sh" enroot useslurm
 
     assert_exists "$MOCKLOGDIR/scancel.log"
     cat "$MOCKLOGDIR/scancel.log"
@@ -180,7 +180,7 @@ function teardown_file(){
 
     # shellcheck disable=SC2031
     export CUSTOM_ENV_CE_DEBUG=1
-    "$SRC/cleanup-slurm.sh" enroot
+    "$SRC/cleanup.sh" enroot useslurm
 
     assert_dir_exists "$HOME/ce-debug/cews_0"
 
@@ -212,7 +212,7 @@ EOF
     JOBSUBNAME1="$(basename "$TODONAME1")"
     JOBSUBNAME2="$(basename "$TODONAME2")"
 
-    "$SRC/cleanup-slurm.sh" enroot
+    "$SRC/cleanup.sh" enroot useslurm
 
     # 2 seconds more for safety
     sleep "$CUSTOM_EXECUTOR_QUEUE_CYCLETIME" 2
@@ -234,7 +234,7 @@ EOF
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
 
-    run "$SRC/cleanup-slurm.sh" enroot
+    run "$SRC/cleanup.sh" enroot useslurm
     assert_success
     assert_not_exists "$MOCKLOGDIR/enroot.log"
 

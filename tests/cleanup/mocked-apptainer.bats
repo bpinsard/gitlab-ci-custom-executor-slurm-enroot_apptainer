@@ -31,7 +31,7 @@ function setup() {
 
 
     # shellcheck disable=SC1090
-    source <( "$SRC/configure-slurm.sh" apptainer 3> /dev/null | read-job-env.py )
+    source <( "$SRC/configure.sh" apptainer useslurm 3> /dev/null | read-job-env.py )
 
 
 }
@@ -68,7 +68,7 @@ function teardown_file(){
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG=
-    "$SRC/cleanup-slurm.sh" apptainer
+    "$SRC/cleanup.sh" apptainer useslurm
 
     # shellcheck source=./src/containerlib-apptainer.sh
     source "$SRC"/containerlib-apptainer.sh
@@ -87,7 +87,7 @@ function teardown_file(){
         export CUSTOM_ENV_CI_JOB_IMAGE=""
         # shellcheck disable=SC1091
         source "$CE_QUEUE_WORKSPACE/.env"
-        "$SRC/cleanup-slurm.sh" apptainer
+        "$SRC/cleanup.sh" apptainer useslurm
         assert_not_exists "$MOCKLOGDIR/apptainer.log"
     )
 }
@@ -108,7 +108,7 @@ function teardown_file(){
     # shellcheck disable=SC1091
     source "$CE_QUEUE_WORKSPACE/.env"
 
-    "$SRC/cleanup-slurm.sh" apptainer
+    "$SRC/cleanup.sh" apptainer useslurm
 
     # shellcheck source=./src/containerlib-apptainer.sh
     source "$SRC"/containerlib-apptainer.sh
@@ -134,7 +134,7 @@ function teardown_file(){
 
     touch "$CUSTOM_ENV_IMAGEFILE"
 
-    run "$SRC/cleanup-slurm.sh" apptainer
+    run "$SRC/cleanup.sh" apptainer useslurm
 
     echo "Cleaned."
     assert_exists "$CUSTOM_ENV_IMAGEFILE"
@@ -158,7 +158,7 @@ function teardown_file(){
 
     touch "$CUSTOM_ENV_IMAGEFILE"
 
-    run "$SRC/cleanup-slurm.sh" apptainer
+    run "$SRC/cleanup.sh" apptainer useslurm
 
     echo "Cleaned."
     assert_exists "$CUSTOM_ENV_IMAGEFILE"

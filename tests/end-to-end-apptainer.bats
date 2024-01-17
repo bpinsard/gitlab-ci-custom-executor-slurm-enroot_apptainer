@@ -20,8 +20,8 @@ function setup(){
 
     JOB_ENV_READER="$PROJECT_ROOT"/tests/mocks/bin/read-job-env.py
 
-    # shellcheck source=./src/include.sh
-    source "$SRC/include.sh"
+    # shellcheck source=./src/slurm-include.sh
+    source "$SRC/slurm-include.sh"
 
     TEST_PLAYGROUND="$PWD/end-to-end-test-apptainer-$BATS_TEST_NAME"
     assert_dir_not_exists "$TEST_PLAYGROUND"
@@ -55,6 +55,10 @@ function setup(){
     fi
     if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
     then
+      export CUSTOM_ENV_DEFAULT_PARTITION="$SLURM_DEFAULT_PARTITION"
+    fi
+    if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
+    then
       echo "Error:CUSTOM_ENV_DEFAULT_PARTITION not defined"
       exit 1
     fi
@@ -74,7 +78,7 @@ function teardown() {
 # bats test_tags=configure,prepare,cleanup
 @test "configure, prepare, and cleanup" {
 
-    "$SRC"/configure-slurm.sh  apptainer | "$JOB_ENV_READER" > ./job-env
+    "$SRC"/configure.sh apptainer useslurm | "$JOB_ENV_READER" > ./job-env
 
     assert_exists ./job-env
     assert_file_contains ./job-env "CE_QUEUE_WORKSPACE"
@@ -95,9 +99,9 @@ function teardown() {
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
 
-    "$SRC"/prepare.sh apptainer
+    "$SRC"/prepare.sh apptainer useslurm
 
-    "$SRC"/cleanup-slurm.sh apptainer
+    "$SRC"/cleanup.sh apptainer useslurm
 
     run _helper
     assert_failure
@@ -106,7 +110,7 @@ function teardown() {
 # bats test_tags=configure,prepare,cleanup,run
 @test "configure, prepare, run and cleanup run a simple script" {
 
-    "$SRC"/configure-slurm.sh apptainer | "$JOB_ENV_READER" > ./job-env
+    "$SRC"/configure.sh apptainer useslurm | "$JOB_ENV_READER" > ./job-env
 
     assert_exists ./job-env
     assert_file_contains ./job-env "CE_QUEUE_WORKSPACE"
@@ -123,7 +127,7 @@ function teardown() {
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
     echo "Preparing job... "
-    "$SRC"/prepare.sh apptainer
+    "$SRC"/prepare.sh apptainer useslurm
     echo "done."
     assert_dir_exists "$CUSTOM_ENV_CI_WS/.apptainer"
 
@@ -135,7 +139,7 @@ EOF
     chmod +x "$STARTDIR"/get_sources_script.sh
 
     echo "Running get_sources... "
-    run "$SRC"/run.sh apptainer "$STARTDIR"/get_sources_script.sh get_sources
+    run "$SRC"/run.sh apptainer useslurm "$STARTDIR"/get_sources_script.sh get_sources
     echo "done."
 
     echo "Job log - after get-sources:"
@@ -156,7 +160,7 @@ EOF
     chmod +x "$STARTDIR"/build_script.sh
 
     echo "Running build_script... "
-    run "$SRC"/run.sh apptainer "$STARTDIR"/build_script.sh build_script
+    run "$SRC"/run.sh apptainer useslurm "$STARTDIR"/build_script.sh build_script
     echo "done."
 
     echo "Job log - after build-script:"
@@ -167,7 +171,7 @@ EOF
     assert_line "Doing a lot of work..."
     assert_file_exists "$CUSTOM_ENV_CI_WS"/job-output.txt
 
-    "$SRC"/cleanup-slurm.sh apptainer
+    "$SRC"/cleanup.sh apptainer useslurm
 
     # Check that the slurm job is over
     run _helper

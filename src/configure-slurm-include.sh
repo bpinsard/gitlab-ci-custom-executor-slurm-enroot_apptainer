@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-# shellcheck source=./src/include.sh
-source "$SRC/include.sh"
+#shellcheck source=src/configure-include.sh
+source "$SRC"/configure-include.sh
+
+#shellcheck source=src/slurm-include.sh
+source "$SRC"/slurm-include.sh
 
 function export_custom_env_var_into_var_if_defined() {
     # If a variable called `CUSTOM_ENV_$VAR` is defined
@@ -30,13 +33,12 @@ function export_all_custom_env_var_into_var_if_defined() {
     done
 }
 
-
 function wait_until_file_exists() {
     local FILE="$1"
     local MAXDELAY="$2"
     local T0="$SECONDS"
     if [ "$#" -ne 2 ]
-    then 
+    then
 	    echo "wrong number of arguments to ${FUNCNAME[0]}" >&2
 	    exit 22
     fi
@@ -50,18 +52,6 @@ function wait_until_file_exists() {
         return 124
     fi
 
-}
-
-function check_custom_env_ci_ws_set(){
-    set +o nounset
-    if [[ -z "$CUSTOM_ENV_CI_WS" ]]
-    then
-        echo "ERROR: CUSTOM_ENV_CI_WS variable not defined." >&2
-        echo "       Please define the CI_WS variable in your gitlab CI/CD setup (See README)." >&2
-
-        exit "$SYSTEM_FAILURE_EXIT_CODE"
-    fi
-    set -o nounset
 }
 
 function check_or_set_custom_env_command_sbatch(){
@@ -78,7 +68,6 @@ function check_or_set_custom_env_command_sbatch(){
     fi
     set -o nounset
 }
-
 
 function get_sbatch_command(){
     local SRC
@@ -118,7 +107,6 @@ function get_sbatch_command(){
     echo "${COMMAND[@]}"
 
 }
-
 function check_for_forbidden_option(){
     ALL_OPTIONS="$1"
     FORBIDDEN_OPTION="$2"
@@ -177,27 +165,6 @@ function print_slurm_environment(){
 
 }
 
-function find_available_workspace_name(){
-
-    ROOT="$1"
-    ROOTDIR="$(dirname "$ROOT")"
-    if [[ ! -d "$ROOTDIR" ]]
-    then
-        echo "Not an existing directory: $ROOTDIR" >&2
-        return 22
-    fi
-
-    N=0;
-    CANDIDATE="$ROOT$N"
-    while ! mkdir "$CANDIDATE" &> /dev/null
-    do
-       N=$((N+1))
-       CANDIDATE="$ROOT$N"
-    done
-    echo "$CANDIDATE"
-
-}
-
 function find_remaining_time_sec_in_allocation(){
 
     local WORKSPACE="$1"
@@ -230,7 +197,6 @@ function has_at_least_half_idle_time_left(){
         at_least_half_idle_time_is_left
     )
 }
-
 
 function allocation_is_compatible(){
     local SLURMENV=$1
@@ -265,5 +231,96 @@ function create_job_slurm(){
 
     chmod +x "$OUTDIR/job.slurm"
     echo "$OUTDIR/job.slurm"
+
+}
+
+
+function look_for_workspace_with_suitable_slurm_allocation(){
+
+    local SLURMENV_CANDIDATE="$CUSTOM_ENV_CI_WS/slurmenv_candidate_$CUSTOM_ENV_CI_JOB_ID"
+    print_slurm_environment > "$SLURMENV_CANDIDATE"
+
+
+    set +o nounset
+    if [ -z "$CUSTOM_ENV_JOB_TIME_SEC" ]
+    then
+      CUSTOM_ENV_JOB_TIME_SEC=600
+    fi
+    set +o nounset
+
+    WORKSPACE=""
+    shopt -s nullglob
+    for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
+    do
+      echo "[CONFIGURE] Testing $SLURMENV_CANDIDATE $CUSTOM_ENV_JOB_TIME_SEC $DIR" >&2
+
+      if allocation_is_compatible "$SLURMENV_CANDIDATE" "$CUSTOM_ENV_JOB_TIME_SEC" "$DIR"
+      then
+        WORKSPACE="$DIR"
+        echo "[CONFIGURE] Found suitable workspace in $WORKSPACE" >&2
+        echo "[CONFIGURE] Slurm job: $(get_slurm_jobid "$WORKSPACE")" >&2
+      fi
+    done
+    echo "$WORKSPACE"
+}
+
+function create_new_slurm_workspace(){
+
+    # finding a new workspace
+    local WORKSPACE
+    WORKSPACE="$(find_available_workspace_name "$CUSTOM_ENV_CI_WS"/cews_)"
+    echo "[CONFIGURE] Creating workspace $WORKSPACE ..." >&2
+
+    JOBSLURM="$(create_job_slurm "$SRC/job.slurm.template" \
+                                 "$CUSTOM_ENV_DEFAULT_PARTITION" \
+                                 "$WORKSPACE")"
+
+    echo "[CONFIGURE] Creating job script at $JOBSLURM ..." >&2
+
+    check_or_set_custom_env_command_sbatch "$JOBSLURM"
+
+    check_string_has_no_forbidden_options "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" || {
+      echo "[CONFIGURE] Error: forbidden option in COMMAND_OPTIONS_SBATCH.">&2
+      exit "$SYSTEM_FAILURE_EXIT_CODE"
+    }
+
+    JOB_ID=$(eval "$(get_sbatch_command \
+                     "$WORKSPACE" \
+                     "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
+                     "$JOBSLURM")")
+
+    echo "[CONFIGURE] Submitted job $JOB_ID ..." >&2
+    wait_for_job_to_be_ready "$JOB_ID"
+    wait_until_file_exists "$WORKSPACE/.env" 90
+
+    print_slurm_environment > "$WORKSPACE/slurmenv"
+    echo "[CONFIGURE] Configured workspace in $WORKSPACE" >&2
+    echo "$WORKSPACE"
+
+}
+
+function print_json_output_slurm(){
+    local CI_BUILDS_DIR
+    local WORKSPACE
+    CI_BUILDS_DIR="$1"
+    WORKSPACE="$2"
+    local TMPFILE
+    TMPFILE="$(mktemp -t CI-conf-slurm-output-"$USER"-XXXXXX)"
+    cat <<EOF > "$TMPFILE"
+{
+  "builds_dir": "$CI_BUILDS_DIR",
+  "driver": {
+    "name": "Slurm driver+enroot/apptainer",
+    "version": "v0.0.1"
+  },
+"job_env": {
+    "CE_QUEUE_WORKSPACE" : "$WORKSPACE"
+  }
+}
+EOF
+
+    cat "$TMPFILE"
+    cat "$TMPFILE" 1>&2
+    rm "$TMPFILE"
 
 }

@@ -1,0 +1,34 @@
+minimal-job-noslurm-nocontainer:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - nocontainer
+  script:
+    - echo "Test Test"
+    - env | sort
+
+artifact-job-noslurm-nocontainer:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    # This needs to match the tag of the test custom executor
+    - noslurm
+    - nocontainer
+  script: touch test-artifact.txt
+  artifacts:
+    paths:
+      - test-artifact.txt
+
+env-job-noslurm-nocontainer:
+  dependencies: []
+  stage: test-deploy-noslurm
+  tags:
+    - noslurm
+    - nocontainer
+  variables:
+    ENV_VAR_1: 55
+  script:
+    - env | grep ENV_VAR_1
+    - test $ENV_VAR_1 -eq 55

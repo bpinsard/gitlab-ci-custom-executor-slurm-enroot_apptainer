@@ -130,7 +130,7 @@ touch script-output-"$STEP".txt
 EOF
     chmod +x ./script-"$STEP".sh
 
-    "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+    "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
 
     assert_exists script-output-"$STEP".txt
     done
@@ -152,7 +152,7 @@ touch script-output-"$STEP".txt
 EOF
        chmod +x ./script-"$STEP".sh
 
-       "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+       "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
 
        # shellcheck disable=SC2031
        assert_file_contains "$CUSTOM_EXECUTOR_QUEUE_LOGFILE" "script-$STEP.sh"
@@ -173,7 +173,7 @@ touch script-output-"$STEP".txt
 EOF
     chmod +x ./script-"$STEP".sh
 
-    "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+    "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
     assert_exists script-output-"$STEP".txt
 
 }
@@ -189,13 +189,13 @@ touch script-output.txt
 EOF
        chmod +x ./script.sh
 
-       "$SRC"/run.sh enroot ./script.sh prepare_script
+       "$SRC"/run.sh enroot useslurm ./script.sh prepare_script
        cat << EOF > script.sh
 sleep 3
 touch script-output-second-time.txt
 EOF
        chmod +x ./script.sh
-       "$SRC"/run.sh enroot ./script.sh prepare_script
+       "$SRC"/run.sh enroot useslurm ./script.sh prepare_script
 
        assert_exists script-output-second-time.txt
 
@@ -213,7 +213,7 @@ echo "Hello from $STEP"
 EOF
     chmod +x ./script-"$STEP".sh
 
-    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
 
     assert_line "Hello from $STEP"
     done
@@ -235,7 +235,7 @@ EOF
     chmod +x ./script-"$STEP".sh
 
     echo "Testing $STEP"
-    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
     assert_equal "$status" 42
     done
 
@@ -255,7 +255,7 @@ echo "won't run"
 EOF
     chmod +x ./script.sh
 
-    run "$SRC/run.sh" enroot ./script.sh
+    run "$SRC/run.sh" enroot useslurm ./script.sh
 
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
 
@@ -278,7 +278,7 @@ echo "won't run"
 EOF
     chmod +x ./script.sh
 
-    run "$SRC/run.sh" enroot ./script.sh get_sources
+    run "$SRC/run.sh" enroot useslurm ./script.sh get_sources
 
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     )
@@ -299,7 +299,7 @@ touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
 EOF
    chmod +x ./script-"$STEPNAME".sh
 
-   "$SRC/run.sh" enroot ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   "$SRC/run.sh" enroot useslurm ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
    assert_exists "$ENROOTLOG"
@@ -319,7 +319,7 @@ touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
 EOF
    chmod +x ./script-"$STEPNAME".sh
 
-   "$SRC/run.sh" apptainer ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   "$SRC/run.sh" apptainer useslurm ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
    assert_exists "$APPTAINERLOG"
@@ -343,7 +343,7 @@ EOF
 touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
 EOF
    chmod +x ./script-"$STEPNAME".sh
-   "$SRC/run.sh" enroot ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   "$SRC/run.sh" enroot useslurm ./script-"$STEPNAME".sh "$STEPNAME" 3>/dev/null
    assert_exists "$TEST_PLAYGROUND/script-output-$STEPNAME".txt
    assert_not_exists "$ENROOTLOG"
    )
@@ -370,7 +370,7 @@ touch "$TEST_PLAYGROUND"/script-output-"$STEPNAME".txt
 EOF
    chmod +x "$TMP_PLAYGROUND/script-$STEPNAME".sh
 
-   "$SRC/run.sh" enroot "$TMP_PLAYGROUND/script-$STEPNAME".sh "$STEPNAME" 3>/dev/null
+   "$SRC/run.sh" enroot useslurm "$TMP_PLAYGROUND/script-$STEPNAME".sh "$STEPNAME" 3>/dev/null
 
    (
    # shellcheck source=./src/containerlib-enroot.sh
@@ -408,7 +408,7 @@ EOF
     touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
     ) &
 
-    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
@@ -444,7 +444,7 @@ EOF
     touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
     ) &
 
-    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
@@ -480,7 +480,7 @@ EOF
     touch "$CUSTOM_ENV_CI_WS/cews_0"/terminated
     ) &
 
-    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
 
     echo "Logfile:"
     echo "=============================="
@@ -518,7 +518,7 @@ EOF
 
     stop_custom_executor_queue
 
-    run "$SRC"/run.sh enroot ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
@@ -527,17 +527,17 @@ EOF
 }
 
 
-@test "run exits with error if not passed 3 arguments" {
+@test "run exits with error if not passed 4 arguments" {
 
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
 
     STEP="a-step-name"
     # shellcheck disable=SC2031
-    run "$SRC"/run.sh ./script-"$STEP".sh "$STEP"
+    run "$SRC"/run.sh useslurm ./script-"$STEP".sh "$STEP"
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_line "Usage: run.sh <containerisation_backend> <script> <stepname>"
+    assert_line "Usage: run.sh <containerisation_backend> <{use,no}slurm> <script> <stepname>"
 
 }
 
@@ -554,7 +554,7 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
-    "$SRC/run.sh" enroot ./script.sh prepare_script
+    "$SRC/run.sh" enroot useslurm ./script.sh prepare_script
 
     ls "$TEST_PLAYGROUND" > files-after-run
 
@@ -577,7 +577,7 @@ EOF
 
     #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
-    run "$SRC/run.sh" some-invalid-string ./script.sh prepare_script
+    run "$SRC/run.sh" some-invalid-string useslurm ./script.sh prepare_script
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
@@ -598,7 +598,7 @@ EOF
     #shellcheck disable=SC2031
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
-    run "$SRC/run.sh" none ./script.sh prepare_script
+    run "$SRC/run.sh" none useslurm ./script.sh prepare_script
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
@@ -619,7 +619,7 @@ EOF
     export CUSTOM_ENV_CI_JOB_IMAGE=""
     #shellcheck disable=SC2030
     export CUSTOM_ENV_IMAGEFILE="a-file.sif"
-    run "$SRC/run.sh" none ./script.sh prepare_script
+    run "$SRC/run.sh" none useslurm ./script.sh prepare_script
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
     assert_output --regexp "Error: Job requires a container image but 'none' selected as backend."
@@ -639,7 +639,7 @@ EOF
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="a-file.sif"
-    run "$SRC/run.sh" apptainer ./script.sh prepare_script
+    run "$SRC/run.sh" apptainer useslurm ./script.sh prepare_script
     assert_success
     assert_file_contains "$MOCKLOGDIR"/apptainer.log "exec.*a-file.sif"
 
@@ -660,7 +660,7 @@ EOF
 
     # shellcheck disable=SC2031
     export CUSTOM_ENV_IMAGEFILE="a-file.sqsh"
-    run "$SRC/run.sh" enroot ./script.sh prepare_script
+    run "$SRC/run.sh" enroot useslurm ./script.sh prepare_script
     assert_success
     ENROOTLOG="$MOCKLOGDIR"/enroot.log
     assert_exists "$ENROOTLOG"
@@ -680,7 +680,7 @@ EOF
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     export CUSTOM_ENV_APPTAINER_EXEC_OPTIONS="--some-options for-apptainer"
-    run "$SRC/run.sh" apptainer ./script.sh prepare_script
+    run "$SRC/run.sh" apptainer useslurm ./script.sh prepare_script
     assert_success
     assert_exists "$MOCKLOGDIR"/apptainer.log
     assert_file_contains "$MOCKLOGDIR"/apptainer.log "exec.*$CUSTOM_ENV_APPTAINER_EXEC_OPTIONS"

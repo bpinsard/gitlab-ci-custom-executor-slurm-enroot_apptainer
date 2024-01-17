@@ -18,7 +18,7 @@ test-report-serial:
 # These targets are provided for convenience
 # to run just a directory-based subset of tests.
 
-test-configure-slurm-include:
+test-configure-include:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure-slurm/include.bats
 
 test-jobsub:

@@ -7,7 +7,7 @@ unit-test-parallel-test-deploy:
     - make test-report-parallel JOBS=8
   tags:
     - slurm
-    - slurm-only
+    - nocontainer
   artifacts:
     when: always
     paths:
@@ -25,7 +25,7 @@ unit-test-serial-test-deploy:
     - make test-report-serial
   tags:
     - slurm
-    - slurm-only
+    - nocontainer
   artifacts:
     when: always
     paths:
@@ -43,4 +43,4 @@ lint-test-deploy:
     - make shellcheck
   tags:
     - slurm
-    - slurm-only
+    - nocontainer

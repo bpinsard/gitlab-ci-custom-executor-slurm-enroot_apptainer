@@ -16,5 +16,7 @@ then
         export ENROOT_DATA_PATH="$CUSTOM_ENV_CI_WS/$CUSTOM_ENV_CI_CONCURRENT_ID/.enroot/data"
     fi
     export CE_CONTAINER_NAME="GLCE_$CUSTOM_ENV_CI_JOB_ID"
+else
+    echo "Enroot containerlib: NO IMAGE SET" 1>&2
 fi
 set -o nounset

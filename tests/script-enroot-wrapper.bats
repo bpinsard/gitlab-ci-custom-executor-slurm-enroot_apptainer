@@ -130,6 +130,8 @@ EOF
     echo "====================="
     for VARNAME in ENROOT_RUNTIME_PATH ENROOT_CACHE_PATH ENROOT_DATA_PATH
     do
+        echo "File: $MOCKLOGDIR/enroot.log"
+        echo "Regex: ${VARNAME}.*${CUSTOM_ENV_CI_WS}"
         assert_file_contains "$MOCKLOGDIR/enroot.log" "${VARNAME}.*${CUSTOM_ENV_CI_WS}"
     done
 

@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}" )/.." > /dev/null 2>&1 && pwd)"
-URL_DEFAULT="https://git.scc.kit.edu/"
+URL_DEFAULT="https://gitlab.kit.edu/"
 CACHE_DIR_BASE_DEFAULT="$HOME/gitlab-runner/cache"
 CI_WS_DEFAULT="$HOME/gitlab-runner"
 
@@ -45,13 +45,16 @@ It accepts the following options:
                           Default:
                           $CACHE_DIR_BASE_DEFAULT/<container-backend>
 
-
     --ci-ws               Workspace for the internals
                           of the custom executor.
                           It will be created if it does not exist.
                           Default:
                           $CI_WS_DEFAULT
 
+     --use-slurm          Values accepted: yes/no.
+                          Whether to run the CI jobs in a slurm allocation
+                          or on the local node
+                          (where the runner has been launched).
 
     --default-partition   The default Slurm partition to use
                           (can be overridden using the right
@@ -80,6 +83,7 @@ OPTSTRING+=",container-backend:"
 OPTSTRING+=",cache-dir-base:"
 OPTSTRING+=",ci-ws:"
 OPTSTRING+=",default-partition:"
+OPTSTRING+=",use-slurm:"
 OPTSTRING+=",help"
 
 export OPTSTRING
@@ -93,6 +97,7 @@ CONTAINER_BACKEND=""
 CACHE_DIR_BASE=""
 CI_WS=""
 DEFAULT_PARTITION=""
+USE_SLURM=""
 
 SANITIZED_OPTIONS=$(getopt --name gitlab-runner-register-wrapper --longoptions "$OPTSTRING" -- "$0" "$@")
 eval set -- "$SANITIZED_OPTIONS"
@@ -136,6 +141,10 @@ case "$1" in
     --help)
         show_help
         exit 0
+        ;;
+    --use-slurm)
+        USE_SLURM="$2"
+        shift
         ;;
     --)
 	break
@@ -213,6 +222,24 @@ then
         DEFAULT_PARTITION="$DEFAULT_PARTITION_DEFAULT"
     fi
 fi
+while [[ ! "$USE_SLURM" =~ ^(yes|no)$ ]]
+do
+    echo "Use slurm? (yes/no):"
+    read -er USE_SLURM
+done
+
+
+if [[ "$USE_SLURM" == yes ]]
+then
+    USE_SLURM_FLAG=useslurm
+    DEFPART_ENV="--env DEFAULT_PARTITION=$DEFAULT_PARTITION"
+elif [[ "$USE_SLURM" == no ]]
+then
+    USE_SLURM_FLAG=noslurm
+    DEFPART_ENV=""
+fi
+
+
 SRC="$CE_REPO"/src
 
 echo "Creating directories:"
@@ -231,18 +258,22 @@ gitlab-runner register \
     --executor="custom" \
     --cache-dir="$CACHE_DIR_BASE/$CONTAINER_BACKEND" \
     --env CI_WS="$CI_WS" \
-    --env DEFAULT_PARTITION="$DEFAULT_PARTITION" \
+    "$DEFPART_ENV" \
     --custom_build_dir-enabled \
-    --custom-config-exec="$SRC/configure-slurm.sh" \
+    --custom-config-exec="$SRC/configure.sh" \
     --custom-config-exec-timeout=2000 \
     --custom-config-args="$CONTAINER_BACKEND" \
+    --custom-config-args="$USE_SLURM_FLAG" \
     --custom-prepare-exec="$SRC/prepare.sh" \
     --custom-prepare-exec-timeout=200 \
     --custom-prepare-args="$CONTAINER_BACKEND" \
+    --custom-prepare-args="$USE_SLURM_FLAG" \
     --custom-run-exec="$SRC/run.sh" \
     --custom-run-args="$CONTAINER_BACKEND" \
-    --custom-cleanup-exec="$SRC/cleanup-slurm.sh" \
+    --custom-run-args="$USE_SLURM_FLAG" \
+    --custom-cleanup-exec="$SRC/cleanup.sh" \
     --custom-cleanup-exec-timeout=200 \
     --custom-cleanup-args="$CONTAINER_BACKEND" \
+    --custom-cleanup-args="$USE_SLURM_FLAG" \
     --custom-graceful-kill-timeout=200 \
     --custom-force-kill-timeout=200

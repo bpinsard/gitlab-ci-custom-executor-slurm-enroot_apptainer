@@ -1,0 +1,46 @@
+noslurm-unit-test-parallel-test-deploy:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test-deploy-noslurm
+  script:
+    - make test-report-parallel JOBS=8
+  tags:
+    - noslurm
+    - nocontainer
+  artifacts:
+    when: always
+    paths:
+      - report-parallel.xml
+    reports:
+      junit: report-parallel.xml
+
+
+noslurm-unit-test-serial-test-deploy:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test-deploy-serial-noslurm-none
+  script:
+    - make test-report-serial
+  tags:
+    - noslurm
+    - nocontainer
+  artifacts:
+    when: always
+    paths:
+      - report-serial.xml
+    reports:
+      junit: report-serial.xml
+
+
+noslurm-lint-test-deploy:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test-deploy-noslurm
+  script:
+    - make shellcheck
+  tags:
+    - noslurm
+    - nocontainer

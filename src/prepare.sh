@@ -4,13 +4,22 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
-# shellcheck source=./src/include.sh
-source "$SRC/include.sh"
-
-echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
-
 CONTAINERISATION_BACKEND="${1}"
+USESLURM="${2}"
+
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
+
+if [[ "$USESLURM" == "useslurm" ]]
+then
+    # shellcheck source=./src/slurm-include.sh
+    source "$SRC/slurm-include.sh"
+    echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
+elif [[ "$USESLURM" == "noslurm" ]]
+then
+    # shellcheck source=./src/include.sh
+    source "$SRC/include.sh"
+fi
+
 
 
 set +o nounset
@@ -87,16 +96,22 @@ source "$PREPARE_SCRIPT"
 EOF
     chmod +x "$WRAP"
 
-    # shellcheck source=./src/custom_executor_queue.sh
-    source "$SRC/custom_executor_queue.sh"
-    # shellcheck disable=SC1091
-    source "$CE_QUEUE_WORKSPACE/.env"
 
     echo "[PREPARE] Wrap to be executed (credentials redacted):" >&2
     echo "==========================" >&2
     grep -vi "PASSWORD\|USERNAME" "$WRAP" >&2
     echo "==========================" >&2
-    submit_to_custom_executor_queue_and_wait "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
+    if [[ "$USESLURM" == "useslurm" ]]
+    then
+        # shellcheck source=./src/custom_executor_queue.sh
+        source "$SRC/custom_executor_queue.sh"
+        # shellcheck disable=SC1091
+        source "$CE_QUEUE_WORKSPACE/.env"
+       submit_to_custom_executor_queue_and_wait "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
+    elif [[ "$USESLURM" == "noslurm" ]]
+    then
+             "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
+    fi
 else
     echo "[PREPARE] No image selected." >&2
 fi
