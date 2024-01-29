@@ -4,7 +4,7 @@
 # because of CE_DEBUG=1
 ce-queue-debug-test-apptainer:
   dependencies: []
-  stage: test-deploy
+  stage: test-deploy-ce-debug-apptainer
   # Making sure this test runs
   # after the test for the enroot version
   # that could conflict with this one
@@ -27,7 +27,7 @@ ce-queue-debug-test-apptainer:
 # caused the cleanup script to save the CE workspace
 # in $HOME
 ce-queue-debug-post-test-apptainer:
-  stage: test-deploy
+  stage: test-deploy-ce-debug-apptainer
   needs:
     - "ce-queue-debug-test-apptainer"
   tags:

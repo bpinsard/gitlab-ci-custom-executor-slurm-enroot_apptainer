@@ -4,7 +4,7 @@
 # because of CE_DEBUG=1
 ce-queue-debug-test-enroot:
   dependencies: []
-  stage: test-deploy
+  stage: test-deploy-ce-debug-enroot
   variables:
     CE_DEBUG: 1
   tags:
@@ -20,7 +20,7 @@ ce-queue-debug-test-enroot:
 # caused the cleanup script to save the CE workspace
 # in $HOME
 ce-queue-debug-post-test-enroot:
-  stage: test-deploy
+  stage: test-deploy-ce-debug-enroot
   needs:
     - "ce-queue-debug-test-enroot"
   tags:
