@@ -8,16 +8,16 @@ DEBUG=""
 set +o nounset
 if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
 then
-    echo "[CLEANUP] Not in Debug Mode"
+    echo_verbose "[CLEANUP] Not in Debug Mode"
     DEBUG="NO"
 else
-    echo "[CLEANUP] Debug Mode active"
+    echo_verbose "[CLEANUP] Debug Mode active"
     DEBUG="YES"
 fi
 set -o nounset
 
 if [[ "$DEBUG" == "NO" ]]
 then
-    echo "[CLEANUP] enroot remove $CE_CONTAINER_NAME"
+    echo_verbose "[CLEANUP] enroot remove $CE_CONTAINER_NAME"
     enroot remove "$CE_CONTAINER_NAME" < <(echo y)
 fi

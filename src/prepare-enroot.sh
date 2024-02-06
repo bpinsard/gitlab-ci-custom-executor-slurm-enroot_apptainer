@@ -33,7 +33,7 @@ then
         CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
     fi
 
-    echo "[PREPARE] Enroot: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
+    echo_verbose "[PREPARE] Enroot: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
 
     COMMAND=(enroot
              import
