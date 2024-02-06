@@ -224,9 +224,11 @@ function create_job_slurm(){
 
     local TEMPLATE="$1"
     local DEFAULT_PARTITION="$2"
-    local OUTDIR="$3"
+    local TIME_LIMIT="`date -d@$3 -u +%H:%M:%S`"
+    local OUTDIR="$4"
 
-    sed 's/%CUSTOM_ENV_DEFAULT_PARTITION%/'"$DEFAULT_PARTITION"'/' "$TEMPLATE"  \
+    sed 's/%CUSTOM_ENV_DEFAULT_PARTITION%/'"$DEFAULT_PARTITION"'/' "$TEMPLATE" | \
+    sed 's/%CUSTOM_ENV_TIME%/'"$TIME_LIMIT"'/' \
         > "$OUTDIR/job.slurm"
 
     chmod +x "$OUTDIR/job.slurm"
@@ -273,6 +275,7 @@ function create_new_slurm_workspace(){
 
     JOBSLURM="$(create_job_slurm "$SRC/job.slurm.template" \
                                  "$CUSTOM_ENV_DEFAULT_PARTITION" \
+                                 "$(($CUSTOM_ENV_JOB_TIME_SEC * 2))" \
                                  "$WORKSPACE")"
 
     echo "[CONFIGURE] Creating job script at $JOBSLURM ..." >&2

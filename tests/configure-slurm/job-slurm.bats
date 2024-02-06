@@ -27,6 +27,7 @@ function setup(){
     JOB_SLURM="$(source "$SRC/configure-slurm-include.sh";
                  create_job_slurm "$SRC/job.slurm.template" \
                                   default-partition-name \
+                                  600 \
                                  "$TEST_PLAYGROUND")"
     export JOB_SLURM
 

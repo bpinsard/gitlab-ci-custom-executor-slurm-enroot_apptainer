@@ -2,7 +2,7 @@
 #SBATCH --job-name GitLabCustomExec
 #SBATCH --partition %CUSTOM_ENV_DEFAULT_PARTITION%
 #SBATCH --ntasks 1
-#SBATCH --time 30
+#SBATCH --time %CUSTOM_ENV_TIME%
 
 
 if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi

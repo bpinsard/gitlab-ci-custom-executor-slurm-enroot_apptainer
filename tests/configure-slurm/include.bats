@@ -211,14 +211,17 @@ function teardown() {
     mkdir "$CUSTOM_ENV_CI_WS"
 
     CUSTOM_ENV_SLURM_DEFAULT_PARTITION=default_partition_name
+    CUSTOM_ENV_JOB_TIME_SEC=1234
 
     run create_job_slurm "$SRC/job.slurm.template" \
                          "$CUSTOM_ENV_SLURM_DEFAULT_PARTITION" \
+                         "$CUSTOM_ENV_JOB_TIME_SEC" \
                          "$CUSTOM_ENV_CI_WS"
 
     assert_output "$CUSTOM_ENV_CI_WS/job.slurm"
     assert_exists "$CUSTOM_ENV_CI_WS/job.slurm"
     assert_file_contains "$CUSTOM_ENV_CI_WS/job.slurm" default_partition_name
+    assert_file_contains "$CUSTOM_ENV_CI_WS/job.slurm" 00:20:34
 
 }
 
