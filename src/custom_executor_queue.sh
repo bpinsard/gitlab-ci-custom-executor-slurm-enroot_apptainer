@@ -208,6 +208,8 @@ function submit_to_custom_executor_queue_and_wait() {
     then
         wait_until_file_contains "$OUTPUTNAME" "$JOB_END_SIGNAL" 10
     fi
+    # wait for the `tail` process to pick up the changed file
+    sleep 1
     disown "$SUBPID"
     kill "$SUBPID" || true
     pkill -f -U "$USER" 'tail -f '"$OUTPUTNAME" || true
