@@ -21,8 +21,9 @@ set -o nounset
 EOF
 
 # This line will print the environment variables
+APPTAINERVARS=${!APPTAINER*}
 # shellcheck disable=SC2086
-{ env | grep -qE '^APPTAINER'; } && declare -p ${!APPTAINER*} > "$DECLARATIONS"
+declare -p ${APPTAINERVARS:-""} 2>/dev/null > "$DECLARATIONS"
 
 cat "$DECLARATIONS"
 

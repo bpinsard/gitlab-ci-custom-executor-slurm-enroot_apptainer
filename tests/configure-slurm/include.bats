@@ -205,20 +205,32 @@ function teardown() {
 
 }
 
+
+@test "create_job_slurm - if WALLTIME_SECONDS > 86400, slurm_time_limit_from_seconds should fail" {
+    run slurm_time_limit_from_seconds 86401
+    assert_failure
+    assert_equal "$status" 22 # invalid argument
+    assert_output --partial "Error: Walltime Seconds > 1 day"
+
+}
+
 @test "create_job_slurm creates job.slurm in CUSTOM_ENV_CI_WS and returns the location" {
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ciws"
     mkdir "$CUSTOM_ENV_CI_WS"
 
     CUSTOM_ENV_SLURM_DEFAULT_PARTITION=default_partition_name
+    CUSTOM_ENV_JOB_TIME_SEC=1234
 
     run create_job_slurm "$SRC/job.slurm.template" \
                          "$CUSTOM_ENV_SLURM_DEFAULT_PARTITION" \
+                         "$CUSTOM_ENV_JOB_TIME_SEC" \
                          "$CUSTOM_ENV_CI_WS"
 
     assert_output "$CUSTOM_ENV_CI_WS/job.slurm"
     assert_exists "$CUSTOM_ENV_CI_WS/job.slurm"
     assert_file_contains "$CUSTOM_ENV_CI_WS/job.slurm" default_partition_name
+    assert_file_contains "$CUSTOM_ENV_CI_WS/job.slurm" 00:20:34
 
 }
 
