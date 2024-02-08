@@ -36,15 +36,16 @@ to the intended contribution workflow:
 
 ### Debug
 
-In some cases, the code looks at a variable called `CUSTOM_ENV_CE_DEBUG` 
-(which should be possible to set as `CE_DEBUG` 
+In some cases, the code looks at a variable called `CUSTOM_ENV_CE_DEBUG_LVL` 
+(which should be possible to set as `CE_DEBUG_LVL` 
 in the environment variable section of the CI "control panel"
 on the gitlab instance web interface).
-When that variable is set,
-the scripts will save some results
-or copy entire directories 
-out of the builds dir so that 
-the results can be inspected.
+When that variable is set to a value
+- greater than 0: the scripts will have a more verbose output
+- greater than 1: the scripts will save some results
+  or copy entire directories 
+  out of the builds dir so that 
+  the results can be inspected.
 
 This debuggability feature might need to be expanded.
 If you find any issues with the runner,

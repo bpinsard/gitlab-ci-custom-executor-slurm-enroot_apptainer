@@ -21,12 +21,13 @@ function terminate_slurm_allocation () {
 
 function remove_old_workspaces(){
     echo "[CLEANUP] Removing old workspaces..." >&2
+    local CUSTOM_ENV_CE_DEBUG_DIR="${CUSTOM_ENV_CE_DEBUG_DIR:-$HOME/ce-debug}/"
     shopt -s nullglob
     for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
     do
         if ! allocation_is_alive "$DIR" && [[ "$DIR" != "$CE_QUEUE_WORKSPACE" ]]
         then
-           if [ "$DEBUG" == "YES" ]
+           if [ "${CUSTOM_ENV_CE_DEBUG_LVL:-0}" -gt 1 ]
            then
                echo "[CLEANUP] Moving old workspace $DIR to $CUSTOM_ENV_CE_DEBUG_DIR for further inspection..." >&2
 
@@ -63,9 +64,9 @@ function cleanup_ce_job_group() {
 }
 
 function backup_ce_workspace_if_debug() {
-    local DEBUG="$1"
-    if [[ "$DEBUG" == "YES" ]]
+    local DEBUG_LVL="$1"
+    if [[ "$DEBUG_LVL" -gt "1" ]]
     then
-       cp -r "$CE_QUEUE_WORKSPACE" "$CUSTOM_ENV_CE_DEBUG_DIR/"
+       cp -r "$CE_QUEUE_WORKSPACE" "${CUSTOM_ENV_CE_DEBUG_DIR:-$HOME/ce-debug}/"
     fi
 }

@@ -87,7 +87,7 @@ function get_sbatch_command(){
     # DEBUG OPTIONS
 
     set +o nounset
-    if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
+    if [[ -z "$CUSTOM_ENV_CE_DEBUG_LVL" ]]
     then
         COMMAND+=( --input=/dev/null
                    --output=/dev/null

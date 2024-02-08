@@ -1,7 +1,7 @@
 # This test,
 # run with the slurm+apptainer custom executor
 # should create a $HOME/ce-debug directory
-# because of CE_DEBUG=2
+# because of CE_DEBUG_LVL=2
 ce-queue-debug-test-apptainer:
   dependencies: []
   stage: test-deploy-ce-debug-apptainer
@@ -13,7 +13,7 @@ ce-queue-debug-test-apptainer:
   needs:
     - "ce-queue-debug-post-test-enroot"
   variables:
-    CE_DEBUG: 2
+    CE_DEBUG_LVL: 2
   tags:
     - slurm
     - apptainer
@@ -22,7 +22,7 @@ ce-queue-debug-test-apptainer:
     - rm -rf "$HOME/ce-debug/"
 
 # This test is a test for the apptainer executor
-# checking that CUSTOM_ENV_CE_DEBUG=2
+# checking that CUSTOM_ENV_CE_DEBUG_LVL=2
 # set in the `ce-queue-debug-test-apptainer` test
 # caused the cleanup script to save the CE workspace
 # in $HOME
