@@ -32,6 +32,12 @@ then
         WORKSPACE=$(create_new_slurm_workspace)
     fi
 
+    if [ "${CUSTOM_ENV_REUSE_WORKSPACE:-ON}" == "OFF" ]
+    then
+        echo "[CONFIGURE] Creating new workspace." >&2
+        WORKSPACE=$(create_new_slurm_workspace)
+    fi
+
     CI_BUILDS_DIR="$CUSTOM_ENV_CI_WS/$BACKEND/$CUSTOM_ENV_CI_CONCURRENT_ID"
     mkdir -p "$CI_BUILDS_DIR"
 
