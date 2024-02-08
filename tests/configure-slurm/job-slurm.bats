@@ -17,7 +17,6 @@ function setup(){
     mkdir "$TEST_PLAYGROUND"
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
-    # export CUSTOM_ENV_CE_DEBUG=1
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 

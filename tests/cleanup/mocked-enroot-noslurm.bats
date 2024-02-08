@@ -110,7 +110,7 @@ function teardown() {
     "$SRC/prepare-enroot.sh"
 
     # shellcheck disable=SC2031
-    export CUSTOM_ENV_CE_DEBUG=1
+    export CUSTOM_ENV_CE_DEBUG=2
     # shellcheck disable=SC2031
     export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-enroot"
 

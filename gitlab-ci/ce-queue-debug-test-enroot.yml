@@ -1,12 +1,12 @@
 # This test,
 # run with the slurm+enroot custom executor
 # should create a $HOME/ce-debug directory
-# because of CE_DEBUG=1
+# because of CE_DEBUG=2
 ce-queue-debug-test-enroot:
   dependencies: []
   stage: test-deploy-ce-debug-enroot
   variables:
-    CE_DEBUG: 1
+    CE_DEBUG: 2
   tags:
     - slurm
     - enroot
@@ -15,7 +15,7 @@ ce-queue-debug-test-enroot:
     - rm -rf "$HOME/ce-debug/"
 
 # This test is a test for the enroot executor
-# checking that CUSTOM_ENV_CE_DEBUG=1
+# checking that CUSTOM_ENV_CE_DEBUG=2
 # set in the `ce-queue-debug-test-enroot` test
 # caused the cleanup script to save the CE workspace
 # in $HOME

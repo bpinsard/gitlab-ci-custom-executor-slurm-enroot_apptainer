@@ -92,7 +92,7 @@ function teardown() {
 
     (
     # shellcheck disable=SC2031
-    export CUSTOM_ENV_CE_DEBUG=1
+    export CUSTOM_ENV_CE_DEBUG=2
     "$SRC"/configure.sh none useslurm 3> /dev/null | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     for STREAM in output error

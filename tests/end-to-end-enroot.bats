@@ -32,7 +32,7 @@ function setup(){
 
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
-    # export CUSTOM_ENV_CE_DEBUG=1
+    # export CUSTOM_ENV_CE_DEBUG=2
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit
 
