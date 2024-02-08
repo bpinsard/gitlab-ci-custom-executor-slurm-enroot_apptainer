@@ -35,7 +35,7 @@ then
     source "$SRC/include.sh"
 fi
 
-echo -n "[RUN] "; validate_containerisation_backend \
+echo_verbose -n "[RUN] "; validate_containerisation_backend \
                      "$CONTAINERISATION_BACKEND" \
                      "$CUSTOM_ENV_CI_JOB_IMAGE" \
                      "$CUSTOM_ENV_IMAGEFILE"
@@ -51,9 +51,9 @@ then
             WRAPPER_NAME=wrap_apptainer
             ;;
         *)
-            echo "[RUN] Error: No valid container backend specified"
-            echo "[RUN]        (i.e., apptainer or enroot)"
-            echo "[RUN]        but job requires a container image."
+            echo_verbose "[RUN] Error: No valid container backend specified"
+            echo_verbose "[RUN]        (i.e., apptainer or enroot)"
+            echo_verbose "[RUN]        but job requires a container image."
             exit 22
             ;;
     esac
@@ -96,7 +96,7 @@ then
         ;;
 
         *)
-            echo "[RUN] Step name not recognized: $STEPNAME" >&2
+            echo_verbose "[RUN] Step name not recognized: $STEPNAME" >&2
             exit "$SYSTEM_FAILURE_EXIT_CODE"
         ;;
     esac
@@ -107,18 +107,18 @@ fi
 
 WRAPPED="$("$F" "$SCRIPT")"
 
-echo "[RUN] Wrap to be executed (credentials redacted):" >&2
+echo_verbose "[RUN] Wrap to be executed (credentials redacted):" >&2
 if [[ "$WRAPPED" == "$ORIGINAL_SCRIPT" ]]
 then
-    echo "<same as received>"
+    echo_verbose "<same as received>"
 else
-    grep -vi "PASSWORD\|USERNAME" "$WRAPPED" >&2
+    cat_verbose <(grep -vi "PASSWORD\|USERNAME" "$WRAPPED") >&2
 fi
 
-echo "[RUN] Output:" >&2
+echo_verbose "[RUN] Output:" >&2
 if [[ "$USESLURM" ==  "useslurm" ]]
 then
-    echo "[RUN] Submitting wrapped script ($WRAPPED) to custom executor queue..."
+    echo_verbose "[RUN] Submitting wrapped script ($WRAPPED) to custom executor queue..."
     # shellcheck source=./src/custom_executor_queue.sh
     source "$SRC/custom_executor_queue.sh"
     # shellcheck disable=SC1091
@@ -130,6 +130,6 @@ then
 fi
 
 EXIT_CODE=$?
-echo "[RUN] Exit code: $EXIT_CODE" >&2
-echo "[RUN] End of Output:" >&2
+echo_verbose "[RUN] Exit code: $EXIT_CODE" >&2
+echo_verbose "[RUN] End of Output:" >&2
 exit "$EXIT_CODE"

@@ -13,7 +13,7 @@ if [[ "$USESLURM" == "useslurm" ]]
 then
     # shellcheck source=./src/slurm-include.sh
     source "$SRC/slurm-include.sh"
-    echo  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
+    echo_verbose  "[PREPARE] Using workspace $CE_QUEUE_WORKSPACE..." >&2
 elif [[ "$USESLURM" == "noslurm" ]]
 then
     # shellcheck source=./src/include.sh
@@ -50,7 +50,7 @@ then
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     fi
 fi
-echo -n "[PREPARE] "; validate_containerisation_backend \
+echo_verbose -n "[PREPARE] "; validate_containerisation_backend \
                              "$CONTAINERISATION_BACKEND" \
                              "$CUSTOM_ENV_CI_JOB_IMAGE" \
                              "$CUSTOM_ENV_IMAGEFILE"
@@ -59,7 +59,7 @@ echo -n "[PREPARE] "; validate_containerisation_backend \
 
 if [[ -n "$CUSTOM_ENV_CI_JOB_IMAGE" ]] || [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
 then
-    echo  "[PREPARE] Using image $CUSTOM_ENV_CI_JOB_IMAGE" >&2
+    echo_verbose  "[PREPARE] Using image $CUSTOM_ENV_CI_JOB_IMAGE" >&2
 
     case "$CONTAINERISATION_BACKEND" in
         enroot)
@@ -69,9 +69,9 @@ then
             PREPARE_SCRIPT="$SRC/prepare-apptainer.sh"
             ;;
         *)
-            echo "[PREPARE] Error: No valid container backend specified"
-            echo "[PREPARE]        (i.e., apptainer or enroot)"
-            echo "[PREPARE]        but job requires a container image."
+            echo_verbose "[PREPARE] Error: No valid container backend specified"
+            echo_verbose "[PREPARE]        (i.e., apptainer or enroot)"
+            echo_verbose "[PREPARE]        but job requires a container image."
             exit 22
             ;;
     esac
@@ -97,10 +97,10 @@ EOF
     chmod +x "$WRAP"
 
 
-    echo "[PREPARE] Wrap to be executed (credentials redacted):" >&2
-    echo "==========================" >&2
-    grep -vi "PASSWORD\|USERNAME" "$WRAP" >&2
-    echo "==========================" >&2
+    echo_verbose "[PREPARE] Wrap to be executed (credentials redacted):" >&2
+    echo_verbose "==========================" >&2
+    cat_verbose <(grep -vi "PASSWORD\|USERNAME" "$WRAP") >&2
+    echo_verbose "==========================" >&2
     if [[ "$USESLURM" == "useslurm" ]]
     then
         # shellcheck source=./src/custom_executor_queue.sh
@@ -113,5 +113,5 @@ EOF
              "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
     fi
 else
-    echo "[PREPARE] No image selected." >&2
+    echo_verbose "[PREPARE] No image selected." >&2
 fi

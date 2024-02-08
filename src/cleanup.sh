@@ -18,18 +18,6 @@ then
     fi
 
     # End lifetime of the CE queue workspace
-    set +o nounset
-    if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
-    then
-        DEBUG="NO"
-    else
-       DEBUG="YES"
-    fi
-
-    if [[ -z "$CUSTOM_ENV_CE_DEBUG_DIR" ]]
-    then
-        CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug"
-    fi
 
     if [[ "$CUSTOM_ENV_KILL_SLURM" -eq 1 ]] && has_slurm_job_id "$CE_QUEUE_WORKSPACE"
     then
@@ -41,7 +29,7 @@ then
 
     remove_old_workspaces
     terminate_slurm_allocation_if_required "$KILL_SLURM"
-    backup_ce_workspace_if_debug "$DEBUG"
+    backup_ce_workspace_if_debug "${CUSTOM_ENV_CE_DEBUG_LVL:-0}"
     cleanup_ce_job_group
 
 elif [[ "$USESLURM" == "noslurm" ]]
@@ -50,14 +38,4 @@ then
     source "$SRC"/cleanup-include.sh
 fi
 
-set +o nounset
-if [[ -z "$CUSTOM_ENV_CI_JOB_IMAGE" ]]
-then
-    export CUSTOM_ENV_CI_JOB_IMAGE=""
-fi
-if [ -z "$CUSTOM_ENV_IMAGEFILE" ]
-then
-    CUSTOM_ENV_IMAGEFILE=''
-fi
-set -o nounset
 cleanup_containers "$CONTAINERISATION_BACKEND"

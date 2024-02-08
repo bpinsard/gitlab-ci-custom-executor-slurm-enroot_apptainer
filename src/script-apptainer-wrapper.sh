@@ -9,6 +9,10 @@ SCRIPTFILETOWRAP="$1"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # shellcheck source=./src/containerlib-apptainer.sh
 source "$SRC"/containerlib-apptainer.sh
+# shellcheck source=./src/containerlib-enroot.sh
+source "$SRC"/include.sh
+
+DECLARATIONS=$(mktemp)
 
 cat <<EOF
 set -o errexit
@@ -18,7 +22,9 @@ EOF
 
 # This line will print the environment variables
 # shellcheck disable=SC2086
-{ env | grep -qE '^APPTAINER'; } && declare -p ${!APPTAINER*}
+{ env | grep -qE '^APPTAINER'; } && declare -p ${!APPTAINER*} > "$DECLARATIONS"
+
+cat "$DECLARATIONS"
 
 set +o nounset
 if [ -z "$CUSTOM_ENV_APPTAINER_EXEC_OPTIONS" ]
@@ -42,3 +48,6 @@ then
     exit "\$status"
 fi
 EOF
+
+cat_verbose "$DECLARATIONS" 1>&2
+rm "$DECLARATIONS"

@@ -114,3 +114,18 @@ function teardown() {
     )
 
 }
+
+@test "Not much diagnostics is given when testing workspaces if CE_DEBUG_LVL=0 (noslurm)" {
+
+    export CUSTOM_ENV_CE_DEBUG_LVL=0
+    run "$SRC"/configure.sh none noslurm 3> /dev/null
+    refute_output --regexp "cews_0 has no env"
+    refute_output --regexp "cews_1 has no slurmenv"
+    refute_output --regexp "slurmenv is different for .*cews_2"
+    refute_output --partial "#SBATCH"
+
+
+    # the json is contained only once in the output, i.e. not in stderr
+    [ "$(echo "$output" | grep -c builds_dir)" -eq 1 ]
+
+}

@@ -125,7 +125,7 @@ Features:
     - [ ] Unit
     - [ ] Integration
   - Connect the batch script's standard input, output and error  with `/dev/null`: `--input=/dev/null` `--output=/dev/null` `--error=/dev/null`
-    This does not happen when the variable `CUSTOM_ENV_CE_DEBUG` is set.
+    This does not happen when the variable `CUSTOM_ENV_CE_DEBUG_LVL` is set to 2 or more.
     - [X] Unit
     - [ ] Integration
 
@@ -271,7 +271,7 @@ for `--writable` (or similar) flag.
     - [ ] Integration
 
 - [X] old custom executors workspaces need to be deleted
-- [X] if `CUSTOM_ENV_CE_DEBUG` is set, 
+- [X] if `CUSTOM_ENV_CE_DEBUG_LVL` is set, 
       the directories are copied into "$HOME/ce-debug"  for later inspection.
 - [ ] containers created in the prepare.sh step need to be removed
   - [X] enroot
@@ -281,7 +281,7 @@ for `--writable` (or similar) flag.
         to point inside the right directories.
   - [X] apptainer
     - removing CE_IMAGEFILE
-  - [X] unless `CUSTOM_ENV_CE_DEBUG` is set
+  - [X] unless `CUSTOM_ENV_CE_DEBUG_LVL` is set
 
    
 ## Diagnostics

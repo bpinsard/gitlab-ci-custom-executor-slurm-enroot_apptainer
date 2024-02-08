@@ -67,7 +67,7 @@ function teardown_file(){
     source "$CE_QUEUE_WORKSPACE/.env"
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CE_DEBUG=
+    export CUSTOM_ENV_CE_DEBUG_LVL=
     "$SRC/cleanup.sh" apptainer useslurm
 
     # shellcheck source=./src/containerlib-apptainer.sh
@@ -92,16 +92,16 @@ function teardown_file(){
     )
 }
 
-@test "apptainer image should not be removed if CUSTOM_ENV_CE_DEBUG is set" {
+@test "apptainer image should not be removed if CUSTOM_ENV_CE_DEBUG_LVL > 1" {
     (
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     # We need this preparation step for container stuff
     "$SRC/prepare-apptainer.sh"
 
-    # shellcheck disable=SC2031
-    export CUSTOM_ENV_CE_DEBUG=1
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=2
+    # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-apptainer"
 
 
@@ -116,6 +116,31 @@ function teardown_file(){
     assert_exists "$CE_IMAGEFILE"
     )
 }
+@test "apptainer image should still be removed if CUSTOM_ENV_CE_DEBUG_LVL = 1" {
+    (
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-apptainer.sh"
+
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-apptainer"
+
+
+    # shellcheck disable=SC1091
+    source "$CE_QUEUE_WORKSPACE/.env"
+
+    "$SRC/cleanup.sh" apptainer useslurm
+
+    # shellcheck source=./src/containerlib-apptainer.sh
+    source "$SRC"/containerlib-apptainer.sh
+
+    assert_not_exists "$CE_IMAGEFILE"
+    )
+}
+
 
 @test "when CUSTOM_ENV_IMAGEFILE is defined, that file is not deleted" {
 
@@ -141,8 +166,33 @@ function teardown_file(){
 
 }
 
-@test "when IMAGEFILE and CI_JOB_IMAGE are defined, IMAGEFILE is not deleted" {
+@test "when IMAGEFILE and CI_JOB_IMAGE are defined, IMAGEFILE is not deleted - no message" {
 
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE="docker://debian:latest"
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-apptainer.sh"
+
+    echo "Prepared..."
+    # shellcheck disable=SC1091
+    source "$CE_QUEUE_WORKSPACE/.env"
+
+    touch "$CUSTOM_ENV_IMAGEFILE"
+
+    run "$SRC/cleanup.sh" apptainer useslurm
+
+    echo "Cleaned."
+    assert_exists "$CUSTOM_ENV_IMAGEFILE"
+    refute_output --partial "Not Removing"
+
+}
+
+
+@test "IMAGEFILE,CI_JOB_IMAGE defined, CE_DEBUG_LVL > 0, then message IMAGEFILE not deleted" {
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
     #shellcheck disable=SC2031
@@ -158,6 +208,8 @@ function teardown_file(){
 
     touch "$CUSTOM_ENV_IMAGEFILE"
 
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
     run "$SRC/cleanup.sh" apptainer useslurm
 
     echo "Cleaned."

@@ -71,14 +71,36 @@ function teardown() {
 
 }
 
-@test "Relevant diagnostics is given when testing workspaces" {
+@test "Relevant diagnostics is given when testing workspaces if CE_DEBUG_LVL>0" {
 
+    # shellcheck disable=SC2030
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
     run "$SRC"/configure.sh none useslurm 3> /dev/null
     assert_output --regexp "cews_0 has no env"
     assert_output --regexp "cews_1 has no slurmenv"
     assert_output --regexp "slurmenv is different for .*cews_2"
+    assert_output --partial "#SBATCH"
+
+    # the json output is contained twice in the output, in stdout and stderr
+    [ "$(echo "$output" | grep -c builds_dir)" -eq 2 ]
+}
+
+@test "Not much diagnostics is given when testing workspaces if CE_DEBUG_LVL=0" {
+
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=0
+    run "$SRC"/configure.sh none useslurm 3> /dev/null
+    refute_output --regexp "cews_0 has no env"
+    refute_output --regexp "cews_1 has no slurmenv"
+    refute_output --regexp "slurmenv is different for .*cews_2"
+    refute_output --partial "#SBATCH"
+
+
+    # the json output is contained only once in the output, i.e. not in stderr
+    [ "$(echo "$output" | grep -c builds_dir)" -eq 1 ]
 
 }
+
 
 
 @test "custom executor queue is started in (mocked) slurm allocation" {
@@ -354,3 +376,4 @@ EOF
     )
 
 }
+

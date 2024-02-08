@@ -56,7 +56,7 @@ function teardown() {
     run "$SRC/cleanup.sh" nonexisting-backend noslurm
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --regexp "Invalid containerisation backend: nonexisting-backend"
+    assert_output --regexp "Error: Invalid containerisation backend: nonexisting-backend"
 }
 
 @test "cleanup should be happy if 'none' is passed as an argument and image is not used (no slurm)" {

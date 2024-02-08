@@ -94,7 +94,7 @@ function teardown_file(){
 
 
 
-@test "cleanup copies the CE queue workspaces to ~/ce-debug/cews_.../ if CUSTOM_ENV_CE_DEBUG is set" {
+@test "cleanup copies the CE queue workspaces to ~/ce-debug/cews_.../ if CUSTOM_ENV_CE_DEBUG_LVL is set" {
 
     # This should be removed
     mkdir -p "$CUSTOM_ENV_CI_WS/cews_10"
@@ -110,7 +110,7 @@ function teardown_file(){
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CE_DEBUG=1
+    export CUSTOM_ENV_CE_DEBUG_LVL=2
     "$SRC/cleanup.sh" enroot useslurm
 
     assert_dir_exists "$HOME/ce-debug/cews_10"
@@ -129,7 +129,7 @@ function teardown_file(){
     run "$SRC/cleanup.sh" nonexisting-backend useslurm
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --regexp "Invalid containerisation backend: nonexisting-backend"
+    assert_output --regexp "Error: Invalid containerisation backend: nonexisting-backend"
 }
 
 @test "cleanup should be happy if 'none' is passed as an argument and image is not used" {
@@ -174,16 +174,27 @@ function teardown_file(){
 
 }
 
-@test "if CUSTOM_ENV_CE_DEBUG is set, save current WS"  {
+@test "if CUSTOM_ENV_CE_DEBUG_LVL > 1, save current WS"  {
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CE_QUEUE_WORKSPACE/.env"
 
-    # shellcheck disable=SC2031
-    export CUSTOM_ENV_CE_DEBUG=1
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=2
     "$SRC/cleanup.sh" enroot useslurm
 
     assert_dir_exists "$HOME/ce-debug/cews_0"
+}
 
+@test "if CUSTOM_ENV_CE_DEBUG_LVL = 1, do not save current WS"  {
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+    echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CE_QUEUE_WORKSPACE/.env"
+
+    rm -r "$HOME/ce-debug/cews_0"
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
+    "$SRC/cleanup.sh" enroot useslurm
+
+    assert_dir_not_exists "$HOME/ce-debug/cews_0"
 }
 
 
@@ -237,5 +248,17 @@ EOF
     run "$SRC/cleanup.sh" enroot useslurm
     assert_success
     assert_not_exists "$MOCKLOGDIR/enroot.log"
+
+}
+
+@test "minimal output when CE_DEBUG_LVL=0" {
+
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=0
+
+    run "$SRC/cleanup.sh" enroot useslurm
+    assert_output "[CLEANUP] Cleaning up..."
 
 }

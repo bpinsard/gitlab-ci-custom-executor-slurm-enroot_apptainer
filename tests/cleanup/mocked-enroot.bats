@@ -68,7 +68,7 @@ function teardown_file(){
     source "$CE_QUEUE_WORKSPACE/.env"
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CE_DEBUG=
+    export CUSTOM_ENV_CE_DEBUG_LVL=
     "$SRC/cleanup.sh" enroot useslurm
 
     # Out mock is not so clever, this does not work.
@@ -94,7 +94,7 @@ function teardown_file(){
     source "$CE_QUEUE_WORKSPACE/.env"
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_CE_DEBUG=
+    export CUSTOM_ENV_CE_DEBUG_LVL=
     "$SRC/cleanup.sh" enroot useslurm
 
     # Out mock is not so clever, this does not work.
@@ -124,16 +124,16 @@ function teardown_file(){
     )
 }
 
-@test "enroot container should not be removed if CUSTOM_ENV_CE_DEBUG is set" {
+@test "enroot container should not be removed if CUSTOM_ENV_CE_DEBUG_LVL > 1" {
 
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
 
     # We need this preparation step for container stuff
     "$SRC/prepare-enroot.sh"
 
-    # shellcheck disable=SC2031
-    export CUSTOM_ENV_CE_DEBUG=1
-    # shellcheck disable=SC2031
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=2
+    # shellcheck disable=SC2030
     export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-enroot"
 
     # shellcheck disable=SC1091
@@ -142,5 +142,26 @@ function teardown_file(){
 
     run cat "$MOCKLOGDIR/enroot.log"
     refute_line --regexp "\sremove\s"
+
+}
+
+@test "enroot container should still be removed if CUSTOM_ENV_CE_DEBUG_LVL = 1" {
+
+    wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-enroot.sh"
+
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
+    # shellcheck disable=SC2031
+    export CUSTOM_ENV_CE_DEBUG_DIR="$HOME/ce-debug-mocked-enroot"
+
+    # shellcheck disable=SC1091
+    source "$CE_QUEUE_WORKSPACE/.env"
+    "$SRC/cleanup.sh" enroot useslurm
+
+    run cat "$MOCKLOGDIR/enroot.log"
+    assert_line --regexp "\sremove\s"
 
 }

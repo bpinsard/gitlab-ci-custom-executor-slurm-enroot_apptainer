@@ -63,12 +63,14 @@ function teardown() {
 
 }
 
-@test "prepare communicates the containerisation backend (no slurm)" {
+@test "prepare communicates the containerisation backend if CE_DEBUG_LVL>0 (no slurm)" {
     (
     #shellcheck disable=SC2030,SC2031
     CUSTOM_ENV_CI_JOB_IMAGE=""
     #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
+
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
     run prepare.sh none noslurm
     assert_output --regexp "Containerisation backend: none"
     )

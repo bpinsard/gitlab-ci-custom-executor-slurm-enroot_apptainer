@@ -93,12 +93,14 @@ function teardown() {
 
 }
 
-@test "prepare communicates the containerisation backend" {
+@test "prepare communicates the containerisation backend if CE_DEBUG_LVL>0" {
     (
     #shellcheck disable=SC2030,SC2031
     CUSTOM_ENV_CI_JOB_IMAGE=""
     #shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
+
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
     run prepare.sh none useslurm
     assert_output --regexp "Containerisation backend: none"
     )
@@ -111,7 +113,7 @@ function teardown() {
     run prepare.sh some-random-string useslurm
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --regexp "Invalid containerisation backend: some-random-string"
+    assert_output --regexp "Error: Invalid containerisation backend: some-random-string"
 
 }
 
