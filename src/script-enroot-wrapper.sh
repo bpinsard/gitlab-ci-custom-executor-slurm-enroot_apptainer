@@ -36,8 +36,9 @@ set -o nounset
 EOF
 
 # This line will print the environment variables
+ENROOTVARS=${!ENROOT*}
 # shellcheck disable=SC2086
-{ env | grep -qE '^ENROOT'; } && declare -p ${!ENROOT*} > "$DECLARATIONS"
+declare -p ${ENROOTVARS:-""} 2> /dev/null > "$DECLARATIONS"
 
 cat "$DECLARATIONS"
 
