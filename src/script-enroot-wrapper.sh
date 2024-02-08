@@ -24,7 +24,10 @@ fi
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 # shellcheck source=./src/containerlib-enroot.sh
 source "$SRC"/containerlib-enroot.sh
+# shellcheck source=./src/include.sh
+source "$SRC"/include.sh
 
+DECLARATIONS=$(mktemp)
 
 cat <<EOF
 set -o errexit
@@ -34,7 +37,9 @@ EOF
 
 # This line will print the environment variables
 # shellcheck disable=SC2086
-{ env | grep -qE '^ENROOT'; } && declare -p ${!ENROOT*}
+{ env | grep -qE '^ENROOT'; } && declare -p ${!ENROOT*} > "$DECLARATIONS"
+
+cat "$DECLARATIONS"
 
 cat <<EOF
 COMMAND=(enroot start 
@@ -52,3 +57,6 @@ then
     exit "\$status"
 fi
 EOF
+
+cat_verbose "$DECLARATIONS" 1>&2
+rm "$DECLARATIONS"

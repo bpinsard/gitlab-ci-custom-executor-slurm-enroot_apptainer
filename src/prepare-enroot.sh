@@ -8,6 +8,8 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # shellcheck source=./src/containerlib-enroot.sh
 source "$SRC"/containerlib-enroot.sh
+# shellcheck source=./src/include.sh
+source "$SRC"/include.sh
 
 CE_IMAGEDIR="$(mktemp -d "$CUSTOM_ENV_CI_WS/imagedirXXXXX")"
 
@@ -33,7 +35,7 @@ then
         CE_IMAGEFILE="$CE_IMAGEDIR"/image.sqsh
     fi
 
-    echo "[PREPARE] Enroot: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
+    echo_verbose "[PREPARE] Enroot: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2
 
     COMMAND=(enroot
              import

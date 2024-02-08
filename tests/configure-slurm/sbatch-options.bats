@@ -74,7 +74,7 @@ function teardown() {
 
     (
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_CE_DEBUG=
+    export CUSTOM_ENV_CE_DEBUG_LVL=
     "$SRC"/configure.sh none useslurm 3> /dev/null | json_validate
     echo "sbatch mock log:"
     echo "===================="
@@ -88,11 +88,11 @@ function teardown() {
 
 }
 
-@test "sbatch NOT invoked with --{output,error}=/dev/null when CUSTOM_ENV_CE_DEBUG is set." {
+@test "sbatch NOT invoked with --{output,error}=/dev/null when CUSTOM_ENV_CE_DEBUG_LVL is set." {
 
     (
     # shellcheck disable=SC2031
-    export CUSTOM_ENV_CE_DEBUG=1
+    export CUSTOM_ENV_CE_DEBUG_LVL=2
     "$SRC"/configure.sh none useslurm 3> /dev/null | json_validate
     run cat "$MOCKLOGDIR"/sbatch.log
     for STREAM in output error

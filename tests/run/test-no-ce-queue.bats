@@ -273,7 +273,7 @@ EOF
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --regexp "Invalid containerisation backend: some-invalid-string"
+    assert_output --regexp "Error: Invalid containerisation backend: some-invalid-string"
 
 }
 

@@ -15,12 +15,28 @@ function validate_containerisation_backend(){
     fi
     case "$CONTAINERISATION_BACKEND" in
     enroot|apptainer|none)
-        echo "Containerisation backend: $CONTAINERISATION_BACKEND" >&2
+        echo_verbose "Containerisation backend: $CONTAINERISATION_BACKEND" >&2
         ;;
     *)
-        echo "Invalid containerisation backend: $CONTAINERISATION_BACKEND" >&2
+        echo "Error: Invalid containerisation backend: $CONTAINERISATION_BACKEND" >&2
         exit "$SYSTEM_FAILURE_EXIT_CODE"
         ;;
     esac
 
+}
+
+
+function echo_verbose() {
+    if [ "${CUSTOM_ENV_CE_DEBUG_LVL:-0}" -gt 0 ]
+    then
+        echo "$@"
+    fi
+}
+
+
+function cat_verbose() {
+    if [ "${CUSTOM_ENV_CE_DEBUG_LVL:-0}" -gt 0 ]
+    then
+        cat "$@"
+    fi
 }

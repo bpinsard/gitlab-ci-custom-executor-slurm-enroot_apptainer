@@ -39,7 +39,7 @@ function wait_until_file_exists() {
     local T0="$SECONDS"
     if [ "$#" -ne 2 ]
     then
-	    echo "wrong number of arguments to ${FUNCNAME[0]}" >&2
+	    echo "Error: wrong number of arguments to ${FUNCNAME[0]}" >&2
 	    exit 22
     fi
     while [[ ! -f "$FILE" && "$SECONDS" -lt $((T0+MAXDELAY)) ]]
@@ -62,8 +62,8 @@ function check_or_set_custom_env_command_sbatch(){
         local SRC
         SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
         echo "Warning: CUSTOM_ENV_COMMAND_OPTIONS_SBATCH not set, working with default options" >&2
-        echo "         See header of $JOBSLURM" >&2
-        grep '#SBATCH' "$JOBSLURM" >&2
+        echo_verbose "         See header of $JOBSLURM" >&2
+        cat_verbose  "$JOBSLURM" | grep '#SBATCH' 1>&2
         export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH=""
     fi
     set -o nounset
@@ -87,7 +87,7 @@ function get_sbatch_command(){
     # DEBUG OPTIONS
 
     set +o nounset
-    if [[ -z "$CUSTOM_ENV_CE_DEBUG" ]]
+    if [[ -z "$CUSTOM_ENV_CE_DEBUG_LVL" ]]
     then
         COMMAND+=( --input=/dev/null
                    --output=/dev/null
@@ -152,7 +152,8 @@ function wait_for_job_to_be_ready(){
     done
 }
 
-
+# Note: the output of this function
+# is not printed to screen, but is further processed.
 function print_slurm_environment(){
 
     set +o nounset
@@ -165,6 +166,8 @@ function print_slurm_environment(){
 
 }
 
+# Note: the output of this function
+# is not printed to screen, but is further processed.
 function find_remaining_time_sec_in_allocation(){
 
     local WORKSPACE="$1"
@@ -205,17 +208,17 @@ function allocation_is_compatible(){
     local ANC="Allocation not compatible: "
     # shellcheck disable=SC2015
     { [[ -f "$WORKSPACE/.env" ]] ||
-          { echo "$ANC $WORKSPACE has no env" >&2 && return 1; } } &&
+          { echo_verbose "$ANC $WORKSPACE has no env" >&2 && return 1; } } &&
     { [[ -f "$WORKSPACE/slurmenv" ]] ||
-          { echo "$ANC $WORKSPACE has no slurmenv" >&2 && return 1; } } &&
+          { echo_verbose "$ANC $WORKSPACE has no slurmenv" >&2 && return 1; } } &&
     { [[ $(diff "$SLURMENV" "$WORKSPACE/slurmenv" | wc -l ) -eq 0 ]] ||
-          { echo "$ANC slurmenv is different for $WORKSPACE" >&2 && return 1; } } &&
+          { echo_verbose "$ANC slurmenv is different for $WORKSPACE" >&2 && return 1; } } &&
     { has_at_least_half_idle_time_left "$WORKSPACE" ||
-          { echo "$ANC not enough idle time left in $WORKSPACE" >&2 && return 1; } } &&
+          { echo_verbose "$ANC not enough idle time left in $WORKSPACE" >&2 && return 1; } } &&
     { ! has_slurm_job_id "$WORKSPACE"  ||
     [ "$JOB_TIME_SEC" -lt "$(find_remaining_time_sec_in_allocation "$WORKSPACE")"  ] &&
-        echo "Allocation Compatible: $WORKSPACE" >&2; } || {
-        echo "$ANC $WORKSPACE has slurm job id but not enough time in the allocation" >&2 && return 1 ;
+        echo_verbose "Allocation Compatible: $WORKSPACE" >&2; } || {
+        echo_verbose "$ANC $WORKSPACE has slurm job id but not enough time in the allocation" >&2 && return 1 ;
     }
 
 }
@@ -252,7 +255,7 @@ function look_for_workspace_with_suitable_slurm_allocation(){
     shopt -s nullglob
     for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
     do
-      echo "[CONFIGURE] Testing $SLURMENV_CANDIDATE $CUSTOM_ENV_JOB_TIME_SEC $DIR" >&2
+      echo_verbose "[CONFIGURE] Testing $SLURMENV_CANDIDATE $CUSTOM_ENV_JOB_TIME_SEC $DIR" >&2
 
       if allocation_is_compatible "$SLURMENV_CANDIDATE" "$CUSTOM_ENV_JOB_TIME_SEC" "$DIR"
       then
@@ -275,7 +278,7 @@ function create_new_slurm_workspace(){
                                  "$CUSTOM_ENV_DEFAULT_PARTITION" \
                                  "$WORKSPACE")"
 
-    echo "[CONFIGURE] Creating job script at $JOBSLURM ..." >&2
+    echo_verbose "[CONFIGURE] Creating job script at $JOBSLURM ..." >&2
 
     check_or_set_custom_env_command_sbatch "$JOBSLURM"
 
@@ -294,7 +297,7 @@ function create_new_slurm_workspace(){
     wait_until_file_exists "$WORKSPACE/.env" 90
 
     print_slurm_environment > "$WORKSPACE/slurmenv"
-    echo "[CONFIGURE] Configured workspace in $WORKSPACE" >&2
+    echo_verbose "[CONFIGURE] Configured workspace in $WORKSPACE" >&2
     echo "$WORKSPACE"
 
 }
@@ -320,7 +323,7 @@ function print_json_output_slurm(){
 EOF
 
     cat "$TMPFILE"
-    cat "$TMPFILE" 1>&2
+    cat_verbose "$TMPFILE" 1>&2
     rm "$TMPFILE"
 
 }

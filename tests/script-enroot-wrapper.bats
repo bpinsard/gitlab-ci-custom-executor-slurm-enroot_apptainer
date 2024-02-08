@@ -114,7 +114,10 @@ EOF
     sync "$SCRIPT_TO_WRAP"
     chmod +x "$SCRIPT_TO_WRAP"
 
+    echo "CUSTOM_ENV_CI_JOB_IMAGE" : "$CUSTOM_ENV_CI_JOB_IMAGE"
+    echo "CUSTOM_ENV_IMAGEFILE" : "$CUSTOM_ENV_IMAGEFILE"
     "$SRC/script-enroot-wrapper.sh" "$SCRIPT_TO_WRAP" > ./wrapped.sh
+
     sync ./wrapped.sh
     chmod +x ./wrapped.sh
 
@@ -134,7 +137,6 @@ EOF
         echo "Regex: ${VARNAME}.*${CUSTOM_ENV_CI_WS}"
         assert_file_contains "$MOCKLOGDIR/enroot.log" "${VARNAME}.*${CUSTOM_ENV_CI_WS}"
     done
-
 
 }
 

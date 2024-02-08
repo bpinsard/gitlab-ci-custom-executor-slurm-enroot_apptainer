@@ -28,7 +28,7 @@ then
 
     if [ -z "$WORKSPACE" ]
     then
-        echo "[CONFIGURE] No suitable workspace found." >&2
+        echo_verbose "[CONFIGURE] No suitable workspace found." >&2
         WORKSPACE=$(create_new_slurm_workspace)
     fi
 
