@@ -205,6 +205,15 @@ function teardown() {
 
 }
 
+
+@test "create_job_slurm - if WALLTIME_SECONDS > 86400, slurm_time_limit_from_seconds should fail" {
+    run slurm_time_limit_from_seconds 86401
+    assert_failure
+    assert_equal "$status" 22 # invalid argument
+    assert_output --partial "Error: Walltime Seconds > 1 day"
+
+}
+
 @test "create_job_slurm creates job.slurm in CUSTOM_ENV_CI_WS and returns the location" {
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ciws"

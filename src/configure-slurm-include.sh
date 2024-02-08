@@ -223,15 +223,28 @@ function allocation_is_compatible(){
 
 }
 
+function slurm_time_limit_from_seconds(){
+    WALLTIME_SECONDS="$1"
+    if [ "$WALLTIME_SECONDS" -gt 86400 ]
+    then
+        echo "Error: Walltime Seconds > 1 day"
+        return 22
+    fi
+    date -d@"$WALLTIME_SECONDS" -u +"%H:%M:%S"
+}
+
+
 function create_job_slurm(){
 
     local TEMPLATE="$1"
     local DEFAULT_PARTITION="$2"
-    local TIME_LIMIT="`date -d@$3 -u +%H:%M:%S`"
+    local TIME_LIMIT_SEC="$3"
+    local TIME_LIMIT_SLURM
+    TIME_LIMIT_SLURM="$(slurm_time_limit_from_seconds "$TIME_LIMIT_SEC")"
     local OUTDIR="$4"
 
     sed 's/%CUSTOM_ENV_DEFAULT_PARTITION%/'"$DEFAULT_PARTITION"'/' "$TEMPLATE" | \
-    sed 's/%CUSTOM_ENV_TIME%/'"$TIME_LIMIT"'/' \
+    sed 's/%CUSTOM_ENV_TIME%/'"$TIME_LIMIT_SLURM"'/' \
         > "$OUTDIR/job.slurm"
 
     chmod +x "$OUTDIR/job.slurm"
@@ -246,12 +259,7 @@ function look_for_workspace_with_suitable_slurm_allocation(){
     print_slurm_environment > "$SLURMENV_CANDIDATE"
 
 
-    set +o nounset
-    if [ -z "$CUSTOM_ENV_JOB_TIME_SEC" ]
-    then
-      CUSTOM_ENV_JOB_TIME_SEC=600
-    fi
-    set +o nounset
+    CUSTOM_ENV_JOB_TIME_SEC="${CUSTOM_ENV_JOB_TIME_SEC:-600}"
 
     WORKSPACE=""
     shopt -s nullglob
@@ -278,7 +286,7 @@ function create_new_slurm_workspace(){
 
     JOBSLURM="$(create_job_slurm "$SRC/job.slurm.template" \
                                  "$CUSTOM_ENV_DEFAULT_PARTITION" \
-                                 "$(($CUSTOM_ENV_JOB_TIME_SEC * 2))" \
+                                 "$(("${CUSTOM_ENV_JOB_TIME_SEC:-1800}" * 2))" \
                                  "$WORKSPACE")"
 
     echo_verbose "[CONFIGURE] Creating job script at $JOBSLURM ..." >&2
