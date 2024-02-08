@@ -7,7 +7,7 @@ source "$SRC"/include.sh
 function cleanup_containers() {
 
     local CONTAINERISATION_BACKEND="$1"
-    echo -n "[CLEANUP] "; validate_containerisation_backend \
+    echo_verbose -n "[CLEANUP] "; validate_containerisation_backend \
                                 "$CONTAINERISATION_BACKEND" \
                                 "${CUSTOM_ENV_CI_JOB_IMAGE:-}"  \
                                 "${CUSTOM_ENV_IMAGEFILE:-}"
@@ -20,12 +20,12 @@ function cleanup_containers() {
 
         case "$CONTAINERISATION_BACKEND" in
             enroot)
-                echo "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
+                echo_verbose "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
                 # shellcheck source=./src/cleanup-enroot.sh
                 source "$SRC/cleanup-enroot.sh"
                 ;;
             apptainer)
-                echo "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
+                echo_verbose "[CLEANUP] Invoking cleanup for $CONTAINERISATION_BACKEND"
                 # shellcheck source=./src/cleanup-apptainer.sh
                 source "$SRC/cleanup-apptainer.sh"
                 ;;

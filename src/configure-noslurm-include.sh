@@ -19,7 +19,7 @@ function print_json_output_noslurm(){
 }
 EOF
     cat "$TMPFILE"
-    cat "$TMPFILE" 1>&2
+    cat_verbose "$TMPFILE" 1>&2
     rm "$TMPFILE"
 
 }

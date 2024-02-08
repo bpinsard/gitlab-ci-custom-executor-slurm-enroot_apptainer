@@ -20,7 +20,7 @@ function terminate_slurm_allocation () {
 
 
 function remove_old_workspaces(){
-    echo "[CLEANUP] Removing old workspaces..." >&2
+    echo_verbose "[CLEANUP] Removing old workspaces..." >&2
     local CUSTOM_ENV_CE_DEBUG_DIR="${CUSTOM_ENV_CE_DEBUG_DIR:-$HOME/ce-debug}/"
     shopt -s nullglob
     for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
@@ -35,7 +35,7 @@ function remove_old_workspaces(){
                rm -r "${CUSTOM_ENV_CE_DEBUG_DIR:?}/$(basename "$DIR")"
                mv "$DIR" "$CUSTOM_ENV_CE_DEBUG_DIR"
            else
-               echo "[CLEANUP] Removing old workspace $DIR..." >&2
+               echo_verbose "[CLEANUP] Removing old workspace $DIR..." >&2
                rm -r "$DIR"
            fi
         fi
