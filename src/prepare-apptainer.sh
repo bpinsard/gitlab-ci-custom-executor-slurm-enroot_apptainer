@@ -8,6 +8,7 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # shellcheck source=./src/containerlib-apptainer.sh
 source "$SRC"/containerlib-apptainer.sh
+# shellcheck source=./src/include.sh
 source "$SRC"/include.sh
 
 echo_verbose "[PREPARE] Apptainer: pulling image $CUSTOM_ENV_CI_JOB_IMAGE to $CE_IMAGEFILE" >&2

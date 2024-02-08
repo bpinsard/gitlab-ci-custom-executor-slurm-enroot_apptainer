@@ -71,8 +71,9 @@ function teardown() {
 
 }
 
-@test "Relevant diagnostics is given when testing workspaces" {
+@test "Relevant diagnostics is given when testing workspaces and CE_DEBUG_LVL>0" {
 
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
     run "$SRC"/configure.sh none useslurm 3> /dev/null
     assert_output --regexp "cews_0 has no env"
     assert_output --regexp "cews_1 has no slurmenv"

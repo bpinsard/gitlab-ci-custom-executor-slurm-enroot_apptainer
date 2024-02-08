@@ -8,9 +8,9 @@ function validate_containerisation_backend(){
 
     if [ -n "$CI_JOB_IMAGE" ] || [ -n "$IMAGEFILE" ] && [ "$CONTAINERISATION_BACKEND" == "none" ]
     then
-        echo_verbose "Error: Job requires a container image but 'none' selected as backend. "
-        echo_verbose "       image: $CI_JOB_IMAGE"
-        echo_verbose "       imagefile: $IMAGEFILE"
+        echo "Error: Job requires a container image but 'none' selected as backend. "
+        echo "       image: $CI_JOB_IMAGE"
+        echo "       imagefile: $IMAGEFILE"
         exit "$SYSTEM_FAILURE_EXIT_CODE"
     fi
     case "$CONTAINERISATION_BACKEND" in
@@ -18,7 +18,7 @@ function validate_containerisation_backend(){
         echo_verbose "Containerisation backend: $CONTAINERISATION_BACKEND" >&2
         ;;
     *)
-        echo_verbose "Invalid containerisation backend: $CONTAINERISATION_BACKEND" >&2
+        echo "Error: Invalid containerisation backend: $CONTAINERISATION_BACKEND" >&2
         exit "$SYSTEM_FAILURE_EXIT_CODE"
         ;;
     esac
@@ -27,16 +27,16 @@ function validate_containerisation_backend(){
 
 
 function echo_verbose() {
-    if [ ! -z "${CUSTOM_ENV_VERBOSE_OUTPUT:-}" ]
+    if [ "${CUSTOM_ENV_CE_DEBUG_LVL:-0}" -gt 0 ]
     then
-        echo $@
+        echo "$@"
     fi
 }
 
 
 function cat_verbose() {
-    if [ ! -z "${CUSTOM_ENV_VERBOSE_OUTPUT:-}" ]
+    if [ "${CUSTOM_ENV_CE_DEBUG_LVL:-0}" -gt 0 ]
     then
-        cat $@
+        cat "$@"
     fi
 }

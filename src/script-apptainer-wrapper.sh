@@ -18,6 +18,9 @@ EOF
 
 # This line will print the environment variables
 # shellcheck disable=SC2086
+{ env | grep -qE '^APPTAINER'; } && declare -p ${!APPTAINER*} 1>&2
+
+# shellcheck disable=SC2086
 { env | grep -qE '^APPTAINER'; } && declare -p ${!APPTAINER*}
 
 set +o nounset

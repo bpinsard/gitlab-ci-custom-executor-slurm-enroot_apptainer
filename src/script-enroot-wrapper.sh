@@ -34,6 +34,9 @@ EOF
 
 # This line will print the environment variables
 # shellcheck disable=SC2086
+{ env | grep -qE '^ENROOT'; } && declare -p ${!ENROOT*} 1>&2
+
+# shellcheck disable=SC2086
 { env | grep -qE '^ENROOT'; } && declare -p ${!ENROOT*}
 
 cat <<EOF

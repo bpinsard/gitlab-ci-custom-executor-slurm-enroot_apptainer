@@ -8,6 +8,8 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 # shellcheck source=./src/containerlib-enroot.sh
 source "$SRC"/containerlib-enroot.sh
+# shellcheck source=./src/include.sh
+source "$SRC"/include.sh
 
 CE_IMAGEDIR="$(mktemp -d "$CUSTOM_ENV_CI_WS/imagedirXXXXX")"
 

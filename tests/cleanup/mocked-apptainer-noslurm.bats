@@ -109,7 +109,29 @@ function teardown() {
 
 }
 
-@test "when IMAGEFILE and CI_JOB_IMAGE are defined, IMAGEFILE is not deleted (noslurm)" {
+@test "when IMAGEFILE and CI_JOB_IMAGE are defined, IMAGEFILE is not deleted - no message (noslurm)" {
+
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
+    #shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CI_JOB_IMAGE="docker://debian:latest"
+
+    # We need this preparation step for container stuff
+    "$SRC/prepare-apptainer.sh"
+
+    echo "Prepared..."
+
+    touch "$CUSTOM_ENV_IMAGEFILE"
+
+    run "$SRC/cleanup.sh" apptainer noslurm
+
+    echo "Cleaned."
+    assert_exists "$CUSTOM_ENV_IMAGEFILE"
+    refute_output --partial "Not Removing"
+
+}
+
+@test "IMAGEFILE,CI_JOB_IMAGE defined, CE_DEBUG_LVL > 0, then message IMAGEFILE not deleted (noslurm)" {
 
     #shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_IMAGEFILE="$TEST_PLAYGROUND/afile.sif"
@@ -122,6 +144,7 @@ function teardown() {
     echo "Prepared..."
 
     touch "$CUSTOM_ENV_IMAGEFILE"
+    export CUSTOM_ENV_CE_DEBUG_LVL=1
 
     run "$SRC/cleanup.sh" apptainer noslurm
 
