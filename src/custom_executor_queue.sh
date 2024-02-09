@@ -211,7 +211,7 @@ function submit_to_custom_executor_queue_and_wait() {
     # wait for the `tail` process to pick up the changed file
     # the sleep needs to be sufficiently long for the output
     # to have been written, the -s flag might also play a role
-    sleep 10
+    sleep 2
     disown "$SUBPID"
     kill "$SUBPID" || true
     pkill -f -U "$USER" 'tail -s 1 -f '"$OUTPUTNAME" || true
