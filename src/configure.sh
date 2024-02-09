@@ -24,18 +24,17 @@ then
 
     export_all_custom_env_var_into_var_if_defined # SLURM ONLY?
 
-    WORKSPACE=$(look_for_workspace_with_suitable_slurm_allocation)
-
-    if [ -z "$WORKSPACE" ]
-    then
-        echo_verbose "[CONFIGURE] No suitable workspace found." >&2
-        WORKSPACE=$(create_new_slurm_workspace)
-    fi
-
     if [ "${CUSTOM_ENV_REUSE_WORKSPACE:-ON}" == "OFF" ]
     then
-        echo "[CONFIGURE] Creating new workspace." >&2
+        echo_verbose "[CONFIGURE] Creating new workspace." >&2
         WORKSPACE=$(create_new_slurm_workspace)
+    else
+        WORKSPACE=$(look_for_workspace_with_suitable_slurm_allocation)
+        if [ -z "$WORKSPACE" ]
+        then
+            echo_verbose "[CONFIGURE] No suitable workspace found." >&2
+            WORKSPACE=$(create_new_slurm_workspace)
+        fi
     fi
 
     CI_BUILDS_DIR="$CUSTOM_ENV_CI_WS/$BACKEND/$CUSTOM_ENV_CI_CONCURRENT_ID"
