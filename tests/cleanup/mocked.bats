@@ -178,6 +178,7 @@ function teardown_file(){
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CE_QUEUE_WORKSPACE/.env"
 
+    rm -rf "$HOME/ce-debug/cews_0"
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CE_DEBUG_LVL=2
     "$SRC/cleanup.sh" enroot useslurm
@@ -189,7 +190,7 @@ function teardown_file(){
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CE_QUEUE_WORKSPACE/.env"
 
-    rm -r "$HOME/ce-debug/cews_0"
+    rm -rf "$HOME/ce-debug/cews_0"
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_CE_DEBUG_LVL=1
     "$SRC/cleanup.sh" enroot useslurm
