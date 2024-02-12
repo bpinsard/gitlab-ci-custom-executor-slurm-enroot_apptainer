@@ -315,6 +315,27 @@ EOF
     assert_equal "$(diff env1 env2 | wc -l )" 0
     assert_file_contains env1 "cews_3"
 }
+@test "when envs match and time is enough but REUSE_WORKSPACE == OFF, allocation not reused" {
+
+    # shellcheck disable=SC2030,SC2031
+    export SLURM_JOB_ID=34343434 # the squeue mock gives us 10 min more
+    "$SRC"/configure.sh none useslurm 3> /dev/null | read-job-env.py > env1
+
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_JOB_TIME_SEC=500
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_REUSE_WORKSPACE=OFF
+    "$SRC"/configure.sh none useslurm 3> /dev/null | read-job-env.py > env2
+
+    echo "envs diff:"
+    diff <(grep -v CE_QUEUE_WORKSPACE env1) <(grep -v CE_QUEUE_WORKSPACE env2)
+
+    assert_equal "$(diff <(grep -v CE_QUEUE_WORKSPACE env1) <(grep -v CE_QUEUE_WORKSPACE env2) | wc -l )" 0
+    assert_file_contains env1 "cews_3"
+    assert_file_contains env2 "cews_4"
+}
+
+
 @test "when envs match but time does not, the allocation is not reused" {
 
     # shellcheck disable=SC2031

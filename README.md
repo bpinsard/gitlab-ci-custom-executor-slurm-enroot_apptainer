@@ -302,6 +302,8 @@ then the executor will try to schedule them on the same slurm allocation,
 if there is enough time left in that allocation.
 This would save the need to submit another job allocation 
 and wait for it to start.
+The allocation is not reused
+if the variable `REUSE_WORKSPACE` is set to `OFF`.
 **Note**: at the moment the executor is not clever enough
 to read the duration of the job from the `-t` or `--time` option
 in `COMMANDS_OPTIONS_SBATCH`. 
@@ -310,6 +312,7 @@ please set the `JOB_TIME_SEC` variable for the job
 to an appropriate value.
 If the variable is not set, it is assumed 
 that the job takes 600 seconds.
+
 
 
 ## Development 
