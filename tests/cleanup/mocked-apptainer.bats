@@ -182,6 +182,8 @@ function teardown_file(){
     source "$CE_QUEUE_WORKSPACE/.env"
 
     touch "$CUSTOM_ENV_IMAGEFILE"
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_CE_DEBUG_LVL=0
 
     run "$SRC/cleanup.sh" apptainer useslurm
 
