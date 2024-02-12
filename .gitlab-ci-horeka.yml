@@ -1,3 +1,6 @@
+variables:
+    CE_DEBUG_LVL: 1
+
 
 stages:
   - test
