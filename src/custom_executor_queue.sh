@@ -198,7 +198,7 @@ function submit_to_custom_executor_queue_and_wait() {
     EXITVALUEFNAME="$(_exitvaluefname "$TODONAME")"
     touch "$OUTPUTNAME"
     local JOB_END_SIGNAL="$DONENAME has ended, $OUTPUTNAME completed."
-    ( tail -f "$OUTPUTNAME" | grep -v "$JOB_END_SIGNAL"; ) &
+    ( tail -s 1 -f "$OUTPUTNAME" | grep -v "$JOB_END_SIGNAL"; ) &
     local SUBPID=$!
     while [ ! -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     do
@@ -208,9 +208,13 @@ function submit_to_custom_executor_queue_and_wait() {
     then
         wait_until_file_contains "$OUTPUTNAME" "$JOB_END_SIGNAL" 10
     fi
+    # wait for the `tail` process to pick up the changed file
+    # the sleep needs to be sufficiently long for the output
+    # to have been written, the -s flag might also play a role
+    sleep 2
     disown "$SUBPID"
     kill "$SUBPID" || true
-    pkill -f -U "$USER" 'tail -f '"$OUTPUTNAME" || true
+    pkill -f -U "$USER" 'tail -s 1 -f '"$OUTPUTNAME" || true
     if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
     then
     echo "Abnormal termination of Custom Executor Queue, exiting."
