@@ -29,6 +29,7 @@ function setup() {
     cd "$STARTDIR" || exit
 
     URL_DEFAULT="https://gitlab.kit.edu/"
+    CI_ALLOWED_COMMITTERS_FILE="$TEST_PLAYGROUND/allowed_committers"
 
     MOCK_INPUTS=(url
                  token
@@ -39,6 +40,8 @@ function setup() {
                  ci_ws
                  default-partition
                  yes # use slurm
+                 "$CI_ALLOWED_COMMITTERS_FILE"
+                 "Alice,Bob,Charles"
                 )
 
 }
@@ -592,5 +595,65 @@ function teardown() {
             "\-\-env DEFAULT_PARTITION"
 
 
+
+}
+
+@test "CI_ALLOWED_COMMITTERS_FILE created" {
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "$CI_ALLOWED_COMMITTERS_FILE" ]]
+        then
+        echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --allowed-committers-file-path "$CI_ALLOWED_COMMITTERS_FILE"
+
+    [ -f "$CI_ALLOWED_COMMITTERS_FILE" ]
+
+}
+
+@test "allowed committers file path mentioned in the help" {
+
+    run "$UTILS"/gitlab-runner-register-wrapper.sh --help
+    assert_output --partial "--allowed-committers-file-path"
+
+}
+
+@test "CI_ALLOWED_COMMITTERS_FILE variable set for the runner" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+            "\-\-env CI_ALLOWED_COMMITTERS_FILE"
+
+
+
+
+}
+
+
+@test "allowed committers added to the file" {
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+        if [[ "$mock_datum" != "Alice,Bob,CharlesMock" ]]
+        then
+          echo "$mock_datum"
+        fi
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --allowed-committers Alice,Bob,Charlie
+
+    assert_file_contains "$CI_ALLOWED_COMMITTERS_FILE" Alice
+    assert_file_contains "$CI_ALLOWED_COMMITTERS_FILE" Bob
+    assert_file_contains "$CI_ALLOWED_COMMITTERS_FILE" Charlie
+
+}
+
+@test "allowed committers mentioned in the help" {
+
+    run "$UTILS"/gitlab-runner-register-wrapper.sh --help
+    assert_output --partial "--allowed-committers "
 
 }

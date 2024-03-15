@@ -71,3 +71,19 @@ function setup(){
     grep_between "$SECTION_TITLE" '^##' -q 'If `CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE` is empty or not set' "$README"
 
 }
+
+@test "CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE managed by gitlab-runner-register-wrapper" {
+
+    [ -x "$PROJECT_ROOT/utils/gitlab-runner-register-wrapper.sh" ]
+
+    SECTION_TITLE="Important: Allowed committers for an executor"
+    grep_between "$SECTION_TITLE" '^##' -q 'gitlab-runner-register-wrapper.sh' "$README"
+
+
+
+    grep_ignoring_hash_comments \
+        -q "CI_ALLOWED_COMMITTERS_FILE created" \
+        "$TESTDIR"/test-gitlab-runner-register-wrapper.bats
+
+
+}

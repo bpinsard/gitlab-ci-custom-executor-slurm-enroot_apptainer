@@ -22,47 +22,57 @@ cat <<EOF
 This script eases the setup of the custom executor.
 It accepts the following options:
 
-    --url                 The url of the gitlab ci coordinator
-                          default:
-                          $URL_DEFAULT
+    --url                            The url of the gitlab ci coordinator
+                                     default:
+                                     $URL_DEFAULT
 
-    --registration-token  The registration token, to be obtained
-                          from the project page
-                          (Settings -> CI/CD -> Runners)
-                          on the gitlab web interface
+    --registration-token             The registration token, to be obtained
+                                     from the project page
+                                     (Settings -> CI/CD -> Runners)
+                                     on the gitlab web interface
 
-    --name|--description  A description for the runner
+    --name|--description             A description for the runner
 
-    --ce-repo             The location of the custom executor code
-                          default:
-                          $REPO
+    --ce-repo                        The location of the custom executor code
+                                     default:
+                                     $REPO
 
-    --container-backend   The backend used for containerised jobs,
-                          i.e., "enroot", "apptainer" or "none".
+    --container-backend              The backend used for containerised jobs,
+                                     i.e., "enroot", "apptainer" or "none".
 
-    --cache-dir-base      Directory where build cache is stored
-                          It will be created if it does not exist.
-                          Default:
-                          $CACHE_DIR_BASE_DEFAULT/<container-backend>
+    --cache-dir-base                 Directory where build cache is stored
+                                     It will be created if it does not exist.
+                                     Default:
+                                     $CACHE_DIR_BASE_DEFAULT/<container-backend>
 
-    --ci-ws               Workspace for the internals
-                          of the custom executor.
-                          It will be created if it does not exist.
-                          Default:
-                          $CI_WS_DEFAULT
+    --ci-ws                          Workspace for the internals
+                                     of the custom executor.
+                                     It will be created if it does not exist.
+                                     Default:
+                                     $CI_WS_DEFAULT
 
-     --use-slurm          Values accepted: yes/no.
-                          Whether to run the CI jobs in a slurm allocation
-                          or on the local node
-                          (where the runner has been launched).
+     --use-slurm                     Values accepted: yes/no.
+                                     Whether to run the CI jobs in a slurm allocation
+                                     or on the local node
+                                     (where the runner has been launched).
 
-    --default-partition   The default Slurm partition to use
-                          (can be overridden using the right
-                          environment variables)
-                          default:
-                          $DEFAULT_PARTITION_DEFAULT
+    --default-partition              The default Slurm partition to use
+                                     (can be overridden using the right
+                                     environment variables)
+                                     default:
+                                     $DEFAULT_PARTITION_DEFAULT
 
-    --help                Show this help and exit.
+    --allowed-committers-file-path   File containing a list of gitlab usernames
+                                     for the commits of which
+                                     CI jobs can be executed by this runner.
+                                     Will be used to store the content
+                                     of the option "allowed-committers"
+
+    --allowed-committers             Comma-separated list of gitlab usernames
+                                     for the commits of which
+                                     CI jobs can be executed by this runner.
+
+    --help                           Show this help and exit.
 
 In case some of the needed information is not provided using
 command line options, it will be asked for in an interactive way.
@@ -84,6 +94,8 @@ OPTSTRING+=",cache-dir-base:"
 OPTSTRING+=",ci-ws:"
 OPTSTRING+=",default-partition:"
 OPTSTRING+=",use-slurm:"
+OPTSTRING+=",allowed-committers-file-path:"
+OPTSTRING+=",allowed-committers:"
 OPTSTRING+=",help"
 
 export OPTSTRING
@@ -98,6 +110,9 @@ CACHE_DIR_BASE=""
 CI_WS=""
 DEFAULT_PARTITION=""
 USE_SLURM=""
+CI_ALLOWED_COMMITTERS_FILE=""
+ALLOWED_COMMITTERS=""
+
 
 SANITIZED_OPTIONS=$(getopt --name gitlab-runner-register-wrapper --longoptions "$OPTSTRING" -- "$0" "$@")
 eval set -- "$SANITIZED_OPTIONS"
@@ -145,6 +160,14 @@ case "$1" in
     --use-slurm)
         USE_SLURM="$2"
         shift
+        ;;
+    --allowed-committers-file-path)
+        CI_ALLOWED_COMMITTERS_FILE="$2"
+        shift;
+        ;;
+    --allowed-committers)
+        ALLOWED_COMMITTERS="$2"
+        shift;
         ;;
     --)
 	break
@@ -239,6 +262,28 @@ then
     DEFPART_ENV=""
 fi
 
+if [ -z "$CI_ALLOWED_COMMITTERS_FILE" ]
+then
+    echo "Location for the file containing the list of allowed committers:"
+    read -er CI_ALLOWED_COMMITTERS_FILE
+fi
+echo "Creating allowed commiters file:"
+mkdir -p "$(dirname "$CI_ALLOWED_COMMITTERS_FILE")"
+touch "$CI_ALLOWED_COMMITTERS_FILE"
+
+if [ -z "$ALLOWED_COMMITTERS" ]
+then
+    echo "Comma-separated list of allowed committers (gitlab usernames):"
+    read -er ALLOWED_COMMITTERS
+fi
+for committer in $(echo "$ALLOWED_COMMITTERS" | tr ',' ' ')
+do
+    echo "Adding $committer to $CI_ALLOWED_COMMITTERS_FILE"
+    echo "$committer" >> "$CI_ALLOWED_COMMITTERS_FILE"
+done
+
+
+
 
 SRC="$CE_REPO"/src
 
@@ -259,6 +304,7 @@ gitlab-runner register \
     --cache-dir="$CACHE_DIR_BASE/$CONTAINER_BACKEND" \
     --env CI_WS="$CI_WS" \
     "$DEFPART_ENV" \
+    --env CI_ALLOWED_COMMITTERS_FILE="$CI_ALLOWED_COMMITTERS_FILE" \
     --custom_build_dir-enabled \
     --custom-config-exec="$SRC/configure.sh" \
     --custom-config-exec-timeout=2000 \

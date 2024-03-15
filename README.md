@@ -177,6 +177,10 @@ can be spoofed
 but the value seen by the runner/executor
 cannot be modified from inside the pipeline file).
 
+The script `gitlab-runner-register-wrapper.sh` 
+takes also care of setting this file up for you,
+asking the relevant information.
+
 
 #### Workspace for the custom executor
 
