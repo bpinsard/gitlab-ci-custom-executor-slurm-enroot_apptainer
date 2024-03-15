@@ -28,6 +28,7 @@ function setup() {
     export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
+    setup_allowed_committers_file
     echo "Test setup phase completed."
 
 

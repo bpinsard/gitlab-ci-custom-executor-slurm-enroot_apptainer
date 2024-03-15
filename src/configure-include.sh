@@ -37,3 +37,48 @@ function find_available_workspace_name(){
 
 }
 
+function check_allowed_committer_list(){
+
+
+    { test -z "${CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE:-}"  && {
+
+          test "$CUSTOM_ENV_GITLAB_USER_LOGIN" == "$USER" || {
+
+              echo "[CONFIGURE]: Error: $CUSTOM_ENV_GITLAB_USER_LOGIN is not $USER" >&2
+              echo "             CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE undefined" >&2
+              exit "$SYSTEM_FAILURE_EXIT_CODE"
+
+          } } } ||  { {
+
+        {
+            local FILE_OWNER_UID USER_ID
+            FILE_OWNER_UID=$(stat -c "%u" "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE")
+            USER_ID=$(id -u)
+
+            test "$USER_ID" == "$FILE_OWNER_UID"
+        } || {
+
+            echo "[CONFIGURE]: Error: $CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE not owned by $USER" >&2
+            exit "$SYSTEM_FAILURE_EXIT_CODE"
+        } } && {
+        local PERMISSIONS
+        PERMISSIONS=$(stat -c "%A" "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE")
+        if ! [[ "$PERMISSIONS" =~ -r...-..-. ]]
+        then
+            echo "[CONFIGURE]: Error: $CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE has not the right permissions" >&2
+            echo "                    it should not be writable by anybody else than the owner." >&2
+            echo "                    (permissions: $PERMISSIONS)" >&2
+            exit "$SYSTEM_FAILURE_EXIT_CODE"
+        fi
+
+    } && {
+
+        grep -wq "$CUSTOM_ENV_GITLAB_USER_LOGIN" "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE"  || {
+            echo "[CONFIGURE]: Error: $CUSTOM_ENV_GITLAB_USER_LOGIN not in allowed committer list." >&2;
+            exit "$SYSTEM_FAILURE_EXIT_CODE";
+
+        }
+    }
+    }
+
+}

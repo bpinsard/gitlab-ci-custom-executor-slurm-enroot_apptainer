@@ -66,6 +66,8 @@ function setup(){
     fi
 
     export CUSTOM_ENV_KILL_SLURM=1
+
+    setup_allowed_committers_file
 }
 
 function teardown() {

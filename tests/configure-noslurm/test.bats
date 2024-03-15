@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2317
 
-# This is based on the tutorial for bats
-# https://bats-core.readthedocs.io/en/stable/tutorial.html
-
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
@@ -18,7 +15,7 @@ function setup() {
     load_mocks
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND="$PWD/configure-test-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/configure-noslurm-test-$BATS_TEST_NAME"
     echo "# Created test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
     export MOCKLOGDIR=$TEST_PLAYGROUND
@@ -32,6 +29,8 @@ function setup() {
 
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
+
+    setup_allowed_committers_file
 
     echo "Test setup phase completed."
 }

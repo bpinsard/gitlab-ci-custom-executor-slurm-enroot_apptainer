@@ -12,7 +12,7 @@ function setup() {
     load_mocks
     SRC="$PROJECT_ROOT"/src
 
-    TEST_PLAYGROUND="$PWD/cleanup-test-enroot-mocked-$BATS_TEST_NAME"
+    TEST_PLAYGROUND="$PWD/cleanup-test-enroot-mocked-noslurm-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
     mkdir "$TEST_PLAYGROUND"
 
@@ -28,6 +28,7 @@ function setup() {
     export CUSTOM_ENV_CI_JOB_IMAGE=docker://alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
+    setup_allowed_committers_file
     echo "Test setup phase completed."
 
 

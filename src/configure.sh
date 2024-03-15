@@ -14,6 +14,13 @@ USESLURM="$2"
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
+#shellcheck source=./src/configure-include.sh
+source "$SRC/configure-include.sh"
+
+check_allowed_committer_list
+
+
+
 
 if [[ "$USESLURM" == "useslurm" ]]
 then
@@ -22,24 +29,12 @@ then
 
     check_custom_env_ci_ws_set
 
-    export_all_custom_env_var_into_var_if_defined # SLURM ONLY?
-
-    if [ "${CUSTOM_ENV_REUSE_WORKSPACE:-ON}" == "OFF" ]
-    then
-        echo_verbose "[CONFIGURE] Creating new workspace." >&2
-        WORKSPACE=$(create_new_slurm_workspace)
-    else
-        WORKSPACE=$(look_for_workspace_with_suitable_slurm_allocation)
-        if [ -z "$WORKSPACE" ]
-        then
-            echo_verbose "[CONFIGURE] No suitable workspace found." >&2
-            WORKSPACE=$(create_new_slurm_workspace)
-        fi
-    fi
+    export_all_slurm_custom_env_var_into_var_if_defined
 
     CI_BUILDS_DIR="$CUSTOM_ENV_CI_WS/$BACKEND/$CUSTOM_ENV_CI_CONCURRENT_ID"
     mkdir -p "$CI_BUILDS_DIR"
 
+    WORKSPACE=$(determine_slurm_workspace "${CUSTOM_ENV_JOB_TIME_SEC:-600}" "${CUSTOM_ENV_REUSE_WORKSPACE:-ON}" )
     print_json_output_slurm "$CI_BUILDS_DIR" "$WORKSPACE"
 fi
 

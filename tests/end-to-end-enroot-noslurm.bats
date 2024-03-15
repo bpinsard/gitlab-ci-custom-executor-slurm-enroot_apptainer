@@ -63,6 +63,8 @@ function setup(){
       exit 1
     fi
 
+    setup_allowed_committers_file
+
 }
 
 function teardown() {

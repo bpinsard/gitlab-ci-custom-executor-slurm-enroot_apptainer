@@ -27,6 +27,7 @@ function setup(){
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
     export CUSTOM_ENV_CI_CONCURRENT_ID=42
 
+    setup_allowed_committers_file
 }
 
 function teardown() {

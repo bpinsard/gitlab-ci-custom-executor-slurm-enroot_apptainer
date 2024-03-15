@@ -38,7 +38,8 @@ function setup(){
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
 
-    }
+    setup_allowed_committers_file
+}
 
 function teardown() {
     if has_apptainer
