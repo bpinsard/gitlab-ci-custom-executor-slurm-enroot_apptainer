@@ -144,6 +144,45 @@ in the `tags:` section of the job definition
 in the CI/CD configuration file 
 (i.e., typically, `.gitlab-ci.yml`).
 
+#### Important: Allowed gitlab users for an executor
+
+Since the GitLab runner process 
+is run with the permissions of the user launching it,
+particular care must be taken
+to make sure that malicious actors 
+are not able to run arbitrary code.
+
+Please have a thorough look 
+at the [security implications](https://docs.gitlab.com/runner/security/)
+of self hosted runners.
+
+As an additional security measure,
+the custom executor can make use 
+of a list of allowed gitlab user usernames.
+
+The list of allowed gitlab users must be saved into a file
+that belongs to the user running the executor
+and is not writable from others.
+The path file can be passed as the last argument to the configure script.
+
+In case the file is not passed as an argument,
+the check is skipped
+(you can use this feature in case 
+you managing pipelines permissions elsewhere
+in a way which is satisfactory for you).
+
+
+Notice that the `GITLAB_USER_LOGIN` variable 
+can be spoofed 
+(it can be set manually when triggering the pipeline,
+but the value seen by the runner/executor
+cannot be modified from inside the pipeline file).
+
+The script `gitlab-runner-register-wrapper.sh` 
+takes also care of setting this file up for you,
+asking the relevant information.
+
+
 #### Workspace for the custom executor
 
 In order to use the custom executor,
@@ -162,6 +201,7 @@ e.g. [in the `.gitlab-ci.yml` file](https://docs.gitlab.com/ee/ci/variables/#def
 in [web interface](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-ui).
 or in the `environment` section of the configuration file
 of the runner (typically, `$HOME/.gitlab-runner/config.toml`).
+
 
 This variable needs to be an absolute path
 pointing to directory 

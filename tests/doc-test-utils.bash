@@ -8,11 +8,21 @@ function grep_between {
     ARGS=("$@")
     FILE="${ARGS[-1]}"
 
-    START_LINENO="$(grep -n "$START_STRING" "$FILE" | head -n 1 | cut -d: -f1)"
-    NLINES="$(grep -n "$END_STRING" <(tail -n +$((START_LINENO+1)) "$FILE") | head -n 1 | cut -d: -f1)"
+    START_LINENO="$(grep -in "$START_STRING" "$FILE" | head -n 1 | cut -d: -f1)"
+    NLINES="$(grep -in "$END_STRING" <(tail -n +$((START_LINENO+1)) "$FILE") | head -n 1 | cut -d: -f1)"
 
     NARGS=$(($#-1-2))
 
     grep "${@:3:$NARGS}" <( tail  -n +"$START_LINENO" "$FILE" | head -n "$((NLINES+1))")
+
+}
+
+function grep_ignoring_hash_comments {
+
+    ARGS=("$@")
+    FILE="${ARGS[-1]}"
+    NOPTIONS=$(($#-1))
+
+    sed 's/#.*$//' "$FILE" | grep "${@:1:$NOPTIONS}"
 
 }

@@ -23,7 +23,7 @@ function export_custom_env_var_into_var_if_defined() {
 
 }
 
-function export_all_custom_env_var_into_var_if_defined() {
+function export_all_slurm_custom_env_var_into_var_if_defined() {
     local SRC
     SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
@@ -259,15 +259,14 @@ function look_for_workspace_with_suitable_slurm_allocation(){
     print_slurm_environment > "$SLURMENV_CANDIDATE"
 
 
-    CUSTOM_ENV_JOB_TIME_SEC="${CUSTOM_ENV_JOB_TIME_SEC:-600}"
 
     WORKSPACE=""
     shopt -s nullglob
     for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
     do
-      echo_verbose "[CONFIGURE] Testing $SLURMENV_CANDIDATE $CUSTOM_ENV_JOB_TIME_SEC $DIR" >&2
+      echo_verbose "[CONFIGURE] Testing $SLURMENV_CANDIDATE $JOB_TIME_SEC $DIR" >&2
 
-      if allocation_is_compatible "$SLURMENV_CANDIDATE" "$CUSTOM_ENV_JOB_TIME_SEC" "$DIR"
+      if allocation_is_compatible "$SLURMENV_CANDIDATE" "$JOB_TIME_SEC" "$DIR"
       then
         WORKSPACE="$DIR"
         echo "[CONFIGURE] Found suitable workspace in $WORKSPACE" >&2
@@ -278,6 +277,7 @@ function look_for_workspace_with_suitable_slurm_allocation(){
 }
 
 function create_new_slurm_workspace(){
+    local JOB_TIME_SEC="$1"
 
     # finding a new workspace
     local WORKSPACE
@@ -286,7 +286,7 @@ function create_new_slurm_workspace(){
 
     JOBSLURM="$(create_job_slurm "$SRC/job.slurm.template" \
                                  "$CUSTOM_ENV_DEFAULT_PARTITION" \
-                                 "$(("${CUSTOM_ENV_JOB_TIME_SEC:-1800}" * 2))" \
+                                 "$(("$JOB_TIME_SEC" * 2))" \
                                  "$WORKSPACE")"
 
     echo_verbose "[CONFIGURE] Creating job script at $JOBSLURM ..." >&2
@@ -312,6 +312,28 @@ function create_new_slurm_workspace(){
     echo "$WORKSPACE"
 
 }
+
+function determine_slurm_workspace(){
+    local WORKSPACE
+    local JOB_TIME_SEC="$1"
+    local REUSE_WORKSPACE="$2"
+    if [ "${REUSE_WORKSPACE}" == "OFF" ]
+    then
+        echo_verbose "[CONFIGURE] Creating new workspace." >&2
+        WORKSPACE=$(create_new_slurm_workspace "$JOB_TIME_SEC")
+    else
+        WORKSPACE=$(look_for_workspace_with_suitable_slurm_allocation)
+        if [ -z "$WORKSPACE" ]
+        then
+            echo_verbose "[CONFIGURE] No suitable workspace found." >&2
+            WORKSPACE=$(create_new_slurm_workspace "$JOB_TIME_SEC")
+        fi
+    fi
+    echo "$WORKSPACE"
+}
+
+
+
 
 function print_json_output_slurm(){
     local CI_BUILDS_DIR

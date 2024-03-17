@@ -37,3 +37,42 @@ function find_available_workspace_name(){
 
 }
 
+function check_allowed_gitlab_user_list(){
+    local ALLOWED_GITLAB_USERS_FILE="$1"
+    local GITLAB_USER_LOGIN="$2"
+
+    [ -n "$ALLOWED_GITLAB_USERS_FILE" ] || return 0
+
+     {
+        {
+            local FILE_OWNER_UID USER_ID
+            FILE_OWNER_UID=$(stat -c "%u" "$ALLOWED_GITLAB_USERS_FILE")
+            USER_ID=$(id -u)
+
+            test "$USER_ID" == "$FILE_OWNER_UID"
+        } || {
+
+            echo "[CONFIGURE]: Error: $ALLOWED_GITLAB_USERS_FILE not owned by $USER" >&2
+            exit "$SYSTEM_FAILURE_EXIT_CODE"
+        } } && {
+        local PERMISSIONS
+        PERMISSIONS=$(stat -c "%A" "$ALLOWED_GITLAB_USERS_FILE")
+        if ! [[ "$PERMISSIONS" =~ -r...-..-. ]]
+        then
+            echo "[CONFIGURE]: Error: $ALLOWED_GITLAB_USERS_FILE has not the right permissions" >&2
+            echo "                    it should not be writable by anybody else than the owner." >&2
+            echo "                    (permissions: $PERMISSIONS)" >&2
+            exit "$SYSTEM_FAILURE_EXIT_CODE"
+        fi
+
+    } && {
+
+        grep -wq "$GITLAB_USER_LOGIN" "$ALLOWED_GITLAB_USERS_FILE"  || {
+            echo "[CONFIGURE]: Error: $GITLAB_USER_LOGIN not in allowed gitlab user list." >&2;
+            exit "$SYSTEM_FAILURE_EXIT_CODE";
+
+        }
+    }
+
+
+}

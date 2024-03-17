@@ -63,6 +63,8 @@ function setup(){
       exit 1
     fi
 
+    setup_allowed_gitlab_users_file
+
 }
 
 function teardown() {

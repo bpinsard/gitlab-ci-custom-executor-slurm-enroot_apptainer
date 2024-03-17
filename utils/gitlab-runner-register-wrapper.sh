@@ -22,47 +22,64 @@ cat <<EOF
 This script eases the setup of the custom executor.
 It accepts the following options:
 
-    --url                 The url of the gitlab ci coordinator
-                          default:
-                          $URL_DEFAULT
+    --url                            The url of the gitlab ci coordinator
+                                     default:
+                                     $URL_DEFAULT
 
-    --registration-token  The registration token, to be obtained
-                          from the project page
-                          (Settings -> CI/CD -> Runners)
-                          on the gitlab web interface
+    --registration-token             The registration token, to be obtained
+                                     from the project page
+                                     (Settings -> CI/CD -> Runners)
+                                     on the gitlab web interface
 
-    --name|--description  A description for the runner
+    --name|--description             A description for the runner
 
-    --ce-repo             The location of the custom executor code
-                          default:
-                          $REPO
+    --ce-repo                        The location of the custom executor code
+                                     default:
+                                     $REPO
 
-    --container-backend   The backend used for containerised jobs,
-                          i.e., "enroot", "apptainer" or "none".
+    --container-backend              The backend used for containerised jobs,
+                                     i.e., "enroot", "apptainer" or "none".
 
-    --cache-dir-base      Directory where build cache is stored
-                          It will be created if it does not exist.
-                          Default:
-                          $CACHE_DIR_BASE_DEFAULT/<container-backend>
+    --cache-dir-base                 Directory where build cache is stored
+                                     It will be created if it does not exist.
+                                     Default:
+                                     $CACHE_DIR_BASE_DEFAULT/<container-backend>
 
-    --ci-ws               Workspace for the internals
-                          of the custom executor.
-                          It will be created if it does not exist.
-                          Default:
-                          $CI_WS_DEFAULT
+    --ci-ws                          Workspace for the internals
+                                     of the custom executor.
+                                     It will be created if it does not exist.
+                                     Default:
+                                     $CI_WS_DEFAULT
 
-     --use-slurm          Values accepted: yes/no.
-                          Whether to run the CI jobs in a slurm allocation
-                          or on the local node
-                          (where the runner has been launched).
+     --use-slurm                     Values accepted: yes/no.
+                                     Whether to run the CI jobs in a slurm allocation
+                                     or on the local node
+                                     (where the runner has been launched).
 
-    --default-partition   The default Slurm partition to use
-                          (can be overridden using the right
-                          environment variables)
-                          default:
-                          $DEFAULT_PARTITION_DEFAULT
+    --default-partition              The default Slurm partition to use
+                                     (can be overridden using the right
+                                     environment variables)
+                                     default:
+                                     $DEFAULT_PARTITION_DEFAULT
 
-    --help                Show this help and exit.
+    --disable-gitlab-user-check      Disables the check on gitlab usernames
+                                     that would otherwise happen
+                                     at the configure stage of each job.
+                                     Use this option only if you are sure
+                                     that this runner will only be used
+                                     to run pipelines for trusted individuals,
+
+    --allowed-gitlab-users-file-path File containing a list of gitlab usernames
+                                     for the commits of which
+                                     CI jobs can be executed by this runner.
+                                     Will be used to store the content
+                                     of the option "allowed-gitlab-users"
+
+    --allowed-gitlab-users           Comma-separated list of gitlab usernames
+                                     for the commits of which
+                                     CI jobs can be executed by this runner.
+
+    --help                           Show this help and exit.
 
 In case some of the needed information is not provided using
 command line options, it will be asked for in an interactive way.
@@ -84,6 +101,9 @@ OPTSTRING+=",cache-dir-base:"
 OPTSTRING+=",ci-ws:"
 OPTSTRING+=",default-partition:"
 OPTSTRING+=",use-slurm:"
+OPTSTRING+=",disable-gitlab-user-check"
+OPTSTRING+=",allowed-gitlab-users-file-path:"
+OPTSTRING+=",allowed-gitlab-users:"
 OPTSTRING+=",help"
 
 export OPTSTRING
@@ -98,6 +118,10 @@ CACHE_DIR_BASE=""
 CI_WS=""
 DEFAULT_PARTITION=""
 USE_SLURM=""
+DISABLE_GITLAB_USERS_CHECK=""
+CI_ALLOWED_GITLAB_USERS_FILE=""
+ALLOWED_GITLAB_USERS=""
+
 
 SANITIZED_OPTIONS=$(getopt --name gitlab-runner-register-wrapper --longoptions "$OPTSTRING" -- "$0" "$@")
 eval set -- "$SANITIZED_OPTIONS"
@@ -145,6 +169,17 @@ case "$1" in
     --use-slurm)
         USE_SLURM="$2"
         shift
+        ;;
+    --disable-gitlab-user-check)
+        DISABLE_GITLAB_USERS_CHECK=yes;
+        ;;
+    --allowed-gitlab-users-file-path)
+        CI_ALLOWED_GITLAB_USERS_FILE="$2"
+        shift;
+        ;;
+    --allowed-gitlab-users)
+        ALLOWED_GITLAB_USERS="$2"
+        shift;
         ;;
     --)
 	break
@@ -239,6 +274,48 @@ then
     DEFPART_ENV=""
 fi
 
+if [ -z "$DISABLE_GITLAB_USERS_CHECK" ]
+then
+   if [ -z "$CI_ALLOWED_GITLAB_USERS_FILE" ]
+   then
+       echo "Location for the file containing the list of allowed gitlab users:"
+       read -er CI_ALLOWED_GITLAB_USERS_FILE
+   fi
+   echo "Creating allowed commiters file:"
+   mkdir -p "$(dirname "$CI_ALLOWED_GITLAB_USERS_FILE")"
+   touch "$CI_ALLOWED_GITLAB_USERS_FILE"
+
+   if [ -z "$ALLOWED_GITLAB_USERS" ]
+   then
+       echo "Comma-separated list of allowed gitlab users (gitlab usernames):"
+       read -er ALLOWED_GITLAB_USERS
+   fi
+   for gitlab_user in $(echo "$ALLOWED_GITLAB_USERS" | tr ',' ' ')
+   do
+       echo "Adding $gitlab_user to $CI_ALLOWED_GITLAB_USERS_FILE"
+       echo "$gitlab_user" >> "$CI_ALLOWED_GITLAB_USERS_FILE"
+   done
+
+   CONFIG_CI_ALLOWED_GITLAB_USER_CHECK="--custom-config-args=$CI_ALLOWED_GITLAB_USERS_FILE"
+else
+   CONFIG_CI_ALLOWED_GITLAB_USER_CHECK=""
+   if [ -n "$CI_ALLOWED_GITLAB_USERS_FILE" ]
+   then
+       echo "Error: --disable-gitlab-user-check and --allowed-gitlab-users-file-path are incompatible options"
+       exit 1
+   fi
+
+   if [ -n "$ALLOWED_GITLAB_USERS" ]
+   then
+       echo "Error: --disable-gitlab-user-check and --allowed-gitlab-users are incompatible options"
+       exit 1
+   fi
+
+fi
+
+
+
+
 
 SRC="$CE_REPO"/src
 
@@ -264,6 +341,7 @@ gitlab-runner register \
     --custom-config-exec-timeout=2000 \
     --custom-config-args="$CONTAINER_BACKEND" \
     --custom-config-args="$USE_SLURM_FLAG" \
+    "$CONFIG_CI_ALLOWED_GITLAB_USER_CHECK" \
     --custom-prepare-exec="$SRC/prepare.sh" \
     --custom-prepare-exec-timeout=200 \
     --custom-prepare-args="$CONTAINER_BACKEND" \
