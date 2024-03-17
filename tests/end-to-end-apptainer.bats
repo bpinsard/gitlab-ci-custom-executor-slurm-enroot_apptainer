@@ -64,7 +64,7 @@ function setup(){
 
     export CUSTOM_ENV_KILL_SLURM=1
 
-    setup_allowed_committers_file
+    setup_allowed_gitlab_users_file
 }
 
 function teardown() {

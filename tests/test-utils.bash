@@ -84,13 +84,13 @@ function try_to_remove_dir(){
     done
 }
 
-function setup_allowed_committers_file() {
+function setup_allowed_gitlab_users_file() {
     export CUSTOM_ENV_GITLAB_USER_LOGIN="Bob"
-    export CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE="$TEST_PLAYGROUND/.gitlab-ce-allowed-committers"
-    echo "Alice" > "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE"
-    echo "Bob" >> "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE"
-    echo "Charles" >> "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE"
+    export ALLOWED_GITLAB_USERS_FILE="$TEST_PLAYGROUND/.gitlab-ce-allowed-gitlab users"
+    echo "Alice" > "$ALLOWED_GITLAB_USERS_FILE"
+    echo "Bob" >> "$ALLOWED_GITLAB_USERS_FILE"
+    echo "Charles" >> "$ALLOWED_GITLAB_USERS_FILE"
 
-    chmod go-w "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE"
+    chmod go-w "$ALLOWED_GITLAB_USERS_FILE"
 
 }

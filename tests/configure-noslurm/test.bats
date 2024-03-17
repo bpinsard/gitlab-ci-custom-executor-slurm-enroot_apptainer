@@ -30,7 +30,7 @@ function setup() {
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
-    setup_allowed_committers_file
+    setup_allowed_gitlab_users_file
 
     echo "Test setup phase completed."
 }

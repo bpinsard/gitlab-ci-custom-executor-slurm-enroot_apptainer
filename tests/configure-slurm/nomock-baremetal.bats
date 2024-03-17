@@ -67,7 +67,7 @@ EOF
 
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env
 
-    setup_allowed_committers_file
+    setup_allowed_gitlab_users_file
 
 }
 

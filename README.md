@@ -144,7 +144,7 @@ in the `tags:` section of the job definition
 in the CI/CD configuration file 
 (i.e., typically, `.gitlab-ci.yml`).
 
-#### Important: Allowed committers for an executor
+#### Important: Allowed gitlab users for an executor
 
 Since the GitLab runner process 
 is run with the permissions of the user launching it,
@@ -158,17 +158,18 @@ of self hosted runners.
 
 As an additional security measure,
 the custom executor can make use 
-of a list of allowed committer usernames.
+of a list of allowed gitlab user usernames.
 
-The list of allowed committers must be saved into a file
+The list of allowed gitlab users must be saved into a file
 that belongs to the user running the executor
 and is not writable from others.
-The path of the file is specified in the `CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE`.
+The path file can be passed as the last argument to the configure script.
 
-
-If `CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE` is empty or not set,
-then the `GITLAB_USER_LOGIN` variable must coincide 
-with the value of the `USER` variable.
+In case the file is not passed as an argument,
+the check is skipped
+(you can use this feature in case 
+you managing pipelines permissions elsewhere
+in a way which is satisfactory for you).
 
 
 Notice that the `GITLAB_USER_LOGIN` variable 

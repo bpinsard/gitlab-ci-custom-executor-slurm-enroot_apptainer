@@ -46,43 +46,38 @@ function setup(){
     grep_ignoring_hash_comments -q '"when envs match and time is enough but REUSE_WORKSPACE == OFF, allocation not reused"' "$TESTDIR"/configure-slurm/test.bats
 }
 
-@test "committer restriction mentioned and implemented" {
+@test "gitlab user restriction mentioned and implemented" {
 
-    SECTION_TITLE="Important: Allowed committers for an executor"
+    SECTION_TITLE="Important: Allowed gitlab users for an executor"
     grep "$SECTION_TITLE" "$README"
 
     grep_between "$SECTION_TITLE" '^##' -qi 'https://docs.gitlab.com/runner/security/' "$README"
 
-    grep_ignoring_hash_comments -q "allowed committers are checked at the configure stage - failure" "$TESTDIR"/configure/tests.bats
-    grep_ignoring_hash_comments -q "allowed committers are checked at the configure stage - success" "$TESTDIR"/configure/tests.bats
-    grep_ignoring_hash_comments -q "allowed committers are checked at the configure stage - substring failure" "$TESTDIR"/configure/tests.bats
+    grep_ignoring_hash_comments -q "allowed gitlab users are checked at the configure stage - failure" "$TESTDIR"/configure/tests.bats
+    grep_ignoring_hash_comments -q "allowed gitlab users are checked at the configure stage - success" "$TESTDIR"/configure/tests.bats
+    grep_ignoring_hash_comments -q "allowed gitlab users are checked at the configure stage - substring failure" "$TESTDIR"/configure/tests.bats
 
 }
 
-@test "CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE mentioned and implemented" {
+@test "allowed gitlab users file mentioned and implemented" {
 
-    SECTION_TITLE="Important: Allowed committers for an executor"
+    SECTION_TITLE="Important: Allowed gitlab users for an executor"
 
-    grep_between "$SECTION_TITLE" '^##' -q 'CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE' "$README"
+    grep_between "$SECTION_TITLE" '^##' -iq 'the path file can be passed as the last argument to the configure script' "$README"
 
-    grep_ignoring_hash_comments -q "if CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE not defined, fail if GITLAB_USER_LOGIN!=USER" "$TESTDIR"/configure/tests.bats
-
-    # shellcheck disable=SC2016
-    grep_between "$SECTION_TITLE" '^##' -q 'If `CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE` is empty or not set' "$README"
+    grep_ignoring_hash_comments -iq "only if FILENAME passed as 3rd arg to configure, used as allowed gitlab users list." "$TESTDIR"/configure/tests.bats
 
 }
 
-@test "CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE managed by gitlab-runner-register-wrapper" {
+@test "allowed gitlab users file managed by gitlab-runner-register-wrapper" {
 
     [ -x "$PROJECT_ROOT/utils/gitlab-runner-register-wrapper.sh" ]
 
-    SECTION_TITLE="Important: Allowed committers for an executor"
+    SECTION_TITLE="Important: Allowed gitlab users for an executor"
     grep_between "$SECTION_TITLE" '^##' -q 'gitlab-runner-register-wrapper.sh' "$README"
 
-
-
     grep_ignoring_hash_comments \
-        -q "CI_ALLOWED_COMMITTERS_FILE created" \
+        -q "allowed gitlab users file created" \
         "$TESTDIR"/test-gitlab-runner-register-wrapper.bats
 
 

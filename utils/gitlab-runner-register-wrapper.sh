@@ -62,13 +62,20 @@ It accepts the following options:
                                      default:
                                      $DEFAULT_PARTITION_DEFAULT
 
-    --allowed-committers-file-path   File containing a list of gitlab usernames
+    --disable-gitlab-user-check      Disables the check on gitlab usernames
+                                     that would otherwise happen
+                                     at the configure stage of each job.
+                                     Use this option only if you are sure
+                                     that this runner will only be used
+                                     to run pipelines for trusted individuals,
+
+    --allowed-gitlab-users-file-path File containing a list of gitlab usernames
                                      for the commits of which
                                      CI jobs can be executed by this runner.
                                      Will be used to store the content
-                                     of the option "allowed-committers"
+                                     of the option "allowed-gitlab-users"
 
-    --allowed-committers             Comma-separated list of gitlab usernames
+    --allowed-gitlab-users           Comma-separated list of gitlab usernames
                                      for the commits of which
                                      CI jobs can be executed by this runner.
 
@@ -94,8 +101,9 @@ OPTSTRING+=",cache-dir-base:"
 OPTSTRING+=",ci-ws:"
 OPTSTRING+=",default-partition:"
 OPTSTRING+=",use-slurm:"
-OPTSTRING+=",allowed-committers-file-path:"
-OPTSTRING+=",allowed-committers:"
+OPTSTRING+=",disable-gitlab-user-check"
+OPTSTRING+=",allowed-gitlab-users-file-path:"
+OPTSTRING+=",allowed-gitlab-users:"
 OPTSTRING+=",help"
 
 export OPTSTRING
@@ -110,8 +118,9 @@ CACHE_DIR_BASE=""
 CI_WS=""
 DEFAULT_PARTITION=""
 USE_SLURM=""
-CI_ALLOWED_COMMITTERS_FILE=""
-ALLOWED_COMMITTERS=""
+DISABLE_GITLAB_USERS_CHECK=""
+CI_ALLOWED_GITLAB_USERS_FILE=""
+ALLOWED_GITLAB_USERS=""
 
 
 SANITIZED_OPTIONS=$(getopt --name gitlab-runner-register-wrapper --longoptions "$OPTSTRING" -- "$0" "$@")
@@ -161,12 +170,15 @@ case "$1" in
         USE_SLURM="$2"
         shift
         ;;
-    --allowed-committers-file-path)
-        CI_ALLOWED_COMMITTERS_FILE="$2"
+    --disable-gitlab-user-check)
+        DISABLE_GITLAB_USERS_CHECK=yes;
+        ;;
+    --allowed-gitlab-users-file-path)
+        CI_ALLOWED_GITLAB_USERS_FILE="$2"
         shift;
         ;;
-    --allowed-committers)
-        ALLOWED_COMMITTERS="$2"
+    --allowed-gitlab-users)
+        ALLOWED_GITLAB_USERS="$2"
         shift;
         ;;
     --)
@@ -262,25 +274,45 @@ then
     DEFPART_ENV=""
 fi
 
-if [ -z "$CI_ALLOWED_COMMITTERS_FILE" ]
+if [ -z "$DISABLE_GITLAB_USERS_CHECK" ]
 then
-    echo "Location for the file containing the list of allowed committers:"
-    read -er CI_ALLOWED_COMMITTERS_FILE
-fi
-echo "Creating allowed commiters file:"
-mkdir -p "$(dirname "$CI_ALLOWED_COMMITTERS_FILE")"
-touch "$CI_ALLOWED_COMMITTERS_FILE"
+   if [ -z "$CI_ALLOWED_GITLAB_USERS_FILE" ]
+   then
+       echo "Location for the file containing the list of allowed gitlab users:"
+       read -er CI_ALLOWED_GITLAB_USERS_FILE
+   fi
+   echo "Creating allowed commiters file:"
+   mkdir -p "$(dirname "$CI_ALLOWED_GITLAB_USERS_FILE")"
+   touch "$CI_ALLOWED_GITLAB_USERS_FILE"
 
-if [ -z "$ALLOWED_COMMITTERS" ]
-then
-    echo "Comma-separated list of allowed committers (gitlab usernames):"
-    read -er ALLOWED_COMMITTERS
+   if [ -z "$ALLOWED_GITLAB_USERS" ]
+   then
+       echo "Comma-separated list of allowed gitlab users (gitlab usernames):"
+       read -er ALLOWED_GITLAB_USERS
+   fi
+   for gitlab_user in $(echo "$ALLOWED_GITLAB_USERS" | tr ',' ' ')
+   do
+       echo "Adding $gitlab_user to $CI_ALLOWED_GITLAB_USERS_FILE"
+       echo "$gitlab_user" >> "$CI_ALLOWED_GITLAB_USERS_FILE"
+   done
+
+   CONFIG_CI_ALLOWED_GITLAB_USER_CHECK="--custom-config-args=$CI_ALLOWED_GITLAB_USERS_FILE"
+else
+   CONFIG_CI_ALLOWED_GITLAB_USER_CHECK=""
+   if [ -n "$CI_ALLOWED_GITLAB_USERS_FILE" ]
+   then
+       echo "Error: --disable-gitlab-user-check and --allowed-gitlab-users-file-path are incompatible options"
+       exit 1
+   fi
+
+   if [ -n "$ALLOWED_GITLAB_USERS" ]
+   then
+       echo "Error: --disable-gitlab-user-check and --allowed-gitlab-users are incompatible options"
+       exit 1
+   fi
+
 fi
-for committer in $(echo "$ALLOWED_COMMITTERS" | tr ',' ' ')
-do
-    echo "Adding $committer to $CI_ALLOWED_COMMITTERS_FILE"
-    echo "$committer" >> "$CI_ALLOWED_COMMITTERS_FILE"
-done
+
 
 
 
@@ -304,12 +336,12 @@ gitlab-runner register \
     --cache-dir="$CACHE_DIR_BASE/$CONTAINER_BACKEND" \
     --env CI_WS="$CI_WS" \
     "$DEFPART_ENV" \
-    --env CI_ALLOWED_COMMITTERS_FILE="$CI_ALLOWED_COMMITTERS_FILE" \
     --custom_build_dir-enabled \
     --custom-config-exec="$SRC/configure.sh" \
     --custom-config-exec-timeout=2000 \
     --custom-config-args="$CONTAINER_BACKEND" \
     --custom-config-args="$USE_SLURM_FLAG" \
+    "$CONFIG_CI_ALLOWED_GITLAB_USER_CHECK" \
     --custom-prepare-exec="$SRC/prepare.sh" \
     --custom-prepare-exec-timeout=200 \
     --custom-prepare-args="$CONTAINER_BACKEND" \

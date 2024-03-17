@@ -11,13 +11,15 @@ set -o pipefail
 
 BACKEND="$1"
 USESLURM="$2"
+ALLOWED_GITLAB_USERS_FILE="${3:-}"
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 
 #shellcheck source=./src/configure-include.sh
 source "$SRC/configure-include.sh"
 
-check_allowed_committer_list
+check_allowed_gitlab_user_list "$ALLOWED_GITLAB_USERS_FILE" "$CUSTOM_ENV_GITLAB_USER_LOGIN"
+
 
 
 

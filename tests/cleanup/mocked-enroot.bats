@@ -29,7 +29,7 @@ function setup() {
     export CUSTOM_ENV_CI_JOB_ID=54321
     export CUSTOM_ENV_DEFAULT_PARTITION=default-partition
 
-    setup_allowed_committers_file
+    setup_allowed_gitlab_users_file
     echo "Test setup phase completed."
 
 

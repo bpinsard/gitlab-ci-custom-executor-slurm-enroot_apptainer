@@ -63,7 +63,7 @@ function setup(){
       exit 1
     fi
 
-    setup_allowed_committers_file
+    setup_allowed_gitlab_users_file
 
 }
 

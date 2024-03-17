@@ -31,7 +31,7 @@ function setup() {
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
 
-    setup_allowed_committers_file
+    setup_allowed_gitlab_users_file
 
     echo "Test setup phase completed."
 }
@@ -48,76 +48,60 @@ function teardown() {
 
 
 
-@test "allowed committers are checked at the configure stage - failure" {
+@test "allowed gitlab users are checked at the configure stage - failure" {
 
     # shellcheck disable=SC2030
     export CUSTOM_ENV_GITLAB_USER_LOGIN="SomeoneElse"
 
-    run "$SRC"/configure.sh none noslurm 3> /dev/null
+    run "$SRC"/configure.sh none noslurm "$ALLOWED_GITLAB_USERS_FILE" 3> /dev/null
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --partial "SomeoneElse not in allowed committer list."
+    assert_output --partial "SomeoneElse not in allowed gitlab user list."
 
 }
 
-@test "allowed committers are checked at the configure stage - success" {
+@test "allowed gitlab users are checked at the configure stage - success" {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_GITLAB_USER_LOGIN="Bob"
 
-    "$SRC"/configure.sh none noslurm 3> /dev/null
+    "$SRC"/configure.sh none noslurm "$ALLOWED_GITLAB_USERS_FILE" 3> /dev/null
 
 }
 
-@test "allowed committers are checked at the configure stage - substring failure" {
+@test "allowed gitlab users are checked at the configure stage - substring failure" {
 
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_GITLAB_USER_LOGIN="Ali"
 
-    run "$SRC"/configure.sh none noslurm 3> /dev/null
+    run "$SRC"/configure.sh none noslurm "$ALLOWED_GITLAB_USERS_FILE" 3> /dev/null
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --partial "Ali not in allowed committer list."
+    assert_output --partial "Ali not in allowed gitlab user list."
 
 }
 
-@test "if CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE not defined, everything ok if GITLAB_USER_LOGIN==USER" {
-
-    unset CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE
+@test "Only if FILENAME passed as 3rd arg to configure, used as allowed gitlab users list." {
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_GITLAB_USER_LOGIN="$USER"
+    export CUSTOM_ENV_GITLAB_USER_LOGIN="Ali"
 
     "$SRC"/configure.sh none noslurm 3> /dev/null
 
 }
 
-@test "if CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE not defined, fail if GITLAB_USER_LOGIN!=USER" {
 
-    unset CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE
+@test "allowed gitlab users file must have the right permissions and ownership" {
 
-    # shellcheck disable=SC2031
-    export CUSTOM_ENV_GITLAB_USER_LOGIN="not_$USER"
+    # shellcheck disable=SC2030,SC2031
+    export CUSTOM_ENV_GITLAB_USER_LOGIN="Ali"
 
-    run "$SRC"/configure.sh none noslurm 3> /dev/null
+    chmod go+w "$ALLOWED_GITLAB_USERS_FILE"
+    ls -l "$ALLOWED_GITLAB_USERS_FILE"
 
-    assert_failure
-    assert_output --partial "$CUSTOM_ENV_GITLAB is not $USER"
-    assert_output --partial "CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE undefined"
-    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-
-}
-
-
-@test "CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE must have the right permissions and ownership" {
-
-
-    chmod go+w "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE"
-    ls -l "$CUSTOM_ENV_CI_ALLOWED_COMMITTERS_FILE"
-
-    run "$SRC"/configure.sh none noslurm 3> /dev/null
+    run "$SRC"/configure.sh none noslurm "$ALLOWED_GITLAB_USERS_FILE" 3> /dev/null
 
     assert_failure
     assert_output --partial "it should not be writable by anybody"

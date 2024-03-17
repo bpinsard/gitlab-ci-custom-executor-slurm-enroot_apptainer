@@ -38,7 +38,7 @@ function setup(){
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
 
-    setup_allowed_committers_file
+    setup_allowed_gitlab_users_file
 }
 
 function teardown() {

@@ -29,7 +29,7 @@ function setup() {
     cd "$STARTDIR" || exit
 
     URL_DEFAULT="https://gitlab.kit.edu/"
-    CI_ALLOWED_COMMITTERS_FILE="$TEST_PLAYGROUND/allowed_committers"
+    ALLOWED_GITLAB_USERS_FILE="$TEST_PLAYGROUND/allowed_gitlab_users"
 
     MOCK_INPUTS=(url
                  token
@@ -40,7 +40,7 @@ function setup() {
                  ci_ws
                  default-partition
                  yes # use slurm
-                 "$CI_ALLOWED_COMMITTERS_FILE"
+                 "$ALLOWED_GITLAB_USERS_FILE"
                  "Alice,Bob,Charles"
                 )
 
@@ -594,48 +594,30 @@ function teardown() {
     assert_file_not_contains "$MOCKLOGDIR"/gitlab-runner.log \
             "\-\-env DEFAULT_PARTITION"
 
-
-
 }
 
-@test "CI_ALLOWED_COMMITTERS_FILE created" {
+@test "allowed gitlab users file created" {
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
-        if [[ "$mock_datum" != "$CI_ALLOWED_COMMITTERS_FILE" ]]
+        if [[ "$mock_datum" != "$ALLOWED_GITLAB_USERS_FILE" ]]
         then
         echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --allowed-committers-file-path "$CI_ALLOWED_COMMITTERS_FILE"
+        --allowed-gitlab-users-file-path "$ALLOWED_GITLAB_USERS_FILE"
 
-    [ -f "$CI_ALLOWED_COMMITTERS_FILE" ]
+    [ -f "$ALLOWED_GITLAB_USERS_FILE" ]
 
 }
 
-@test "allowed committers file path mentioned in the help" {
+@test "allowed gitlab users file path mentioned in the help" {
 
     run "$UTILS"/gitlab-runner-register-wrapper.sh --help
-    assert_output --partial "--allowed-committers-file-path"
+    assert_output --partial "--allowed-gitlab-users-file-path"
 
 }
 
-@test "CI_ALLOWED_COMMITTERS_FILE variable set for the runner" {
-
-    for mock_datum in "${MOCK_INPUTS[@]}"
-    do
-        echo "$mock_datum"
-    done | "$UTILS"/gitlab-runner-register-wrapper.sh
-
-    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
-            "\-\-env CI_ALLOWED_COMMITTERS_FILE"
-
-
-
-
-}
-
-
-@test "allowed committers added to the file" {
+@test "allowed gitlab users added to the file" {
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
         if [[ "$mock_datum" != "Alice,Bob,CharlesMock" ]]
@@ -643,17 +625,110 @@ function teardown() {
           echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --allowed-committers Alice,Bob,Charlie
+        --allowed-gitlab-users Alice,Bob,Charlie
 
-    assert_file_contains "$CI_ALLOWED_COMMITTERS_FILE" Alice
-    assert_file_contains "$CI_ALLOWED_COMMITTERS_FILE" Bob
-    assert_file_contains "$CI_ALLOWED_COMMITTERS_FILE" Charlie
+    assert_file_contains "$ALLOWED_GITLAB_USERS_FILE" Alice
+    assert_file_contains "$ALLOWED_GITLAB_USERS_FILE" Bob
+    assert_file_contains "$ALLOWED_GITLAB_USERS_FILE" Charlie
 
 }
 
-@test "allowed committers mentioned in the help" {
+@test "allowed gitlab users mentioned in the help" {
 
     run "$UTILS"/gitlab-runner-register-wrapper.sh --help
-    assert_output --partial "--allowed-committers "
+    assert_output --partial "--allowed-gitlab-users "
+
+}
+
+
+@test "allowed gitlab users file passed to configure as argument" {
+
+    for mock_datum in "${MOCK_INPUTS[@]}"
+    do
+          echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh
+
+
+    assert_file_contains "$MOCKLOGDIR"/gitlab-runner.log \
+        "\-\-custom-config-args=$ALLOWED_GITLAB_USERS_FILE"
+
+
+}
+
+@test "--disable-gitlab-user-check disables gitlab user check" {
+
+    MOCK_INPUTS_TMP=(url
+                     token
+                     name
+                     cerepo # custom executor repository
+                     enroot
+                     cache_dir
+                     ci_ws
+                     default-partition
+                     yes # use slurm
+                )
+
+
+    for mock_datum in "${MOCK_INPUTS_TMP[@]}"
+    do
+          echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh --disable-gitlab-user-check
+
+    assert_file_not_contains "$MOCKLOGDIR"/gitlab-runner.log \
+        "\-\-custom-config-args=$ALLOWED_GITLAB_USERS_FILE"
+
+
+
+}
+
+@test "--disable-gitlab-user-check mentioned in help" {
+
+    run "$UTILS"/gitlab-runner-register-wrapper.sh --help
+    assert_output --partial "--disable-gitlab-user-check"
+}
+
+@test "--disable-gitlab-user-check and other options are not compatible" {
+
+    MOCK_INPUTS_TMP=(url
+                     token
+                     name
+                     cerepo # custom executor repository
+                     enroot
+                     cache_dir
+                     ci_ws
+                     default-partition
+                     yes # use slurm
+                )
+
+
+    _helper() {
+    for mock_datum in "${MOCK_INPUTS_TMP[@]}"
+    do
+          echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --disable-gitlab-user-check \
+        --allowed-gitlab-users-file-path somewhere
+
+    }
+
+    run _helper
+
+    assert_failure
+    assert_output --partial "--disable-gitlab-user-check and --allowed-gitlab-users-file-path are incompatible options"
+
+    _helper2() {
+    for mock_datum in "${MOCK_INPUTS_TMP[@]}"
+    do
+          echo "$mock_datum"
+    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+        --disable-gitlab-user-check \
+        --allowed-gitlab-users someone,someoneelse
+
+    }
+
+    run _helper2
+
+    assert_failure
+    assert_output --partial "--disable-gitlab-user-check and --allowed-gitlab-users are incompatible options"
 
 }

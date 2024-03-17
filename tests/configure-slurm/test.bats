@@ -44,7 +44,7 @@ function setup() {
 
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_3/.env"
 
-    setup_allowed_committers_file
+    setup_allowed_gitlab_users_file
 
     echo "Test setup phase completed."
 }
