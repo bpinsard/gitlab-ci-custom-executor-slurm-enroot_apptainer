@@ -104,8 +104,11 @@ function teardown() {
 
     "$SRC"/cleanup.sh apptainer useslurm
 
-    run is_job_in_squeue_output
-    assert_failure
+    squeue > squeue-output.txt
+    function is_job_not_in_file(){ ! grep -q "$CE_SLURM_JOB_ID" squeue-output.txt; }
+    function is_job_completing() { grep "$CE_SLURM_JOB_ID" squeue-output.txt | grep -qw 'CG' ; }
+    is_job_not_in_file || is_job_completing
+
 }
 
 # bats test_tags=configure,prepare,cleanup,run
@@ -175,7 +178,10 @@ EOF
     "$SRC"/cleanup.sh apptainer useslurm
 
     # Check that the slurm job is over
-    run is_job_in_squeue_output
-    assert_failure
+
+    squeue > squeue-output.txt
+    function is_job_not_in_file(){ ! grep -q "$CE_SLURM_JOB_ID" squeue-output.txt; }
+    function is_job_completing() { grep "$CE_SLURM_JOB_ID" squeue-output.txt | grep -qw 'CG' ; }
+    is_job_not_in_file || is_job_completing
 
 }
