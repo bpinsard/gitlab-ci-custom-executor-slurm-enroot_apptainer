@@ -10,12 +10,10 @@ test-and-coverage:
 	ps aux | grep 'tests/bats/libexec' | grep -v grep | awk '{print $$2}' | xargs kill
 
 test-report-parallel:
-	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial \
-$(find tests/ -maxdepth 1 -not -name mocks) > report-parallel.xml
+	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) > report-parallel.xml
 
 test-report-serial:
-	./tests/bats/bin/bats --formatter junit --filter-tags serial \
-$(find tests/ -maxdepth 1 -not -name mocks) > report-serial.xml
+	./tests/bats/bin/bats --formatter junit --filter-tags serial $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) > report-serial.xml
 
 # Test that can fail
 test-report-optionals:
