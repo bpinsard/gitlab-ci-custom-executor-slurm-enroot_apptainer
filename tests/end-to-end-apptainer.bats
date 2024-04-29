@@ -89,9 +89,9 @@ function teardown() {
     CE_SLURM_JOB_ID="$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
 
     # shellcheck disable=SC2317
-    function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
+    function is_job_in_squeue_output(){ squeue | grep "$CE_SLURM_JOB_ID"; }
 
-    run _helper
+    run is_job_in_squeue_output
     echo "Logfile so far:"
     cat "$CE_QUEUE_WORKSPACE/log.txt" # For debugging
     echo "end of logfile"
@@ -104,7 +104,7 @@ function teardown() {
 
     "$SRC"/cleanup.sh apptainer useslurm
 
-    run _helper
+    run is_job_in_squeue_output
     assert_failure
 }
 
@@ -120,8 +120,8 @@ function teardown() {
 
     CE_SLURM_JOB_ID="$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
 
-    function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
-    run _helper
+    function is_job_in_squeue_output(){ squeue | grep "$CE_SLURM_JOB_ID"; }
+    run is_job_in_squeue_output
     assert_success
 
 
@@ -175,7 +175,7 @@ EOF
     "$SRC"/cleanup.sh apptainer useslurm
 
     # Check that the slurm job is over
-    run _helper
+    run is_job_in_squeue_output
     assert_failure
 
 }
