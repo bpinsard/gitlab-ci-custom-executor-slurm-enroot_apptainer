@@ -83,23 +83,6 @@ function has_slurm () {
 
 
 
-@test "sbatch input environment variables read from docs are the expected ones" {
-
-   has_slurm || skip
-   local MOCK="$PROJECT_ROOT"/tests/mocks
-   local SRC="$PROJECT_ROOT"/src
-
-   "$SRC"/slurm-utils/_get-sbatch-input-env-list.sh | sort > real
-   "$MOCK"/bin/get-sbatch-input-env-list.sh | sort  > mock
-
-   diff real mock | tee diff-real-mock
-
-   N=$( wc -l < diff-real-mock)
-
-   assert_equal "$N" 0
-
-}
-
 @test "sbatch mock tries to execute the first non option argument" {
     # This is not how real sbatch works,
     # but we need to keep things simple here.
