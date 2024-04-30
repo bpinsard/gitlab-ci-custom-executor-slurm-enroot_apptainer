@@ -1,12 +1,24 @@
+variables:
+    CE_DEBUG_LVL: 1
+
 
 stages:
   - test
   - packaging
   - deploy
+  - test-deploy-noslurm
   - test-deploy
+  - test-deploy-ce-debug-enroot
+  - test-deploy-ce-debug-apptainer
+  - test-deploy-serial-none
+  - test-deploy-serial-noslurm-none
+  - test-deploy-serial-enroot
+  - test-deploy-serial-apptainer
+  - bats-cleanup
 
 include:
   - '/gitlab-ci/lint-and-unit.yml'
+  - '/gitlab-ci/optionals.yml'
   - '/gitlab-ci/package.yml'
   - '/gitlab-ci/update-ce-code.yml'
   - '/gitlab-ci/interactive-test.yml'
@@ -20,5 +32,9 @@ include:
   - '/gitlab-ci/bootstrap-slurm-only.yml'
   - '/gitlab-ci/bootstrap-enroot.yml'
   - '/gitlab-ci/bootstrap-apptainer.yml'
+  - '/gitlab-ci/features-enroot-noslurm.yml'
+  - '/gitlab-ci/features-apptainer-noslurm.yml'
+  - '/gitlab-ci/features-noslurm-nocontainer.yml'
+  - '/gitlab-ci/bootstrap-noslurm-nocontainer.yml'
   - '/gitlab-ci/bwuc2-specific.yml'
   - '/gitlab-ci/joker.yml'

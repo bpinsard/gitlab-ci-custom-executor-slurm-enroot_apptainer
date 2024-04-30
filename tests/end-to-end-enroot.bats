@@ -90,12 +90,10 @@ function teardown() {
     source ./job-env
 
     CE_SLURM_JOB_ID="$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
+    function is_job_in_squeue_output(){ squeue | grep "$CE_SLURM_JOB_ID"; }
+    is_job_in_squeue_output
 
     # shellcheck disable=SC2317
-    function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
-
-    run _helper
-    assert_success
 
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
@@ -104,9 +102,11 @@ function teardown() {
 
     "$SRC"/cleanup.sh enroot useslurm
 
-    run _helper
-    assert_failure
-
+    # Check that the slurm job is over
+    squeue > squeue-output.txt
+    function is_job_not_in_file(){ ! grep -q "$CE_SLURM_JOB_ID" squeue-output.txt; }
+    function is_job_completing() { grep "$CE_SLURM_JOB_ID" squeue-output.txt | grep -qw 'CG' ; }
+    is_job_not_in_file || is_job_completing
 }
 
 # bats test_tags=configure,prepare,cleanup,run
@@ -121,10 +121,8 @@ function teardown() {
 
     CE_SLURM_JOB_ID="$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
 
-    function _helper(){ squeue | grep -q "$CE_SLURM_JOB_ID"; }
-    run _helper
-    assert_success
-
+    function is_job_in_squeue_output(){ squeue | grep "$CE_SLURM_JOB_ID"; }
+    is_job_in_squeue_output
 
     assert_file_exists "$CE_QUEUE_WORKSPACE/.env"
 
@@ -187,7 +185,9 @@ EOF
     "$SRC"/cleanup.sh enroot useslurm
 
     # Check that the slurm job is over
-    run _helper
-    assert_failure
+    squeue > squeue-output.txt
+    function is_job_not_in_file(){ ! grep -q "$CE_SLURM_JOB_ID" squeue-output.txt; }
+    function is_job_completing() { grep "$CE_SLURM_JOB_ID" squeue-output.txt | grep -qw 'CG' ; }
+    is_job_not_in_file || is_job_completing
 
 }

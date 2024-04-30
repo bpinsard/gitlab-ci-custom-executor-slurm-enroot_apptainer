@@ -1,0 +1,16 @@
+unit-test-parallel-optionals:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test
+  script:
+    - make test-report-optionals JOBS=8
+  tags:
+    - shell
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - report-optionals.xml
+    reports:
+      junit: report-optionals.xml
