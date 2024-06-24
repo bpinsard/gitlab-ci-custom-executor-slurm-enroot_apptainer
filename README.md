@@ -1,7 +1,7 @@
-# GitLab custom executor using Slurm + Enroot/Singularity
+# GitLab custom executor using Slurm + Enroot/Apptainer
 
 
-![Pipeline Status](https://git.scc.kit.edu/hs2454/gitlab-ci-custom-executor-slurm-enroot_apptainer/badges/main/pipeline.svg)
+![Pipeline Status](https://git.scc.kit.edu/scs-public/gitlab-ci-custom-executor-slurm-enroot_apptainer/badges/main/pipeline.svg)
 
 This is a [custom executor for GitLab](https://docs.gitlab.com/runner/executors/custom.html)
 written taking inspiration from https://github.com/ginkgo-project/gitlab-hpc-ci-cb 
@@ -35,30 +35,29 @@ More info can be obtained [here](https://docs.gitlab.com/runner/)
   It is a standalone program that 
   manages the communication with the GitLab instance,
   and provides some standard mechanisms of execution
-  and customization hooks.
+  and customization hooks;
 - the runner: an abstract resource that can run CI jobs.
   A runner can be created/registered for a GitLab repository,
-  for a GitLab group or a GitLab instance.
+  for a GitLab group or a GitLab instance;
 - the executor: the underlying concrete  mechanism 
-  that will execute the CI jobs
-  More info can be obtained [here](https://docs.gitlab.com/runner/executors/)
+  that will execute the CI jobs.
+  More info can be obtained [here](https://docs.gitlab.com/runner/executors/);
 - the custom executor: a custom version of the executor,
   composed of a number of scripts
   representing the customization hooks of the runner.
-  More info can be obtained [here](https://docs.gitlab.com/runner/executors/custom.html)
+  More info can be obtained [here](https://docs.gitlab.com/runner/executors/custom.html).
 
 ### GitLab CI setup: obtaining the custom executor code
 
 The of the custom executor needs to be copied to the hpc system. 
 There are a few ways to do this.
 Either:
-- This code might be available on the system,
-  in the system directories
-  (see system documentation).
-  This is by far the simplest option
 - Clone this repository on the system.
   This is the best option if you think 
   you will have to modify the code;
+- Or this code might be available on the system,
+  in the system directories
+  (this might be mentioned in the system documentation).
 
 Alternatively, a  tarball with all the necessary code
 can be produced using the `Makefile` 
@@ -66,7 +65,6 @@ in the `packaging` directory extract it on the system.
 It is also produced as an artifact
 by one of the jobs in the CI pipeline
 of this project.
-
 
 ### GitLab CI setup: Register the runner
 To register a new runner
@@ -93,7 +91,7 @@ The most important inputs and options are:
   (retrieve this from the CI runner setting web page);
 - the project registration token,
   needed by the runner to query 
-  the gitlab server for CI jobs
+  the GitLab server for CI jobs
   (retrieve this from the CI runner setting web page
   or from the registration procedure);
 - a description, or name, for the runner
@@ -144,7 +142,7 @@ in the `tags:` section of the job definition
 in the CI/CD configuration file 
 (i.e., typically, `.gitlab-ci.yml`).
 
-#### Important: Allowed gitlab users for an executor
+#### Important: Allowed GitLab users for an executor
 
 Since the GitLab runner process 
 is run with the permissions of the user launching it,
@@ -158,9 +156,9 @@ of self hosted runners.
 
 As an additional security measure,
 the custom executor can make use 
-of a list of allowed gitlab user usernames.
+of a list of allowed GitLab user usernames.
 
-The list of allowed gitlab users must be saved into a file
+The list of allowed GitLab users must be saved into a file
 that belongs to the user running the executor
 and is not writable from others.
 The path file can be passed as the last argument to the configure script.
@@ -237,14 +235,14 @@ of `gitlab-runner register`).
 
 ### CI jobs in containers on HoreKa and bwUniCluster 2.0
 
-The custom executor can use [Singularity/Apptainer](https://apptainer.org/)
+The custom executor can use [Apptainer](https://apptainer.org/)
 or [Enroot](https://github.com/NVIDIA/enroot) to run jobs in containers
-(this relies on Singularity/Apptainer or Enroot to be installed
+(this relies on Apptainer or Enroot to be installed
 on the HPC system in use).
 
 In order to use those, make sure that:
 - either the `image:` tag of the CI job 
-  is set in the same format as Singularity/Apptainer or Enroot expect it.
+  is set in the same format as Apptainer or Enroot expect it.
   Both Apptainer and Enroot do support image specification in a format like
   `docker://debian:latest`.
 - or an `IMAGEFILE` variable is set 
@@ -260,7 +258,7 @@ while the one for Apptainer is described
 (the `apptainer pull` command is used under the hood).
 
 **Note:** it is not possible to execute root commands 
-in Singularity containers on HoreKa or bwUnicluster 2.0.
+in Apptainer containers on HoreKa or bwUnicluster 2.0.
 With Enroot it is theoretically possible to use the `--root` option 
 for the command `enroot start`, 
 but it is not implemented at the moment.
@@ -294,7 +292,7 @@ For non authenticated users it is 100 pulls *per IP address* every 6 hours,
 while for authenticated users it is 200 pulls *per account* every 6 hours.
 If you are hitting a pull rate limit, consider authenticating.
 
-Singularity and Enroot have different authentication mechanisms. 
+Apptainer and Enroot have different authentication mechanisms. 
 
 DockerHub access tokens can be configured to have a smaller scope,
 and according to [the documentation](https://docs.docker.com/docker-hub/access-tokens/)
@@ -309,7 +307,7 @@ Use one of the numerous alternatives.**
 Apptainer [can use](https://apptainer.org/docs/user/latest/docker_and_oci.html#environment-variables)
 the `APPTAINER_DOCKER_USERNAME`
 and `APPTAINER_DOCKER_PASSWORD` environment variables.
-These can be set on the GitLabCI interface
+These can be set on the GitLab CI interface
 and will be then used by the custom executor.
 
 Alternatively, it is possible to use 

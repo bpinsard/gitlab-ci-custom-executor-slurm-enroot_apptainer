@@ -165,7 +165,7 @@ It will source `containerlib.sh`.
       (except for `ENROOT_TEMP_PATH`)
 - [X] do not do anything if image is not defined
 
-#### Singularity
+#### Apptainer
 Enroot and apptainer work in quite a different way.
 In the way that it is configured on HoreKa, 
 apptainer will by default mount PWD and HOME.
