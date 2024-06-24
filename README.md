@@ -1,12 +1,11 @@
 # GitLab custom executor using Slurm + Enroot/Apptainer
 
-
 This is a [custom executor for GitLab](https://docs.gitlab.com/runner/executors/custom.html)
 written taking inspiration from https://github.com/ginkgo-project/gitlab-hpc-ci-cb 
 and from Holger Obermaier's Slurm and Enroot custom executor.
 
 
-![Pipeline Status](https://git.scc.kit.edu/scs-public/gitlab-ci-custom-executor-slurm-enroot_apptainer/badges/main/pipeline.svg)
+[![pipeline status](https://gitlab.kit.edu/kit/scs-public/gitlab-ci-custom-executor-slurm-enroot_apptainer/badges/main/pipeline.svg)](https://gitlab.kit.edu/kit/scs-public/gitlab-ci-custom-executor-slurm-enroot_apptainer/-/commits/main) 
 
 ## What it does
 
