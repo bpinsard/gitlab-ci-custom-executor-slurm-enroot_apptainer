@@ -48,8 +48,8 @@ function setup(){
 
 @test "gitlab user restriction mentioned and implemented" {
 
-    SECTION_TITLE="Important: Allowed gitlab users for an executor"
-    grep "$SECTION_TITLE" "$README"
+    SECTION_TITLE="Important: Allowed GitLab users for an executor"
+    grep -i "$SECTION_TITLE" "$README"
 
     grep_between "$SECTION_TITLE" '^##' -qi 'https://docs.gitlab.com/runner/security/' "$README"
 
