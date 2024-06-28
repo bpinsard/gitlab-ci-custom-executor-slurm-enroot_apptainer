@@ -46,6 +46,37 @@ function setup(){
     grep_ignoring_hash_comments -q '"when envs match and time is enough but REUSE_WORKSPACE == OFF, allocation not reused"' "$TESTDIR"/configure-slurm/test.bats
 }
 
+@test "GitLab is correctly capitalized" {
+
+    local PROPER_CAPITALIZATION="GitLab"
+
+
+python <<EOF
+import re
+
+proper_capitalization="$PROPER_CAPITALIZATION"
+
+text = open("$README",'r').read()
+all_gitlab_matches = re.findall(r'((\s|^)gitlab)',
+                                text,
+                                re.IGNORECASE)
+
+proper_gitlab_matches = re.findall(r'((\s|^)'+proper_capitalization+r')',
+                                   text)
+
+
+all_count = len(all_gitlab_matches)
+proper_count = len(proper_gitlab_matches)
+if all_count != proper_count:
+    print(f"only {proper_count} GitLab mentions are correctly capitalized out of {all_count}")
+    exit(1)
+EOF
+
+
+
+
+}
+
 @test "gitlab user restriction mentioned and implemented" {
 
     SECTION_TITLE="Important: Allowed GitLab users for an executor"
