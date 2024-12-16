@@ -3,6 +3,7 @@ apptainer-unit-test-parallel-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
+    JOB_TIME_SEC: 1800
   stage: test-deploy
   script:
     - make test-report-parallel JOBS=8
