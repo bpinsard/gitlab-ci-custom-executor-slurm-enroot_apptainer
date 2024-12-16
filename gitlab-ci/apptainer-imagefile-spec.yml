@@ -56,6 +56,7 @@ apptainer-imagefile-job-no-image-second-round:
 
 
 apptainer-imagefile-clean:
+  allow_failure: true
   dependencies: []
   needs:
     - apptainer-imagefile-job-no-image

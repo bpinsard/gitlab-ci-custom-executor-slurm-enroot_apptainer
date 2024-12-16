@@ -53,6 +53,7 @@ enroot-imagefile-job-no-image-second-round:
 
 
 enroot-imagefile-clean:
+  allow_failure: true
   dependencies: []
   needs:
     - enroot-imagefile-job-no-image
