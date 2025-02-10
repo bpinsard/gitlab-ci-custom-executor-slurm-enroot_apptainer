@@ -219,23 +219,28 @@ Detailed setup steps:
   (this is done int the test-deploy stage),
   and for downloading container images to test the `IMAGEFILE` feature.
   
-- 3 custom gitlab runners needs to be registered 
+- In order to test all the possible configurations
+  of the custom executor,
+  6 custom gitlab runners needs to be registered 
   and properly configured 
   so that they use the scripts in the test directory
   used in the test-deploy stage.
   Unfortunately, with the latest version of GitLab (>= 16.0)
   this requires some manual labor,
-  as one needs to obtain *3 different registration tokens*
+  as one needs to obtain *6 different registration tokens*
   from the GitLab server web interface
   (A single registration token for all the runners
   can be used with GitLab < 16.0).
   To register one runner based on the custom executor
-  in a convenient way, one can use the command
-  `./utils/gitlab-runner-register-wrapper.sh`.
+  in a convenient way, 
+  the command `./utils/gitlab-runner-register-wrapper.sh` 
+  can be used.
   Suggestions:
   - The `--container-backend` option 
     can be used to specify `apptainer`, `enroot` and `none`
     each time, for each runner.
+  - The `--use-slurm` flag can be used 
+    with values "yes" and "no".
   - The `--registration-token` option can be used 
     to pass the registration tokens obtained 
     from the GitLab server web interface.
@@ -243,6 +248,7 @@ Detailed setup steps:
     to each one of the runners, *which is important 
     to distinguish them from each other*
     in the GitLab server web interface
+
   After each runner has been registered,
   tags can be assigned to it 
   from the GitLab server web interface
