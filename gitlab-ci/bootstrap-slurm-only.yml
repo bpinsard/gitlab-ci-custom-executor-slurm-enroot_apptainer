@@ -5,7 +5,8 @@ unit-test-parallel-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy
   script:
-    - make test-report-parallel JOBS=8
+    #- make test-report-parallel JOBS=8
+    - ./tests/bats/bin/bats ./tests/*
   tags:
     - slurm
     - nocontainer
