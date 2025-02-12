@@ -18,7 +18,7 @@ source "$SRC"/custom_executor_queue.sh
 
 echo -n "Starting custom executor queue... " >&2
 start_custom_executor_queue "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"
-echo -n "done. Waiting." >&2
+echo "done. Waiting." >&2
 
 # shellcheck disable=SC1091
 source "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE"/.env
