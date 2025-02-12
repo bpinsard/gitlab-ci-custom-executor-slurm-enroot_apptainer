@@ -131,22 +131,32 @@ function check_string_has_no_forbidden_options(){
     done
 }
 
+
+function get_job_start_time(){
+    JOBID="$1"
+    date -d "@$(squeue --start --job "$JOBID" --json 2>/dev/null| jq '.jobs[0]["start_time"]["number"]' )" 2>/dev/null
+}
+
 function wait_for_job_to_be_ready(){
     local JOB_ID="$1"
+    OLD_START_TIME=""
     while ! scontrol wait_job "$JOB_ID" &> /dev/null
     do
         sleep 3
         if [ $((SECONDS % 20)) -lt 3 ]
         then
-            STARTTIME="$(squeue --start --job "$JOB_ID" --format %S | tail -n 1)"
-            if [ "$STARTTIME" == "START_TIME" ]
+            STARTTIME=$(get_job_start_time "$JOB_ID")
+            if [ "$STARTTIME" != "$OLD_START_TIME" ]
+            then
+                echo "Checked at: $(date) - Expected start: $STARTTIME" >&2
+                echo "This feature might be unreliable..." >&2
+                OLD_START_TIME="$STARTTIME"
+            fi
+            if [ "$STARTTIME" == "" ]
             then
                 echo "Error in finding the job start time:" >&2
                 echo sacct -j "$JOB_ID" >&2
                 sacct -j "$JOB_ID" >&2
-                echo "This feature might be unreliable..." >&2
-            else
-                echo "$(date) Expected start: $STARTTIME" >&2
             fi
         fi
     done
