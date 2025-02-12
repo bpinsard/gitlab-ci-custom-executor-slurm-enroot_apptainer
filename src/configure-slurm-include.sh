@@ -133,8 +133,16 @@ function check_string_has_no_forbidden_options(){
 
 
 function get_job_start_time(){
-    JOBID="$1"
-    date -d "@$(squeue --start --job "$JOBID" --json 2>/dev/null| jq '.jobs[0]["start_time"]["number"]' )" 2>/dev/null
+    local JOBID="$1"
+    local UNIX_TIME
+    UNIX_TIME="$(squeue --start --job "$JOBID" --json 2>/dev/null| jq '.jobs[0]["start_time"]["number"]')"
+
+    if [[ "$UNIX_TIME" -eq 0 ]]
+    then
+        echo "Information not yet available"
+    else
+        date -d "@$UNIX_TIME" 2>/dev/null
+    fi
 }
 
 function wait_for_job_to_be_ready(){
@@ -160,6 +168,8 @@ function wait_for_job_to_be_ready(){
             fi
         fi
     done
+    echo "Job is ready..." >&2
+
 }
 
 # Note: the output of this function
