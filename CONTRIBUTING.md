@@ -47,6 +47,10 @@ When that variable is set to a value
   out of the builds dir so that 
   the results can be inspected.
 
+To debug the custom executor, 
+one could try to set this variable
+when triggering manually a pipeline.
+
 This debuggability feature might need to be expanded.
 If you find any issues with the runner,
 please let us know.
