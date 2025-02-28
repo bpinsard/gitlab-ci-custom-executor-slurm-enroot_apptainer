@@ -327,7 +327,7 @@ mkdir -p "$CI_WS"
 
 echo "Registering runner using ${CONTAINER_BACKEND} backend"
 
-gitlab-runner register \
+COMMAND=(gitlab-runner register \
     --non-interactive \
     --name="$NAME ($CONTAINER_BACKEND)" \
     --url="$URL" \
@@ -354,4 +354,6 @@ gitlab-runner register \
     --custom-cleanup-args="$CONTAINER_BACKEND" \
     --custom-cleanup-args="$USE_SLURM_FLAG" \
     --custom-graceful-kill-timeout=200 \
-    --custom-force-kill-timeout=200
+    --custom-force-kill-timeout=200)
+
+${COMMAND[@]}
