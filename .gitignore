@@ -4,3 +4,4 @@ shellcheck-stable/
 *.swp
 coverage/
 trashcan
+.python-version
