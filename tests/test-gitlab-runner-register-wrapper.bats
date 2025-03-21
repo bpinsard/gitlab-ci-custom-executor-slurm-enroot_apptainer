@@ -591,7 +591,7 @@ function teardown() {
         --use-slurm no \
 
 
-    assert_file_not_contains "$MOCKLOGDIR"/gitlab-runner.log \
+        assert_file_not_contains "$MOCKLOGDIR"/gitlab-runner.log \
             "\-\-env DEFAULT_PARTITION"
 
 }
@@ -622,7 +622,7 @@ function teardown() {
     do
         if [[ "$mock_datum" != "Alice,Bob,CharlesMock" ]]
         then
-          echo "$mock_datum"
+        echo "$mock_datum"
         fi
     done | "$UTILS"/gitlab-runner-register-wrapper.sh \
         --allowed-gitlab-users Alice,Bob,Charlie
@@ -645,7 +645,7 @@ function teardown() {
 
     for mock_datum in "${MOCK_INPUTS[@]}"
     do
-          echo "$mock_datum"
+        echo "$mock_datum"
     done | "$UTILS"/gitlab-runner-register-wrapper.sh
 
 
@@ -666,12 +666,12 @@ function teardown() {
                      ci_ws
                      default-partition
                      yes # use slurm
-                )
+                    )
 
 
     for mock_datum in "${MOCK_INPUTS_TMP[@]}"
     do
-          echo "$mock_datum"
+        echo "$mock_datum"
     done | "$UTILS"/gitlab-runner-register-wrapper.sh --disable-gitlab-user-check
 
     assert_file_not_contains "$MOCKLOGDIR"/gitlab-runner.log \
@@ -698,16 +698,17 @@ function teardown() {
                      ci_ws
                      default-partition
                      yes # use slurm
-                )
+                    )
 
 
     _helper() {
-    for mock_datum in "${MOCK_INPUTS_TMP[@]}"
-    do
-          echo "$mock_datum"
-    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --disable-gitlab-user-check \
-        --allowed-gitlab-users-file-path somewhere
+        # shellcheck disable=SC2317
+        for mock_datum in "${MOCK_INPUTS_TMP[@]}"
+        do
+            echo "$mock_datum"
+        done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+            --disable-gitlab-user-check \
+            --allowed-gitlab-users-file-path somewhere
 
     }
 
@@ -717,12 +718,12 @@ function teardown() {
     assert_output --partial "--disable-gitlab-user-check and --allowed-gitlab-users-file-path are incompatible options"
 
     _helper2() {
-    for mock_datum in "${MOCK_INPUTS_TMP[@]}"
-    do
-          echo "$mock_datum"
-    done | "$UTILS"/gitlab-runner-register-wrapper.sh \
-        --disable-gitlab-user-check \
-        --allowed-gitlab-users someone,someoneelse
+        for mock_datum in "${MOCK_INPUTS_TMP[@]}"
+        do
+            echo "$mock_datum"
+        done | "$UTILS"/gitlab-runner-register-wrapper.sh \
+            --disable-gitlab-user-check \
+            --allowed-gitlab-users someone,someoneelse
 
     }
 
@@ -730,5 +731,36 @@ function teardown() {
 
     assert_failure
     assert_output --partial "--disable-gitlab-user-check and --allowed-gitlab-users are incompatible options"
+
+}
+
+@test "leaving empty allowed gitlab users filename disables the check on allowed users" {
+    MOCK_INPUTS_TMP=(url
+                     token
+                     name
+                     cerepo # custom executor repository
+                     enroot
+                     cache_dir
+                     ci_ws
+                     default-partition
+                     yes # use slurm
+                     ""
+                    )
+
+    _helper() {
+        for mock_datum in "${MOCK_INPUTS_TMP[@]}"
+        do
+            echo "$mock_datum"
+        done | "$UTILS"/gitlab-runner-register-wrapper.sh
+    }
+
+    run _helper
+    assert_success
+    assert_exists "$MOCKLOGDIR"/gitlab-runner.log
+    assert_equal "$(grep -o custom-config-args "$MOCKLOGDIR"/gitlab-runner.log | wc -l)" 2
+    assert_output --partial "No check will be performed on gitlab users."
+
+
+
 
 }

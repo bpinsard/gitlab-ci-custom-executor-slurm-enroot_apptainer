@@ -10,9 +10,9 @@ CACHE_DIR_BASE_DEFAULT="$HOME/gitlab-runner/cache"
 CI_WS_DEFAULT="$HOME/gitlab-runner"
 
 function get_slurm_default_partition() {
-   set -o pipefail
-   { scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2; } || echo dev_cpuonly
-   set +o pipefail
+set -o pipefail
+{ scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2; } || echo dev_cpuonly
+set +o pipefail
 }
 DEFAULT_PARTITION_DEFAULT="$(get_slurm_default_partition)"
 
@@ -129,68 +129,68 @@ eval set -- "$SANITIZED_OPTIONS"
 
 while [ $# -gt 0 ]
 do
-case "$1" in
-    --url)
-        URL="$2"
-        shift
-        ;;
-    --registration-token)
-        REGISTRATION_TOKEN="$2"
-        shift
-        ;;
-    --name|--description)
-        NAME="$2"
-        shift
-        ;;
-    --ce-repo)
-        CE_REPO="$2"
-        shift
-        ;;
-    --container-backend)
-        CONTAINER_BACKEND="$2"
-        shift
-        ;;
-    --cache-dir-base)
-        CACHE_DIR_BASE="$2"
-        shift
-        ;;
-    --ci-ws)
-        CI_WS="$2"
-        shift
-        ;;
-    --default-partition)
-        DEFAULT_PARTITION="$2"
-        shift
-        ;;
-    --help)
-        show_help
-        exit 0
-        ;;
-    --use-slurm)
-        USE_SLURM="$2"
-        shift
-        ;;
-    --disable-gitlab-user-check)
-        DISABLE_GITLAB_USERS_CHECK=yes;
-        ;;
-    --allowed-gitlab-users-file-path)
-        CI_ALLOWED_GITLAB_USERS_FILE="$2"
-        shift;
-        ;;
-    --allowed-gitlab-users)
-        ALLOWED_GITLAB_USERS="$2"
-        shift;
-        ;;
-    --)
-	break
-        ;;
-    *)
-        echo "Unexpected arguments or options:" "$@"
-        exit 22
-        ;;
+    case "$1" in
+        --url)
+            URL="$2"
+            shift
+            ;;
+        --registration-token)
+            REGISTRATION_TOKEN="$2"
+            shift
+            ;;
+        --name|--description)
+            NAME="$2"
+            shift
+            ;;
+        --ce-repo)
+            CE_REPO="$2"
+            shift
+            ;;
+        --container-backend)
+            CONTAINER_BACKEND="$2"
+            shift
+            ;;
+        --cache-dir-base)
+            CACHE_DIR_BASE="$2"
+            shift
+            ;;
+        --ci-ws)
+            CI_WS="$2"
+            shift
+            ;;
+        --default-partition)
+            DEFAULT_PARTITION="$2"
+            shift
+            ;;
+        --help)
+            show_help
+            exit 0
+            ;;
+        --use-slurm)
+            USE_SLURM="$2"
+            shift
+            ;;
+        --disable-gitlab-user-check)
+            DISABLE_GITLAB_USERS_CHECK=yes;
+            ;;
+        --allowed-gitlab-users-file-path)
+            CI_ALLOWED_GITLAB_USERS_FILE="$2"
+            shift;
+            ;;
+        --allowed-gitlab-users)
+            ALLOWED_GITLAB_USERS="$2"
+            shift;
+            ;;
+        --)
+	        break
+            ;;
+        *)
+            echo "Unexpected arguments or options:" "$@"
+            exit 22
+            ;;
 
-esac
-shift
+    esac
+    shift
 done
 
 
@@ -225,8 +225,8 @@ then
 fi
 while [[ ! "$CONTAINER_BACKEND" =~ ^(enroot|apptainer|none)$ ]]
 do
-   echo "Container backend ('apptainer', 'enroot' or 'none' - type unquoted):"
-   read -er CONTAINER_BACKEND
+    echo "Container backend ('apptainer', 'enroot' or 'none' - type unquoted):"
+    read -er CONTAINER_BACKEND
 done
 
 if [ -z "$CACHE_DIR_BASE" ]
@@ -276,27 +276,34 @@ fi
 
 if [ -z "$DISABLE_GITLAB_USERS_CHECK" ]
 then
-   if [ -z "$CI_ALLOWED_GITLAB_USERS_FILE" ]
-   then
-       echo "Location for the file containing the list of allowed gitlab users:"
-       read -er CI_ALLOWED_GITLAB_USERS_FILE
-   fi
-   echo "Creating allowed commiters file:"
-   mkdir -p "$(dirname "$CI_ALLOWED_GITLAB_USERS_FILE")"
-   touch "$CI_ALLOWED_GITLAB_USERS_FILE"
+    if [ -z "$CI_ALLOWED_GITLAB_USERS_FILE" ]
+    then
+        echo "Location for the file containing the list of allowed gitlab users:"
+        echo "(Leave empty to disable check on gitlab users)"
+        read -er CI_ALLOWED_GITLAB_USERS_FILE
+    fi
+    if [ -n "$CI_ALLOWED_GITLAB_USERS_FILE" ]
+    then
+        echo "Creating allowed commiters file:"
+        mkdir -p "$(dirname "$CI_ALLOWED_GITLAB_USERS_FILE")"
+        touch "$CI_ALLOWED_GITLAB_USERS_FILE"
 
-   if [ -z "$ALLOWED_GITLAB_USERS" ]
-   then
-       echo "Comma-separated list of allowed gitlab users (gitlab usernames):"
-       read -er ALLOWED_GITLAB_USERS
-   fi
-   for gitlab_user in $(echo "$ALLOWED_GITLAB_USERS" | tr ',' ' ')
-   do
-       echo "Adding $gitlab_user to $CI_ALLOWED_GITLAB_USERS_FILE"
-       echo "$gitlab_user" >> "$CI_ALLOWED_GITLAB_USERS_FILE"
-   done
+        if [ -z "$ALLOWED_GITLAB_USERS" ]
+        then
+            echo "Comma-separated list of allowed gitlab users (gitlab usernames):"
+            read -er ALLOWED_GITLAB_USERS
+        fi
+        for gitlab_user in $(echo "$ALLOWED_GITLAB_USERS" | tr ',' ' ')
+        do
+            echo "Adding $gitlab_user to $CI_ALLOWED_GITLAB_USERS_FILE"
+            echo "$gitlab_user" >> "$CI_ALLOWED_GITLAB_USERS_FILE"
+        done
 
-   CONFIG_CI_ALLOWED_GITLAB_USER_CHECK="--custom-config-args=$CI_ALLOWED_GITLAB_USERS_FILE"
+        CONFIG_CI_ALLOWED_GITLAB_USER_CHECK="--custom-config-args=$CI_ALLOWED_GITLAB_USERS_FILE"
+    else
+        echo "No check will be performed on gitlab users."
+        CONFIG_CI_ALLOWED_GITLAB_USER_CHECK=""
+    fi
 else
    CONFIG_CI_ALLOWED_GITLAB_USER_CHECK=""
    if [ -n "$CI_ALLOWED_GITLAB_USERS_FILE" ]
