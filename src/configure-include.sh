@@ -76,3 +76,10 @@ function check_allowed_gitlab_user_list(){
 
 
 }
+
+
+function get_gitlab_username_from_job_token(){
+  # Example from: https://docs.gitlab.com/api/jobs/#get-job-tokens-job
+  curl --header "Authorization: Bearer $CUSTOM_ENV_CI_JOB_TOKEN" \
+  --url "${CUSTOM_ENV_CI_API_V4_URL}/job" | jq .user.username
+}

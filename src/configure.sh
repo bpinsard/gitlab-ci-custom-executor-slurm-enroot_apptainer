@@ -18,11 +18,7 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"
 #shellcheck source=./src/configure-include.sh
 source "$SRC/configure-include.sh"
 
-check_allowed_gitlab_user_list "$ALLOWED_GITLAB_USERS_FILE" "$CUSTOM_ENV_GITLAB_USER_LOGIN"
-
-
-
-
+check_allowed_gitlab_user_list "$ALLOWED_GITLAB_USERS_FILE" "$(get_gitlab_username_from_job_token)"
 
 if [[ "$USESLURM" == "useslurm" ]]
 then
