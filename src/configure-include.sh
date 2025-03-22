@@ -41,8 +41,10 @@ function check_allowed_gitlab_user_list(){
     local ALLOWED_GITLAB_USERS_FILE="$1"
     local GITLAB_USER_LOGIN="$2"
 
+
     [ -n "$ALLOWED_GITLAB_USERS_FILE" ] || return 0
 
+    echo "Checking if gitlab user $GITLAB_USER_LOGIN is in file $ALLOWED_GITLAB_USERS_FILE ..."
      {
         {
             local FILE_OWNER_UID USER_ID
