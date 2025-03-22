@@ -137,7 +137,7 @@ function get_job_start_time(){
     local UNIX_TIME
     UNIX_TIME="$(squeue --start --job "$JOBID" --json 2>/dev/null| jq '.jobs[0]["start_time"]["number"]')"
 
-    if [[ "$UNIX_TIME" -eq 0 ]]
+    if [[ "${UNIX_TIME:-0}" -eq 0 ]]
     then
         echo "Information not yet available"
     else
@@ -147,7 +147,7 @@ function get_job_start_time(){
 
 function wait_for_job_to_be_ready(){
     local JOB_ID="$1"
-    OLD_START_TIME=""
+    local OLD_START_TIME=""
     while ! scontrol wait_job "$JOB_ID" &> /dev/null
     do
         sleep 3
