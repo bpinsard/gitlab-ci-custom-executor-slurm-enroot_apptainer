@@ -23,7 +23,7 @@ function setup(){
     TEST_PLAYGROUND="$PWD/end-to-end-test-apptainer-$BATS_TEST_NAME"
     assert_dir_not_exists "$TEST_PLAYGROUND"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
 
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
@@ -37,6 +37,8 @@ function setup(){
 
     export SYSTEM_FALURE_EXIT_CODE=102
     export CUSTOM_ENV_CI_JOB_ID=54321
+    export CUSTOM_ENV_CI_JOB_TOKEN=""
+    export CUSTOM_ENV_CI_API_V4_URL=""
 
     setup_allowed_gitlab_users_file
 }

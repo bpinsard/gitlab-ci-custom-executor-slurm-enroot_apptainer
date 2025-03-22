@@ -26,7 +26,7 @@ function setup(){
     TEST_PLAYGROUND="$PWD/end-to-end-test-apptainer-$BATS_TEST_NAME"
     assert_dir_not_exists "$TEST_PLAYGROUND"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
 
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start

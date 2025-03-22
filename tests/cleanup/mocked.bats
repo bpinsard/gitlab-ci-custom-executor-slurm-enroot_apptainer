@@ -14,7 +14,7 @@ function setup() {
 
     TEST_PLAYGROUND="$PWD/cleanup-test-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
 
     export MOCKLOGDIR=$TEST_PLAYGROUND
 
@@ -176,6 +176,7 @@ function teardown_file(){
 
 }
 
+#bats test_tags=serial
 @test "if CUSTOM_ENV_CE_DEBUG_LVL > 1, save current WS"  {
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CE_QUEUE_WORKSPACE/.env"
@@ -188,6 +189,7 @@ function teardown_file(){
     assert_dir_exists "$HOME/ce-debug/cews_0"
 }
 
+#bats test_tags=serial
 @test "if CUSTOM_ENV_CE_DEBUG_LVL = 1, do not save current WS"  {
     wait_until_file_exists "$CE_QUEUE_WORKSPACE/.env" 10
     echo "declare -- CUSTOM_EXECUTOR_QUEUE_SLURM_JOB_ID=34343434" >> "$CE_QUEUE_WORKSPACE/.env"

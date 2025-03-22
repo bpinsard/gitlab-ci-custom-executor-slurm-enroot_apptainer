@@ -14,7 +14,7 @@ function setup(){
 
     TEST_PLAYGROUND="$PWD/apptainer-prepare-test-$BATS_TEST_NAME"
 
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
     export MOCKLOGDIR="$TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start

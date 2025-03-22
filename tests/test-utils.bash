@@ -91,3 +91,15 @@ function setup_allowed_gitlab_users_file() {
     chmod go-w "$ALLOWED_GITLAB_USERS_FILE"
 
 }
+
+function create_dir_or_error_if_exists(){
+    local DIR="$1"
+
+    if [[ -d "$DIR" ]]
+    then
+        echo "Error: $DIR exists"
+        exit 1
+    else
+        mkdir "$DIR"
+    fi
+}

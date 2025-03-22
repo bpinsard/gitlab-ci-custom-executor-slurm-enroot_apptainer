@@ -9,7 +9,7 @@ setup(){
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
 
     rm -rf "$TEST_PLAYGROUND"
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
 
     WORKDIR="${TEST_PLAYGROUND}"/cews
     STARTDIR="${TEST_PLAYGROUND}"/start

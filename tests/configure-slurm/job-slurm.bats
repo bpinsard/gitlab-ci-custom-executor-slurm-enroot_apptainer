@@ -14,7 +14,7 @@ function setup(){
     TEST_PLAYGROUND="$PWD/job-slurm-test-$BATS_TEST_NAME"
 
     echo "# Creating test playground in $TEST_PLAYGROUND" >&3
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
     export TEST_PLAYGROUND
     export STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"

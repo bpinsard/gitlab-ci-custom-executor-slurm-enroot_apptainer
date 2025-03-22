@@ -15,7 +15,7 @@ function setup(){
     export ENROOT_RUNTIME_PATH="$PROJECT_ROOT/enroot-test/enroot/run"
 
     TEST_PLAYGROUND="$PWD/test-enroot-gpu-$BATS_TEST_NAME"
-    mkdir "$TEST_PLAYGROUND" 
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND" 
     cp ./tests/contract/test.cu "$TEST_PLAYGROUND"
     cd "$TEST_PLAYGROUND" || exit
 

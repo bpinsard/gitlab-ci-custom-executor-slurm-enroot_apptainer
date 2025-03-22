@@ -14,7 +14,7 @@ function setup() {
     SRC="$PROJECT_ROOT"/src
 
     TEST_PLAYGROUND="$PWD/run-test-$BATS_TEST_NAME"
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
     # outside CUSTOM_ENV_CI_WS
     TMP_PLAYGROUND=$(mktemp -d /tmp/run-testXXXXXXX)
     export MOCKLOGDIR="$TEST_PLAYGROUND"

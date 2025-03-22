@@ -14,7 +14,7 @@ function setup() {
 
     TEST_PLAYGROUND="$PWD/cleanup-test-enroot-mocked-noslurm-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
 
     export MOCKLOGDIR=$TEST_PLAYGROUND
 

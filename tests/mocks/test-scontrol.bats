@@ -11,7 +11,7 @@ setup(){
     load_mocks
     TEST_PLAYGROUND="$PWD/test-scontrol-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || exit

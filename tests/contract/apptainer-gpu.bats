@@ -23,7 +23,7 @@ function setup(){
     IMAGEFILE="$PROJECT_ROOT/cuda_$TAG.sif"
 
     TEST_PLAYGROUND="$PWD/test-apptainer-gpu-$BATS_TEST_NAME"
-    mkdir "$TEST_PLAYGROUND" 
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND" 
     cp ./tests/contract/test.cu "$TEST_PLAYGROUND"
     cd "$TEST_PLAYGROUND" || exit
 

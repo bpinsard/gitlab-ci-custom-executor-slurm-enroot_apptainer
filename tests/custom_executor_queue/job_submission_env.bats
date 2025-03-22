@@ -7,7 +7,7 @@ setup(){
 
     TEST_PLAYGROUND="$PWD/ce-queue-job-sub-test-env-$BATS_TEST_NAME"
     echo "# Creating test playground at $TEST_PLAYGROUND" >&3
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
 
 
     WORKDIR="${TEST_PLAYGROUND}"/cews

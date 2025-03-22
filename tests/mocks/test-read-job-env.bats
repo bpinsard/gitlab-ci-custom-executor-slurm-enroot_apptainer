@@ -12,7 +12,7 @@ function setup() {
 
     TEST_PLAYGROUND="$PWD/read-job-env-test-$BATS_TEST_NAME"
     echo "Creating test playground at $TEST_PLAYGROUND"
-    mkdir "$TEST_PLAYGROUND"
+    create_dir_or_error_if_exists "$TEST_PLAYGROUND"
 
     STARTDIR="${TEST_PLAYGROUND}"/start
     mkdir -p "$STARTDIR"
