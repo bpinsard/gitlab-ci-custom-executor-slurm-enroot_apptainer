@@ -30,6 +30,8 @@ function setup() {
 
     export CUSTOM_ENV_CI_JOB_IMAGE=alpine:latest
     export CUSTOM_ENV_CI_JOB_ID=54321
+    export CUSTOM_ENV_CI_JOB_TOKEN=""
+    export CUSTOM_ENV_CI_API_V4_URL=""
 
     setup_allowed_gitlab_users_file
 
@@ -46,47 +48,43 @@ function teardown() {
 
 }
 
-
-
 @test "allowed gitlab users are checked at the configure stage - failure" {
 
     # shellcheck disable=SC2030
-    export CUSTOM_ENV_GITLAB_USER_LOGIN="SomeoneElse"
+    echo "Alice" > "$ALLOWED_GITLAB_USERS_FILE"
 
     run "$SRC"/configure.sh none noslurm "$ALLOWED_GITLAB_USERS_FILE" 3> /dev/null
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --partial "SomeoneElse not in allowed gitlab user list."
+    # some.one configured in the mock of curl
+    assert_output --partial "some.one not in allowed gitlab user list."
 
 }
 
 @test "allowed gitlab users are checked at the configure stage - success" {
 
+    # some.one configured in the mock of curl
+    echo "some.one" > "$ALLOWED_GITLAB_USERS_FILE"
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_GITLAB_USER_LOGIN="Bob"
-
     "$SRC"/configure.sh none noslurm "$ALLOWED_GITLAB_USERS_FILE" 3> /dev/null
 
 }
 
 @test "allowed gitlab users are checked at the configure stage - substring failure" {
 
-    # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_GITLAB_USER_LOGIN="Ali"
 
+    echo "some.one.else" > "$ALLOWED_GITLAB_USERS_FILE"
     run "$SRC"/configure.sh none noslurm "$ALLOWED_GITLAB_USERS_FILE" 3> /dev/null
 
     assert_failure
     assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
-    assert_output --partial "Ali not in allowed gitlab user list."
+    # some.one configured in the mock of curl
+    assert_output --partial "some.one not in allowed gitlab user list."
 
 }
 
 @test "Only if FILENAME passed as 3rd arg to configure, used as allowed gitlab users list." {
-
-    # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_GITLAB_USER_LOGIN="Ali"
 
     "$SRC"/configure.sh none noslurm 3> /dev/null
 
@@ -96,8 +94,6 @@ function teardown() {
 @test "allowed gitlab users file must have the right permissions and ownership" {
 
     # shellcheck disable=SC2030,SC2031
-    export CUSTOM_ENV_GITLAB_USER_LOGIN="Ali"
-
     chmod go+w "$ALLOWED_GITLAB_USERS_FILE"
     ls -l "$ALLOWED_GITLAB_USERS_FILE"
 

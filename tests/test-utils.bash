@@ -87,10 +87,7 @@ function try_to_remove_dir(){
 function setup_allowed_gitlab_users_file() {
     export CUSTOM_ENV_GITLAB_USER_LOGIN="Bob"
     export ALLOWED_GITLAB_USERS_FILE="$TEST_PLAYGROUND/.gitlab-ce-allowed-gitlab-users"
-    echo "Alice" > "$ALLOWED_GITLAB_USERS_FILE"
-    echo "Bob" >> "$ALLOWED_GITLAB_USERS_FILE"
-    echo "Charles" >> "$ALLOWED_GITLAB_USERS_FILE"
-
+    touch "$ALLOWED_GITLAB_USERS_FILE"
     chmod go-w "$ALLOWED_GITLAB_USERS_FILE"
 
 }

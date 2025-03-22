@@ -44,7 +44,7 @@ function check_allowed_gitlab_user_list(){
 
     [ -n "$ALLOWED_GITLAB_USERS_FILE" ] || return 0
 
-    echo "Checking if gitlab user $GITLAB_USER_LOGIN is in file $ALLOWED_GITLAB_USERS_FILE ..."
+    echo "Checking if gitlab user $GITLAB_USER_LOGIN is in file $ALLOWED_GITLAB_USERS_FILE ..." >&2
      {
         {
             local FILE_OWNER_UID USER_ID
@@ -69,7 +69,7 @@ function check_allowed_gitlab_user_list(){
 
     } && {
 
-        grep -wq "$GITLAB_USER_LOGIN" "$ALLOWED_GITLAB_USERS_FILE"  || {
+        grep -Eq "^$GITLAB_USER_LOGIN$" "$ALLOWED_GITLAB_USERS_FILE"  || {
             echo "[CONFIGURE]: Error: $GITLAB_USER_LOGIN not in allowed gitlab user list." >&2;
             exit "$SYSTEM_FAILURE_EXIT_CODE";
 
@@ -83,5 +83,5 @@ function check_allowed_gitlab_user_list(){
 function get_gitlab_username_from_job_token(){
   # Example from: https://docs.gitlab.com/api/jobs/#get-job-tokens-job
   curl --header "Authorization: Bearer $CUSTOM_ENV_CI_JOB_TOKEN" \
-  --url "${CUSTOM_ENV_CI_API_V4_URL}/job" | jq .user.username
+  --url "${CUSTOM_ENV_CI_API_V4_URL}/job" | jq .user.username  | tr -d '"'
 }
