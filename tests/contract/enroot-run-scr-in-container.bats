@@ -3,6 +3,7 @@
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
+    load '../test-utils' # for 'create_dir_or_error_if_exists'
 
     type -p enroot || { echo "# enroot executable not found, skipping" >&3 ; skip ;}
 
