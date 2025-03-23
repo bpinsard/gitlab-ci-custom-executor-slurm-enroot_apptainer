@@ -5,8 +5,7 @@ noslurm-unit-test-parallel-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy-noslurm
   script:
-    #- make test-report-parallel JOBS=8
-    - ./tests/bats/bin/bats ./tests/*
+    - make test-report-parallel JOBS=8
   tags:
     - noslurm
     - nocontainer
