@@ -60,6 +60,9 @@ jq -r .job_env.CE_QUEUE_WORKSPACE
       false
     fi
 
+    export CUSTOM_ENV_CI_JOB_TOKEN=""
+    export CUSTOM_ENV_CI_API_V4_URL=""
+
 
     CEQ_ENV="$CUSTOM_ENV_CI_WS/cews_0"/.env
 

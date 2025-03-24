@@ -27,6 +27,9 @@ function setup(){
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
     export CUSTOM_ENV_CI_CONCURRENT_ID=42
 
+    export CUSTOM_ENV_CI_JOB_TOKEN=""
+    export CUSTOM_ENV_CI_API_V4_URL=""
+
     setup_allowed_gitlab_users_file
 }
 
