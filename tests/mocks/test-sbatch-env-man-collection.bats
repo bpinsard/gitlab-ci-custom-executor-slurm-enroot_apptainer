@@ -28,7 +28,7 @@ teardown(){
 }
 
 
-
+# bats test_tags=skipped-local
 @test "sbatch input environment variables read from docs are the expected ones" {
 
    has_slurm || skip

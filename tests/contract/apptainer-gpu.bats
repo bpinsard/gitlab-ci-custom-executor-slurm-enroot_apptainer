@@ -88,6 +88,7 @@ function teardown_file() {
     } } || { echo "# necessary executables not found, skipping" >&3; }
 }
 
+# bats test_tags=skipped-local
 @test "apptainer gpu job fails without --nv" {
     COMMAND=(apptainer exec --bind '/scratch' "$IMAGEFILE" bash -c "nvcc -o tt ./test.cu && ./tt && echo ok")
     echo "${COMMAND[@]}" >&3
@@ -97,6 +98,7 @@ function teardown_file() {
     assert_equal "$status" 6 # ENXIO No such device or address
 }
 
+# bats test_tags=skipped-local
 @test "apptainer gpu job fails without monting /scratch" {
     COMMAND=(apptainer exec --nv "$IMAGEFILE" bash -c "nvcc -o tt ./test.cu && ./tt && echo ok")
     echo "${COMMAND[@]}" >&3
@@ -107,6 +109,7 @@ function teardown_file() {
     assert_output --regexp 'nvcc fatal\s+: Could not open output file'
 }
 
+# bats test_tags=skipped-local
 @test "apptainer gpu job works if --nv and /scratch are managed" {
     COMMAND=(apptainer exec --bind '/scratch' --nv "$IMAGEFILE" bash -c "nvcc -o tt ./test.cu && ./tt && echo ok")
     echo "${COMMAND[@]}" >&3

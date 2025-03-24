@@ -83,7 +83,7 @@ function teardown() {
 }
 
 
-
+# bats test_tags=skipped-local
 @test "configure launches custom executor queue in slurm job - no container" {
 
     ###############################################
@@ -113,6 +113,7 @@ function teardown() {
 }
 
 
+# bats test_tags=skipped-local
 @test "configure launches custom executor queue in slurm job - no container - submission" {
 
 
@@ -197,6 +198,7 @@ EOF
 
 }
 
+# bats test_tags=skipped-local
 @test "custom executor queue is sent SIGUSR1 before end of job and trap is activated" {
 
 

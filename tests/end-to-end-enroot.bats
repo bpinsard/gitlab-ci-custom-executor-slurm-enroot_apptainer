@@ -79,7 +79,7 @@ function teardown() {
 }
 
 
-# bats test_tags=configure,prepare,cleanup
+# bats test_tags=configure,prepare,cleanup,skipped-local
 @test "configure, prepare, and cleanup" {
 
     "$SRC"/configure.sh enroot useslurm | "$JOB_ENV_READER" > ./job-env
@@ -109,7 +109,7 @@ function teardown() {
     is_job_not_in_file || is_job_completing
 }
 
-# bats test_tags=configure,prepare,cleanup,run
+# bats test_tags=configure,prepare,cleanup,run,skipped-local
 @test "configure, prepare, run and cleanup run a simple script" {
 
     "$SRC"/configure.sh enroot useslurm | "$JOB_ENV_READER" > ./job-env

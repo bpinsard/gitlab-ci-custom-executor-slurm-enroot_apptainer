@@ -89,6 +89,7 @@ function teardown_file() {
 }
 
 
+# bats test_tags=skipped-local
 @test "enroot gpu job works without monting /scratch" { 
     COMMAND=(enroot start --mount "$PWD:$PWD"
              enroot-gpu-test-container

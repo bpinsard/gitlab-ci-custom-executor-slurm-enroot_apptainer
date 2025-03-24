@@ -37,7 +37,7 @@ function teardown() {
     rm -rf "$TEST_PLAYGROUND"
 }
 
-# bats test_tags=serial
+# bats test_tags=serial,skipped-local
 @test "srun --container-image runs in a container (with the right mount options)" {
     # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/
     on_horeka || skip
