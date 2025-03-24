@@ -6,7 +6,7 @@ function load_mocks(){
 
 
 function json_validate () {
-    python3 -c 'import json,sys;json.load(sys.stdin)' || ( echo "JSON validation failed" && exit 1 )
+    jq || ( echo "JSON validation failed" && exit 1 )
 }
 
 function wait_until_file_exists() {

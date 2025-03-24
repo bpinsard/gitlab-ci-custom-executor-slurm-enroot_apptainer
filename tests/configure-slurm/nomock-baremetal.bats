@@ -30,11 +30,7 @@ function setup(){
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || false
 
-    cat << EOF > get_workspace.py
-import sys, json
-dump = json.load(sys.stdin)
-print(dump["job_env"]["CE_QUEUE_WORKSPACE"])
-EOF
+jq -r .job_env.CE_QUEUE_WORKSPACE
 
     echo "# Test setup phase completed." >&3
 
@@ -97,7 +93,7 @@ function teardown() {
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 1 -n 1"
     # shellcheck disable=SC2031
-    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | jq -r .job_env.CE_QUEUE_WORKSPACE )
     cat config-output
     # shellcheck disable=SC2031
     # shellcheck source=./src/slurm-include.sh
@@ -127,7 +123,7 @@ function teardown() {
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 3 -n 1"
     # shellcheck disable=SC2031
-    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | jq -r .job_env.CE_QUEUE_WORKSPACE)
     cat config-output
     # shellcheck disable=SC2031
     # shellcheck source=./src/slurm-include.sh
@@ -211,7 +207,7 @@ EOF
     # shellcheck disable=SC2030,SC2031
     export CUSTOM_ENV_COMMAND_OPTIONS_SBATCH="--partition=$SLURM_DEFAULT_PARTITION -t 2 -n 1"
     # shellcheck disable=SC2031
-    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | python3 get_workspace.py)
+    WORKSPACE=$("$SRC"/configure.sh none useslurm | tee config-output | jq -r .job_env.CE_QUEUE_WORKSPACE)
     cat config-output
     # shellcheck disable=SC2031
     # shellcheck source=./src/slurm-include.sh

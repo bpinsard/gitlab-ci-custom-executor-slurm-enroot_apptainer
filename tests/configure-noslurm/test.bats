@@ -67,7 +67,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure.sh none noslurm 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
+    "$SRC"/configure.sh none noslurm 3> /dev/null | jq -r .driver.name
     }
 
     run _helper
@@ -79,7 +79,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure.sh a-backend noslurm 3> /dev/null | python3 -c 'import json,sys;print(json.load(sys.stdin)["builds_dir"])'
+    "$SRC"/configure.sh a-backend noslurm 3> /dev/null | jq -r .builds_dir
     }
 
     run _helper
@@ -94,7 +94,7 @@ function teardown() {
 
     function _helper() {
 
-    "$SRC"/configure.sh none noslurm 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
+    "$SRC"/configure.sh none noslurm 3> /dev/null | jq -r .driver.version
     }
 
     run _helper
