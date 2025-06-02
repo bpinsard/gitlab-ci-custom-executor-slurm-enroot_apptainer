@@ -1,11 +1,11 @@
-noslurm-unit-test-parallel-test-deploy:
+noslurm-unit-test-parallel-localnoskip-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
     JOB_TIME_SEC: 1800
   stage: test-deploy-noslurm
   script:
-    - make test-report-parallel JOBS=8
+    - make test-report-parallel-no-skipped-local JOBS=8
   tags:
     - noslurm
     - nocontainer
@@ -17,13 +17,13 @@ noslurm-unit-test-parallel-test-deploy:
       junit: report-parallel.xml
 
 
-noslurm-unit-test-serial-test-deploy:
+noslurm-unit-test-serial-localnoskip-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-noslurm-none
   script:
-    - make test-report-serial
+    - make test-report-serial-no-skipped-local
   tags:
     - noslurm
     - nocontainer
@@ -33,6 +33,46 @@ noslurm-unit-test-serial-test-deploy:
       - report-serial.xml
     reports:
       junit: report-serial.xml
+
+noslurm-unit-test-parallel-localskip-test-deploy:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    JOB_TIME_SEC: 1800
+  stage: test-deploy-noslurm
+  script:
+    - make test-report-parallel-skipped-local JOBS=8
+  tags:
+    - noslurm
+    - nocontainer
+  artifacts:
+    when: always
+    paths:
+      - report-parallel.xml
+    reports:
+      junit: report-parallel.xml
+
+
+noslurm-unit-test-serial-localskip-test-deploy:
+  dependencies: 
+    - noslurm-unit-test-serial-localnoskip-test-deploy
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test-deploy-serial-noslurm-none
+  script:
+    - make test-report-serial-skipped-local
+  tags:
+    - noslurm
+    - nocontainer
+  artifacts:
+    when: always
+    paths:
+      - report-serial.xml
+    reports:
+      junit: report-serial.xml
+
+
+
 
 
 noslurm-lint-test-deploy:

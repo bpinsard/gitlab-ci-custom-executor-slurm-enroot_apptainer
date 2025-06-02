@@ -12,6 +12,16 @@ test-and-coverage:
 test-report-parallel:
 	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) > report-parallel.xml
 
+test-report-parallel-no-skipped-local:
+	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags '!serial,!skipped-local' tests/* 
+test-report-parallel-skipped-local:
+	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags '!serial,skipped-local' tests/* 
+test-report-serial-no-skipped-local:
+	./tests/bats/bin/bats --formatter junit --filter-tags 'serial,!skipped-local' tests/* 
+
+test-report-serial-skipped-local:
+	./tests/bats/bin/bats --formatter junit --filter-tags 'serial,skipped-local' tests/* 
+
 test-report-serial:
 	./tests/bats/bin/bats --formatter junit --filter-tags serial $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) > report-serial.xml
 
