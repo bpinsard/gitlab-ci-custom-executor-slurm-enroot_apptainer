@@ -51,6 +51,7 @@ function setup_file() {
                          --gres=gpu:1 \
                          --parsable \
                          -o "$HOME/.apptainer-gpu-test-job.out" \
+                         --job-name 'apptainer-wrap' \
                          --wrap "sleep 150")
     echo "Submitted Job: $TEST_JOB_ID" >&3
     echo "$TEST_JOB_ID" > "$(get_gpu_test_jobid_file)"

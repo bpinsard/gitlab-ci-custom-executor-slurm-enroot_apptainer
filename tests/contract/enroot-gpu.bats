@@ -50,6 +50,7 @@ function setup_file() {
                                 --gres=gpu:1 \
                                 --parsable \
                                 -o "$HOME/.enroot-gpu-test-job.out" \
+                                -job-name 'enroot-wrap' \
                                 --wrap "sleep 150")
     echo "Submitted Job: $ENROOT_TEST_JOB_ID" >&3
     echo "$ENROOT_TEST_JOB_ID" > "$HOME/.enroot-gpu-test-jobid"

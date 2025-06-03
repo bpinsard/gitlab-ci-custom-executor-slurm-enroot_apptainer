@@ -9,7 +9,7 @@ function get_slurm_default_partition() {
 SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
 export SLURM_DEFAULT_PARTITION
 
-JOBID=$(sbatch -p "$SLURM_DEFAULT_PARTITION" -n 1 -t 5 --wrap "sleep 100" --parsable)
+JOBID=$(sbatch -p "$SLURM_DEFAULT_PARTITION" -n 1 -t 5 --job-name 'test-container-wrap' --wrap "sleep 100" --parsable)
 
 echo "$JOBID" created
 

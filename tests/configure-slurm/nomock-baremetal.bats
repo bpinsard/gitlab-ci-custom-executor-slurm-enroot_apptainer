@@ -233,7 +233,7 @@ EOF
     echo "Checking that job $JOB_ID has ended with the right message"
     run sbatch -p "$SLURM_DEFAULT_PARTITION" -n 1 -t 1 \
         --dependency=afterany:"$JOB_ID" \
-       	--wait \
+       	--wait --job-name 'ceq-wrap' \
 	--wrap "grep -q 'Stopping custom executor queue...' $CUSTOM_EXECUTOR_QUEUE_LOGFILE"
 
     assert_success
