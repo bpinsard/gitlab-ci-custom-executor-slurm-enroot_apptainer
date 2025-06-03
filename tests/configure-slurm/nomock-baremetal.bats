@@ -30,8 +30,6 @@ function setup(){
     mkdir -p "$STARTDIR"
     cd "$STARTDIR" || false
 
-jq -r .job_env.CE_QUEUE_WORKSPACE
-
     echo "# Test setup phase completed." >&3
 
     # shellcheck disable=SC2030
