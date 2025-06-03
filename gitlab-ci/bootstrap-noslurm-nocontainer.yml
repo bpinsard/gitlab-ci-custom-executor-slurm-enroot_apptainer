@@ -1,3 +1,5 @@
+# localnoskip: tests that typically are not skipped on a dev machine
+# dev machine: a machine possibly without slurm and/or enroot and/or apptainer
 noslurm-unit-test-parallel-localnoskip-test-deploy:
   dependencies: []
   variables:
@@ -5,16 +7,16 @@ noslurm-unit-test-parallel-localnoskip-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy-noslurm
   script:
-    - make test-report-parallel-no-skipped-local JOBS=8
+    - make test-report-parallel-no-skipped-local JOBS=8 > report_parallel_localnoskip.xml
   tags:
     - noslurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - report-parallel.xml
+      - report_parallel_localnoskip.xml
     reports:
-      junit: report-parallel.xml
+      junit: report_parallel_localnoskip.xml
 
 
 noslurm-unit-test-serial-localnoskip-test-deploy:
@@ -23,16 +25,16 @@ noslurm-unit-test-serial-localnoskip-test-deploy:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-noslurm-none
   script:
-    - make test-report-serial-no-skipped-local
+    - make test-report-serial-no-skipped-local > report_serial_localnoskip.xml
   tags:
     - noslurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - report-serial.xml
+      - report_serial_localnoskip.xml
     reports:
-      junit: report-serial.xml
+      junit: report_serial_localnoskip.xml
 
 noslurm-unit-test-parallel-localskip-test-deploy:
   dependencies: []
@@ -41,16 +43,16 @@ noslurm-unit-test-parallel-localskip-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy-noslurm
   script:
-    - make test-report-parallel-skipped-local JOBS=8
+    - make test-report-parallel-skipped-local JOBS=8 > report_parallel_localskip.xml
   tags:
     - noslurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - report-parallel.xml
+      - report_parallel_localskip.xml
     reports:
-      junit: report-parallel.xml
+      junit: report_parallel_localskip.xml
 
 
 noslurm-unit-test-serial-localskip-test-deploy:
@@ -60,16 +62,16 @@ noslurm-unit-test-serial-localskip-test-deploy:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-noslurm-none
   script:
-    - make test-report-serial-skipped-local
+    - make test-report-serial-skipped-local > report_serial_localskip.xml
   tags:
     - noslurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - report-serial.xml
+      - report_serial_localskip.xml
     reports:
-      junit: report-serial.xml
+      junit: report_serial_localskip.xml
 
 
 

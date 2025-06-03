@@ -4,13 +4,13 @@ unit-test-parallel-optionals:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test-report-optionals JOBS=8
+    - make test-report-optionals JOBS=8 > report_optionals.xml
   tags:
     - shell
   allow_failure: true
   artifacts:
     when: always
     paths:
-      - report-optionals.xml
+      - report_optionals.xml
     reports:
-      junit: report-optionals.xml
+      junit: report_optionals.xml
