@@ -157,7 +157,7 @@ EOF
     assert_file_contains "$EXITCODE" "42"
 
 }
-# bats test_tags=location,skipped-local,mayhang
+# bats test_tags=location,skipped-local
 @test "submitted script is executed in the same directory it was submitted" {
     # This might actually not be needed and potentially harmful
     # in the context of the CI custom executor

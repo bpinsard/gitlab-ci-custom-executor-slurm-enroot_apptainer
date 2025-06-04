@@ -52,7 +52,7 @@ function teardown() {
 }
 
 
-# bats test_tags=configure,prepare,cleanup,mayhang
+# bats test_tags=configure,prepare,cleanup
 @test "configure, prepare, and cleanup (noslurm)" {
 
     "$SRC"/configure.sh apptainer noslurm | "$JOB_ENV_READER" > ./job-env
@@ -67,7 +67,7 @@ function teardown() {
 
 }
 
-# bats test_tags=configure,prepare,cleanup,run,mayhang
+# bats test_tags=configure,prepare,cleanup,run
 @test "configure, prepare, run and cleanup run a simple script (noslurm)" {
 
     "$SRC"/configure.sh apptainer noslurm | "$JOB_ENV_READER" > ./job-env
