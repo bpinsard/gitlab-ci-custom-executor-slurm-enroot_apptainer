@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+function has_slurm () {
+	man sbatch &> /dev/null
+}
+
 setup(){
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output
@@ -28,7 +33,7 @@ teardown(){
 }
 
 
-# bats test_tags=skipped-local,mayhang
+# bats test_tags=skipped-local
 @test "sbatch input environment variables read from docs are the expected ones" {
 
    has_slurm || skip
