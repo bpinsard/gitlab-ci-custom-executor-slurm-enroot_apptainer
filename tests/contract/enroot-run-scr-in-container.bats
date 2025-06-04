@@ -22,7 +22,7 @@ function teardown() {
 
 }
 
-# bats test_tags=coverage-problematic,skipped-local
+# bats test_tags=coverage-problematic,skipped-local,mayhang
 @test "enroot mounts single file in container and executes it without problems." {
 
     # shellcheck disable=SC2030
@@ -52,7 +52,7 @@ EOF
 
 }
 
-# bats test_tags=coverage-problematic,skipped-local
+# bats test_tags=coverage-problematic,skipped-local,mayhang
 @test "enroot CANNOT mounts two files with a single --mount directive." {
 
     # shellcheck disable=SC2030,SC2031
@@ -85,7 +85,7 @@ EOF
 
 }
 
-# bats test_tags=coverage-problematic,skipped-local
+# bats test_tags=coverage-problematic,skipped-local,mayhang
 @test "enroot accepts multiple --mount directives." {
 
     # shellcheck disable=SC2030,SC2031
@@ -122,7 +122,7 @@ EOF
 
 
 
-# bats test_tags=coverage-problematic,skipped-local
+# bats test_tags=coverage-problematic,skipped-local,mayhang
 @test "enroot CANNOT mount single file in container AND directory that contains it at the same time" {
 
     # shellcheck disable=SC2031

@@ -76,7 +76,7 @@ function teardown() {
 }
 
 
-# bats test_tags=configure,prepare,cleanup,skipped-local
+# bats test_tags=configure,prepare,cleanup,skipped-local,mayhang
 @test "configure, prepare, and cleanup (noslurm)" {
 
     "$SRC"/configure.sh enroot noslurm | "$JOB_ENV_READER" > ./job-env
@@ -91,7 +91,7 @@ function teardown() {
 
 }
 
-# bats test_tags=configure,prepare,cleanup,run,skipped-local
+# bats test_tags=configure,prepare,cleanup,run,skipped-local,mayhang
 @test "configure, prepare, run and cleanup run a simple script (noslurm)" {
 
     "$SRC"/configure.sh enroot noslurm | "$JOB_ENV_READER" > ./job-env
