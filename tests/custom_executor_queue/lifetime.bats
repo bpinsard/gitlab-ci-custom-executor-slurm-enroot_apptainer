@@ -242,12 +242,12 @@ teardown(){
     cp "$WORKDIR/".env new_env
 
     # There is only one job in the background
-    assert_equal $(jobs | wc -l ) 1
+    assert_equal "$(jobs | wc -l )" 1
 
     # The .env file has not changed
     diff old_env new_env
 
-
+    # shellcheck disable=SC1091
     source "$WORKDIR/".env
     stop_custom_executor_queue
 }
@@ -287,9 +287,9 @@ teardown(){
     cp "$WORKDIR/".env new_env
 
     # There is only one job in the background
-    assert_equal $(jobs | wc -l ) 1
+    assert_equal "$(jobs | wc -l )" 1
 
-    assert_equal $(diff old_env new_env  | grep CUSTOM_EXECUTOR_QUEUE_PID | wc -l ) 2
+    assert_equal "$(diff old_env new_env  | grep -c CUSTOM_EXECUTOR_QUEUE_PID)" 2
 }
 
 @test "start_custom_executor_queue does start a new queue in a dead workspace and messages about it" {

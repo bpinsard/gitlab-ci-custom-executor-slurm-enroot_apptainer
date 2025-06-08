@@ -17,6 +17,7 @@ function start_custom_executor_queue () {
     CUSTOM_EXECUTOR_QUEUE_WORKSPACE="$1"
     if [ -f  "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env ]
     then
+       # shellcheck disable=SC1091
        source "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
        if custom_executor_queue_is_alive
        then
