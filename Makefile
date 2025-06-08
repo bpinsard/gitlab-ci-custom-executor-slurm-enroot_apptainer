@@ -9,30 +9,15 @@ test-and-coverage:
 	for batsfile in $$(git ls-files '*.bats'); do bashcov -- ./tests/bats/bin/bats -T "$$batsfile"; done
 	ps aux | grep 'tests/bats/libexec' | grep -v grep | awk '{print $$2}' | xargs kill
 
-test-report-parallel:
-	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks)
+test_report_parallel_no_skipped_local.xml:
+	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags '!serial,!skipped-local' tests/* > test_report_parallel_no_skipped_local.xml
 
-test-report-parallel-no-skipped-local:
-	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags '!serial,!skipped-local' tests/* 
-
-test-report-parallel-skipped-local:
-	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags '!serial,skipped-local' tests/*
-
-test-report-serial-no-skipped-local:
-	./tests/bats/bin/bats --formatter junit --filter-tags 'serial,!skipped-local' tests/* 
-
-test-report-serial-skipped-local:
-	./tests/bats/bin/bats --formatter junit --filter-tags 'serial,skipped-local' tests/* 
-
-test-report-serial:
-	./tests/bats/bin/bats --formatter junit --filter-tags serial $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks)
-
-test-report-critical:
-	./tests/bats/bin/bats --formatter junit --filter-tags 'serial' --filter-tags 'skipped-local'  $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks)
+test_report_critical.xml:
+	./tests/bats/bin/bats --formatter junit --filter-tags 'serial' --filter-tags 'skipped-local'  $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) > test_report_critical.xml
 
 # Test that can fail
-test-report-optionals:
-	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/mocks 
+test_report_optionals.xml:
+	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/mocks  > test_report_optionals.xml
 
 
 # These targets are provided for convenience

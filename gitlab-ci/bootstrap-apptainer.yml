@@ -6,16 +6,16 @@ apptainer-unit-test-parallel-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy
   script:
-    - make test-report-parallel-no-skipped-local JOBS=8 > report_parallel.xml
+    - make test_report_parallel_no_skipped_local.xml JOBS=8 
   tags:
     - slurm
     - apptainer
   artifacts:
     when: always
     paths:
-      - report_parallel.xml
+      - test_report_parallel_no_skipped_local.xml
     reports:
-      junit: report_parallel.xml
+      junit: test_report_parallel_no_skipped_local.xml
 
 
 apptainer-unit-test-critical-test-deploy:
@@ -24,16 +24,16 @@ apptainer-unit-test-critical-test-deploy:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-apptainer
   script:
-    - make test-report-critical > report_critical_apptainer.xml
+    - make test_report_critical.xml 
   tags:
     - slurm
     - apptainer
   artifacts:
     when: always
     paths:
-      - report_critical_apptainer.xml
+      - test_report_critical.xml 
     reports:
-      junit: report_critical_apptainer.xml
+      junit: test_report_critical.xml 
 
 
 apptainer-lint-test-deploy:

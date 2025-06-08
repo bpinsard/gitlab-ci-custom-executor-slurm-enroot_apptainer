@@ -7,16 +7,16 @@ noslurm-unit-test-parallel-localnoskip-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy-noslurm
   script:
-    - make test-report-parallel-no-skipped-local JOBS=8 > report_parallel_localnoskip.xml
+    - make test_report_parallel_no_skipped_local.xml JOBS=8
   tags:
     - noslurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - report_parallel_localnoskip.xml
+      - > test_report_parallel_no_skipped_local.xml
     reports:
-      junit: report_parallel_localnoskip.xml
+      junit: > test_report_parallel_no_skipped_local.xml
 
 
 noslurm-unit-test-critical-test-deploy:
@@ -25,16 +25,16 @@ noslurm-unit-test-critical-test-deploy:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-noslurm-none
   script:
-    make test-report-critical > ./report_critical.xml
+    make test_report_critical.xml
   tags:
     - noslurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - report_critical.xml
+      - test_report_critical.xml
     reports:
-      junit: report_critical.xml
+      junit: test_report_critical.xml
 
 noslurm-lint-test-deploy:
   dependencies: []

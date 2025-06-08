@@ -9,22 +9,22 @@ lint:
     - shell
 
 
-unit-test-serial:
+unit-test-critical:
   when: manual # This test is redundant
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test-report-serial > report_serial.xml
+    - make test_report_critical.xml
   tags:
     - shell
   artifacts:
     when: always
     paths:
-      - report_serial.xml
+      - test_report_critical.xml
     reports:
-      junit: report_serial.xml
+      junit: test_report_critical.xml
 
 
 unit-test-parallel:
@@ -34,12 +34,12 @@ unit-test-parallel:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test-report-parallel-no-skipped-local JOBS=8 > report_parallel.xml
+    - make test_report_parallel_no_skipped_local.xml JOBS=8
   tags:
     - shell
   artifacts:
     when: always
     paths:
-      - report_parallel.xml
+      - test_report_parallel_no_skipped_local.xml
     reports:
-      junit: report_parallel.xml
+      junit: test_report_parallel_no_skipped_local.xml

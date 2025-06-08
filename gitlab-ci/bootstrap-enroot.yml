@@ -6,16 +6,16 @@ enroot-unit-test-parallel-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy
   script:
-    - make test-report-parallel-no-skipped-local JOBS=8 > report_parallel_enroot.xml
+    - make test_report_parallel_no_skipped_local.xml JOBS=8
   tags:
     - slurm
     - enroot
   artifacts:
     when: always
     paths:
-      - report_parallel_enroot.xml
+      - test_report_parallel_no_skipped_local.xml
     reports:
-      junit: report-parallel_enroot.xml
+      junit: test_report_parallel_no_skipped_local.xml
 
 enroot-unit-test-critical-test-deploy:
   dependencies: []
@@ -23,16 +23,16 @@ enroot-unit-test-critical-test-deploy:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-enroot
   script:
-    - make test-report-critical > report_critical_enroot.xml
+    - make test_report_critical.xml
   tags:
     - slurm
     - enroot
   artifacts:
     when: always
     paths:
-      - report_critical_enroot.xml
+      - test_report_critical.xml
     reports:
-      junit: report_critical_enroot.xml
+      junit: test_report_critical.xml
 
 enroot-lint-test-deploy:
   dependencies: []
