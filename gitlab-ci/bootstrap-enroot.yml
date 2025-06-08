@@ -6,16 +6,16 @@ enroot-unit-test-parallel-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy
   script:
-    - make test-report-parallel JOBS=8
+    - make test-report-parallel-no-skipped-local JOBS=8 > report_parallel_enroot.xml
   tags:
     - slurm
     - enroot
   artifacts:
     when: always
     paths:
-      - report-parallel.xml
+      - report_parallel_enroot.xml
     reports:
-      junit: report-parallel.xml
+      junit: report-parallel_enroot.xml
 
 enroot-unit-test-critical-test-deploy:
   dependencies: []

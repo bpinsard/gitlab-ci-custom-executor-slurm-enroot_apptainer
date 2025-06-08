@@ -16,15 +16,15 @@ unit-test-serial:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test-report-serial
+    - make test-report-serial > report_serial.xml
   tags:
     - shell
   artifacts:
     when: always
     paths:
-      - report-serial.xml
+      - report_serial.xml
     reports:
-      junit: report-serial.xml
+      junit: report_serial.xml
 
 
 unit-test-parallel:
@@ -34,12 +34,12 @@ unit-test-parallel:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test
   script:
-    - make test-report-parallel JOBS=8
+    - make test-report-parallel-no-skipped-local JOBS=8 > report_parallel.xml
   tags:
     - shell
   artifacts:
     when: always
     paths:
-      - report-parallel.xml
+      - report_parallel.xml
     reports:
-      junit: report-parallel.xml
+      junit: report_parallel.xml

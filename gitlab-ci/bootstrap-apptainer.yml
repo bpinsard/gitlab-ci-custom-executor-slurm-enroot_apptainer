@@ -6,16 +6,16 @@ apptainer-unit-test-parallel-test-deploy:
     JOB_TIME_SEC: 1800
   stage: test-deploy
   script:
-    - make test-report-parallel JOBS=8
+    - make test-report-parallel-no-skipped-local JOBS=8 > report_parallel.xml
   tags:
     - slurm
     - apptainer
   artifacts:
     when: always
     paths:
-      - report-parallel.xml
+      - report_parallel.xml
     reports:
-      junit: report-parallel.xml
+      junit: report_parallel.xml
 
 
 apptainer-unit-test-critical-test-deploy:
