@@ -5,9 +5,9 @@ joker:
     - unit-test-parallel
     - unit-test-serial
     - apptainer-unit-test-parallel-test-deploy
-    - apptainer-unit-test-serial-test-deploy
+    - apptainer-unit-test-critical-test-deploy
     - enroot-unit-test-parallel-test-deploy
-    - enroot-unit-test-serial-test-deploy
+    - enroot-unit-test-critical-test-deploy
     - unit-test-parallel-test-deploy
     - unit-test-serial-test-deploy
   stage: bats-cleanup
