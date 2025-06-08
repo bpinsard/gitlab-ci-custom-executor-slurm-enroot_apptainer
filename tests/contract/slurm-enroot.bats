@@ -57,7 +57,7 @@ function teardown() {
     # Running inside a container (on a compute node)
     run srun -p "$SLURM_DEFAULT_PARTITION" \
         --container-image=alpine:latest \
-        --container-mounts=/scratch:/scratch,/etc/slurm/task_prolog.hk:/etc/slurm/task_prolog.hk \
+        --container-mounts=/scratch:/scratch,/etc/slurm/task_prolog:/etc/slurm/task_prolog \
         -n 1 -t 1 \
         "${GET_DISTRONAME[@]}"
 
