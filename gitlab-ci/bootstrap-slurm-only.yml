@@ -17,22 +17,22 @@ unit-test-parallel-test-deploy:
       junit: report_parallel.xml
 
 
-unit-test-serial-test-deploy:
+unit-test-critical-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-none
   script:
-    - make test-report-serial > report_serial.xml
+    - make test-report-critical > report_critical.xml
   tags:
     - slurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - report_serial.xml
+      - report_critical.xml
     reports:
-      junit: report_serial.xml
+      junit: report_critical.xml
 
 
 lint-test-deploy:
