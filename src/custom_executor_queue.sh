@@ -12,9 +12,21 @@ function start_custom_executor_queue () {
         return 1
     fi
     declare -i CUSTOM_EXECUTOR_QUEUE_CYCLETIME
-    # In seconds
+   # In seconds
     CUSTOM_EXECUTOR_QUEUE_CYCLETIME=3 # DEBUG
     CUSTOM_EXECUTOR_QUEUE_WORKSPACE="$1"
+    if [ -f  "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env ]
+    then
+       source "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
+       if custom_executor_queue_is_alive
+       then
+          echo "Custom executor queue already running in $CUSTOM_EXECUTOR_QUEUE_WORKSPACE, not starting another one." >> "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+          return 0
+       else
+          echo "Custom executor queue no more running in $CUSTOM_EXECUTOR_QUEUE_WORKSPACE, re-starting another one." >> "$CUSTOM_EXECUTOR_QUEUE_LOGFILE"
+          rm "${CUSTOM_EXECUTOR_QUEUE_WORKSPACE}"/.env
+       fi
+    fi
     if [ "$#" -eq 2 ]
     then
         CUSTOM_EXECUTOR_QUEUE_MAX_IDLE_TIME_SEC="$2"

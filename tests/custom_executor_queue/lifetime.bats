@@ -230,3 +230,76 @@ teardown(){
 
 
 }
+
+@test "start_custom_executor_queue does not start a new queue in a running workspace" {
+
+    start_custom_executor_queue "$WORKDIR"
+
+    cp "$WORKDIR/".env old_env
+
+    start_custom_executor_queue "$WORKDIR"
+
+    cp "$WORKDIR/".env new_env
+
+    # There is only one job in the background
+    assert_equal $(jobs | wc -l ) 1
+
+    # The .env file has not changed
+    diff old_env new_env
+
+
+    source "$WORKDIR/".env
+    stop_custom_executor_queue
+}
+
+@test "start_custom_executor_queue in a running workspace does not change env vars" {
+
+    start_custom_executor_queue "$WORKDIR"
+
+    env > old_env
+
+    start_custom_executor_queue "$WORKDIR"
+
+    env > new_env
+
+    diff old_env new_env
+
+}
+
+@test "start_custom_executor_queue in a running workspace puts a message in the existing log file" {
+
+    start_custom_executor_queue "$WORKDIR"
+
+    start_custom_executor_queue "$WORKDIR"
+
+    LOGFILE="$WORKDIR"/log.txt
+    assert_file_contains "$LOGFILE" "Custom executor queue already running in $WORKDIR, not starting another one."
+
+}
+
+@test "start_custom_executor_queue does start a new queue in a dead workspace" {
+
+    start_custom_executor_queue "$WORKDIR"
+    cp "$WORKDIR/".env old_env
+    stop_custom_executor_queue
+
+    start_custom_executor_queue "$WORKDIR"
+    cp "$WORKDIR/".env new_env
+
+    # There is only one job in the background
+    assert_equal $(jobs | wc -l ) 1
+
+    assert_equal $(diff old_env new_env  | grep CUSTOM_EXECUTOR_QUEUE_PID | wc -l ) 2
+}
+
+@test "start_custom_executor_queue does start a new queue in a dead workspace and messages about it" {
+
+    start_custom_executor_queue "$WORKDIR"
+    stop_custom_executor_queue
+
+    start_custom_executor_queue "$WORKDIR"
+
+    LOGFILE="$WORKDIR"/log.txt
+    assert_file_contains "$LOGFILE" "Custom executor queue no more running in $WORKDIR, re-starting another one."
+
+}
