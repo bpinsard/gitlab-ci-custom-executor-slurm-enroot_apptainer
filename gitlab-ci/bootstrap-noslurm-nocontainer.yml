@@ -19,63 +19,22 @@ noslurm-unit-test-parallel-localnoskip-test-deploy:
       junit: report_parallel_localnoskip.xml
 
 
-noslurm-unit-test-serial-localnoskip-test-deploy:
+noslurm-unit-test-critical-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-noslurm-none
   script:
-    - make test-report-serial-no-skipped-local > report_serial_localnoskip.xml
+    make test-report-critical > ./report_critical.xml
   tags:
     - noslurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - report_serial_localnoskip.xml
+      - report_critical.xml
     reports:
-      junit: report_serial_localnoskip.xml
-
-noslurm-unit-test-parallel-localskip-test-deploy:
-  dependencies: []
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-    JOB_TIME_SEC: 1800
-  stage: test-deploy-noslurm
-  script:
-    - make test-report-parallel-skipped-local JOBS=8 > report_parallel_localskip.xml
-  tags:
-    - noslurm
-    - nocontainer
-  artifacts:
-    when: always
-    paths:
-      - report_parallel_localskip.xml
-    reports:
-      junit: report_parallel_localskip.xml
-
-
-noslurm-unit-test-serial-localskip-test-deploy:
-  dependencies: 
-    - noslurm-unit-test-serial-localnoskip-test-deploy
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-  stage: test-deploy-serial-noslurm-none
-  script:
-    - make test-report-serial-skipped-local > report_serial_localskip.xml
-  tags:
-    - noslurm
-    - nocontainer
-  artifacts:
-    when: always
-    paths:
-      - report_serial_localskip.xml
-    reports:
-      junit: report_serial_localskip.xml
-
-
-
-
+      junit: report_critical.xml
 
 noslurm-lint-test-deploy:
   dependencies: []

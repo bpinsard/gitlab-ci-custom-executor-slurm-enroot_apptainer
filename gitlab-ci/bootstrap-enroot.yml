@@ -17,22 +17,22 @@ enroot-unit-test-parallel-test-deploy:
     reports:
       junit: report-parallel.xml
 
-enroot-unit-test-serial-test-deploy:
+enroot-unit-test-critical-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-enroot
   script:
-    - make test-report-serial
+    - make test-report-critical > report_critical_enroot.xml
   tags:
     - slurm
     - enroot
   artifacts:
     when: always
     paths:
-      - report-serial.xml
+      - report_critical_enroot.xml
     reports:
-      junit: report-serial.xml
+      junit: report_critical_enroot.xml
 
 enroot-lint-test-deploy:
   dependencies: []

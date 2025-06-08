@@ -8,6 +8,10 @@ function get_slurm_default_partition() {
     scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2
 }
 
+function on_horeka () {
+    hostname | grep -q -E "hkn[0-9]{4}.localdomain" 
+}
+
 function setup() {
     load '../test_helper/bats-support/load' # for run
     load '../test_helper/bats-assert/load' # for assert_output and refute_output

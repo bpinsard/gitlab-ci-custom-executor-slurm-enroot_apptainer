@@ -46,12 +46,12 @@ function setup_file() {
     echo "${COMMAND[@]}" >&3
     "${COMMAND[@]}" >&3
     ENROOT_TEST_JOB_ID=$(sbatch --partition accelerated \
-                                -t 3 \
+                                -t 10 \
                                 --gres=gpu:1 \
                                 --parsable \
                                 -o "$HOME/.enroot-gpu-test-job.out" \
                                 --job-name 'enroot-wrap' \
-                                --wrap "sleep 150")
+                                --wrap "sleep 500")
     echo "Submitted Job: $ENROOT_TEST_JOB_ID" >&3
     echo "$ENROOT_TEST_JOB_ID" > "$HOME/.enroot-gpu-test-jobid"
     while ! scontrol wait_job "$ENROOT_TEST_JOB_ID" &> /dev/null

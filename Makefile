@@ -27,6 +27,9 @@ test-report-serial-skipped-local:
 test-report-serial:
 	./tests/bats/bin/bats --formatter junit --filter-tags serial $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks)
 
+test-report-critical:
+	./tests/bats/bin/bats --formatter junit --filter-tags 'serial' --filter-tags 'skipped-local'  $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks)
+
 # Test that can fail
 test-report-optionals:
 	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/mocks 
