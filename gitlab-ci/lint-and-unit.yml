@@ -10,6 +10,8 @@ lint:
 
 
 unit-test-critical:
+  env:
+    JOB_TIME_SEC: 3600
   when: manual # This test is redundant
   dependencies: []
   variables:

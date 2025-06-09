@@ -18,6 +18,8 @@ enroot-unit-test-parallel-test-deploy:
       junit: test_report_parallel_no_skipped_local.xml
 
 enroot-unit-test-critical-test-deploy:
+  env:
+    JOB_TIME_SEC: 3600
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive

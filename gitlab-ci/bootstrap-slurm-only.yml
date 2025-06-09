@@ -18,6 +18,8 @@ unit-test-parallel-test-deploy:
 
 
 unit-test-critical-test-deploy:
+  env:
+    JOB_TIME_SEC: 3600
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
