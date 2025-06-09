@@ -69,7 +69,7 @@ function backup_ce_workspace_if_debug() {
     then
        local CE_DEBUG_DIR
        CE_DEBUG_DIR="${CUSTOM_ENV_CE_DEBUG_DIR:-$HOME/ce-debug}/"
-       mkdir -p "$(dirname "$CE_DEBUG_DIR")"
+       mkdir -p "$CE_DEBUG_DIR"
        cp -r "$CE_QUEUE_WORKSPACE" "$CE_DEBUG_DIR"
     fi
 }
