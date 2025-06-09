@@ -35,3 +35,10 @@ function allocation_is_alive(){
     }
 
 }
+
+function allocation_is_starting(){
+
+    local WORKSPACE="$1"
+    [ -d "$WORKSPACE" ] && [ ! -f "$WORKSPACE/.env" ]
+
+}

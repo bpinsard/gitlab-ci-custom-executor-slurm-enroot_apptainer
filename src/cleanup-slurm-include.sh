@@ -25,7 +25,7 @@ function remove_old_workspaces(){
     shopt -s nullglob
     for DIR in "$CUSTOM_ENV_CI_WS"/cews_*
     do
-        if ! allocation_is_alive "$DIR" && [[ "$DIR" != "$CE_QUEUE_WORKSPACE" ]]
+        if ! { allocation_is_alive "$DIR" || allocation_is_starting "$DIR" ; } && [[ "$DIR" != "$CE_QUEUE_WORKSPACE" ]]
         then
            if [ "${CUSTOM_ENV_CE_DEBUG_LVL:-0}" -gt 1 ]
            then

@@ -205,6 +205,27 @@ function teardown() {
 
 }
 
+@test "allocation_is_starting succeeds for a workspace that has no .env yet" {
+
+    WS="$TEST_PLAYGROUND/cews_something"
+    mkdir "$WS"
+
+    allocation_is_starting "$WS"
+
+}
+
+@test "allocation_is_starting fails for a workspace that has a .env already" {
+
+    WS="$TEST_PLAYGROUND/cews_something"
+    mkdir "$WS"
+    touch "$WS/.env"
+
+
+    run allocation_is_starting "$WS"
+    assert_failure
+
+}
+
 
 @test "create_job_slurm - if WALLTIME_SECONDS > 86400, slurm_time_limit_from_seconds should fail" {
     run slurm_time_limit_from_seconds 86401
