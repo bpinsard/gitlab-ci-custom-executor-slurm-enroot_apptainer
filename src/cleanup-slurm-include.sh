@@ -67,7 +67,9 @@ function backup_ce_workspace_if_debug() {
     local DEBUG_LVL="$1"
     if [[ "$DEBUG_LVL" -gt "1" ]]
     then
-       mkdir "$(dirname "${CUSTOM_ENV_CE_DEBUG_DIR:-$HOME/ce-debug}/")"
-       cp -r "$CE_QUEUE_WORKSPACE" "${CUSTOM_ENV_CE_DEBUG_DIR:-$HOME/ce-debug}/"
+       local CE_DEBUG_DIR
+       CE_DEBUG_DIR="${CUSTOM_ENV_CE_DEBUG_DIR:-$HOME/ce-debug}/"
+       mkdir -p "$(dirname "$CE_DEBUG_DIR")"
+       cp -r "$CE_QUEUE_WORKSPACE" "$CE_DEBUG_DIR"
     fi
 }
