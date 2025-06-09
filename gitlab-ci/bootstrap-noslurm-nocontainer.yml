@@ -14,9 +14,9 @@ noslurm-unit-test-parallel-localnoskip-test-deploy:
   artifacts:
     when: always
     paths:
-      - > test_report_parallel_no_skipped_local.xml
+      - test_report_parallel_no_skipped_local.xml
     reports:
-      junit: > test_report_parallel_no_skipped_local.xml
+      junit: test_report_parallel_no_skipped_local.xml
 
 
 noslurm-unit-test-critical-test-deploy:
