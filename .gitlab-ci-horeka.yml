@@ -38,7 +38,4 @@ include:
   #  - '/gitlab-ci/bootstrap-noslurm-nocontainer.yml'
   #  - '/gitlab-ci/horeka-specific.yml'
   #  - '/gitlab-ci/joker.yml'
-  - gitlab-ci/bootstrap-apptainer.yml
-  - gitlab-ci/bootstrap-enroot.yml
-  - gitlab-ci/bootstrap-slurm-only.yml
-  - gitlab-ci/lint-and-unit.yml
+  - gitlab-ci/debug.yml
