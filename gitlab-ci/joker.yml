@@ -2,8 +2,6 @@
 joker:
   dependencies: []
   needs:
-    - unit-test-parallel
-    - unit-test-serial
     - apptainer-unit-test-parallel-test-deploy
     - apptainer-unit-test-critical-test-deploy
     - enroot-unit-test-parallel-test-deploy
