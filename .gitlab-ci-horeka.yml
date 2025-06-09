@@ -6,14 +6,14 @@ stages:
   - test
   - packaging
   - deploy
-  - test-deploy-noslurm
-  - test-deploy
-  - test-deploy-ce-debug-enroot
-  - test-deploy-ce-debug-apptainer
   - test-deploy-serial-none
   - test-deploy-serial-noslurm-none
   - test-deploy-serial-enroot
   - test-deploy-serial-apptainer
+  - test-deploy-noslurm
+  - test-deploy
+  - test-deploy-ce-debug-enroot
+  - test-deploy-ce-debug-apptainer
   - bats-cleanup
 
 include:
