@@ -20,11 +20,10 @@ noslurm-unit-test-parallel-localnoskip-test-deploy:
 
 
 noslurm-unit-test-critical-test-deploy:
-  env:
-    JOB_TIME_SEC: 3600
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
+    JOB_TIME_SEC: 3600
   stage: test-deploy-serial-noslurm-none
   script:
     make test_report_critical.xml
