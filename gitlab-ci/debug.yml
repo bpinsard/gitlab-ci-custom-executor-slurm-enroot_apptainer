@@ -4,8 +4,8 @@ unit-test-critical-test-deploy:
     GIT_SUBMODULE_STRATEGY: recursive
     JOB_TIME_SEC: 3600
   stage: test-deploy-serial-none
-  script: |
-	./tests/bats/bin/bats --filter-tags 'serial' --filter-tags 'skipped-local'  $(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks)
+  script:
+    - ./tests/bats/bin/bats --filter-tags 'serial' --filter-tags 'skipped-local'  $(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks)
   tags:
     - slurm
     - nocontainer
