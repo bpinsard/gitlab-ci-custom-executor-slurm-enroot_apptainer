@@ -67,7 +67,7 @@ function teardown() {
         echo "# This test has failed. " >&3
         echo "# This test might fail with a 'permission denied' error," >&3
         echo "# this is why we to not use pyxis." >&3
-        assert_output --partial "permission denied"
+        assert_output --partial "slurmstepd: error: TaskProlog failed status=127"
     else
         assert_output --partial "Alpine Linux"
     fi
