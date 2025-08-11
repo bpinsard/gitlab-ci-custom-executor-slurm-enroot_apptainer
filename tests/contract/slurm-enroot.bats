@@ -43,7 +43,6 @@ function teardown() {
 
 # bats test_tags=serial,skipped-local
 @test "srun --container-image runs in a container (with the right mount options)" {
-    # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/
     on_horeka || skip
     GET_DISTRONAME=(grep PRETTY /etc/os-release)
     
@@ -65,9 +64,11 @@ function teardown() {
     if [[  "$status" -ne 0 ]]
     then
         echo "# This test has failed. " >&3
-        echo "# This test might fail with a 'permission denied' error," >&3
-        echo "# this is why we to not use pyxis." >&3
-        assert_output --partial "slurmstepd: error: TaskProlog failed status=127"
+        echo "# This test might fail with any of the following errors: " >&3
+        echo "# - 'permission denied'" >&3
+        echo "# - 'slurmstepd: error: TaskProlog failed status=127'" >&3
+        echo "# - 'slurmstepd: error: pyxis: failed to import docker image'" >&3
+        echo "# this is why we do not use pyxis." >&3
     else
         assert_output --partial "Alpine Linux"
     fi
