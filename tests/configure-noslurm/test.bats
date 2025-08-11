@@ -47,6 +47,7 @@ function teardown() {
 
 @test "script outputs valid json (no slurm)" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
     set -o errexit
@@ -65,6 +66,7 @@ function teardown() {
 
 @test "script output has driver.name (no slurm)" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
     "$SRC"/configure.sh none noslurm 3> /dev/null | jq -r .driver.name
@@ -77,6 +79,7 @@ function teardown() {
 
 @test "script output has builds_dir and it is in CI_WS,contains CI_CONCURRENT_ID and backend (no slurm)" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
     "$SRC"/configure.sh a-backend noslurm 3> /dev/null | jq -r .builds_dir
@@ -92,6 +95,7 @@ function teardown() {
 
 @test "script output has driver.version (no slurm)" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
     "$SRC"/configure.sh none noslurm 3> /dev/null | jq -r .driver.version

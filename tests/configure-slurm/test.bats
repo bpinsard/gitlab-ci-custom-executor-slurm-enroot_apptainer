@@ -192,6 +192,7 @@ function teardown() {
 
 @test "script outputs valid json" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
     set -o errexit
@@ -218,6 +219,7 @@ function teardown() {
 
 @test "script output has driver.name" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
     "$SRC"/configure.sh none useslurm 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["name"]'
@@ -230,6 +232,7 @@ function teardown() {
 
 @test "script output has builds_dir and it is in CI_WS,contains CI_CONCURRENT_ID and backend" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
     "$SRC"/configure.sh a-backend useslurm 3> /dev/null | python3 -c 'import json,sys;print(json.load(sys.stdin)["builds_dir"])'
@@ -245,6 +248,7 @@ function teardown() {
 
 @test "script output has driver.version" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
     "$SRC"/configure.sh none useslurm 3> /dev/null | python3 -c 'import json,sys;json.load(sys.stdin)["driver"]["version"]'
@@ -257,6 +261,7 @@ function teardown() {
 
 @test "script output has job_env.CE_QUEUE_WORKSPACE (where the .env created by start_custom_executor_queue lives)" {
 
+    # shellcheck disable=SC2329
     function _helper() {
 
 cat <<EOF > scr.py

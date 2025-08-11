@@ -75,16 +75,17 @@ teardown(){
         # shellcheck source=./src/containerlib-enroot.sh
         source "$SRC"/containerlib-enroot.sh
 
-         _helper() {
-             # shellcheck disable=SC2317
-             env | grep -cE '^ENROOT_.*_PATH'
-         }
+        # shellcheck disable=SC2329
+        function _helper() {
+            # shellcheck disable=SC2317
+            env | grep -cE '^ENROOT_.*_PATH'
+        }
 
-         run _helper
-         assert_output 0
-         set +o nounset
-         assert [ -z "$CE_CONTAINER_NAME" ]
-         set -o nounset
+        run _helper
+        assert_output 0
+        set +o nounset
+        assert [ -z "$CE_CONTAINER_NAME" ]
+        set -o nounset
     )
 }
 

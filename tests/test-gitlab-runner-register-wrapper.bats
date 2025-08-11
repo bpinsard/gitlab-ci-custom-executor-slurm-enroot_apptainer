@@ -467,7 +467,8 @@ function teardown() {
 
 @test "default value is displayed correctly for url:" {
 
-    _helper(){
+    # shellcheck disable=SC2329
+    function _helper(){
         # shellcheck disable=SC2317
         for mock_datum in "${MOCK_INPUTS[@]}"
         do
@@ -483,7 +484,8 @@ function teardown() {
 
 @test "default value is displayed correctly for the custom executor repo:" {
 
-    _helper(){
+    # shellcheck disable=SC2329
+    function _helper(){
         # shellcheck disable=SC2317
         for mock_datum in "${MOCK_INPUTS[@]}"
         do
@@ -701,7 +703,8 @@ function teardown() {
                     )
 
 
-    _helper() {
+    # shellcheck disable=SC2329
+    function _helper() {
         # shellcheck disable=SC2317
         for mock_datum in "${MOCK_INPUTS_TMP[@]}"
         do

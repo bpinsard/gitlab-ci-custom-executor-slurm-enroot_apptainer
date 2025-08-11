@@ -35,7 +35,7 @@ then
     echo -n "image: $CUSTOM_ENV_CI_JOB_IMAGE"
     echo -n " and variable IMAGEFILE=$CUSTOM_ENV_IMAGEFILE"
     echo " are set at the same time."
-    if [[ -a "$CUSTOM_ENV_IMAGEFILE" ]]
+    if [[ -e "$CUSTOM_ENV_IMAGEFILE" ]]
     then
         echo "$CUSTOM_ENV_IMAGEFILE does exist, not dowloading image: $CUSTOM_ENV_CI_JOB_IMAGE"
     fi
@@ -44,7 +44,7 @@ fi
 # image: undefined but IMAGEFILE defined
 if [[ -z "$CUSTOM_ENV_CI_JOB_IMAGE" ]] && [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
 then
-    if [[ ! -a "$CUSTOM_ENV_IMAGEFILE" ]]
+    if [[ ! -e "$CUSTOM_ENV_IMAGEFILE" ]]
     then
         echo "IMAGEFILE=$CUSTOM_ENV_IMAGEFILE does not exist and image: not specified."
         exit "$SYSTEM_FAILURE_EXIT_CODE"

@@ -88,7 +88,7 @@ function teardown() {
 
     CE_SLURM_JOB_ID="$(get_slurm_jobid "$CE_QUEUE_WORKSPACE")"
 
-    # shellcheck disable=SC2317
+    # shellcheck disable=SC2317,SC2329
     function is_job_in_squeue_output(){ squeue | grep "$CE_SLURM_JOB_ID"; }
 
     run is_job_in_squeue_output

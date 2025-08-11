@@ -26,7 +26,7 @@ set -o nounset
 
 set -o errexit
 
-if [[ -z "$CUSTOM_ENV_IMAGEFILE" ]] || [[ ! -a "$CUSTOM_ENV_IMAGEFILE" ]]
+if [[ -z "$CUSTOM_ENV_IMAGEFILE" ]] || [[ ! -e "$CUSTOM_ENV_IMAGEFILE" ]]
 then
     if [[ -n "$CUSTOM_ENV_IMAGEFILE" ]]
     then

@@ -46,6 +46,7 @@ EOF
     (
     # shellcheck disable=SC2030
     export MY_VARIABLE="some-thing"
+    # shellcheck disable=SC2329
     function _helper(){
         # shellcheck disable=SC2317
         submit_to_custom_executor_queue_and_wait job.sh JOB-54321 | grep -v "has ended,"
@@ -106,6 +107,7 @@ EOF
     (
 
     export SLURM_SOMETHING="some-thing"
+    # shellcheck disable=SC2329
     function _helper(){
         # shellcheck disable=SC2317
         submit_to_custom_executor_queue_and_wait job.sh JOB-54321 | grep -v "has ended,"
@@ -130,7 +132,8 @@ EOF
     # shellcheck disable=SC2034
     declare -ir VARNOVALUE
 
-    _helper() {
+    # shellcheck disable=SC2329
+    function _helper() {
         # shellcheck disable=SC2317
         cat <<EOF | purge_variables
 declare -r READONLY_VAR1=12345

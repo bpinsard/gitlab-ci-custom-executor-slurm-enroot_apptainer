@@ -21,7 +21,7 @@ fi
 set -o nounset
 
 
-if [[ -z "$CUSTOM_ENV_IMAGEFILE" ]] || [[ ! -a "$CUSTOM_ENV_IMAGEFILE" ]]
+if [[ -z "$CUSTOM_ENV_IMAGEFILE" ]] || [[ ! -e "$CUSTOM_ENV_IMAGEFILE" ]]
 then
     COMMAND=(apptainer
              pull
