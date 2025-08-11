@@ -45,7 +45,6 @@ function teardown() {
 @test "srun --container-image runs in a container (with the right mount options)" {
     # Ffrom https://www.nhr.kit.edu/userdocs/horeka/containers/
     on_horeka || skip
-    skip # THIS TEST FAILS CURRENTLY
     GET_DISTRONAME=(grep PRETTY /etc/os-release)
     
     # Running on the host (on a compute node)
@@ -55,10 +54,11 @@ function teardown() {
 
     refute_output --partial "Alpine Linux"
 
+    # From: https://www.nhr.kit.edu/userdocs/horeka/containers/#start-directly-via-pyxis
     # Running inside a container (on a compute node)
     run srun -p "$SLURM_DEFAULT_PARTITION" \
         --container-image=alpine:latest \
-        --container-mounts=/scratch:/scratch,/etc/slurm/task_prolog:/etc/slurm/task_prolog \
+        --container-mounts=/etc/slurm/task_prolog:/etc/slurm/task_prolog,/scratch:/scratch,/usr/lib64/slurm/libslurmfull.so,/usr/lib64/libhwloc.so.15 \
         -n 1 -t 1 \
         "${GET_DISTRONAME[@]}"
 
