@@ -343,7 +343,7 @@ COMMAND=(gitlab-runner register \
     --cache-dir="$CACHE_DIR_BASE/$CONTAINER_BACKEND" \
     --env CI_WS="$CI_WS" \
     "$DEFPART_ENV" \
-    --custom_build_dir-enabled \
+    --custom_build_dir-enabled true\
     --custom-config-exec="$SRC/configure.sh" \
     --custom-config-exec-timeout=2000 \
     --custom-config-args="$CONTAINER_BACKEND" \
