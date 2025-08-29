@@ -31,6 +31,11 @@ function setup() {
     URL_DEFAULT="https://gitlab.kit.edu/"
     ALLOWED_GITLAB_USERS_FILE="$TEST_PLAYGROUND/allowed_gitlab_users"
 
+    GITLAB_RUNNER_MOCK_VERSION="$(
+                 "$UTILS"/gitlab-runner-register-wrapper.sh --show-validated-runner-version-only
+).1"
+    export GITLAB_RUNNER_MOCK_VERSION
+
     MOCK_INPUTS=(url
                  token
                  name
@@ -750,6 +755,7 @@ function teardown() {
                      ""
                     )
 
+    # shellcheck disable=SC2329
     _helper() {
         for mock_datum in "${MOCK_INPUTS_TMP[@]}"
         do
@@ -763,7 +769,53 @@ function teardown() {
     assert_equal "$(grep -o custom-config-args "$MOCKLOGDIR"/gitlab-runner.log | wc -l)" 2
     assert_output --partial "No check will be performed on gitlab users."
 
+}
 
+@test "gitlab runner version (major/minor) is checked and error is thrown if it does not match" {
+    MOCK_INPUTS_TMP=(url
+                     token
+                     name
+                     cerepo # custom executor repository
+                     enroot
+                     cache_dir
+                     ci_ws
+                     default-partition
+                     yes # use slurm
+                     ""
+                    )
+
+    # shellcheck disable=SC2329
+    _helper() {
+        for mock_datum in "${MOCK_INPUTS_TMP[@]}"
+        do
+            echo "$mock_datum"
+        done | "$UTILS"/gitlab-runner-register-wrapper.sh
+    }
+
+    export GITLAB_RUNNER_MOCK_VERSION=17.9.25
+    run _helper
+    assert_failure
+    assert_output --partial "This wrapper has not been manually tested with this gitlab runner version"
+    assert_output --partial "Please contact the maintainers."
+
+}
+
+@test "--runner-version-check-only mentioned in help" {
+
+    run "$UTILS"/gitlab-runner-register-wrapper.sh --help
+    assert_output --partial "--runner-version-check-only"
+}
+
+@test "--show-validated-runner-version-only mentioned in help" {
+
+    run "$UTILS"/gitlab-runner-register-wrapper.sh --help
+    assert_output --partial "--show-validated-runner-version-only"
+}
+
+@test "when --runner-version-check-only is used, no other action is performed by the runner" {
+
+
+    "$UTILS"/gitlab-runner-register-wrapper.sh --runner-version-check-only
 
 
 }

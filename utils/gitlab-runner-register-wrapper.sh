@@ -1,5 +1,7 @@
 #!/bin/bash
 
+VALIDATED_AGAINST_GITLAB_RUNNER_VERSION_MAJOR_MINOR=18.0
+
 set -o errexit
 set -o nounset
 set -o pipefail
@@ -22,72 +24,97 @@ cat <<EOF
 This script eases the setup of the custom executor.
 It accepts the following options:
 
-    --url                            The url of the gitlab ci coordinator
-                                     default:
-                                     $URL_DEFAULT
+    --url                                 The url of the gitlab ci coordinator
+                                          default:
+                                          $URL_DEFAULT
 
-    --registration-token             The registration token, to be obtained
-                                     from the project page
-                                     (Settings -> CI/CD -> Runners)
-                                     on the gitlab web interface
+    --registration-token                  The registration token, to be obtained
+                                          from the project page
+                                          (Settings -> CI/CD -> Runners)
+                                          on the gitlab web interface
 
-    --name|--description             A description for the runner
+    --name|--description                  A description for the runner
 
-    --ce-repo                        The location of the custom executor code
-                                     default:
-                                     $REPO
+    --ce-repo                             The location of the custom executor code
+                                          default:
+                                          $REPO
 
-    --container-backend              The backend used for containerised jobs,
-                                     i.e., "enroot", "apptainer" or "none".
+    --container-backend                   The backend used for containerised jobs,
+                                          i.e., "enroot", "apptainer" or "none".
 
-    --cache-dir-base                 Directory where build cache is stored
-                                     It will be created if it does not exist.
-                                     Default:
-                                     $CACHE_DIR_BASE_DEFAULT/<container-backend>
+    --cache-dir-base                      Directory where build cache is stored
+                                          It will be created if it does not exist.
+                                          Default:
+                                          $CACHE_DIR_BASE_DEFAULT/<container-backend>
 
-    --ci-ws                          Workspace for the internals
-                                     of the custom executor.
-                                     It will be created if it does not exist.
-                                     Default:
-                                     $CI_WS_DEFAULT
+    --ci-ws                               Workspace for the internals
+                                          of the custom executor.
+                                          It will be created if it does not exist.
+                                          Default:
+                                          $CI_WS_DEFAULT
 
-     --use-slurm                     Values accepted: yes/no.
-                                     Whether to run the CI jobs in a slurm allocation
-                                     or on the local node
-                                     (where the runner has been launched).
+     --use-slurm                          Values accepted: yes/no.
+                                          Whether to run the CI jobs in a slurm allocation
+                                          or on the local node
+                                          (where the runner has been launched).
 
-    --default-partition              The default Slurm partition to use
-                                     (can be overridden using the right
-                                     environment variables)
-                                     default:
-                                     $DEFAULT_PARTITION_DEFAULT
+    --default-partition                   The default Slurm partition to use
+                                          (can be overridden using the right
+                                          environment variables)
+                                          default:
+                                          $DEFAULT_PARTITION_DEFAULT
 
-    --disable-gitlab-user-check      Disables the check on gitlab usernames
-                                     that would otherwise happen
-                                     at the configure stage of each job.
-                                     Use this option only if you are sure
-                                     that this runner will only be used
-                                     to run pipelines for trusted individuals,
+    --disable-gitlab-user-check           Disables the check on gitlab usernames
+                                          that would otherwise happen
+                                          at the configure stage of each job.
+                                          Use this option only if you are sure
+                                          that this runner will only be used
+                                          to run pipelines for trusted individuals,
 
-    --allowed-gitlab-users-file-path File containing a list of gitlab usernames
-                                     for the commits of which
-                                     CI jobs can be executed by this runner.
-                                     Will be used to store the content
-                                     of the option "allowed-gitlab-users"
+    --allowed-gitlab-users-file-path      File containing a list of gitlab usernames
+                                          for the commits of which
+                                          CI jobs can be executed by this runner.
+                                          Will be used to store the content
+                                          of the option "allowed-gitlab-users"
 
-    --allowed-gitlab-users           Comma-separated list of gitlab usernames
-                                     for the commits of which
-                                     CI jobs can be executed by this runner.
+    --allowed-gitlab-users                Comma-separated list of gitlab usernames
+                                          for the commits of which
+                                          CI jobs can be executed by this runner.
 
-    --help                           Show this help and exit.
+    --runner-version-check-only           Only checks that
+                                          the version of the gitlab-runner application
+                                          matches the one
+                                          that this script was tested against.
+
+    --show-validated-runner-version-only  Show only the gitlab runner version
+                                          that this script was tested against.
+
+    --help                                Show this help and exit.
 
 In case some of the needed information is not provided using
 command line options, it will be asked for in an interactive way.
 
 EOF
+}
 
+function check_gitlab_runner_version(){
+
+[[ $(gitlab-runner --version | grep Version:) =~ Version:[[:space:]]+([0-9]+)\.([0-9]+)\.([0-9]+) ]]
+local MAJOR=${BASH_REMATCH[1]}
+local MINOR=${BASH_REMATCH[2]}
+[ "$MAJOR.$MINOR" == "$VALIDATED_AGAINST_GITLAB_RUNNER_VERSION_MAJOR_MINOR" ] || {
+    echo "This wrapper has not been manually tested with this gitlab runner version"
+    echo "Please contact the maintainers."
+    echo "Expected Version: $VALIDATED_AGAINST_GITLAB_RUNNER_VERSION_MAJOR_MINOR"
+    echo "Found Version: ${BASH_REMATCH[0]}"
+    exit 1
+}
 
 }
+
+
+
+
 
 
 OPTSTRING=""
@@ -104,6 +131,8 @@ OPTSTRING+=",use-slurm:"
 OPTSTRING+=",disable-gitlab-user-check"
 OPTSTRING+=",allowed-gitlab-users-file-path:"
 OPTSTRING+=",allowed-gitlab-users:"
+OPTSTRING+=",show-validated-runner-version-only"
+OPTSTRING+=",runner-version-check-only"
 OPTSTRING+=",help"
 
 export OPTSTRING
@@ -181,6 +210,13 @@ do
             ALLOWED_GITLAB_USERS="$2"
             shift;
             ;;
+        --show-validated-runner-version-only)
+            echo "$VALIDATED_AGAINST_GITLAB_RUNNER_VERSION_MAJOR_MINOR"
+            exit 0;
+            ;;
+        --runner-version-check-only)
+            VERSION_CHECK_ONLY=
+            ;;
         --)
 	        break
             ;;
@@ -192,6 +228,14 @@ do
     esac
     shift
 done
+
+
+check_gitlab_runner_version
+
+if [ -v VERSION_CHECK_ONLY ]
+then
+    exit 0
+fi
 
 
 if [ -z "$URL" ]

@@ -4,5 +4,20 @@ GITLAB_RUNNER_LOG="$MOCKLOGDIR"/gitlab-runner.log
 
 BASEMOCK="$(cd "$(dirname "${BASH_SOURCE[0]}" )" > /dev/null 2>&1 && pwd)"/basemock
 
+
+if [[ "$1" == '--version' ]]
+then
+cat <<EOF
+Version:      $GITLAB_RUNNER_MOCK_VERSION
+Git revision: 3e653c4e
+Git branch:   18-0-stable
+GO version:   go1.23.6 X:cacheprog
+Built:        2025-05-16T17:25:38Z
+OS/Arch:      linux/amd64
+EOF
+shift
+fi
+
+
 # shellcheck source=./tests/mocks/bin/basemock
 source "$BASEMOCK" "$GITLAB_RUNNER_LOG" "$@"

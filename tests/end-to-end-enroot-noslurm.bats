@@ -4,10 +4,6 @@ function has_enroot(){
     which enroot &> /dev/null
 }
 
-function get_slurm_default_partition() {
-    scontrol show partition | grep -e "dev_\(single\|cpuonly\)" | cut -d= -f2
-}
-
 function setup(){
     load './test_helper/bats-support/load' # for run
     load './test_helper/bats-assert/load' # for assert_output and refute_output
@@ -43,25 +39,6 @@ function setup(){
 
     export CUSTOM_ENV_CI_WS="$TEST_PLAYGROUND/ci-ws"; mkdir -p "$CUSTOM_ENV_CI_WS"
     export CUSTOM_ENV_CI_CONCURRENT_ID=42
-
-    SLURM_DEFAULT_PARTITION=$(get_slurm_default_partition)
-    export SLURM_DEFAULT_PARTITION
-    if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
-    then
-      # If we are in a testing environment,
-      # it might be that CUSTOM_ENV_DEFAULT_PARTITION is not defined
-      # while DEFAULT_PARTITION is defined instead.
-      export CUSTOM_ENV_DEFAULT_PARTITION="$DEFAULT_PARTITION"
-    fi
-    if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
-    then
-      export CUSTOM_ENV_DEFAULT_PARTITION="$SLURM_DEFAULT_PARTITION"
-    fi
-    if [ -z "$CUSTOM_ENV_DEFAULT_PARTITION" ]
-    then
-      echo "Error:CUSTOM_ENV_DEFAULT_PARTITION not defined"
-      exit 1
-    fi
 
     setup_allowed_gitlab_users_file
 

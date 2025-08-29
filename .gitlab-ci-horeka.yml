@@ -6,6 +6,7 @@ stages:
   - test
   - packaging
   - deploy
+  - version-check
   - test-deploy-serial-none
   - test-deploy-serial-noslurm-none
   - test-deploy-serial-enroot
