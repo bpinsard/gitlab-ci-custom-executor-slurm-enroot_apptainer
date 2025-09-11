@@ -213,7 +213,9 @@ function submit_to_custom_executor_queue_and_wait() {
     local JOB_END_SIGNAL="$DONENAME has ended, $OUTPUTNAME completed."
     ( tail -s 1 -f "$OUTPUTNAME" | grep -v "$JOB_END_SIGNAL"; ) &
     local SUBPID=$!
-    while [ ! -f "$DONENAME" ] && [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
+    while [ ! -f "$DONENAME" ] && \
+          [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ] && \
+          [ ! -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/slurm-out-of-time" ]
     do
         sleep 1
     done
@@ -228,10 +230,19 @@ function submit_to_custom_executor_queue_and_wait() {
     disown "$SUBPID"
     kill "$SUBPID" || true
     pkill -f -U "$USER" 'tail -s 1 -f '"$OUTPUTNAME" || true
-    if [ ! -f "$DONENAME" ] && [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
+    if [ ! -f "$DONENAME" ]
     then
-    echo "Abnormal termination of Custom Executor Queue, exiting."
-    exit "$SYSTEM_FAILURE_EXIT_CODE"
+       if [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
+       then
+           echo "Abnormal termination of Custom Executor Queue, exiting."
+           exit "$SYSTEM_FAILURE_EXIT_CODE"
+       fi
+       if [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/slurm-out-of-time" ]
+       then
+           echo "Slurm job ran out of time! Exiting."
+           exit "$SYSTEM_FAILURE_EXIT_CODE"
+       fi
+
     fi
 
     TIME="$(date +"%s")"
@@ -290,8 +301,18 @@ function stop_all () {
 
 function emergency_stop () {
     stop_all
+    touch "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated"
     exit 0
 }
+
+function out_of_time_stop () {
+    stop_all
+    _log "Received signal meaning OUT OF TIME"
+    touch "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/slurm-out-of-time"
+    exit 0
+}
+
+
 
 function cleanup_custom_executor_queue_workspace() {
     stop_custom_executor_queue
@@ -300,9 +321,9 @@ function cleanup_custom_executor_queue_workspace() {
 
 
 function _custom_executor_queue () {
-    trap emergency_stop SIGTERM SIGUSR1
+    trap emergency_stop SIGTERM
+    trap out_of_time_stop SIGUSR1
     # shellcheck disable=SC2064
-    trap "touch $CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated;" EXIT
     date +%s > "$CUSTOM_EXECUTOR_QUEUE_LAST_ACTIVITY"
     export CE_QUEUE_PID="$BASHPID" # Debug
 

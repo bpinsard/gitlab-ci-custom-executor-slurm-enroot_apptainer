@@ -382,6 +382,41 @@ EOF
 }
 
 # bats test_tags=termination
+@test "run exits with error when slurm job out of time." {
+    # shellcheck disable=SC2030,SC2031
+    export SYSTEM_FAILURE_EXIT_CODE=102
+    # shellcheck disable=SC1091,SC2031
+    source "$CE_QUEUE_WORKSPACE/.env"
+    # shellcheck source=./src/custom_executor_queue.sh
+    source "$SRC/custom_executor_queue.sh"
+
+    # shellcheck disable=SC2030
+    STEP="${STEPS_IN_CONTAINER[0]}"
+cat << EOF > script-"$STEP".sh
+
+sleep 100
+
+EOF
+    chmod +x ./script-"$STEP".sh
+
+    echo "Testing $STEP"
+
+    (
+    sleep 5
+    out_of_time_stop
+    ) &
+
+    run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
+
+    assert_failure
+    assert_equal "$status" "$SYSTEM_FAILURE_EXIT_CODE"
+    assert_line "Slurm job ran out of time! Exiting."
+
+
+}
+
+
+# bats test_tags=termination
 @test "run exits with error when slurm job has terminated, but script (in container) has not." {
     # shellcheck disable=SC2030,SC2031
     export SYSTEM_FAILURE_EXIT_CODE=102
@@ -403,9 +438,7 @@ EOF
 
     (
     sleep 5
-    # Terminating the
-    stop_custom_executor_queue
-    touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
+    emergency_stop
     ) &
 
     run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
@@ -440,8 +473,7 @@ EOF
     (
     sleep 5
     # Terminating the
-    stop_custom_executor_queue
-    touch "$CUSTOM_ENV_CI_WS/cews_$CUSTOM_ENV_CI_JOB_ID"/terminated
+    emergency_stop
     ) &
 
     run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"
@@ -476,8 +508,7 @@ EOF
     (
     sleep 20 # Very large for safety
     # Terminating the whole queue
-    stop_custom_executor_queue
-    touch "$CUSTOM_ENV_CI_WS/cews_0"/terminated
+    emergency_stop
     ) &
 
     run "$SRC"/run.sh enroot useslurm ./script-"$STEP".sh "$STEP"

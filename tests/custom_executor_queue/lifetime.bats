@@ -201,6 +201,36 @@ teardown(){
 
 }
 
+@test "when killed with SIGUSR1 should signal out of time" {
+
+    LOGFILE="$WORKDIR"/log.txt
+
+    (start_custom_executor_queue "$WORKDIR" 3> /dev/null)
+    # shellcheck disable=SC1091
+    source "$WORKDIR"/.env
+
+    wait_until_file_contains "$LOGFILE" "Starting custom executor queue." 20
+    kill -s SIGUSR1 "$CUSTOM_EXECUTOR_QUEUE_PID"
+    # killing might take a while, but not forever
+    declare -i count
+    count=0
+    while custom_executor_queue_is_alive && [ "$count" -lt 40 ]
+    do
+        sleep 1
+        count=$((count+1))
+    done
+    if custom_executor_queue_is_alive
+    then
+        echo "custom executor queue refuses to die"
+    fi
+    wait_until_file_contains "$LOGFILE" "Received signal meaning OUT OF TIME" 20
+
+    assert_exists "$WORKDIR/slurm-out-of-time"
+
+
+
+
+}
 
 # bats test_tags=ce_termination
 @test "custom executor queue should die gracefully when killed with SIGTERM and print a message" {
