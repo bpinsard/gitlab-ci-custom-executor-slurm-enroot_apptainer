@@ -235,14 +235,17 @@ function submit_to_custom_executor_queue_and_wait() {
        if [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated" ]
        then
            echo "Abnormal termination of Custom Executor Queue, exiting."
-           exit "$SYSTEM_FAILURE_EXIT_CODE"
+           local FAILED=1
        fi
        if [ -f  "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/slurm-out-of-time" ]
        then
            echo "Slurm job ran out of time! Exiting."
+           local FAILED=1
+       fi
+       if [ -v FAILED ]
+       then
            exit "$SYSTEM_FAILURE_EXIT_CODE"
        fi
-
     fi
 
     TIME="$(date +"%s")"
@@ -301,6 +304,7 @@ function stop_all () {
 
 function emergency_stop () {
     stop_all
+    _log "Emergency stop"
     touch "$CUSTOM_EXECUTOR_QUEUE_WORKSPACE/terminated"
     exit 0
 }

@@ -226,9 +226,7 @@ teardown(){
     wait_until_file_contains "$LOGFILE" "Received signal meaning OUT OF TIME" 20
 
     assert_exists "$WORKDIR/slurm-out-of-time"
-
-
-
+    assert_not_exists "$WORKDIR/terminated"
 
 }
 
