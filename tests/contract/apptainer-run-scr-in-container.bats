@@ -45,7 +45,7 @@ function teardown() {
 }
 
 
-# bats test_tags=pull,serial,skipped-local
+# bats test_tags=pull,serial,skipped-local,slurmalloc
 @test "apptainer pull runs on the compute node, accept name for output image file and uses cache" {
 
     # shellcheck disable=SC2031
@@ -62,7 +62,7 @@ function teardown() {
 
 }
 
-# bats test_tags=run,serial,skipped-local
+# bats test_tags=run,serial,skipped-local,slurmalloc
 @test "apptainer executes file in PWD with --bind (exec no salloc)" {
     # we need an allocation for this, unfortunately.
     srun --time 5 \
@@ -95,7 +95,7 @@ EOF
 
 }
 
-# bats test_tags=run,serial,skipped-local
+# bats test_tags=run,serial,skipped-local,slurmalloc
 @test "apptainer sees PWD" {
     # we need an allocation for this, unfortunately.
     srun --time 5 \
@@ -109,7 +109,7 @@ EOF
 
 }
 
-# bats test_tags=run,serial,skipped-local
+# bats test_tags=run,serial,skipped-local,slurmalloc
 @test "apptainer scripts able to write on the host without --writable" {
     # we need an allocation for this, unfortunately.
     srun --time 5 \
@@ -141,7 +141,7 @@ EOF
 
 }
 
-# bats test_tags=coverage-problematic,skipped-local,nohang
+# bats test_tags=coverage-problematic,skipped-local,nohang,slurmalloc
 @test "apptainer mounts single file in container and executes it without problems" {
 
     # we need an allocation for this, unfortunately.
@@ -165,7 +165,7 @@ EOF
 
 }
 
-# bats test_tags=coverage-problematic,skipped-local,nohang
+# bats test_tags=coverage-problematic,skipped-local,nohang,slurmalloc
 @test "apptainer mounts directory and single file in directory in container and executes it without problems" {
 
     # we need an allocation for this, unfortunately.

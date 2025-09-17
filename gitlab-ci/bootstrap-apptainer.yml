@@ -18,22 +18,39 @@ apptainer-unit-test-parallel-test-deploy:
       junit: test_report_parallel_no_skipped_local.xml
 
 
-apptainer-unit-test-critical-test-deploy:
+apptainer-unit-test-critical-noslurmalloc-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   stage: test-deploy-serial-apptainer
   script:
-    - make test_report_critical.xml 
+    - make test_report_critical_noslurmalloc.xml
   tags:
     - slurm
     - apptainer
   artifacts:
     when: always
     paths:
-      - test_report_critical.xml 
+      - test_report_critical_noslurmalloc.xml
     reports:
-      junit: test_report_critical.xml 
+      junit: test_report_critical_noslurmalloc.xml
+
+apptainer-unit-test-critical-slurmalloc-test-deploy:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  stage: test-deploy-serial-apptainer
+  script:
+    - make test_report_critical_slurmalloc.xml
+  tags:
+    - noslurm
+    - apptainer
+  artifacts:
+    when: always
+    paths:
+      - test_report_critical_slurmalloc.xml
+    reports:
+      junit: test_report_critical_slurmalloc.xml
 
 
 apptainer-lint-test-deploy:

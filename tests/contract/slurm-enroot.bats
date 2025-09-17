@@ -41,7 +41,7 @@ function teardown() {
     rm -rf "$TEST_PLAYGROUND"
 }
 
-# bats test_tags=serial,skipped-local
+# bats test_tags=serial,skipped-local,slurmalloc
 @test "srun --container-image runs in a container (with the right mount options)" {
     on_horeka || skip
     GET_DISTRONAME=(grep PRETTY /etc/os-release)

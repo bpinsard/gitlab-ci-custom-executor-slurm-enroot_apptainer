@@ -13,15 +13,23 @@ test_report_parallel_no_skipped_local.xml:
 	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags '!serial,!skipped-local' tests/* > test_report_parallel_no_skipped_local.xml
 
 test_report_critical.xml:
-	./tests/bats/bin/bats --formatter junit --filter-tags 'serial' --filter-tags 'skipped-local'  $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) > test_report_critical.xml
+	./tests/bats/bin/bats --formatter junit \
+		--filter-tags 'serial,skipped-local'  $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) > test_report_critical.xml
 
+test_report_critical_noslurmalloc.xml:
+	./tests/bats/bin/bats --formatter junit \
+		--filter-tags 'serial,skipped-local,!slurmalloc' \
+		$$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) \
+		> test_report_critical_noslurmalloc.xml
+
+test_report_critical_slurmalloc.xml:
+	./tests/bats/bin/bats --formatter junit \
+		--filter-tags 'serial,skipped-local,slurmalloc' \
+		$$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks) \
+		> test_report_critical_slurmalloc.xml
 # Test that can fail
 test_report_optionals.xml:
 	./tests/bats/bin/bats --jobs $(JOBS) --formatter junit --filter-tags !serial tests/mocks  > test_report_optionals.xml
-
-
-# These targets are provided for convenience
-# to run just a directory-based subset of tests.
 
 test-configure-include:
 	./tests/bats/bin/bats --jobs $(JOBS) -T tests/configure-slurm/include.bats

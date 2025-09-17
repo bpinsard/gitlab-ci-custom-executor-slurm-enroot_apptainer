@@ -17,23 +17,56 @@ unit-test-parallel-test-deploy:
       junit: test_report_parallel_no_skipped_local.xml
 
 
-unit-test-critical-test-deploy:
+unit-test-critical-noslurmalloc-test-deploy:
   dependencies: []
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
     JOB_TIME_SEC: 3600
   stage: test-deploy-serial-none
   script:
-    - make test_report_critical.xml
+    - make test_report_critical_noslurmalloc.xml
   tags:
     - slurm
     - nocontainer
   artifacts:
     when: always
     paths:
-      - test_report_critical.xml
+      - test_report_critical_noslurmalloc.xml
     reports:
-      junit: test_report_critical.xml
+      junit: test_report_critical_noslurmalloc.xml
+
+unit-test-critical-slurmalloc-test-deploy:
+  dependencies: []
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    JOB_TIME_SEC: 3600
+  stage: test-deploy-serial-none
+  script:
+    - make test_report_critical_slurmalloc.xml
+  tags:
+    - nocontainer
+    - noslurm
+  artifacts:
+    when: always
+    paths:
+      - test_report_critical_slurmalloc.xml
+    reports:
+      junit: test_report_critical_slurmalloc.xml
+
+
+unit-test-critical-test-deploy-show:
+  needs:
+    - job: unit-test-critical-test-deploy
+  when: on_failure
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    JOB_TIME_SEC: 3600
+  stage: test-deploy-serial-none
+  script:
+	- ./tests/bats/bin/bats --filter-tags 'serial' --filter-tags 'skipped-local'  $$(find tests/ -maxdepth 1 -mindepth 1 -not -name mocks)
+  tags:
+    - slurm
+    - nocontainer
 
 
 lint-test-deploy:
