@@ -16,7 +16,9 @@ unit-test-parallel-test-deploy:
     reports:
       junit: test_report_parallel_no_skipped_local.xml
 
-
+# Tests that do not depend on slurm
+# can be run in a slurm allocation
+# (Runner on compute node)
 unit-test-critical-noslurmalloc-test-deploy:
   dependencies: []
   variables:
@@ -35,6 +37,10 @@ unit-test-critical-noslurmalloc-test-deploy:
     reports:
       junit: test_report_critical_noslurmalloc.xml
 
+# Tests that depend on slurm
+# should not be run in a slurm allocation
+# which is time-limited
+# (Better run on a compute node)
 unit-test-critical-slurmalloc-test-deploy:
   dependencies: []
   variables:

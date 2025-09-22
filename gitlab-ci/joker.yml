@@ -7,7 +7,7 @@ joker:
     - enroot-unit-test-parallel-test-deploy
     - enroot-unit-test-critical-slurmalloc-test-deploy
     - unit-test-parallel-test-deploy
-    - unit-test-critical-test-deploy
+    - unit-test-critical-slurmalloc-test-deploy
   stage: bats-cleanup
   script:
     - make joker || true
