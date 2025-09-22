@@ -3,9 +3,9 @@ joker:
   dependencies: []
   needs:
     - apptainer-unit-test-parallel-test-deploy
-    - apptainer-unit-test-critical-test-deploy
+    - apptainer-unit-test-critical-slurmalloc-test-deploy
     - enroot-unit-test-parallel-test-deploy
-    - enroot-unit-test-critical-test-deploy
+    - enroot-unit-test-critical-slurmalloc-test-deploy
     - unit-test-parallel-test-deploy
     - unit-test-critical-test-deploy
   stage: bats-cleanup
