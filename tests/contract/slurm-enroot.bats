@@ -51,12 +51,12 @@ function teardown() {
         -n 1 -t 1 \
         "${GET_DISTRONAME[@]}"
 
-    refute_output --partial "Alpine Linux"
+    refute_output --partial "Ubuntu"
 
     # From: https://www.nhr.kit.edu/userdocs/horeka/containers/#start-directly-via-pyxis
     # Running inside a container (on a compute node)
     run srun -p "$SLURM_DEFAULT_PARTITION" \
-        --container-image=alpine:latest \
+        --container-image=ubuntu:latest \
         --container-mounts=/etc/slurm/task_prolog:/etc/slurm/task_prolog,/scratch:/scratch,/usr/lib64/slurm/libslurmfull.so,/usr/lib64/libhwloc.so.15 \
         -n 1 -t 1 \
         "${GET_DISTRONAME[@]}"
@@ -70,6 +70,6 @@ function teardown() {
         echo "# - 'slurmstepd: error: pyxis: failed to import docker image'" >&3
         echo "# this is why we do not use pyxis." >&3
     else
-        assert_output --partial "Alpine Linux"
+        assert_output --partial "Ubuntu"
     fi
 }
