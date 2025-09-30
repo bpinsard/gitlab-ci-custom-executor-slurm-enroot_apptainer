@@ -149,6 +149,53 @@ function get_job_start_time(){
     fi
 }
 
+
+function check_job_state(){
+    local JOBID=$1
+    sacct --parsable --job "$JOBID" -X --brief | tail -n 1 | cut -d'|' -f2
+}
+
+function react_on_job_state(){
+    local JOB_STATE="$1"
+    local JOB_ID="$2"
+    local STDOUT_FILE="$HOME/cetest$JOB_ID.out"
+    local STDERR_FILE="$HOME/cetest$JOB_ID.err"
+
+    function printinfo(){
+        echo "Please have a look at the files:" >&2
+        echo " - $STDOUT_FILE" >&2
+        echo " - $STDERR_FILE" >&2
+    }
+
+    case "$JOB_STATE" in
+        COMPLETED)
+            echo "Slurm Job $JOB_ID has unexpectetly already completed, aborting..." >&2
+            printinfo
+           exit 1
+            ;;
+        FAILED)
+            echo "Slurm Job $JOB_ID has unexpectedly already completed and has failed, aborting..." >&2
+            printinfo
+            exit 1
+            ;;
+        PENDING)
+            echo "Slurm Job $JOB_ID is still pending, waiting..." >&2
+            ;;
+        RUNNING)
+            echo "Slurm Job $JOB_ID is running, CI job should start shortly..." >&2
+            ;;
+        TIMEOUT)
+            echo "Slurm Job $JOB_ID has unexpectedly already completed and timed out, aborting...";
+            printinfo
+            exit 1
+            ;;
+        *)
+            echo "Slurm Job is still in an unknown state...";
+            ;;
+    esac
+}
+
+
 function wait_for_job_to_be_ready(){
     local JOB_ID="$1"
     local OLD_START_TIME=""
@@ -167,8 +214,10 @@ function wait_for_job_to_be_ready(){
             if [ "$STARTTIME" == "" ]
             then
                 echo "Error in finding the job start time:" >&2
-                echo sacct -j "$JOB_ID" >&2
-                sacct -j "$JOB_ID" >&2
+                echo "sacct --job $JOB_ID -X --brief" >&2
+                sacct --job "$JOB_ID" -X --brief >&2
+                JOB_STATE="$(check_job_state "$JOB_ID")"
+                react_on_job_state "$JOB_STATE" "$JOB_ID"
             fi
         fi
     done
