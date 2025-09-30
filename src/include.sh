@@ -29,7 +29,7 @@ function validate_containerisation_backend(){
 function echo_verbose() {
     if [ "${CUSTOM_ENV_CE_DEBUG_LVL:-0}" -gt 0 ]
     then
-        echo "$@"
+        echo "$(date +"[%y-%m-%d T %H:%M:%S] - ")" "$@"
     fi
 }
 
