@@ -378,8 +378,11 @@ function create_new_slurm_workspace(){
 
     echo "[CONFIGURE] Submitted job $JOB_ID ..." >&2
     wait_for_job_to_be_ready "$JOB_ID"
+    echo_verbose "[CONFIGURE] $JOB_ID is ready, waiting for $WORKSPACE/.env to appear" >&2
     wait_until_file_exists "$WORKSPACE/.env" 90
+    echo_verbose "[CONFIGURE] file $WORKSPACE/.env appeared" >&2
 
+    echo_verbose "[CONFIGURE] Saving slurm environment in $WORKSPACE/slurmenv ..." >&2
     print_slurm_environment > "$WORKSPACE/slurmenv"
     echo_verbose "[CONFIGURE] Configured workspace in $WORKSPACE" >&2
     echo "$WORKSPACE"
