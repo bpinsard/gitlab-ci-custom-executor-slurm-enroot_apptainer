@@ -94,9 +94,13 @@ function get_sbatch_command(){
                    --error=/dev/null
     	      )
     else
+        local STDOUT_FILE="$HOME/cetest%J.out"
+        local STDERR_FILE="$HOME/cetest%J.err"
+        echo_verbose "   Output file: $STDOUT_FILE " >&2
+        echo_verbose "   Error file: $STDERR_FILE " >&2
         COMMAND+=( --input=/dev/null
-                   --output=/home/hk-project-scs/%u/cetest%J.out
-                   --error=/home/hk-project-scs/%u/cetest%J.err
+                   --output="$STDOUT_FILE"
+                   --error="$STDERR_FILE"
         )
     fi
     set -o nounset
