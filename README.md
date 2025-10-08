@@ -142,6 +142,20 @@ in the `tags:` section of the job definition
 in the CI/CD configuration file 
 (i.e., typically, `.gitlab-ci.yml`).
 
+#### Important: timeouts and Slurm allocations 
+
+If the executor is configured to use a slurm allocation 
+to run the CI jobs,
+and if the slurm allocation takes more than 
+a certain amount of time 
+to start,
+then `gitlab-runner` will terminate the executor.
+This amount of time is set 
+in the configuration file of the runner
+(usually, `~/.gitlab-runner/config.toml`)
+with the *config_exec_timeout* parameter
+(defined specifically for each registered runner).
+
 #### Important: Allowed GitLab users for an executor
 
 Since the GitLab runner process 
