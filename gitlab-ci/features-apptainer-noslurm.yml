@@ -98,5 +98,5 @@ apptainer-writable-tmpfs-fakeroot-test-noslurm:
     APPTAINER_EXEC_OPTIONS: "--writable-tmpfs --fakeroot"
   script:
     - apt update
-    - echo y | apt install rolldice # Smallest apt package
-    - echo y | apt remove rolldice
+    - apt install -y rolldice # Smallest apt package
+    - apt remove -y rolldice
