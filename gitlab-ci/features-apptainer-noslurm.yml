@@ -86,3 +86,17 @@ apptainer-writable-tmpfs-test-noslurm:
     - cd /
     - touch a-file
     - rm a-file
+
+apptainer-writable-tmpfs-fakeroot-test-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  image: docker://ubuntu:latest
+  tags:
+    - noslurm
+    - apptainer
+  variables:
+    APPTAINER_EXEC_OPTIONS: "--writable-tmpfs --fakeroot"
+  script:
+    - apt update
+    - echo y | apt install rolldice # Smallest apt package
+    - echo y | apt remove rolldice
