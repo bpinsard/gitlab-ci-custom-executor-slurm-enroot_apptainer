@@ -72,3 +72,17 @@ apptainer-exec-options-test-noslurm:
   script:
     - echo $THEANSWER
     - test $THEANSWER -eq 42
+
+apptainer-writable-tmpfs-test-noslurm:
+  dependencies: []
+  stage: test-deploy-noslurm
+  image: docker://debian:latest
+  tags:
+    - noslurm
+    - apptainer
+  variables:
+    APPTAINER_EXEC_OPTIONS: "--writable-tmpfs"
+  script:
+    - cd /
+    - touch a-file
+    - rm a-file
