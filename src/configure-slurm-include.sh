@@ -376,6 +376,8 @@ function create_new_slurm_workspace(){
                      "$CUSTOM_ENV_COMMAND_OPTIONS_SBATCH" \
                      "$JOBSLURM")")
 
+    [ -n "$JOB_ID" ] || exit "$SYSTEM_FAILURE_EXIT_CODE"
+
     echo "[CONFIGURE] Submitted job $JOB_ID ..." >&2
     wait_for_job_to_be_ready "$JOB_ID"
     echo_verbose "[CONFIGURE] $JOB_ID is ready, waiting for $WORKSPACE/.env to appear" >&2
