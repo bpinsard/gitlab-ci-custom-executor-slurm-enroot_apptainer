@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VALIDATED_AGAINST_GITLAB_RUNNER_VERSION_MAJOR_MINOR=18.0
+VALIDATED_AGAINST_GITLAB_RUNNER_VERSION_MAJOR_MINOR=19.3
 
 set -o errexit
 set -o nounset
@@ -247,12 +247,12 @@ then
         URL="$URL_DEFAULT"
     fi
 fi
-if [ -z "$REGISTRATION_TOKEN" ] 
+if [ -z "$REGISTRATION_TOKEN" ]
 then
 	echo "Registration Token:"
 	read -r REGISTRATION_TOKEN
 fi
-if [ -z "$NAME" ] 
+if [ -z "$NAME" ]
 then
 	echo "Name or description:"
 	read -r NAME

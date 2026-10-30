@@ -8,6 +8,7 @@ if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
 set -o nounset
 set -o errexit
 set -o pipefail
+shopt -s inherit_errexit
 
 BACKEND="$1"
 USESLURM="$2"
@@ -33,6 +34,11 @@ then
     mkdir -p "$CI_BUILDS_DIR"
 
     WORKSPACE=$(determine_slurm_workspace "${CUSTOM_ENV_JOB_TIME_SEC:-600}" "${CUSTOM_ENV_REUSE_WORKSPACE:-ON}" )
+    if [[ -z "$WORKSPACE" ]]
+    then
+        echo "[CONFIGURE] Error: could not determine a slurm workspace." >&2
+        exit "$SYSTEM_FAILURE_EXIT_CODE"
+    fi
     print_json_output_slurm "$CI_BUILDS_DIR" "$WORKSPACE"
 fi
 
