@@ -316,7 +316,15 @@ function create_job_slurm(){
     TIME_LIMIT_SLURM="$(slurm_time_limit_from_seconds "$TIME_LIMIT_SEC")"
     local OUTDIR="$4"
 
-    sed 's/%CUSTOM_ENV_DEFAULT_PARTITION%/'"$DEFAULT_PARTITION"'/' "$TEMPLATE" | \
+    # Without a default partition, drop the directive
+    # and let slurm choose its own default.
+    local PARTITION_SED='s/%CUSTOM_ENV_DEFAULT_PARTITION%/'"$DEFAULT_PARTITION"'/'
+    if [[ -z "$DEFAULT_PARTITION" ]]
+    then
+        PARTITION_SED='/^#SBATCH --partition %CUSTOM_ENV_DEFAULT_PARTITION%$/d'
+    fi
+
+    sed "$PARTITION_SED" "$TEMPLATE" | \
     sed 's/%CUSTOM_ENV_TIME%/'"$TIME_LIMIT_SLURM"'/' \
         > "$OUTDIR/job.slurm"
 
@@ -358,7 +366,7 @@ function create_new_slurm_workspace(){
     echo "[CONFIGURE] Creating workspace $WORKSPACE ..." >&2
 
     JOBSLURM="$(create_job_slurm "$SRC/job.slurm.template" \
-                                 "$CUSTOM_ENV_DEFAULT_PARTITION" \
+                                 "${CUSTOM_ENV_DEFAULT_PARTITION:-}" \
                                  "$(("$JOB_TIME_SEC" * 2))" \
                                  "$WORKSPACE")"
 
