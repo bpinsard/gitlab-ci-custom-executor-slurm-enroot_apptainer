@@ -32,5 +32,6 @@ then
     "${COMMAND[@]}" || {
         echo "ERROR: command failed: ${COMMAND[*]}";
         echo "       Image pull failed";
+        exit 1
         }
 fi

@@ -101,7 +101,20 @@ EOF
     echo_verbose "==========================" >&2
     cat_verbose <(grep -vi "PASSWORD\|USERNAME" "$WRAP") >&2
     echo_verbose "==========================" >&2
-    if [[ "$USESLURM" == "useslurm" ]]
+    set +o nounset
+    PREFETCH_ON_LOGIN_NODE="${CUSTOM_ENV_PREFETCH_ON_LOGIN_NODE:-0}"
+    set -o nounset
+
+    if [[ "$USESLURM" == "useslurm" ]] &&
+       [[ "$CONTAINERISATION_BACKEND" == "apptainer" ]] &&
+       [[ "$PREFETCH_ON_LOGIN_NODE" == "1" ]]
+    then
+        # The compute nodes might have no internet access:
+        # pull the image here, on the node where the runner lives.
+        # The image is stored in CI_WS, shared with the compute nodes.
+        echo_verbose "[PREPARE] PREFETCH_ON_LOGIN_NODE=1: pulling image on this node." >&2
+        "$WRAP" "JOB_$CUSTOM_ENV_CI_JOB_ID"
+    elif [[ "$USESLURM" == "useslurm" ]]
     then
         # shellcheck source=./src/custom_executor_queue.sh
         source "$SRC/custom_executor_queue.sh"

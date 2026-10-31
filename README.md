@@ -318,6 +318,15 @@ Use one of the numerous alternatives.**
 
 #### Apptainer
 
+If the Slurm compute nodes have no internet access,
+set the CI/CD variable `PREFETCH_ON_LOGIN_NODE=1`.
+The image is then pulled by `apptainer`
+on the machine hosting the runner, instead of inside the Slurm allocation.
+The image is stored in `CI_WS`,
+which must be reachable from the compute nodes.
+This is supported only for the apptainer backend.
+
+
 Apptainer [can use](https://apptainer.org/docs/user/latest/docker_and_oci.html#environment-variables)
 the `APPTAINER_DOCKER_USERNAME`
 and `APPTAINER_DOCKER_PASSWORD` environment variables.
