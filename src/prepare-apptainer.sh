@@ -23,10 +23,19 @@ set -o nounset
 
 if [[ -z "$CUSTOM_ENV_IMAGEFILE" ]] || [[ ! -e "$CUSTOM_ENV_IMAGEFILE" ]]
 then
+    # GitLab's `image:` is a bare docker reference (e.g. alpine:latest),
+    # while apptainer needs an explicit transport.
+    IMAGE_REF="$CUSTOM_ENV_CI_JOB_IMAGE"
+    if [[ ! "$IMAGE_REF" =~ ^(docker|oras|library|shub|http|https)://  ]] &&
+       [[ ! "$IMAGE_REF" =~ ^(docker-archive|docker-daemon|oci|oci-archive|sif|dir): ]]
+    then
+        IMAGE_REF="docker://$IMAGE_REF"
+    fi
+
     COMMAND=(apptainer
              pull
              "$CE_IMAGEFILE"
-             "$CUSTOM_ENV_CI_JOB_IMAGE")
+             "$IMAGE_REF")
 
     echo_verbose "[PREPARE] Command: ${COMMAND[*]}" >&2
     "${COMMAND[@]}" || {
